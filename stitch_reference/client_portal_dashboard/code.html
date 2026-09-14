@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"secondary-fixed-dim":"#e6c364","on-tertiary-fixed-variant":"#424844","on-secondary-fixed-variant":"#584400","error":"#ba1a1a","tertiary":"#1c221f","on-surface-variant":"#424843","surface-dim":"#dbdad7","inverse-on-surface":"#f1f1ee","secondary-fixed":"#ffe08f","on-tertiary":"#ffffff","surface-bright":"#faf9f6","on-tertiary-fixed":"#171d1a","secondary-container":"#fed977","on-primary-container":"#82a78f","tertiary-container":"#313733","primary-container":"#1a3c2a","surface-container":"#efeeeb","tertiary-fixed-dim":"#c2c8c3","on-error-container":"#93000a","primary":"#022616","on-primary":"#ffffff","on-tertiary-container":"#9aa09b","surface":"#faf9f6","on-secondary-container":"#785d00","surface-container-high":"#e9e8e5","outline-variant":"#c1c8c1","surface-container-highest":"#e3e2e0","primary-fixed":"#c5ecd2","on-primary-fixed-variant":"#2c4e3a","outline":"#727973","primary-fixed-dim":"#a9cfb6","inverse-primary":"#a9cfb6","secondary":"#755b00","surface-tint":"#436651","error-container":"#ffdad6","surface-container-lowest":"#ffffff","on-secondary":"#ffffff","surface-variant":"#e3e2e0","surface-container-low":"#f4f3f1","tertiary-fixed":"#dee4df","on-background":"#1a1c1a","background":"#faf9f6","on-primary-fixed":"#002112","on-error":"#ffffff","on-surface":"#1a1c1a","inverse-surface":"#2f312f","on-secondary-fixed":"#241a00"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-3xs":"0.125rem","space-sm":"0.75rem","space-xs":"0.5rem","margin":"1rem","space-3xl":"4rem","space-2xl":"3rem","gutter-lg":"1.5rem","margin-lg":"2rem","gutter":"1rem","space-md":"1rem","space-lg":"1.5rem","space-xl":"2rem","margin-md":"1.5rem","space-2xs":"0.25rem"},"fontFamily":{"label-md":["Inter"],"headline-md":["Inter"],"headline-lg":["Inter"],"code-sm":["JetBrains Mono"],"headline-sm":["Inter"],"code-md":["JetBrains Mono"],"body-lg":["Inter"],"display":["Inter"],"headline-lg-mobile":["Inter"],"body-md":["Inter"],"body-sm":["Inter"],"label-sm":["Inter"]},"fontSize":{"label-md":["0.8125rem",{"lineHeight":"1.125rem","letterSpacing":"0.01em","fontWeight":"500"}],"headline-md":["1.25rem",{"lineHeight":"1.75rem","letterSpacing":"-0.015em","fontWeight":"600"}],"headline-lg":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.02em","fontWeight":"600"}],"code-sm":["0.6875rem",{"lineHeight":"1rem","letterSpacing":"0em","fontWeight":"500"}],"headline-sm":["1rem",{"lineHeight":"1.5rem","letterSpacing":"-0.01em","fontWeight":"600"}],"code-md":["0.8125rem",{"lineHeight":"1.25rem","letterSpacing":"-0.01em","fontWeight":"400"}],"body-lg":["1rem",{"lineHeight":"1.625rem","letterSpacing":"-0.005em","fontWeight":"400"}],"display":["2.25rem",{"lineHeight":"2.75rem","letterSpacing":"-0.025em","fontWeight":"600"}],"headline-lg-mobile":["1.375rem",{"lineHeight":"1.75rem","letterSpacing":"-0.015em","fontWeight":"600"}],"body-md":["0.875rem",{"lineHeight":"1.375rem","letterSpacing":"0em","fontWeight":"400"}],"body-sm":["0.75rem",{"lineHeight":"1.125rem","letterSpacing":"0em","fontWeight":"400"}],"label-sm":["0.6875rem",{"lineHeight":"1rem","letterSpacing":"0.03em","fontWeight":"600"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-[0_1px_8px_rgba(17,23,20,0.04)]"><div class="h-16 w-full px-gutter-lg flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-xs"><img alt="Brand logo. - Primary color: #1a3c2a
+- Font: inter
+- Mode: light
+- Roundness: rounded-sm
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XDCvcMumfuKw0N2xQRpeBOPM7Ecnp7MQP4LBHgH46kFr6V1vSC4gTEB3oyajqX4M4Zw9J5fjGGIaalzcTFAxxk1wea3wlO4CevUvgkMiGWWw3nb4JOd8WcDOFvtyoFjVAKuPBfwJuHXEsLVG-_-xg2qANr--ZWvx3OQDf-EXXJcCwChtgOnXq0_SCrpR0Am3xhLev8XLPHGJvP3RR9m-Md9xT_Iy9-9Ox0vnhNFnydd_MbtsFjq3rDEfU"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-primary tracking-tight">Quire Legal</span><span class="font-code-sm text-code-sm text-on-surface-variant uppercase">Client Portal</span></div></div><nav class="hidden lg:flex items-center gap-space-2xs" data-active-classes="bg-primary-container text-on-primary font-label-md"><a aria-current="page" class="px-space-sm py-space-xs rounded transition-colors bg-primary-container text-on-primary font-label-md" data-path="dashboard" href="#">Dashboard</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="my-matters" href="#">My Matters</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="documents" href="#">Documents</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="messages" href="#">Messages</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="invoices-and-payments" href="#">Invoices &amp; Payments</a></nav></div><div class="flex items-center gap-space-md"><button class="relative p-space-xs rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span></button><button class="hidden sm:inline-flex items-center gap-space-xs px-space-sm py-space-xs rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container-high hover:text-on-surface transition-colors shadow-[0_1px_3px_rgba(17,23,20,0.04)]" type="button"><span class="material-symbols-outlined text-[16px] text-primary">support_agent</span><span class="font-label-md text-label-md">Contact Legal Team</span></button><div class="flex items-center gap-space-xs pl-space-xs py-space-2xs pr-space-xs rounded bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div class="hidden md:flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface leading-tight">David Castellan</span><span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Castellan Property Group</span></div><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></div></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<!-- Interactive Modal Container for Quick Uploads -->
+<div class="fixed inset-0 z-50 hidden items-center justify-center bg-tertiary/40 backdrop-blur-sm p-space-md" id="upload-modal">
+<div class="w-full max-w-lg bg-surface-container-lowest rounded-xl shadow-xl p-space-xl flex flex-col gap-space-md animate-in fade-in zoom-in-95 duration-150">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[24px]">cloud_upload</span>
+<h3 class="font-headline-md text-headline-md text-primary">Upload Client Documents</h3>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface p-space-2xs rounded" onclick="document.getElementById('upload-modal').classList.add('hidden')" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+        Files are instantly encrypted with AES-256 and stamped into matter <span class="font-code-sm text-code-sm text-primary font-semibold">HO-2026-0042</span> under legal privilege.
+      </p>
+<div class="p-space-xl bg-surface-container-low rounded-lg flex flex-col items-center justify-center text-center cursor-pointer hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary text-[36px] mb-space-2xs">upload_file</span>
+<span class="font-label-md text-label-md text-on-surface">Click to select files or drag and drop</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant mt-space-3xs">PDF, DOCX, TIFF up to 50MB</span>
+</div>
+<div class="flex justify-end gap-space-sm mt-space-2xs">
+<button class="px-space-md py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors" onclick="document.getElementById('upload-modal').classList.add('hidden')" type="button">Cancel</button>
+<button class="px-space-md py-space-xs rounded font-label-md text-label-md bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-sm" onclick="alert('Document safely uploaded &amp; encrypted for Margaret Chen.'); document.getElementById('upload-modal').classList.add('hidden')" type="button">Submit Document</button>
+</div>
+</div>
+</div>
+<div class="w-full max-w-7xl mx-auto px-gutter sm:px-gutter-lg py-space-lg flex flex-col gap-space-lg">
+<!-- Top Editorial Header & Attorney Contact Badge -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md pb-space-xs">
+<div class="flex flex-col gap-space-2xs max-w-2xl">
+<div class="flex items-center gap-space-xs">
+<span class="font-code-sm text-code-sm uppercase tracking-wider text-primary font-semibold">Matter Client Command</span>
+<span class="w-1.5 h-1.5 rounded-full bg-primary/40"></span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Castellan Property Group</span>
+</div>
+<h1 class="font-display text-display text-primary tracking-tight">Good afternoon, David</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+          Welcome to your secure client portal with Chen &amp; Sterling LLP. Here is the latest certified progress on your active legal matters.
+        </p>
+</div>
+<!-- Lead Counsel Direct Contact Card -->
+<div class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex items-center gap-space-md min-w-[300px]">
+<div class="relative">
+<img class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="Professional studio portrait of senior attorney Margaret Chen with warm editorial lighting, dark green tailored suit, confident and calm reassuring posture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCf0x1XZa5roLu76V0XOHlvmGwxOJdlOK505XHeYs9UrwcJUHOdHX1pIm7U8djRz3JBVWfG04NzrxLR41ON39pJeFDsXgcmDkzdxuaHStD_vg3rPEyora7nNonM6hanI7_1hgxJvJQEIfsqqMsUWP045900yjw7LlJ-H1JDk8hqLjFwKKdTv4MDtYMTHjBJHpp22AR5Vq3x4_4yqu72T65hyY2sJhNcBc3b9Q2bOsR74cNb3N9UNi-I"/>
+<span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#10b981] ring-2 ring-surface-container-lowest" title="Attorney Online"></span>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center gap-space-2xs">
+<span class="font-label-md text-label-md text-on-surface truncate">Margaret Chen</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">(Senior Partner)</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Lead Trial Counsel</span>
+<div class="flex items-center gap-space-xs mt-space-3xs">
+<a class="inline-flex items-center gap-space-3xs font-code-sm text-code-sm text-primary hover:underline" href="tel:4158904200">
+<span class="material-symbols-outlined text-[14px]">call</span>(415) 890-4200
+            </a>
+<span class="text-on-surface-variant text-code-sm">•</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Direct Secure Line</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Required Amber Notification Banner -->
+<div class="w-full bg-[#fdf9ef] rounded-xl shadow-sm p-space-md md:p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between flex-wrap gap-space-sm pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<div class="w-7 h-7 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-[18px]">notification_important</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-[#785d00]">Immediate Action Required (2 Items)</h2>
+<p class="font-body-sm text-body-sm text-[#584400]">Court and accounting statutory deadlines pending your review.</p>
+</div>
+</div>
+<span class="font-code-sm text-code-sm bg-secondary-fixed text-on-secondary-fixed px-space-xs py-space-3xs rounded font-medium">Privileged Docket Alerts</span>
+</div>
+<!-- Action Items Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<!-- Action Item 1: Document Request -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex flex-col justify-between gap-space-md hover:shadow-md transition-shadow">
+<div class="flex flex-col gap-space-2xs">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="inline-flex items-center gap-space-3xs font-label-sm text-label-sm px-space-xs py-space-3xs rounded-full bg-[#fef2f2] text-[#991b1b]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#dc2626]"></span> Due Oct 20, 2026 (5 days remaining)
+              </span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Requested by M. Chen</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mt-space-2xs">Document Request: Executed Lease Amendment &amp; Structural Survey</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Required for deposition readiness of Dr. Thorne. Please supply signed counterpart and municipal stamp survey scan.
+            </p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<div class="flex items-center gap-space-2xs text-on-surface-variant font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">verified_user</span>
+<span>AES-256 Vault Intake</span>
+</div>
+<button class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-all shadow-sm" onclick="document.getElementById('upload-modal').classList.remove('hidden')" type="button">
+<span class="material-symbols-outlined text-[16px]">upload</span>
+<span>Upload Document / Scan</span>
+</button>
+</div>
+</div>
+<!-- Action Item 2: Invoice Replenishment -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex flex-col justify-between gap-space-md hover:shadow-md transition-shadow">
+<div class="flex flex-col gap-space-2xs">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="inline-flex items-center gap-space-3xs font-label-sm text-label-sm px-space-xs py-space-3xs rounded-full bg-secondary-fixed text-on-secondary-fixed">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Due Oct 25, 2026
+              </span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Matter HO-2026-0042</span>
+</div>
+<div class="flex items-baseline justify-between mt-space-2xs">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Retainer Replenishment: Inv #INV-2026-088</h3>
+<span class="font-headline-md text-headline-md text-primary font-bold">$14,200.00</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Replenishment of litigation expert trust reserve for upcoming Q4 expert witness depositions and filings.
+            </p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<div class="flex items-center gap-space-2xs text-on-surface-variant font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">account_balance</span>
+<span>IOLTA Certified Trust</span>
+</div>
+<button class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded bg-surface-container-high text-on-surface font-label-md text-label-md hover:bg-surface-container-highest transition-all shadow-sm" onclick="alert('Redirecting to secure retainer checkout...')" type="button">
+<span class="material-symbols-outlined text-[16px]">receipt_long</span>
+<span>Review &amp; Pay Online</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Active Dossier Card: "Marsh v. Castellan Property Group" -->
+<div class="w-full bg-surface-container-lowest rounded-xl shadow-sm p-space-md md:p-space-lg flex flex-col gap-space-lg">
+<!-- Matter Dossier Header -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md pb-space-sm">
+<div class="flex flex-col gap-space-3xs">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-label-sm text-label-sm px-space-xs py-space-3xs rounded-full bg-[#ecfdf5] text-[#065f46] font-semibold flex items-center gap-space-3xs">
+<span class="w-2 h-2 rounded-full bg-[#059669] animate-pulse"></span> Active Litigation
+            </span>
+<span class="font-code-sm text-code-sm text-on-surface-variant px-space-xs py-space-3xs bg-surface-container rounded">Docket # HO-2026-0042</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Commercial Real Estate Litigation</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-primary tracking-tight mt-space-2xs">Marsh v. Castellan Property Group</h2>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-space-xs flex-wrap">
+<span>Presiding: <strong class="text-on-surface">Hon. Evelyn Keller</strong> (NY Supreme Court, Commercial Division)</span>
+<span>•</span>
+<span>Opposing Counsel: Vance &amp; Sterling PC</span>
+</p>
+</div>
+<!-- Next Major Court Milestone Callout -->
+<div class="bg-surface-container-low p-space-sm rounded-lg flex items-center gap-space-md min-w-[280px]">
+<div class="w-10 h-10 rounded-lg bg-primary-container text-on-primary flex flex-col items-center justify-center font-code-sm">
+<span class="text-[10px] uppercase font-bold leading-none">OCT</span>
+<span class="text-[15px] font-bold leading-none mt-0.5">17</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-semibold">Next Court Event</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Pre-Trial Evidentiary Conf.</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">9:30 AM • Room 402B • Margaret Chen attending</span>
+</div>
+</div>
+</div>
+<!-- 7-Stage Visual Case Lifecycle Progress Bar -->
+<div class="flex flex-col gap-space-sm pt-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Matter Lifecycle Velocity</span>
+<span class="font-code-sm text-code-sm text-primary font-semibold">Stage 3 of 7: Discovery &amp; Depositions (65% Completed)</span>
+</div>
+<!-- Visual Step Bar Grid -->
+<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-space-2xs">
+<!-- Stage 1 -->
+<div class="flex flex-col gap-space-2xs bg-surface-container-low p-space-xs rounded">
+<div class="h-1.5 w-full bg-[#10b981] rounded-full"></div>
+<div class="flex items-center gap-space-3xs">
+<span class="material-symbols-outlined text-[14px] text-[#10b981]">check_circle</span>
+<span class="font-code-sm text-code-sm font-semibold text-on-surface">1. Retention</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">Executed May 12</span>
+</div>
+<!-- Stage 2 -->
+<div class="flex flex-col gap-space-2xs bg-surface-container-low p-space-xs rounded">
+<div class="h-1.5 w-full bg-[#10b981] rounded-full"></div>
+<div class="flex items-center gap-space-3xs">
+<span class="material-symbols-outlined text-[14px] text-[#10b981]">check_circle</span>
+<span class="font-code-sm text-code-sm font-semibold text-on-surface">2. Pleadings</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">Answer Filed Jun 28</span>
+</div>
+<!-- Stage 3 (ACTIVE) -->
+<div class="flex flex-col gap-space-2xs bg-primary-container/10 p-space-xs rounded shadow-sm relative overflow-hidden">
+<div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden relative">
+<div class="h-full bg-primary rounded-full transition-all duration-500" style="width: 65%;"></div>
+</div>
+<div class="flex items-center gap-space-3xs">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+<span class="font-code-sm text-code-sm font-bold text-primary">3. Discovery</span>
+</div>
+<span class="font-body-sm text-body-sm text-primary font-medium text-[11px] leading-tight">Active In Progress</span>
+</div>
+<!-- Stage 4 -->
+<div class="flex flex-col gap-space-2xs bg-surface-container-low p-space-xs rounded opacity-60">
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full"></div>
+<div class="flex items-center gap-space-3xs">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">schedule</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">4. Settlement</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">Projected Nov 2026</span>
+</div>
+<!-- Stage 5 -->
+<div class="flex flex-col gap-space-2xs bg-surface-container-low p-space-xs rounded opacity-60">
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full"></div>
+<div class="flex items-center gap-space-3xs">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">schedule</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">5. Pre-Trial</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">Dec 2026</span>
+</div>
+<!-- Stage 6 -->
+<div class="flex flex-col gap-space-2xs bg-surface-container-low p-space-xs rounded opacity-60">
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full"></div>
+<div class="flex items-center gap-space-3xs">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">schedule</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">6. Trial</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">Q1 2027 Window</span>
+</div>
+<!-- Stage 7 -->
+<div class="flex flex-col gap-space-2xs bg-surface-container-low p-space-xs rounded opacity-60">
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full"></div>
+<div class="flex items-center gap-space-3xs">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">schedule</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">7. Judgment</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">Final Resolution</span>
+</div>
+</div>
+</div>
+<!-- Quick Docket Verification Strip -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-sm pt-space-xs bg-surface-container-low p-space-sm rounded-lg">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">folder_shared</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold leading-tight">18</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Shared Documents</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[20px]">pending_actions</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold leading-tight">1</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Pending Upload</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">account_balance</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold leading-tight">$45,000</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Verified Trust Escrow</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">mark_email_unread</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold leading-tight">1 Unread</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Counsel Message</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Asymmetric Two-Column Productivity Workspace -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- Left Column (60%): Documents & Direct Encrypted Communication -->
+<div class="lg:col-span-7 flex flex-col gap-space-lg">
+<!-- Documents Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md md:p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">description</span>
+<h3 class="font-headline-md text-headline-md text-primary">Recently Shared by Legal Team</h3>
+</div>
+<a class="font-label-md text-label-md text-primary hover:underline flex items-center gap-space-3xs font-semibold" href="#">
+              View All 18 Documents <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<!-- Document List Rows -->
+<div class="flex flex-col gap-space-xs">
+<!-- Doc 1 -->
+<div class="p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded bg-surface-container-highest flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate font-semibold">Joint_Discovery_Plan_Stamped.pdf</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Uploaded yesterday by J. Sterling • 2.4 MB</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<span class="hidden sm:inline-flex font-code-sm text-code-sm px-space-xs py-space-3xs rounded bg-[#ecfdf5] text-[#065f46]">Court Conformed</span>
+<button class="p-space-xs rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" onclick="alert('Downloading privileged document...')" type="button">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+</div>
+<!-- Doc 2 -->
+<div class="p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded bg-surface-container-highest flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate font-semibold">Expert_Deposition_Notice_DrThorne.pdf</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Uploaded Oct 12 by M. Chen • 1.1 MB</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<span class="hidden sm:inline-flex font-code-sm text-code-sm px-space-xs py-space-3xs rounded bg-secondary-fixed text-on-secondary-fixed">Action Item</span>
+<button class="p-space-xs rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" onclick="alert('Downloading privileged document...')" type="button">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+</div>
+<!-- Doc 3 -->
+<div class="p-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded bg-surface-container-highest flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">receipt</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate font-semibold">Retainer_Escrow_Receipt_Oct.pdf</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Uploaded Oct 02 by Client Accounts • 410 KB</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<span class="hidden sm:inline-flex font-code-sm text-code-sm px-space-xs py-space-3xs rounded bg-surface-container-highest text-on-surface-variant">Trust Verified</span>
+<button class="p-space-xs rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" onclick="alert('Downloading privileged document...')" type="button">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Secure Privilege Encrypted Messages Preview -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md md:p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">lock</span>
+<h3 class="font-headline-md text-headline-md text-primary">Privileged Client Channel</h3>
+</div>
+<span class="font-code-sm text-code-sm text-[#065f46] bg-[#ecfdf5] px-space-xs py-space-3xs rounded font-semibold">
+              End-to-End Encrypted
+            </span>
+</div>
+<!-- Message Exchange History Snippet -->
+<div class="p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Margaret Chen</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">• 10:42 AM Today</span>
+</div>
+<span class="font-code-sm text-code-sm text-primary font-medium">Matter HO-2026-0042</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+              “Good morning David. Yes, our trust accounting team verified receipt of the $45,000 wire this morning. We have scheduled the expert deposition prep session for Thursday afternoon. Julian is currently finalizing our reply brief in chief.”
+            </p>
+</div>
+<!-- Quick Encrypted Message Input -->
+<form class="flex flex-col gap-space-xs mt-space-2xs" onsubmit="event.preventDefault(); const inp = document.getElementById('msg-input'); if(inp.value.trim()){ alert('Encrypted transmission dispatched to Margaret Chen &amp; Julian Sterling.'); inp.value=''; }">
+<div class="relative">
+<textarea class="w-full bg-surface-container-lowest text-on-surface placeholder:text-on-surface-variant p-space-sm rounded-lg font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-inner resize-none" id="msg-input" placeholder="Send an encrypted response or instruction directly to Margaret Chen..." rows="2"></textarea>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs text-on-surface-variant font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">shield</span>
+<span>Protected under Rule 1.6 confidentiality</span>
+</div>
+<button class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-all shadow-sm" type="submit">
+<span class="material-symbols-outlined text-[16px]">send</span>
+<span>Send Encrypted Message</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+<!-- Right Column (40%): Court Docket, Legal Team, & Privileged Security Box -->
+<div class="lg:col-span-5 flex flex-col gap-space-lg">
+<!-- Upcoming Key Dates & Court Events -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md md:p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">event_note</span>
+<h3 class="font-headline-md text-headline-md text-primary">Upcoming Key Dates</h3>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Court Docket</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Date Item 1 -->
+<div class="flex items-start gap-space-sm p-space-xs rounded hover:bg-surface-container-low transition-colors">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex flex-col items-center justify-center flex-shrink-0 font-code-sm">
+<span class="text-[10px] uppercase font-bold text-primary">OCT</span>
+<span class="text-[16px] font-bold text-on-surface">17</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">Pre-Trial Conference &amp; Motion Hearing</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Chambers, NY Supreme Court • Rm 402B</span>
+<span class="font-code-sm text-code-sm text-primary font-medium mt-1">Margaret Chen in attendance</span>
+</div>
+</div>
+<!-- Date Item 2 -->
+<div class="flex items-start gap-space-sm p-space-xs rounded hover:bg-surface-container-low transition-colors">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex flex-col items-center justify-center flex-shrink-0 font-code-sm">
+<span class="text-[10px] uppercase font-bold text-primary">OCT</span>
+<span class="text-[16px] font-bold text-on-surface">22</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">Deposition: Defense Structural Expert</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Chen &amp; Sterling Virtual Deposition Room</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant mt-1">Court Reporter Assigned</span>
+</div>
+</div>
+<!-- Date Item 3 -->
+<div class="flex items-start gap-space-sm p-space-xs rounded hover:bg-surface-container-low transition-colors">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex flex-col items-center justify-center flex-shrink-0 font-code-sm">
+<span class="text-[10px] uppercase font-bold text-secondary">OCT</span>
+<span class="text-[16px] font-bold text-on-surface">27</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-semibold leading-tight">Summary Judgment Motion Filing Cutoff</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Firm Statutory Electronic Filing Deadline</span>
+<span class="font-code-sm text-code-sm text-secondary font-medium mt-1">Julian Sterling handling brief</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Dedicated Legal Team Directory -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md md:p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">badge</span>
+<h3 class="font-headline-md text-headline-md text-primary">Your Dedicated Legal Team</h3>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Chen &amp; Sterling</span>
+</div>
+<div class="flex flex-col gap-space-md">
+<!-- Member 1 -->
+<div class="flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Portrait of senior corporate litigator Margaret Chen with warm light background and focused expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnc7dgSQkU2Ih8NEHzY3R94ssEo16qWiRJciVRtlyCMnAfVZjPo00pr9Dv6AS4-7WUknE9W8GdRSfDJcTteKm985OGLq7dwKFPn5-AbWTLCz1zsnC90oUnlVjs8GOcMwvanO6f5y-26rf1A7LwlOlFZaN2i4DUfAdgwWOmwjnVg91ChC6C-KbZ7lT0-WCZGUzhcas-vgopmxd4_8fPVjfB9nmXPG4gB4XfMRLm6x_KfWoD_mIa12Y0"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">Margaret Chen</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Lead Trial Counsel • Partner</span>
+</div>
+</div>
+<div class="flex items-center gap-space-3xs">
+<a class="p-space-xs rounded hover:bg-surface-container text-primary transition-colors" href="mailto:mchen@quirelegal.com" title="Email Attorney">
+<span class="material-symbols-outlined text-[18px]">email</span>
+</a>
+<a class="p-space-xs rounded hover:bg-surface-container text-primary transition-colors" href="tel:4158904200" title="Call Direct Line">
+<span class="material-symbols-outlined text-[18px]">call</span>
+</a>
+</div>
+</div>
+<!-- Member 2 -->
+<div class="flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Portrait of senior litigation associate Julian Sterling in professional office attire, intelligent friendly expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeYDx5crCmV4l-gE3u43P1Fs6RIre0JlgXprw-6TVAspkS1nOrYgMlJvLfQ2INWr1GXUgGpNho2gIit572OGcPYIxz7S5kOrOtpB_L7LA2REwVenSqgC5mfcGc5P4f4yUEtc-9Y2gkO8pHGSOUm7yV3kZR_zNfC-ILmZaics31eetkyTtTORwJwp7UhzvVHd7cw8ISHG2rZYWdEQXYSyoHN3U3quANHLCVXUxNRX3bOQDdn2N28ltP"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">Julian Sterling</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Senior Litigation Associate</span>
+</div>
+</div>
+<div class="flex items-center gap-space-3xs">
+<a class="p-space-xs rounded hover:bg-surface-container text-primary transition-colors" href="mailto:jsterling@quirelegal.com" title="Email Attorney">
+<span class="material-symbols-outlined text-[18px]">email</span>
+</a>
+</div>
+</div>
+<!-- Member 3 -->
+<div class="flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Portrait of senior legal coordinator Elena Rostova with calm attentive expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDV0oinqVl3btTrRVn6ggLTsOkz0Qhlp5DtqVSHSyi_iKUiaEsrIlNBC-mbyZblaaQj40lH4adEPbWN03StLhJz0jdjZcYNn4MnAt8AGesNG6c71xY0tVEhEfpQmxCK4eZMj8yK5Wp12YjqfK8w9IUkVbbklz6_YCMxxwBLotR8Bdk6mf-x8KN6iZxU94CFaf3oNBOpu8f-d88C6WtFwc7vgkmK-MAhc3HKkKhvv3APUu-hu6KDic61"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">Elena Rostova</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Senior Paralegal • Coordinator</span>
+</div>
+</div>
+<div class="flex items-center gap-space-3xs">
+<a class="p-space-xs rounded hover:bg-surface-container text-primary transition-colors" href="mailto:erostova@quirelegal.com" title="Email Coordinator">
+<span class="material-symbols-outlined text-[18px]">email</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Security & Legal Privilege Guarantee -->
+<div class="bg-primary text-on-primary rounded-xl p-space-md md:p-space-lg flex flex-col gap-space-sm shadow-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-on-primary text-[22px]">verified</span>
+<h4 class="font-headline-sm text-headline-sm text-on-primary">Security &amp; Privilege Guarantee</h4>
+</div>
+<p class="font-body-sm text-body-sm text-on-primary/80 leading-relaxed">
+            All correspondence, uploads, and transactional balances in this portal are certified under NY State Bar Rule 1.6 Attorney-Client Privilege. Transmissions utilize Bank-grade AES-256 zero-knowledge encryption protocols.
+          </p>
+<div class="flex items-center justify-between pt-space-xs border-t border-on-primary/10">
+<span class="font-code-sm text-code-sm text-on-primary/70">Session ID: #QL-8892-SEC</span>
+<span class="font-code-sm text-code-sm text-primary-fixed font-semibold">256-Bit TLS Active</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main><footer class="w-full bg-surface-container-low py-space-lg"><div class="w-full px-gutter-lg flex flex-col sm:flex-row items-center justify-between gap-space-sm text-on-surface-variant font-body-sm text-body-sm"><div class="flex items-center gap-space-sm"><span class="font-label-md text-label-md text-on-surface">Quire Legal LLP</span><span>•</span><span>Archival Client Services &amp; Counsel</span></div><div class="flex items-center gap-space-md"><a class="hover:text-on-surface transition-colors" href="#">Security &amp; Encryption</a><a class="hover:text-on-surface transition-colors" href="#">Retainer Terms</a><a class="hover:text-on-surface transition-colors" href="#">Help Center</a></div></div></footer></body></html>

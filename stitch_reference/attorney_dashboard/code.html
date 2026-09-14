@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"tertiary":"#1c221f","inverse-primary":"#a9cfb6","tertiary-container":"#313733","on-background":"#1a1c1a","error":"#ba1a1a","on-tertiary-fixed-variant":"#424844","surface-container-low":"#f4f3f1","on-secondary-fixed":"#241a00","on-secondary":"#ffffff","surface-tint":"#436651","secondary-fixed-dim":"#e6c364","surface-container":"#efeeeb","on-primary-fixed-variant":"#2c4e3a","on-primary-container":"#82a78f","error-container":"#ffdad6","on-error":"#ffffff","primary-fixed":"#c5ecd2","secondary":"#755b00","on-error-container":"#93000a","on-surface-variant":"#424843","outline-variant":"#c1c8c1","primary":"#022616","tertiary-fixed":"#dee4df","on-secondary-container":"#785d00","surface-dim":"#dbdad7","surface-container-high":"#e9e8e5","tertiary-fixed-dim":"#c2c8c3","on-surface":"#1a1c1a","surface-container-lowest":"#ffffff","background":"#faf9f6","surface-container-highest":"#e3e2e0","surface-variant":"#e3e2e0","primary-container":"#1a3c2a","secondary-container":"#fed977","on-secondary-fixed-variant":"#584400","primary-fixed-dim":"#a9cfb6","outline":"#727973","on-tertiary-container":"#9aa09b","inverse-on-surface":"#f1f1ee","inverse-surface":"#2f312f","on-primary-fixed":"#002112","on-tertiary-fixed":"#171d1a","on-primary":"#ffffff","on-tertiary":"#ffffff","secondary-fixed":"#ffe08f","surface-bright":"#faf9f6","surface":"#faf9f6"},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},spacing:{"space-xs":"0.5rem","space-3xs":"0.125rem","space-3xl":"4rem","space-2xl":"3rem","space-md":"1rem","margin-md":"1.5rem","margin":"1rem","margin-lg":"2rem","space-xl":"2rem","gutter-lg":"1.5rem","space-sm":"0.75rem","space-lg":"1.5rem","space-2xs":"0.25rem","gutter":"1rem"},fontFamily:{"body-lg":["Inter"],"headline-lg":["Inter"],"body-sm":["Inter"],"code-sm":["JetBrains Mono"],"label-md":["Inter"],"label-sm":["Inter"],"code-md":["JetBrains Mono"],"headline-lg-mobile":["Inter"],"body-md":["Inter"],"display":["Inter"],"headline-md":["Inter"],"headline-sm":["Inter"]},fontSize:{"body-lg":["1rem",{"lineHeight":"1.625rem","letterSpacing":"-0.005em","fontWeight":"400"}],"headline-lg":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.02em","fontWeight":"600"}],"body-sm":["0.75rem",{"lineHeight":"1.125rem","letterSpacing":"0em","fontWeight":"400"}],"code-sm":["0.6875rem",{"lineHeight":"1rem","letterSpacing":"0em","fontWeight":"500"}],"label-md":["0.8125rem",{"lineHeight":"1.125rem","letterSpacing":"0.01em","fontWeight":"500"}],"label-sm":["0.6875rem",{"lineHeight":"1rem","letterSpacing":"0.03em","fontWeight":"600"}],"code-md":["0.8125rem",{"lineHeight":"1.25rem","letterSpacing":"-0.01em","fontWeight":"400"}],"headline-lg-mobile":["1.375rem",{"lineHeight":"1.75rem","letterSpacing":"-0.015em","fontWeight":"600"}],"body-md":["0.875rem",{"lineHeight":"1.375rem","letterSpacing":"0em","fontWeight":"400"}],"display":["2.25rem",{"lineHeight":"2.75rem","letterSpacing":"-0.025em","fontWeight":"600"}],"headline-md":["1.25rem",{"lineHeight":"1.75rem","letterSpacing":"-0.015em","fontWeight":"600"}],"headline-sm":["1rem",{"lineHeight":"1.5rem","letterSpacing":"-0.01em","fontWeight":"600"}]}}}}</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-[260px] bg-primary text-tertiary-fixed z-50 flex flex-col justify-between border-r border-tertiary-container shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col"><div class="p-space-md border-b border-tertiary-container"><div class="flex items-center gap-space-xs mb-space-sm"><img alt="Quire Legal Brand Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XDCvcMumfuKw0N2xQRpeBOPM7Ecnp7MQP4LBHgH46kFr6V1vSC4gTEB3oyajqX4M4Zw9J5fjGGIaalzcTFAxxk1wea3wlO4CevUvgkMiGWWw3nb4JOd8WcDOFvtyoFjVAKuPBfwJuHXEsLVG-_-xg2qANr--ZWvx3OQDf-EXXJcCwChtgOnXq0_SCrpR0Am3xhLev8XLPHGJvP3RR9m-Md9xT_Iy9-9Ox0vnhNFnydd_MbtsFjq3rDEfU"/><span class="font-headline-sm text-headline-sm text-on-primary tracking-tight font-bold">Quire</span></div><button class="w-full flex items-center justify-between px-space-xs py-space-2xs rounded bg-tertiary-container hover:bg-tertiary transition-colors text-left"><div class="flex flex-col min-w-0"><span class="font-label-md text-label-md text-on-primary truncate font-medium">Chen &amp; Sterling LLP</span><span class="font-code-sm text-code-sm text-on-tertiary-container">Enterprise Legal</span></div><span class="material-symbols-outlined text-on-tertiary-container text-lg">unfold_more</span></button></div><div class="px-space-xs py-space-sm flex flex-col gap-space-3xs"><span class="px-space-xs py-space-3xs font-label-sm text-label-sm uppercase tracking-wider text-on-tertiary-container">Practice</span><nav class="flex flex-col gap-space-3xs" data-active-classes="bg-primary-container text-on-primary font-medium"><a aria-current="page" class="flex items-center justify-between px-space-xs py-space-2xs rounded transition-colors bg-primary-container text-on-primary font-medium" data-path="dashboard" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">dashboard</span><span class="font-label-md text-label-md">Dashboard</span></div></a><a class="flex items-center justify-between px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="matters" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">cases</span><span class="font-label-md text-label-md">Matters</span></div><span class="font-code-sm text-code-sm px-space-2xs py-space-3xs rounded-full bg-primary-container text-primary-fixed">42</span></a><a class="flex items-center justify-between px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="clients" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">group</span><span class="font-label-md text-label-md">Clients</span></div></a><a class="flex items-center justify-between px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="documents" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">description</span><span class="font-label-md text-label-md">Documents</span></div></a><a class="flex items-center justify-between px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="messages" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">chat</span><span class="font-label-md text-label-md">Messages</span></div><span class="font-code-sm text-code-sm px-space-2xs py-space-3xs rounded-full bg-secondary-container text-on-secondary-container font-semibold">3</span></a><a class="flex items-center justify-between px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="tasks" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">check_box</span><span class="font-label-md text-label-md">Tasks</span></div></a><a class="flex items-center justify-between px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="calendar" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">calendar_today</span><span class="font-label-md text-label-md">Calendar</span></div></a><a class="flex items-center justify-between px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="billing-and-trust" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">account_balance_wallet</span><span class="font-label-md text-label-md">Billing &amp; Trust</span></div></a></nav></div><div class="h-px bg-tertiary-container mx-space-xs my-space-xs"></div><div class="px-space-xs flex flex-col gap-space-3xs"><span class="px-space-xs py-space-3xs font-label-sm text-label-sm uppercase tracking-wider text-on-tertiary-container">Organization</span><nav class="flex flex-col gap-space-3xs" data-active-classes="bg-primary-container text-on-primary font-medium"><a class="flex items-center gap-space-xs px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="firm-settings" href="#"><span class="material-symbols-outlined text-xl">tune</span><span class="font-label-md text-label-md">Firm Settings</span></a><a class="flex items-center gap-space-xs px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="knowledge-base" href="#"><span class="material-symbols-outlined text-xl">menu_book</span><span class="font-label-md text-label-md">Knowledge Base</span></a><a class="flex items-center gap-space-xs px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="audit-trail" href="#"><span class="material-symbols-outlined text-xl">verified_user</span><span class="font-label-md text-label-md">Audit Trail</span></a></nav></div></div><div class="p-space-xs border-t border-tertiary-container bg-tertiary"><div class="flex items-center justify-between p-space-xs rounded bg-tertiary-container/50"><div class="flex items-center gap-space-xs"><div class="relative"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIoTWcGclpDFdP6M8nJjTR6RyLXNBiYMD9JiIBxm7ApghMExHQdmVIKSe_2Q4eWApzbSXPAcsueAD5hlDW3Sl-NJeIfAHF7KanUvH1-iEcvN8KWcHpiWF8LXUbrSkDIx9-vayC92YRHLKWDl6vBD02LkCaq_Z0K90xONaPC4-zDE6ehft5of8aOzviOmRgSBWacX0cIFINykHKQ9gsUmME6ooucvTwyD44Qq2al5teRX_tiVZ13_um"/><span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-inverse-primary ring-2 ring-primary"></span></div><div class="flex flex-col min-w-0"><span class="font-label-md text-label-md text-on-primary font-medium truncate">Margaret Chen</span><span class="font-label-sm text-label-sm text-on-tertiary-container truncate">Senior Partner</span></div></div><a class="text-on-tertiary-container hover:text-on-primary transition-colors" data-path="login" href="#" title="Sign out"><span class="material-symbols-outlined text-lg">logout</span></a></div></div></aside><div class="pl-[260px]"><header class="fixed top-0 left-[260px] right-0 h-16 bg-surface/90 backdrop-blur-md border-b border-surface-container-high z-40 px-space-lg flex items-center justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex items-center gap-space-md flex-1 max-w-xl"><div class="relative w-full"><span class="material-symbols-outlined absolute left-space-xs top-1/2 -translate-y-1/2 text-outline text-lg">search</span><input class="w-full h-9 pl-9 pr-14 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container" placeholder="Search matters, clients, docket, files..." type="text"/><span class="absolute right-space-xs top-1/2 -translate-y-1/2 font-code-sm text-code-sm bg-surface-container text-on-surface-variant px-space-2xs py-space-3xs rounded border border-outline-variant">⌘K</span></div><button class="inline-flex items-center gap-space-2xs px-space-sm h-9 rounded bg-primary-container text-on-primary font-label-md text-label-md hover:bg-primary transition-colors shrink-0 shadow-sm"><span class="material-symbols-outlined text-base">add</span><span>New Matter</span></button></div><div class="flex items-center gap-space-md shrink-0"><div class="flex items-center gap-space-xs bg-surface-container-low border border-outline-variant px-space-sm h-9 rounded font-code-sm text-code-sm text-on-surface"><span class="material-symbols-outlined text-secondary text-base animate-pulse">timer</span><span class="font-medium">02:14:00</span><span class="text-outline">—</span><span class="text-on-surface-variant max-w-[140px] truncate">Marsh v. Castellan</span><span class="px-space-2xs py-space-3xs rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">Billable</span></div><button class="relative p-space-2xs text-on-surface-variant hover:text-on-surface transition-colors rounded-full hover:bg-surface-container-high"><span class="material-symbols-outlined text-xl">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary-container ring-1 ring-surface"></span></button><button class="p-space-2xs text-on-surface-variant hover:text-on-surface transition-colors rounded-full hover:bg-surface-container-high" title="Help Guide"><span class="material-symbols-outlined text-xl">help_outline</span></button><div class="h-5 w-px bg-outline-variant"></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIoTWcGclpDFdP6M8nJjTR6RyLXNBiYMD9JiIBxm7ApghMExHQdmVIKSe_2Q4eWApzbSXPAcsueAD5hlDW3Sl-NJeIfAHF7KanUvH1-iEcvN8KWcHpiWF8LXUbrSkDIx9-vayC92YRHLKWDl6vBD02LkCaq_Z0K90xONaPC4-zDE6ehft5of8aOzviOmRgSBWacX0cIFINykHKQ9gsUmME6ooucvTwyD44Qq2al5teRX_tiVZ13_um"/></div></header><main class="relative pt-16 bg-surface min-h-screen p-space-lg"><div class="flex flex-col w-full">
+<!-- Interactive Modals / Overlay Elements -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-tertiary/40 backdrop-blur-sm p-space-md" id="quickTimeModal">
+<div class="w-full max-w-lg bg-surface-container-lowest rounded-xl shadow-2xl p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-full bg-secondary-container/50 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-lg">timer</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Log Billable Time</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Capture professional legal hours instantly</p>
+</div>
+</div>
+<button class="p-space-2xs text-outline hover:text-on-surface rounded-lg hover:bg-surface-container transition-colors" onclick="document.getElementById('quickTimeModal').classList.add('hidden')">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+<div class="flex flex-col gap-space-sm pt-space-xs">
+<div class="flex flex-col gap-space-2xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Matter Dossier</label>
+<select class="w-full h-10 px-space-sm rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:bg-surface-container-lowest shadow-sm">
+<option>HO-2026-0042 — Marsh v. Castellan (Litigation)</option>
+<option>IP-2026-0118 — Lin BioTech v. GeneCore (Patent Dispute)</option>
+<option>TX-2026-0894 — Vance Family Office Restructuring</option>
+<option>MA-2026-0312 — Vespera Capital Acquisition</option>
+</select>
+</div>
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="flex flex-col gap-space-2xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Duration (Hours)</label>
+<input class="w-full h-10 px-space-sm rounded-lg bg-surface-container-low text-on-surface font-code-md text-code-md focus:outline-none focus:bg-surface-container-lowest shadow-sm" type="text" value="1.75"/>
+</div>
+<div class="flex flex-col gap-space-2xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Billing Activity Code</label>
+<select class="w-full h-10 px-space-sm rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:bg-surface-container-lowest shadow-sm">
+<option>L120 — Analysis &amp; Strategy</option>
+<option>L110 — Fact Investigation</option>
+<option>L330 — Depositions &amp; Prep</option>
+<option>A104 — Document Review</option>
+</select>
+</div>
+</div>
+<div class="flex flex-col gap-space-2xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Narrative Description</label>
+<textarea class="w-full p-space-sm rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:bg-surface-container-lowest shadow-sm resize-none" placeholder="Drafted reply brief regarding motion in limine; reviewed deposition transcripts..." rows="3"></textarea>
+</div>
+<div class="flex items-center justify-between pt-space-2xs">
+<label class="flex items-center gap-space-xs cursor-pointer">
+<input checked="" class="w-4 h-4 rounded text-primary-container accent-primary-container" type="checkbox"/>
+<span class="font-label-md text-label-md text-on-surface">Billable entry</span>
+</label>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-md py-space-xs rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-colors" onclick="document.getElementById('quickTimeModal').classList.add('hidden')">Cancel</button>
+<button class="px-space-md py-space-xs rounded-lg bg-primary-container text-on-primary font-label-md text-label-md hover:bg-primary shadow-sm transition-all" onclick="document.getElementById('quickTimeModal').classList.add('hidden')">Record Entry</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Top Bar Greeting & Quick Actions -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md pb-space-lg mb-space-sm">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs mb-space-2xs">
+<span class="inline-flex items-center gap-1.5 px-space-xs py-0.5 rounded-full bg-surface-container font-code-sm text-code-sm text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed-dim"></span>
+          ACTIVE SESSION · MARGARET CHEN
+        </span>
+<span class="text-outline font-label-sm text-label-sm">/</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">SENIOR LITIGATION PARTNER</span>
+</div>
+<h1 class="font-display text-display text-on-surface tracking-tight">Good afternoon, Margaret</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Wednesday, October 15, 2026 <span class="text-outline mx-1.5">·</span> Chen &amp; Sterling LLP <span class="text-outline mx-1.5">·</span> San Francisco / New York Chambers</p>
+</div>
+<!-- Action Toolbar with Editorial Depth -->
+<div class="flex items-center gap-space-xs shrink-0 flex-wrap">
+<button class="inline-flex items-center gap-space-xs px-space-md h-10 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md hover:bg-primary transition-all shadow-md group" onclick="document.getElementById('quickTimeModal').classList.remove('hidden')">
+<span class="material-symbols-outlined text-secondary-fixed-dim text-lg group-hover:rotate-12 transition-transform">timer</span>
+<span>Log Billable Time</span>
+<span class="font-code-sm text-code-sm px-1.5 py-0.5 rounded bg-tertiary text-inverse-primary ml-1">⌘T</span>
+</button>
+<button class="inline-flex items-center gap-space-2xs px-space-md h-10 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md hover:bg-surface-container shadow-sm transition-colors">
+<span class="material-symbols-outlined text-outline text-lg">add_task</span>
+<span>Quick Task</span>
+</button>
+<button class="inline-flex items-center gap-space-2xs px-space-md h-10 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md hover:bg-surface-container shadow-sm transition-colors">
+<span class="material-symbols-outlined text-outline text-lg">print</span>
+<span>Export Docket</span>
+</button>
+</div>
+</div>
+<!-- Row 1: KPI Metric Cards (Asymmetrical, Rich Data Presentation) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md mb-space-lg">
+<!-- Card 1: Active Matters -->
+<div class="p-space-md bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between group hover:shadow-md transition-shadow relative overflow-hidden">
+<div class="absolute -right-6 -bottom-6 w-24 h-24 bg-primary-container/5 rounded-full pointer-events-none"></div>
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Active Matters</span>
+<div class="flex items-baseline gap-space-xs mt-space-2xs">
+<span class="font-display text-display text-on-surface font-semibold">24</span>
+<span class="inline-flex items-center text-primary-fixed-dim bg-primary-container px-1.5 py-0.5 rounded font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-xs mr-0.5">arrow_upward</span>3 this mo.
+            </span>
+</div>
+</div>
+<div class="w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-xl">folder_managed</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed-dim"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">6 in Discovery</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">4 Trial-Ready</span>
+</div>
+</div>
+</div>
+<!-- Card 2: Tasks Due This Week -->
+<div class="p-space-md bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between group hover:shadow-md transition-shadow relative overflow-hidden">
+<div class="absolute -right-6 -bottom-6 w-24 h-24 bg-error-container/20 rounded-full pointer-events-none"></div>
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Tasks Due This Week</span>
+<div class="flex items-baseline gap-space-xs mt-space-2xs">
+<span class="font-display text-display text-on-surface font-semibold">18</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">of 34 completed</span>
+</div>
+</div>
+<div class="w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-xl">event_upcoming</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center gap-space-xs">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-error animate-ping"></span>
+          4 Urgent Filings
+        </span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
+          9 Client Inquiries
+        </span>
+</div>
+</div>
+<!-- Card 3: Uploads to Review -->
+<div class="p-space-md bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between group hover:shadow-md transition-shadow relative overflow-hidden">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Uploads to Review</span>
+<div class="flex items-baseline gap-space-xs mt-space-2xs">
+<span class="font-display text-display text-on-surface font-semibold">11</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Client Filings</span>
+</div>
+</div>
+<div class="w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-xl">policy</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-secondary font-medium">
+<span class="material-symbols-outlined text-sm">lock</span>
+          Privilege flagged: 3 docs
+        </span>
+<span class="font-code-sm text-code-sm text-outline">Queue #4</span>
+</div>
+</div>
+<!-- Card 4: Unbilled WIP & AR -->
+<div class="p-space-md bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between group hover:shadow-md transition-shadow relative overflow-hidden">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Unbilled WIP &amp; AR</span>
+<div class="flex items-baseline gap-space-2xs mt-space-2xs">
+<span class="font-display text-display text-on-surface font-semibold tracking-tight">$142,850</span>
+</div>
+</div>
+<div class="w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-xl">account_balance</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between">
+<span class="font-code-sm text-code-sm text-on-surface-variant">$38.2k in trust</span>
+<span class="inline-flex items-center font-code-sm text-code-sm font-semibold text-primary-container">
+          94.2% Realization
+        </span>
+</div>
+</div>
+</div>
+<!-- Row 2: Two-Column Working Grid (60% / 40% Split) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- LEFT COLUMN (approx 60% -> col-span-7) -->
+<div class="lg:col-span-7 flex flex-col gap-space-lg">
+<!-- Card: High-Priority Tasks -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md flex flex-col">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs pb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary-container text-xl">assignment_turned_in</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Your High-Priority Tasks</h2>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-medium">18 Remaining</span>
+</div>
+<div class="flex items-center gap-space-2xs text-outline">
+<button class="p-1 hover:text-on-surface rounded hover:bg-surface-container transition-colors" title="Filter list">
+<span class="material-symbols-outlined text-lg">filter_list</span>
+</button>
+<button class="p-1 hover:text-on-surface rounded hover:bg-surface-container transition-colors" title="View Kanban">
+<span class="material-symbols-outlined text-lg">view_kanban</span>
+</button>
+</div>
+</div>
+<!-- Tab Filters (Linear/Notion inspired) -->
+<div class="flex items-center gap-space-xs overflow-x-auto pb-space-xs pt-space-2xs no-scrollbar">
+<button class="px-space-xs py-1 rounded bg-primary-container text-on-primary font-label-sm text-label-sm font-medium shrink-0">
+            All Tasks (18)
+          </button>
+<button class="px-space-xs py-1 rounded bg-surface-container-low text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-medium shrink-0 transition-colors">
+            Court Filings (5)
+          </button>
+<button class="px-space-xs py-1 rounded bg-surface-container-low text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-medium shrink-0 transition-colors">
+            Client Review (8)
+          </button>
+<button class="px-space-xs py-1 rounded bg-surface-container-low text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-medium shrink-0 transition-colors">
+            Internal Strategy (5)
+          </button>
+</div>
+<!-- Task Checklist Stream -->
+<div class="flex flex-col gap-space-2xs mt-space-xs">
+<!-- Item 1: Urgent Court Deadline -->
+<div class="group p-space-sm rounded-lg bg-surface-container-lowest hover:bg-surface-container-low transition-all flex items-start justify-between gap-space-sm shadow-[0_1px_3px_rgba(17,23,20,0.03)]">
+<div class="flex items-start gap-space-sm min-w-0">
+<input class="mt-1 w-4 h-4 rounded text-primary-container accent-primary-container cursor-pointer shrink-0" type="checkbox"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary-container transition-colors">Finalize &amp; E-File Motion in Limine</span>
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm uppercase font-semibold">Urgent</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded">HO-2026-0042</span>
+</div>
+<div class="flex items-center gap-space-sm mt-1 text-on-surface-variant flex-wrap">
+<span class="font-label-sm text-label-sm flex items-center gap-1 text-error">
+<span class="material-symbols-outlined text-sm">schedule</span> Today, 4:00 PM (EDT)
+                  </span>
+<span class="text-outline">·</span>
+<span class="font-label-sm text-label-sm">Marsh v. Castellan</span>
+<span class="text-outline">·</span>
+<span class="font-label-sm text-label-sm text-outline">Lead: M. Chen</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-2xs shrink-0 opacity-80 group-hover:opacity-100">
+<span class="font-code-sm text-code-sm px-2 py-1 rounded bg-surface-container text-on-surface font-medium">3 Docs Attached</span>
+</div>
+</div>
+<!-- Item 2: High Priority Client Review -->
+<div class="group p-space-sm rounded-lg bg-surface-container-lowest hover:bg-surface-container-low transition-all flex items-start justify-between gap-space-sm shadow-[0_1px_3px_rgba(17,23,20,0.03)]">
+<div class="flex items-start gap-space-sm min-w-0">
+<input class="mt-1 w-4 h-4 rounded text-primary-container accent-primary-container cursor-pointer shrink-0" type="checkbox"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary-container transition-colors">Review Patent Assignment Agreement Draft</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm uppercase font-semibold">High</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded">IP-2026-0118</span>
+</div>
+<div class="flex items-center gap-space-sm mt-1 text-on-surface-variant flex-wrap">
+<span class="font-label-sm text-label-sm flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-sm">schedule</span> Tomorrow, 11:30 AM
+                  </span>
+<span class="text-outline">·</span>
+<span class="font-label-sm text-label-sm">Lin BioTech IP Transfer</span>
+<span class="text-outline">·</span>
+<span class="font-label-sm text-label-sm text-outline">Sarah Lin requested revisions</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-2xs shrink-0">
+<span class="w-6 h-6 rounded-full bg-primary text-on-primary font-code-sm text-code-sm flex items-center justify-center">SL</span>
+</div>
+</div>
+<!-- Item 3: Deposition Exhibit Preparation -->
+<div class="group p-space-sm rounded-lg bg-surface-container-lowest hover:bg-surface-container-low transition-all flex items-start justify-between gap-space-sm shadow-[0_1px_3px_rgba(17,23,20,0.03)]">
+<div class="flex items-start gap-space-sm min-w-0">
+<input class="mt-1 w-4 h-4 rounded text-primary-container accent-primary-container cursor-pointer shrink-0" type="checkbox"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary-container transition-colors">Prepare Deposition Exhibit Binder (Dr. Thorne)</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm uppercase font-medium">Standard</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded">HO-2026-0042</span>
+</div>
+<div class="flex items-center gap-space-sm mt-1 text-on-surface-variant flex-wrap">
+<span class="font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> Friday, Oct 17
+                  </span>
+<span class="text-outline">·</span>
+<span class="font-label-sm text-label-sm">Marsh v. Castellan</span>
+<span class="text-outline">·</span>
+<span class="font-label-sm text-label-sm text-outline">Assigned to: J. Sterling</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-2xs shrink-0">
+<span class="material-symbols-outlined text-outline text-lg">folder_zip</span>
+</div>
+</div>
+<!-- Item 4: Conflict Check Review -->
+<div class="group p-space-sm rounded-lg bg-surface-container-lowest hover:bg-surface-container-low transition-all flex items-start justify-between gap-space-sm shadow-[0_1px_3px_rgba(17,23,20,0.03)]">
+<div class="flex items-start gap-space-sm min-w-0">
+<input class="mt-1 w-4 h-4 rounded text-primary-container accent-primary-container cursor-pointer shrink-0" type="checkbox"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary-container transition-colors">Sign off on Conflict Clearance: Vantage Bio Matter</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm uppercase font-semibold">High</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded">NEW-INTAKE</span>
+</div>
+<div class="flex items-center gap-space-sm mt-1 text-on-surface-variant flex-wrap">
+<span class="font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> Monday, Oct 20
+                  </span>
+<span class="text-outline">·</span>
+<span class="font-label-sm text-label-sm">Ethics &amp; Intake Review</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-2xs shrink-0">
+<span class="material-symbols-outlined text-outline text-lg">security</span>
+</div>
+</div>
+</div>
+<div class="pt-space-sm mt-space-xs flex items-center justify-between">
+<button class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary-container hover:text-primary font-medium">
+<span class="material-symbols-outlined text-sm">add</span> Add inline task (Shift + Enter)
+          </button>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface" href="#">View All 18 Tasks →</a>
+</div>
+</div>
+<!-- Card: Waiting on You / Client Action Required -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md flex flex-col">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-xl">hourglass_top</span>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Waiting on You / Client Action Required</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Unblocking external parties &amp; active signature queues</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-code-sm text-code-sm font-semibold">3 Pending</span>
+</div>
+<div class="flex flex-col gap-space-sm mt-space-2xs">
+<!-- Pending Action 1 -->
+<div class="p-space-sm rounded-lg bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-10 h-10 rounded-full object-cover shrink-0 shadow-sm" data-alt="Corporate headshot portrait of David Castellan, an executive client dressed in a tailored navy blazer, warm ambient legal boardroom lighting, warm editorial aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEGyxwrwC6e4mOzuCHOHCeS1oD19REldwvY29g4Kk2O23z0uUDWhiwumG6h4qVrLRJ5UPQ3MVdQd0lZHUWnQxDHAQFYOxWSTJTlWxQeOSftsYIKR5jBd6J7raluE78_6UnosIWmk-Z8RmFCEDi5xQxU4HKOJkCe2n7Y2rpB_QIb6JZJQb-QF693q8qVAbeOULmpS8omXg_oATR0hClf_B8KJwOae6Ebo4eWEcOrxrl-16wFLbCWNv3"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-md text-label-md text-on-surface font-semibold">David Castellan</span>
+<span class="font-code-sm text-code-sm px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant">Marsh v. Castellan</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface truncate">Signed Engagement &amp; Retainer Wire Confirmation ready</p>
+<span class="font-label-sm text-label-sm text-outline">Uploaded 3 hours ago · $45,000 Trust Wire Pending Verification</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs shrink-0 self-end sm:self-center">
+<button class="px-space-sm py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-sm text-label-sm font-medium shadow-sm transition-colors">
+                Inspect Wire
+              </button>
+<button class="px-space-sm py-1.5 rounded-lg bg-primary-container text-on-primary hover:bg-primary font-label-sm text-label-sm font-medium shadow-sm transition-colors">
+                Countersign
+              </button>
+</div>
+</div>
+<!-- Pending Action 2 -->
+<div class="p-space-sm rounded-lg bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-10 h-10 rounded-full object-cover shrink-0 shadow-sm" data-alt="Portrait photo of Dr Sarah Lin, CEO of Lin BioTech, minimalist smart casual studio portrait with neutral ivory tones and sophisticated editorial contrast" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1LudGNQlw2GR1XBQYPQrskmEGBKiya-vOpfoOznULfrZg8eB2oLJZT0HazmKLGnZyvk_rimDquwUxa01dunPpBG6S3WvtNaPm913_8oidA5QBUfIH2HvYK5h6VJnnpSlfKT9rVB9byvNPgTCpl8td9K-mYxoIkQaB7k7pYZqJalh3avT3qXw6qYqJUL1GjsRuJoFUIvKFyxUeT9eQ7b8mYbi3K4ynP5S4BURfGF3iNFHIZvqoXyaI"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Sarah Lin</span>
+<span class="font-code-sm text-code-sm px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant">Lin BioTech</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface truncate">Requested revision on Section 4.2 (Patent Exclusivity Clause)</p>
+<span class="font-label-sm text-label-sm text-secondary font-medium">Waiting on your markup · Sent 2 days ago</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs shrink-0 self-end sm:self-center">
+<button class="px-space-sm py-1.5 rounded-lg bg-primary-container text-on-primary hover:bg-primary font-label-sm text-label-sm font-medium shadow-sm transition-colors">
+                Open Redline
+              </button>
+</div>
+</div>
+<!-- Pending Action 3 -->
+<div class="p-space-sm rounded-lg bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-10 h-10 rounded-full object-cover shrink-0 shadow-sm" data-alt="Executive portrait of Marcus Vance, senior private wealth trustee, dignified gray hair, dark charcoal suit, soft cinematic window lighting in modern law office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgJAdkokgNjb8p2lq5cFi9IdI9MKEhX0C0P_L67IkTTLnxOJFvuntUDZQsBc_IyHYYXvUaJovGX9-MXR3GTVq1IQ8JrXN0qa3nEnWyvcngKDOyQLs_cjrw1ctERluB4Ufm1B5N-r5AvLwgY4RS0UMF2H8TjS5qStoLjW-S1jLOeurVdfCkOC9BA0TyA_IzG2gtzdllDAk958gaeQKsJXxFu3jEnW_BTDdFNZSuhMW9iOCKdvBCCGD0"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Marcus Vance</span>
+<span class="font-code-sm text-code-sm px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant">Vance Estate</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface truncate">Uploaded 4 confidential tax disclosures for upcoming deposition</p>
+<span class="font-label-sm text-label-sm text-outline">Uploaded yesterday at 5:14 PM · Privileged Client Vault</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs shrink-0 self-end sm:self-center">
+<button class="px-space-sm py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-sm text-label-sm font-medium shadow-sm transition-colors">
+                Review (4 files)
+              </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN (approx 40% -> col-span-5) -->
+<div class="lg:col-span-5 flex flex-col gap-space-lg">
+<!-- Card: Upcoming Court Dates & Docket (Next 14 Days) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md flex flex-col">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-space-xs">
+<div class="w-7 h-7 rounded-lg bg-primary-container flex items-center justify-center text-primary-fixed">
+<span class="material-symbols-outlined text-base">gavel</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Docket &amp; Court Schedule</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Next 14 Days · NY County &amp; Federal Southern District</p>
+</div>
+</div>
+<button class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface flex items-center gap-0.5">
+<span>Cal View</span>
+<span class="material-symbols-outlined text-sm">calendar_month</span>
+</button>
+</div>
+<!-- Schedule Items -->
+<div class="flex flex-col gap-space-sm mt-space-2xs">
+<!-- Event 1 -->
+<div class="p-space-sm rounded-lg bg-surface-container-low relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-error"></div>
+<div class="flex items-start justify-between pl-space-xs">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-error uppercase">Oct 17 · 09:30 AM</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-1 rounded text-on-surface-variant">ROOM 402B</span>
+</div>
+<h4 class="font-label-md text-label-md text-on-surface font-semibold mt-1">Pre-Trial Conference &amp; Motion Hearing</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Marsh v. Castellan · Hon. Justice Evelyn Keller</p>
+<div class="flex items-center gap-space-xs mt-2 text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-sm">location_on</span>
+<span>NY County Supreme Court, 60 Centre St</span>
+</div>
+</div>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-error-container text-on-error-container font-semibold shrink-0">In Person</span>
+</div>
+</div>
+<!-- Event 2 -->
+<div class="p-space-sm rounded-lg bg-surface-container-low relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary"></div>
+<div class="flex items-start justify-between pl-space-xs">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-secondary uppercase">Oct 22 · 01:00 PM</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-1 rounded text-on-surface-variant">SECURE V-CON</span>
+</div>
+<h4 class="font-label-md text-label-md text-on-surface font-semibold mt-1">Expert Deposition: Dr. Aris Thorne</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Biochemical Valuation · Lin BioTech v. GeneCore</p>
+<div class="flex items-center gap-space-xs mt-2 text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-sm">videocam</span>
+<span>Zoom Conference ID: 894-3312-90 · Steno booked</span>
+</div>
+</div>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-secondary-container text-on-secondary-container font-semibold shrink-0">Virtual</span>
+</div>
+</div>
+<!-- Event 3 -->
+<div class="p-space-sm rounded-lg bg-surface-container-low relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary-container"></div>
+<div class="flex items-start justify-between pl-space-xs">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-primary-container uppercase">Oct 27 · 05:00 PM</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-1 rounded text-on-surface-variant">STATUTORY</span>
+</div>
+<h4 class="font-label-md text-label-md text-on-surface font-semibold mt-1">Summary Judgment Filing Deadline</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Castellan Cross-Claims · Strict Statutory Cutoff</p>
+<div class="flex items-center gap-space-xs mt-2 text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-sm">cloud_upload</span>
+<span>NYCEF Electronic Filing Portal</span>
+</div>
+</div>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-medium shrink-0">Deadline</span>
+</div>
+</div>
+</div>
+<div class="pt-space-sm mt-space-2xs text-center">
+<button class="w-full py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md font-medium transition-colors">
+            Sync Calendar to Outlook / Apple Cal
+          </button>
+</div>
+</div>
+<!-- Card: Firm Audit & Activity Stream -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md flex flex-col">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-on-surface text-xl">history</span>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Firm Activity &amp; Audit Trail</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Real-time collaboration across practice groups</p>
+</div>
+</div>
+<span class="w-2 h-2 rounded-full bg-primary-container animate-ping"></span>
+</div>
+<div class="flex flex-col gap-space-sm mt-space-2xs relative">
+<!-- Feed Item 1 -->
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center font-bold shrink-0 shadow-sm">
+              JS
+            </div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Julian Sterling</span>
+<span class="font-code-sm text-code-sm text-outline">12m ago</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Uploaded updated expert disclosures: <span class="font-medium text-on-surface">Exhibit_9B_Thorne_Analysis.pdf</span>
+</p>
+<div class="flex items-center gap-space-xs mt-1">
+<span class="font-code-sm text-code-sm text-primary-container hover:underline cursor-pointer">Preview Document</span>
+<span class="text-outline">·</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">HO-2026-0042</span>
+</div>
+</div>
+</div>
+<!-- Feed Item 2 -->
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center justify-center font-bold shrink-0 shadow-sm">
+              AR
+            </div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Ananya Rao (Associate)</span>
+<span class="font-code-sm text-code-sm text-outline">44m ago</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Logged <span class="font-medium text-on-surface">3.2 hours</span> for statutory research on trade secret preemption.
+              </p>
+<div class="flex items-center gap-space-xs mt-1">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Matter: IP-2026-0118</span>
+<span class="text-outline">·</span>
+<span class="font-code-sm text-code-sm text-secondary">Verified billable</span>
+</div>
+</div>
+</div>
+<!-- Feed Item 3 -->
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-tertiary text-on-tertiary font-label-sm text-label-sm flex items-center justify-center font-bold shrink-0 shadow-sm">
+              SYS
+            </div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Court Docket Watch</span>
+<span class="font-code-sm text-code-sm text-outline">2h ago</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Notice of Appearance filed by opposing counsel (Cravath, Swaine &amp; Moore) in <span class="font-medium text-on-surface">Marsh v. Castellan</span>.
+              </p>
+<div class="flex items-center gap-space-xs mt-1">
+<span class="font-code-sm text-code-sm text-primary-container hover:underline cursor-pointer">View Electronic Docket Entry</span>
+</div>
+</div>
+</div>
+<!-- Feed Item 4 -->
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container text-primary-fixed font-label-sm text-label-sm flex items-center justify-center font-bold shrink-0 shadow-sm">
+              TB
+            </div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Trust Accounting</span>
+<span class="font-code-sm text-code-sm text-outline">4h ago</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Client wire of <span class="font-medium text-on-surface">$50,000</span> cleared into IOLTA account for Lin BioTech IP.
+              </p>
+</div>
+</div>
+</div>
+<div class="pt-space-sm mt-space-2xs text-center">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface inline-flex items-center gap-1" href="#">
+<span>View Full Compliance Audit Log</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div></main></div></body></html>

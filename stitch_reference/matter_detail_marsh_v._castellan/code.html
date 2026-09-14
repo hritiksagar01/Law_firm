@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"tertiary":"#1c221f","inverse-primary":"#a9cfb6","tertiary-container":"#313733","on-background":"#1a1c1a","error":"#ba1a1a","on-tertiary-fixed-variant":"#424844","surface-container-low":"#f4f3f1","on-secondary-fixed":"#241a00","on-secondary":"#ffffff","surface-tint":"#436651","secondary-fixed-dim":"#e6c364","surface-container":"#efeeeb","on-primary-fixed-variant":"#2c4e3a","on-primary-container":"#82a78f","error-container":"#ffdad6","on-error":"#ffffff","primary-fixed":"#c5ecd2","secondary":"#755b00","on-error-container":"#93000a","on-surface-variant":"#424843","outline-variant":"#c1c8c1","primary":"#022616","tertiary-fixed":"#dee4df","on-secondary-container":"#785d00","surface-dim":"#dbdad7","surface-container-high":"#e9e8e5","tertiary-fixed-dim":"#c2c8c3","on-surface":"#1a1c1a","surface-container-lowest":"#ffffff","background":"#faf9f6","surface-container-highest":"#e3e2e0","surface-variant":"#e3e2e0","primary-container":"#1a3c2a","secondary-container":"#fed977","on-secondary-fixed-variant":"#584400","primary-fixed-dim":"#a9cfb6","outline":"#727973","on-tertiary-container":"#9aa09b","inverse-on-surface":"#f1f1ee","inverse-surface":"#2f312f","on-primary-fixed":"#002112","on-tertiary-fixed":"#171d1a","on-primary":"#ffffff","on-tertiary":"#ffffff","secondary-fixed":"#ffe08f","surface-bright":"#faf9f6","surface":"#faf9f6"},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},spacing:{"space-xs":"0.5rem","space-3xs":"0.125rem","space-3xl":"4rem","space-2xl":"3rem","space-md":"1rem","margin-md":"1.5rem","margin":"1rem","margin-lg":"2rem","space-xl":"2rem","gutter-lg":"1.5rem","space-sm":"0.75rem","space-lg":"1.5rem","space-2xs":"0.25rem","gutter":"1rem"},fontFamily:{"body-lg":["Inter"],"headline-lg":["Inter"],"body-sm":["Inter"],"code-sm":["JetBrains Mono"],"label-md":["Inter"],"label-sm":["Inter"],"code-md":["JetBrains Mono"],"headline-lg-mobile":["Inter"],"body-md":["Inter"],"display":["Inter"],"headline-md":["Inter"],"headline-sm":["Inter"]},fontSize:{"body-lg":["1rem",{"lineHeight":"1.625rem","letterSpacing":"-0.005em","fontWeight":"400"}],"headline-lg":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.02em","fontWeight":"600"}],"body-sm":["0.75rem",{"lineHeight":"1.125rem","letterSpacing":"0em","fontWeight":"400"}],"code-sm":["0.6875rem",{"lineHeight":"1rem","letterSpacing":"0em","fontWeight":"500"}],"label-md":["0.8125rem",{"lineHeight":"1.125rem","letterSpacing":"0.01em","fontWeight":"500"}],"label-sm":["0.6875rem",{"lineHeight":"1rem","letterSpacing":"0.03em","fontWeight":"600"}],"code-md":["0.8125rem",{"lineHeight":"1.25rem","letterSpacing":"-0.01em","fontWeight":"400"}],"headline-lg-mobile":["1.375rem",{"lineHeight":"1.75rem","letterSpacing":"-0.015em","fontWeight":"600"}],"body-md":["0.875rem",{"lineHeight":"1.375rem","letterSpacing":"0em","fontWeight":"400"}],"display":["2.25rem",{"lineHeight":"2.75rem","letterSpacing":"-0.025em","fontWeight":"600"}],"headline-md":["1.25rem",{"lineHeight":"1.75rem","letterSpacing":"-0.015em","fontWeight":"600"}],"headline-sm":["1rem",{"lineHeight":"1.5rem","letterSpacing":"-0.01em","fontWeight":"600"}]}}}}</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-[260px] bg-primary text-tertiary-fixed z-50 flex flex-col justify-between border-r border-tertiary-container shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col"><div class="p-space-md border-b border-tertiary-container"><div class="flex items-center gap-space-xs mb-space-sm"><img alt="Quire Legal Brand Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XDCvcMumfuKw0N2xQRpeBOPM7Ecnp7MQP4LBHgH46kFr6V1vSC4gTEB3oyajqX4M4Zw9J5fjGGIaalzcTFAxxk1wea3wlO4CevUvgkMiGWWw3nb4JOd8WcDOFvtyoFjVAKuPBfwJuHXEsLVG-_-xg2qANr--ZWvx3OQDf-EXXJcCwChtgOnXq0_SCrpR0Am3xhLev8XLPHGJvP3RR9m-Md9xT_Iy9-9Ox0vnhNFnydd_MbtsFjq3rDEfU"/><span class="font-headline-sm text-headline-sm text-on-primary tracking-tight font-bold">Quire</span></div><button class="w-full flex items-center justify-between px-space-xs py-space-2xs rounded bg-tertiary-container hover:bg-tertiary transition-colors text-left"><div class="flex flex-col min-w-0"><span class="font-label-md text-label-md text-on-primary truncate font-medium">Chen &amp; Sterling LLP</span><span class="font-code-sm text-code-sm text-on-tertiary-container">Enterprise Legal</span></div><span class="material-symbols-outlined text-on-tertiary-container text-lg">unfold_more</span></button></div><div class="px-space-xs py-space-sm flex flex-col gap-space-3xs"><span class="px-space-xs py-space-3xs font-label-sm text-label-sm uppercase tracking-wider text-on-tertiary-container">Practice</span><nav class="flex flex-col gap-space-3xs" data-active-classes="bg-primary-container text-on-primary font-medium"><a class="flex items-center justify-between px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="dashboard" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">dashboard</span><span class="font-label-md text-label-md">Dashboard</span></div></a><a aria-current="page" class="flex items-center justify-between px-space-xs py-space-2xs rounded transition-colors bg-primary-container text-on-primary font-medium" data-path="matters" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">cases</span><span class="font-label-md text-label-md">Matters</span></div><span class="font-code-sm text-code-sm px-space-2xs py-space-3xs rounded-full bg-primary-container text-primary-fixed">42</span></a><a class="flex items-center justify-between px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="clients" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">group</span><span class="font-label-md text-label-md">Clients</span></div></a><a class="flex items-center justify-between px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="documents" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">description</span><span class="font-label-md text-label-md">Documents</span></div></a><a class="flex items-center justify-between px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="messages" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">chat</span><span class="font-label-md text-label-md">Messages</span></div><span class="font-code-sm text-code-sm px-space-2xs py-space-3xs rounded-full bg-secondary-container text-on-secondary-container font-semibold">3</span></a><a class="flex items-center justify-between px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="tasks" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">check_box</span><span class="font-label-md text-label-md">Tasks</span></div></a><a class="flex items-center justify-between px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="calendar" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">calendar_today</span><span class="font-label-md text-label-md">Calendar</span></div></a><a class="flex items-center justify-between px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="billing-and-trust" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-xl">account_balance_wallet</span><span class="font-label-md text-label-md">Billing &amp; Trust</span></div></a></nav></div><div class="h-px bg-tertiary-container mx-space-xs my-space-xs"></div><div class="px-space-xs flex flex-col gap-space-3xs"><span class="px-space-xs py-space-3xs font-label-sm text-label-sm uppercase tracking-wider text-on-tertiary-container">Organization</span><nav class="flex flex-col gap-space-3xs" data-active-classes="bg-primary-container text-on-primary font-medium"><a class="flex items-center gap-space-xs px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="firm-settings" href="#"><span class="material-symbols-outlined text-xl">tune</span><span class="font-label-md text-label-md">Firm Settings</span></a><a class="flex items-center gap-space-xs px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="knowledge-base" href="#"><span class="material-symbols-outlined text-xl">menu_book</span><span class="font-label-md text-label-md">Knowledge Base</span></a><a class="flex items-center gap-space-xs px-space-xs py-space-2xs rounded text-tertiary-fixed hover:bg-primary-container hover:text-on-primary transition-colors" data-path="audit-trail" href="#"><span class="material-symbols-outlined text-xl">verified_user</span><span class="font-label-md text-label-md">Audit Trail</span></a></nav></div></div><div class="p-space-xs border-t border-tertiary-container bg-tertiary"><div class="flex items-center justify-between p-space-xs rounded bg-tertiary-container/50"><div class="flex items-center gap-space-xs"><div class="relative"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIoTWcGclpDFdP6M8nJjTR6RyLXNBiYMD9JiIBxm7ApghMExHQdmVIKSe_2Q4eWApzbSXPAcsueAD5hlDW3Sl-NJeIfAHF7KanUvH1-iEcvN8KWcHpiWF8LXUbrSkDIx9-vayC92YRHLKWDl6vBD02LkCaq_Z0K90xONaPC4-zDE6ehft5of8aOzviOmRgSBWacX0cIFINykHKQ9gsUmME6ooucvTwyD44Qq2al5teRX_tiVZ13_um"/><span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-inverse-primary ring-2 ring-primary"></span></div><div class="flex flex-col min-w-0"><span class="font-label-md text-label-md text-on-primary font-medium truncate">Margaret Chen</span><span class="font-label-sm text-label-sm text-on-tertiary-container truncate">Senior Partner</span></div></div><a class="text-on-tertiary-container hover:text-on-primary transition-colors" data-path="login" href="#" title="Sign out"><span class="material-symbols-outlined text-lg">logout</span></a></div></div></aside><div class="pl-[260px]"><header class="fixed top-0 left-[260px] right-0 h-16 bg-surface/90 backdrop-blur-md border-b border-surface-container-high z-40 px-space-lg flex items-center justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex items-center gap-space-md flex-1 max-w-xl"><div class="relative w-full"><span class="material-symbols-outlined absolute left-space-xs top-1/2 -translate-y-1/2 text-outline text-lg">search</span><input class="w-full h-9 pl-9 pr-14 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container" placeholder="Search matters, clients, docket, files..." type="text"/><span class="absolute right-space-xs top-1/2 -translate-y-1/2 font-code-sm text-code-sm bg-surface-container text-on-surface-variant px-space-2xs py-space-3xs rounded border border-outline-variant">⌘K</span></div><button class="inline-flex items-center gap-space-2xs px-space-sm h-9 rounded bg-primary-container text-on-primary font-label-md text-label-md hover:bg-primary transition-colors shrink-0 shadow-sm"><span class="material-symbols-outlined text-base">add</span><span>New Matter</span></button></div><div class="flex items-center gap-space-md shrink-0"><div class="flex items-center gap-space-xs bg-surface-container-low border border-outline-variant px-space-sm h-9 rounded font-code-sm text-code-sm text-on-surface"><span class="material-symbols-outlined text-secondary text-base animate-pulse">timer</span><span class="font-medium">02:14:00</span><span class="text-outline">—</span><span class="text-on-surface-variant max-w-[140px] truncate">Marsh v. Castellan</span><span class="px-space-2xs py-space-3xs rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">Billable</span></div><button class="relative p-space-2xs text-on-surface-variant hover:text-on-surface transition-colors rounded-full hover:bg-surface-container-high"><span class="material-symbols-outlined text-xl">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary-container ring-1 ring-surface"></span></button><button class="p-space-2xs text-on-surface-variant hover:text-on-surface transition-colors rounded-full hover:bg-surface-container-high" title="Help Guide"><span class="material-symbols-outlined text-xl">help_outline</span></button><div class="h-5 w-px bg-outline-variant"></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIoTWcGclpDFdP6M8nJjTR6RyLXNBiYMD9JiIBxm7ApghMExHQdmVIKSe_2Q4eWApzbSXPAcsueAD5hlDW3Sl-NJeIfAHF7KanUvH1-iEcvN8KWcHpiWF8LXUbrSkDIx9-vayC92YRHLKWDl6vBD02LkCaq_Z0K90xONaPC4-zDE6ehft5of8aOzviOmRgSBWacX0cIFINykHKQ9gsUmME6ooucvTwyD44Qq2al5teRX_tiVZ13_um"/></div></header><main class="relative pt-16 bg-surface min-h-screen p-space-lg"><div class="flex flex-col w-full">
+<!-- Case Header Banner -->
+<section class="relative bg-surface-container-lowest rounded-xl shadow-sm p-space-lg mb-space-md overflow-hidden">
+<!-- Ambient subtle background depth wash -->
+<div class="absolute -top-24 -right-24 w-96 h-96 bg-primary-fixed/20 rounded-full blur-3xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col gap-space-sm">
+<!-- Breadcrumb & Top Tags -->
+<div class="flex flex-wrap items-center justify-between gap-space-xs">
+<div class="flex items-center gap-space-xs font-code-sm text-code-sm text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="#">Matters</a>
+<span class="text-outline">/</span>
+<a class="hover:text-primary transition-colors" href="#">Commercial Litigation</a>
+<span class="text-outline">/</span>
+<span class="text-primary font-medium">HO-2026-0042</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center gap-space-2xs px-space-xs py-space-3xs rounded bg-surface-container text-on-surface-variant font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-xs">pin</span> HO-2026-0042
+          </span>
+<span class="inline-flex items-center gap-space-2xs px-space-xs py-space-3xs rounded-full bg-surface-container-high text-surface-tint font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-surface-tint animate-pulse"></span> Active · Discovery Phase
+          </span>
+<span class="inline-flex items-center gap-space-2xs px-space-xs py-space-3xs rounded-full bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
+            Commercial Litigation
+          </span>
+<span class="inline-flex items-center gap-space-2xs px-space-xs py-space-3xs rounded-full bg-secondary-container/30 text-on-secondary-container font-label-sm text-label-sm shadow-xs">
+<span class="material-symbols-outlined text-xs text-secondary">lock</span> Attorney-Client Privileged
+          </span>
+</div>
+</div>
+<!-- Main Title & Action Bar -->
+<div class="flex flex-col xl:flex-row xl:items-center justify-between gap-space-md pt-space-2xs">
+<div>
+<h1 class="font-display text-display text-primary font-bold tracking-tight">
+            Marsh v. Castellan Property Group
+          </h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-space-3xs">
+            Commercial lease breach and structural improvement allocation litigation · SDNY Docket 1:26-cv-04821-EV
+          </p>
+</div>
+<div class="flex flex-wrap items-center gap-space-xs shrink-0">
+<button class="inline-flex items-center gap-space-2xs px-space-md h-9 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md hover:bg-primary shadow-sm transition-all duration-150 active:scale-[0.98]">
+<span class="material-symbols-outlined text-base">more_time</span>
+<span>+ Log Billable Time</span>
+</button>
+<button class="inline-flex items-center gap-space-2xs px-space-sm h-9 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-label-md text-label-md transition-colors shadow-xs">
+<span class="material-symbols-outlined text-base">upload_file</span>
+<span>+ Upload Filing</span>
+</button>
+<button class="inline-flex items-center gap-space-2xs px-space-sm h-9 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-label-md text-label-md transition-colors shadow-xs">
+<span class="material-symbols-outlined text-base">receipt_long</span>
+<span>Generate Court Packet</span>
+</button>
+<button class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors shadow-xs" title="More Actions">
+<span class="material-symbols-outlined text-base">more_horiz</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Sub-Header Metadata Ribbon -->
+<section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-space-xs mb-space-md">
+<!-- Client -->
+<div class="bg-surface-container-lowest p-space-sm rounded-lg shadow-sm flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Client</span>
+<a class="font-label-md text-label-md font-semibold text-primary hover:underline truncate mt-space-2xs" href="#">
+        Castellan Real Estate LLC
+      </a>
+<span class="font-code-sm text-code-sm text-on-surface-variant truncate">Arthur Marsh, Principal</span>
+</div>
+<!-- Lead Attorney -->
+<div class="bg-surface-container-lowest p-space-sm rounded-lg shadow-sm flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Lead Attorney</span>
+<div class="flex items-center gap-space-2xs mt-space-2xs">
+<img alt="Margaret Chen" class="w-6 h-6 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIoTWcGclpDFdP6M8nJjTR6RyLXNBiYMD9JiIBxm7ApghMExHQdmVIKSe_2Q4eWApzbSXPAcsueAD5hlDW3Sl-NJeIfAHF7KanUvH1-iEcvN8KWcHpiWF8LXUbrSkDIx9-vayC92YRHLKWDl6vBD02LkCaq_Z0K90xONaPC4-zDE6ehft5of8aOzviOmRgSBWacX0cIFINykHKQ9gsUmME6ooucvTwyD44Qq2al5teRX_tiVZ13_um"/>
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate">Margaret Chen</span>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Senior Partner</span>
+</div>
+<!-- Assigned Court -->
+<div class="bg-surface-container-lowest p-space-sm rounded-lg shadow-sm flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Jurisdiction</span>
+<span class="font-label-md text-label-md font-medium text-on-surface truncate mt-space-2xs" title="U.S. District Court, Southern District of NY">
+        U.S. Dist. Court, SDNY
+      </span>
+<span class="font-code-sm text-code-sm text-on-surface-variant truncate">Hon. Elena Vance</span>
+</div>
+<!-- Docket Number -->
+<div class="bg-surface-container-lowest p-space-sm rounded-lg shadow-sm flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Docket No</span>
+<div class="flex items-center gap-space-2xs mt-space-2xs">
+<span class="material-symbols-outlined text-sm text-outline">gavel</span>
+<span class="font-code-md text-code-md font-semibold text-on-surface">1:26-cv-04821-EV</span>
+</div>
+<span class="font-code-sm text-code-sm text-primary hover:underline cursor-pointer">PACER Connected</span>
+</div>
+<!-- Opened Date -->
+<div class="bg-surface-container-lowest p-space-sm rounded-lg shadow-sm flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Matter Opened</span>
+<span class="font-label-md text-label-md font-medium text-on-surface mt-space-2xs">Jan 12, 2026</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">279 Days in Progress</span>
+</div>
+<!-- Next Court Date (Amber Priority Highlight) -->
+<div class="bg-secondary-container/20 p-space-sm rounded-lg shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-secondary-container uppercase tracking-wider font-semibold">Next Court Event</span>
+<span class="material-symbols-outlined text-sm text-secondary">event_upcoming</span>
+</div>
+<span class="font-label-md text-label-md font-bold text-on-secondary-container truncate mt-space-2xs">Pre-Trial Conf.</span>
+<div class="inline-flex items-center gap-space-3xs text-secondary font-code-sm text-code-sm font-semibold">
+<span>Oct 17, 2026</span>
+<span class="px-space-3xs py-0.5 rounded bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">2 days</span>
+</div>
+</div>
+</section>
+<!-- 9-Tab Navigation System -->
+<nav class="bg-surface-container-lowest rounded-xl shadow-sm px-space-md flex items-center gap-space-xs overflow-x-auto no-scrollbar mb-space-md">
+<button class="flex items-center gap-space-2xs py-space-sm px-space-xs text-primary font-headline-sm text-headline-sm border-b-2 border-primary transition-colors shrink-0">
+<span>Overview</span>
+</button>
+<button class="flex items-center gap-space-2xs py-space-sm px-space-xs text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors shrink-0">
+<span>Work Product</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-space-2xs py-space-3xs rounded-full text-on-surface-variant">14</span>
+</button>
+<button class="flex items-center gap-space-2xs py-space-sm px-space-xs text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors shrink-0">
+<span>Internal Notes</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-space-2xs py-space-3xs rounded-full text-on-surface-variant">8</span>
+</button>
+<button class="flex items-center gap-space-2xs py-space-sm px-space-xs text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors shrink-0">
+<span>Client Files</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-space-2xs py-space-3xs rounded-full text-on-surface-variant">29</span>
+</button>
+<button class="flex items-center gap-space-2xs py-space-sm px-space-xs text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors shrink-0">
+<span>Requests</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-space-2xs py-space-3xs rounded-full text-on-surface-variant">3</span>
+</button>
+<button class="flex items-center gap-space-2xs py-space-sm px-space-xs text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors shrink-0">
+<span>Messages</span>
+<span class="font-code-sm text-code-sm bg-secondary-container text-on-secondary-container font-semibold px-space-2xs py-space-3xs rounded-full">4</span>
+</button>
+<button class="flex items-center gap-space-2xs py-space-sm px-space-xs text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors shrink-0">
+<span>Tasks</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-space-2xs py-space-3xs rounded-full text-on-surface-variant">6</span>
+</button>
+<button class="flex items-center gap-space-2xs py-space-sm px-space-xs text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors shrink-0">
+<span>Court Timeline</span>
+</button>
+<button class="flex items-center gap-space-2xs py-space-sm px-space-xs text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors shrink-0">
+<span>Billing &amp; Trust</span>
+<span class="font-code-sm text-code-sm bg-primary-fixed text-on-primary-fixed font-semibold px-space-2xs py-space-3xs rounded-full">$42.5k WIP</span>
+</button>
+</nav>
+<!-- Overview Master Dashboard -->
+<div class="flex flex-col gap-space-md">
+<!-- Top Case Stage Tracker (7 Milestones) -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Matter Lifecycle Stage</span>
+<span class="font-code-sm text-code-sm text-primary font-semibold bg-primary-fixed/40 px-space-2xs py-space-3xs rounded">Stage 3 of 7 · Discovery (65% Complete)</span>
+</div>
+<div class="flex items-center gap-space-xs font-code-sm text-code-sm text-on-surface-variant">
+<span>Est. Trial Target: May 2027</span>
+</div>
+</div>
+<!-- Milestone Track -->
+<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-space-xs">
+<!-- 1. Intake Completed -->
+<div class="flex flex-col gap-space-3xs p-space-xs rounded bg-surface-container-low">
+<div class="flex items-center justify-between">
+<span class="font-code-sm text-code-sm text-on-surface-variant">01</span>
+<span class="material-symbols-outlined text-sm text-surface-tint">check_circle</span>
+</div>
+<span class="font-label-sm text-label-sm font-semibold text-on-surface">Intake</span>
+<span class="font-code-sm text-code-sm text-outline">Jan 12, 2026</span>
+</div>
+<!-- 2. Pleadings Completed -->
+<div class="flex flex-col gap-space-3xs p-space-xs rounded bg-surface-container-low">
+<div class="flex items-center justify-between">
+<span class="font-code-sm text-code-sm text-on-surface-variant">02</span>
+<span class="material-symbols-outlined text-sm text-surface-tint">check_circle</span>
+</div>
+<span class="font-label-sm text-label-sm font-semibold text-on-surface">Pleadings</span>
+<span class="font-code-sm text-code-sm text-outline">Mar 04, 2026</span>
+</div>
+<!-- 3. Discovery (Active) -->
+<div class="flex flex-col gap-space-3xs p-space-xs rounded bg-primary-container text-on-primary shadow-xs">
+<div class="flex items-center justify-between">
+<span class="font-code-sm text-code-sm text-on-primary-container">03</span>
+<span class="material-symbols-outlined text-sm text-primary-fixed animate-pulse">pending</span>
+</div>
+<span class="font-label-sm text-label-sm font-bold text-on-primary">Discovery</span>
+<div class="w-full bg-primary h-1 rounded-full overflow-hidden mt-space-3xs">
+<div class="bg-primary-fixed h-full rounded-full" style="width: 65%;"></div>
+</div>
+</div>
+<!-- 4. Settlement Conference -->
+<div class="flex flex-col gap-space-3xs p-space-xs rounded bg-surface-container opacity-70">
+<div class="flex items-center justify-between">
+<span class="font-code-sm text-code-sm text-outline">04</span>
+<span class="material-symbols-outlined text-sm text-outline">radio_button_unchecked</span>
+</div>
+<span class="font-label-sm text-label-sm font-medium text-on-surface-variant">Settlement Conf.</span>
+<span class="font-code-sm text-code-sm text-outline">Nov 2026</span>
+</div>
+<!-- 5. Pre-Trial Motions -->
+<div class="flex flex-col gap-space-3xs p-space-xs rounded bg-surface-container opacity-70">
+<div class="flex items-center justify-between">
+<span class="font-code-sm text-code-sm text-outline">05</span>
+<span class="material-symbols-outlined text-sm text-outline">radio_button_unchecked</span>
+</div>
+<span class="font-label-sm text-label-sm font-medium text-on-surface-variant">Pre-Trial Motions</span>
+<span class="font-code-sm text-code-sm text-outline">Q1 2027</span>
+</div>
+<!-- 6. Trial -->
+<div class="flex flex-col gap-space-3xs p-space-xs rounded bg-surface-container opacity-70">
+<div class="flex items-center justify-between">
+<span class="font-code-sm text-code-sm text-outline">06</span>
+<span class="material-symbols-outlined text-sm text-outline">radio_button_unchecked</span>
+</div>
+<span class="font-label-sm text-label-sm font-medium text-on-surface-variant">Trial</span>
+<span class="font-code-sm text-code-sm text-outline">May 2027</span>
+</div>
+<!-- 7. Judgment -->
+<div class="flex flex-col gap-space-3xs p-space-xs rounded bg-surface-container opacity-70">
+<div class="flex items-center justify-between">
+<span class="font-code-sm text-code-sm text-outline">07</span>
+<span class="material-symbols-outlined text-sm text-outline">radio_button_unchecked</span>
+</div>
+<span class="font-label-sm text-label-sm font-medium text-on-surface-variant">Judgment</span>
+<span class="font-code-sm text-code-sm text-outline">Pending</span>
+</div>
+</div>
+</div>
+<!-- Three-Column Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md">
+<!-- Column 1: Case Summary & Pleadings Digest (35% -> 4/12 cols) -->
+<div class="lg:col-span-4 flex flex-col gap-space-md">
+<!-- Factual Digest Card -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-primary font-semibold">Case Summary &amp; Digest</span>
+<button class="text-outline hover:text-on-surface transition-colors" title="Edit Summary">
+<span class="material-symbols-outlined text-base">edit_note</span>
+</button>
+</div>
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+            Action arises from alleged breach of a 15-year commercial master lease for Floors 12–16 at <strong class="text-primary font-semibold">450 Lexington Avenue</strong>. Plaintiff contends Castellan improperly withheld <span class="font-code-sm text-code-sm bg-surface-container px-1 py-0.5 rounded text-on-surface font-semibold">$1,450,000</span> in tenant improvement credits following HVAC structural load defects discovered during core fit-out.
+          </p>
+<div class="flex flex-col gap-space-xs bg-surface-container-low p-space-sm rounded-lg">
+<div class="flex justify-between items-center text-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Opposing Counsel</span>
+<span class="font-label-sm text-label-sm font-semibold text-on-surface">Whitman &amp; Sterling LLP</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Lead Opposing Attorney</span>
+<span class="font-code-sm text-code-sm text-on-surface">David Vance, Esq.</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Claim Value</span>
+<span class="font-code-md text-code-md font-bold text-error">$1,450,000.00</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Counterclaim Filed</span>
+<span class="font-code-md text-code-md font-semibold text-surface-tint">$620,000 (Cross-Action)</span>
+</div>
+</div>
+<!-- Key Claims Tagging -->
+<div class="flex flex-col gap-space-2xs">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Governing Legal Causes</span>
+<div class="flex flex-wrap gap-space-2xs">
+<span class="font-code-sm text-code-sm bg-surface-container px-space-xs py-space-3xs rounded text-on-surface">NY UCC Art. 2-A</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-space-xs py-space-3xs rounded text-on-surface">Breach of Covenant</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-space-xs py-space-3xs rounded text-on-surface">Indemnification §14.3</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-space-xs py-space-3xs rounded text-on-surface">Liquidated Damages</span>
+</div>
+</div>
+</div>
+<!-- Property / Evidentiary Location Insight -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-primary font-semibold">Subject Property</span>
+<span class="font-code-sm text-code-sm text-outline">NYC Parcel #104-002</span>
+</div>
+<div class="w-full h-36 bg-cover bg-center rounded-lg relative overflow-hidden shadow-inner" data-location="450 Lexington Ave, New York, NY" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCN22BjBqSPD6Osq4-KubcozblYrm5jFZefAtkmWkWNxjwmIT2aoYoFsRcjDnVzdch4HgYo7qKlBPZXlBlfL8X5E3qDyqLiDJU7EhN8upnIzfkwT_JD8FLt1dfwL5_bjfAyxpA_s0mZ3DK5ozRYcjwdEbbOdWZ8METAi-iJoHcVnUYdBesJ66HQHb2W0r4srHXquSKjk3sUCYvU7-vvayfNHB9CW2XiuLmOraTcngCh--rR5EEwT1wI')">
+<div class="absolute inset-0 bg-primary/20 backdrop-brightness-95"></div>
+<div class="absolute bottom-2 left-2 bg-surface-container-lowest/90 backdrop-blur-xs px-space-xs py-space-3xs rounded text-on-surface font-code-sm text-code-sm">
+              450 Lexington Avenue, New York, NY
+            </div>
+</div>
+</div>
+</div>
+<!-- Column 2: Recent Filings & Critical Work Product (40% -> 5/12 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-md">
+<!-- Critical Work Product & Filings -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-primary font-semibold">Active Filings &amp; Work Product</span>
+<span class="font-code-sm text-code-sm px-space-2xs py-space-3xs rounded bg-surface-container text-on-surface-variant font-medium">3 Pending Review</span>
+</div>
+<button class="inline-flex items-center gap-space-3xs text-primary font-label-md text-label-md hover:underline font-semibold">
+<span class="material-symbols-outlined text-sm">add</span> Add Filing
+            </button>
+</div>
+<!-- Document List -->
+<div class="flex flex-col gap-space-xs">
+<!-- Doc 1 -->
+<div class="flex items-start justify-between p-space-sm bg-surface rounded-lg hover:bg-surface-container-low transition-colors group cursor-pointer shadow-xs">
+<div class="flex items-start gap-space-xs min-w-0">
+<div class="w-8 h-8 rounded bg-primary-container/10 text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-lg">description</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate group-hover:text-primary transition-colors">
+                    Joint Discovery Plan &amp; Stipulation.pdf
+                  </span>
+<div class="flex items-center gap-space-2xs text-on-surface-variant font-code-sm text-code-sm mt-0.5">
+<span>Filed Oct 08, 2026</span>
+<span>·</span>
+<span class="text-secondary font-medium">🔒 Privileged</span>
+<span>·</span>
+<span>2.4 MB</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface transition-colors text-base shrink-0">download</span>
+</div>
+<!-- Doc 2 -->
+<div class="flex items-start justify-between p-space-sm bg-surface rounded-lg hover:bg-surface-container-low transition-colors group cursor-pointer shadow-xs">
+<div class="flex items-start gap-space-xs min-w-0">
+<div class="w-8 h-8 rounded bg-surface-container-high text-on-surface-variant flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-lg">article</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate group-hover:text-primary transition-colors">
+                    Expert Witness Deposition Transcript - Thorne.docx
+                  </span>
+<div class="flex items-center gap-space-2xs text-on-surface-variant font-code-sm text-code-sm mt-0.5">
+<span>Drafted Oct 05, 2026</span>
+<span>·</span>
+<span class="text-surface-tint font-medium">Elena R.</span>
+<span>·</span>
+<span>118 pages</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface transition-colors text-base shrink-0">open_in_new</span>
+</div>
+<!-- Doc 3 -->
+<div class="flex items-start justify-between p-space-sm bg-surface rounded-lg hover:bg-surface-container-low transition-colors group cursor-pointer shadow-xs">
+<div class="flex items-start gap-space-xs min-w-0">
+<div class="w-8 h-8 rounded bg-error-container text-on-error-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-lg">priority_high</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate group-hover:text-primary transition-colors">
+                    Plaintiff's Second Request for Production of Documents.pdf
+                  </span>
+<div class="flex items-center gap-space-2xs text-on-surface-variant font-code-sm text-code-sm mt-0.5">
+<span class="text-error font-medium">Response Due: Oct 24, 2026</span>
+<span>·</span>
+<span>Service Pack</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface transition-colors text-base shrink-0">schedule</span>
+</div>
+</div>
+</div>
+<!-- Pending Deliverables & Countdown Timers -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-primary font-semibold">Critical Deadlines</span>
+<span class="font-code-sm text-code-sm text-outline">FRCP Time-Rules Active</span>
+</div>
+<div class="flex flex-col gap-space-xs">
+<!-- Deliverable 1 -->
+<div class="flex items-center justify-between p-space-sm rounded bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Submit Joint Proposed Pre-Trial Order</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">SDNY Part 14 Room 21B · Presiding Hon. Vance</span>
+</div>
+<div class="text-right">
+<span class="font-code-md text-code-md font-bold text-secondary">T-48 hrs</span>
+<p class="font-code-sm text-code-sm text-on-surface-variant">Oct 17, 9:00 AM</p>
+</div>
+</div>
+<!-- Deliverable 2 -->
+<div class="flex items-center justify-between p-space-sm rounded bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Serve Rebuttal Expert Reports (HVAC Structural)</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Engaged firm: Thornton Tomasetti Inc.</span>
+</div>
+<div class="text-right">
+<span class="font-code-md text-code-md font-bold text-on-surface">T-14 days</span>
+<p class="font-code-sm text-code-sm text-on-surface-variant">Oct 29, 2026</p>
+</div>
+</div>
+<!-- Deliverable 3 -->
+<div class="flex items-center justify-between p-space-sm rounded bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Close of Fact Discovery Depositions</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">6 remaining depositions scheduled</span>
+</div>
+<div class="text-right">
+<span class="font-code-md text-code-md font-bold text-on-surface">T-32 days</span>
+<p class="font-code-sm text-code-sm text-on-surface-variant">Nov 16, 2026</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column 3: Case Team & Financials (25% -> 3/12 cols) -->
+<div class="lg:col-span-3 flex flex-col gap-space-md">
+<!-- Case Team Widget -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-primary font-semibold">Assigned Legal Team</span>
+<button class="text-outline hover:text-on-surface transition-colors" title="Manage Team">
+<span class="material-symbols-outlined text-base">group_add</span>
+</button>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Lead -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<img alt="Margaret Chen" class="w-9 h-9 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIoTWcGclpDFdP6M8nJjTR6RyLXNBiYMD9JiIBxm7ApghMExHQdmVIKSe_2Q4eWApzbSXPAcsueAD5hlDW3Sl-NJeIfAHF7KanUvH1-iEcvN8KWcHpiWF8LXUbrSkDIx9-vayC92YRHLKWDl6vBD02LkCaq_Z0K90xONaPC4-zDE6ehft5of8aOzviOmRgSBWacX0cIFINykHKQ9gsUmME6ooucvTwyD44Qq2al5teRX_tiVZ13_um"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate">Margaret Chen</span>
+<span class="font-code-sm text-code-sm text-primary font-medium">Lead Trial Counsel</span>
+</div>
+</div>
+<button class="p-1 rounded hover:bg-surface-container text-outline hover:text-on-surface transition-colors" title="Message">
+<span class="material-symbols-outlined text-base">chat_bubble_outline</span>
+</button>
+</div>
+<!-- Associate -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center font-label-md font-semibold text-primary">
+                  ER
+                </div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate">Elena Rostova</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Senior Associate</span>
+</div>
+</div>
+<button class="p-1 rounded hover:bg-surface-container text-outline hover:text-on-surface transition-colors" title="Message">
+<span class="material-symbols-outlined text-base">chat_bubble_outline</span>
+</button>
+</div>
+<!-- Paralegal -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center font-label-md font-semibold text-on-surface-variant">
+                  MB
+                </div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate">Marcus Bell</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Senior Paralegal</span>
+</div>
+</div>
+<button class="p-1 rounded hover:bg-surface-container text-outline hover:text-on-surface transition-colors" title="Message">
+<span class="material-symbols-outlined text-base">chat_bubble_outline</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Real-Time Stopwatch Widget -->
+<div class="bg-primary text-on-primary p-space-md rounded-xl shadow-md flex flex-col gap-space-sm relative overflow-hidden">
+<div class="absolute -right-8 -bottom-8 w-32 h-32 bg-primary-fixed/10 rounded-full blur-xl pointer-events-none"></div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container font-semibold">Live Time Capture</span>
+<span class="w-2 h-2 rounded-full bg-secondary-container animate-ping"></span>
+</div>
+<div class="flex items-baseline justify-between pt-space-3xs">
+<span class="font-code-md text-headline-lg font-bold tracking-tight text-on-primary" id="case-timer-display">02:14:00</span>
+<span class="font-label-sm text-label-sm px-space-2xs py-space-3xs rounded bg-primary-container text-primary-fixed">Billable @ $625/hr</span>
+</div>
+<p class="font-code-sm text-code-sm text-on-primary-container truncate">
+            Task: Review Opposing Response to Doc Request #4
+          </p>
+<div class="flex items-center gap-space-xs pt-space-3xs">
+<button class="flex-1 h-8 rounded bg-primary-fixed text-on-primary-fixed font-label-md text-label-md font-semibold hover:bg-primary-fixed-dim transition-colors flex items-center justify-center gap-1" id="timer-toggle-btn">
+<span class="material-symbols-outlined text-sm">pause</span> Pause
+            </button>
+<button class="h-8 px-space-sm rounded bg-tertiary-container hover:bg-tertiary transition-colors text-on-primary font-label-md text-label-md">
+              Log &amp; Clear
+            </button>
+</div>
+</div>
+<!-- Financial Health & WIP Card -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-primary font-semibold">Trust &amp; Unbilled WIP</span>
+<span class="material-symbols-outlined text-outline text-base">account_balance</span>
+</div>
+<!-- WIP Progress -->
+<div class="flex flex-col gap-space-3xs">
+<div class="flex justify-between items-baseline">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Unbilled Time (WIP)</span>
+<span class="font-code-md text-code-md font-bold text-on-surface">$18,810.00</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full rounded-full" style="width: 62%;"></div>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface-variant">34.2 billable hrs logged this period</span>
+</div>
+<!-- Trust Retainer Balance -->
+<div class="flex flex-col gap-space-3xs pt-space-xs">
+<div class="flex justify-between items-baseline">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Trust Account Retainer</span>
+<span class="font-code-md text-code-md font-bold text-surface-tint">$18,500.00</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-surface-tint h-full rounded-full" style="width: 61.6%;"></div>
+</div>
+<span class="font-code-sm text-code-sm text-outline">$18.5k remaining of $30,000 evergreen retainer</span>
+</div>
+<!-- Quick Action -->
+<a class="inline-flex items-center justify-between p-space-xs mt-space-2xs rounded bg-surface-container-low hover:bg-surface-container transition-colors group" href="#">
+<span class="font-label-md text-label-md text-on-surface font-medium">Generate Draft Invoice</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-base">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    // Micro-interaction for Billable Stopwatch toggle
+    let isRunning = true;
+    let seconds = 8040; // 02:14:00 in seconds
+    const timerDisplay = document.getElementById('case-timer-display');
+    const toggleBtn = document.getElementById('timer-toggle-btn');
+
+    function formatTime(totalSecs) {
+      const hrs = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
+      const mins = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
+      const secs = (totalSecs % 60).toString().padStart(2, '0');
+      return `${hrs}:${mins}:${secs}`;
+    }
+
+    const interval = setInterval(() => {
+      if (isRunning && timerDisplay) {
+        seconds++;
+        timerDisplay.textContent = formatTime(seconds);
+      }
+    }, 1000);
+
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        isRunning = !isRunning;
+        if (isRunning) {
+          toggleBtn.innerHTML = '<span class="material-symbols-outlined text-sm">pause</span> Pause';
+          toggleBtn.classList.remove('bg-surface-container-high', 'text-on-surface');
+          toggleBtn.classList.add('bg-primary-fixed', 'text-on-primary-fixed');
+        } else {
+          toggleBtn.innerHTML = '<span class="material-symbols-outlined text-sm">play_arrow</span> Resume';
+          toggleBtn.classList.remove('bg-primary-fixed', 'text-on-primary-fixed');
+          toggleBtn.classList.add('bg-surface-container-high', 'text-on-surface');
+        }
+      });
+    }
+  })();
+</script></main></div></body></html>

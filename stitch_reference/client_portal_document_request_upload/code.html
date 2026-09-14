@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"secondary-fixed-dim":"#e6c364","on-tertiary-fixed-variant":"#424844","on-secondary-fixed-variant":"#584400","error":"#ba1a1a","tertiary":"#1c221f","on-surface-variant":"#424843","surface-dim":"#dbdad7","inverse-on-surface":"#f1f1ee","secondary-fixed":"#ffe08f","on-tertiary":"#ffffff","surface-bright":"#faf9f6","on-tertiary-fixed":"#171d1a","secondary-container":"#fed977","on-primary-container":"#82a78f","tertiary-container":"#313733","primary-container":"#1a3c2a","surface-container":"#efeeeb","tertiary-fixed-dim":"#c2c8c3","on-error-container":"#93000a","primary":"#022616","on-primary":"#ffffff","on-tertiary-container":"#9aa09b","surface":"#faf9f6","on-secondary-container":"#785d00","surface-container-high":"#e9e8e5","outline-variant":"#c1c8c1","surface-container-highest":"#e3e2e0","primary-fixed":"#c5ecd2","on-primary-fixed-variant":"#2c4e3a","outline":"#727973","primary-fixed-dim":"#a9cfb6","inverse-primary":"#a9cfb6","secondary":"#755b00","surface-tint":"#436651","error-container":"#ffdad6","surface-container-lowest":"#ffffff","on-secondary":"#ffffff","surface-variant":"#e3e2e0","surface-container-low":"#f4f3f1","tertiary-fixed":"#dee4df","on-background":"#1a1c1a","background":"#faf9f6","on-primary-fixed":"#002112","on-error":"#ffffff","on-surface":"#1a1c1a","inverse-surface":"#2f312f","on-secondary-fixed":"#241a00"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-3xs":"0.125rem","space-sm":"0.75rem","space-xs":"0.5rem","margin":"1rem","space-3xl":"4rem","space-2xl":"3rem","gutter-lg":"1.5rem","margin-lg":"2rem","gutter":"1rem","space-md":"1rem","space-lg":"1.5rem","space-xl":"2rem","margin-md":"1.5rem","space-2xs":"0.25rem"},"fontFamily":{"label-md":["Inter"],"headline-md":["Inter"],"headline-lg":["Inter"],"code-sm":["JetBrains Mono"],"headline-sm":["Inter"],"code-md":["JetBrains Mono"],"body-lg":["Inter"],"display":["Inter"],"headline-lg-mobile":["Inter"],"body-md":["Inter"],"body-sm":["Inter"],"label-sm":["Inter"]},"fontSize":{"label-md":["0.8125rem",{"lineHeight":"1.125rem","letterSpacing":"0.01em","fontWeight":"500"}],"headline-md":["1.25rem",{"lineHeight":"1.75rem","letterSpacing":"-0.015em","fontWeight":"600"}],"headline-lg":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.02em","fontWeight":"600"}],"code-sm":["0.6875rem",{"lineHeight":"1rem","letterSpacing":"0em","fontWeight":"500"}],"headline-sm":["1rem",{"lineHeight":"1.5rem","letterSpacing":"-0.01em","fontWeight":"600"}],"code-md":["0.8125rem",{"lineHeight":"1.25rem","letterSpacing":"-0.01em","fontWeight":"400"}],"body-lg":["1rem",{"lineHeight":"1.625rem","letterSpacing":"-0.005em","fontWeight":"400"}],"display":["2.25rem",{"lineHeight":"2.75rem","letterSpacing":"-0.025em","fontWeight":"600"}],"headline-lg-mobile":["1.375rem",{"lineHeight":"1.75rem","letterSpacing":"-0.015em","fontWeight":"600"}],"body-md":["0.875rem",{"lineHeight":"1.375rem","letterSpacing":"0em","fontWeight":"400"}],"body-sm":["0.75rem",{"lineHeight":"1.125rem","letterSpacing":"0em","fontWeight":"400"}],"label-sm":["0.6875rem",{"lineHeight":"1rem","letterSpacing":"0.03em","fontWeight":"600"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-[0_1px_8px_rgba(17,23,20,0.04)]"><div class="h-16 w-full px-gutter-lg flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-xs"><img alt="Brand logo. - Primary color: #1a3c2a
+- Font: inter
+- Mode: light
+- Roundness: rounded-sm
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XDCvcMumfuKw0N2xQRpeBOPM7Ecnp7MQP4LBHgH46kFr6V1vSC4gTEB3oyajqX4M4Zw9J5fjGGIaalzcTFAxxk1wea3wlO4CevUvgkMiGWWw3nb4JOd8WcDOFvtyoFjVAKuPBfwJuHXEsLVG-_-xg2qANr--ZWvx3OQDf-EXXJcCwChtgOnXq0_SCrpR0Am3xhLev8XLPHGJvP3RR9m-Md9xT_Iy9-9Ox0vnhNFnydd_MbtsFjq3rDEfU"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-primary tracking-tight">Quire Legal</span><span class="font-code-sm text-code-sm text-on-surface-variant uppercase">Client Portal</span></div></div><nav class="hidden lg:flex items-center gap-space-2xs" data-active-classes="bg-primary-container text-on-primary font-label-md"><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="dashboard" href="#">Dashboard</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="my-matters" href="#">My Matters</a><a aria-current="page" class="px-space-sm py-space-xs rounded transition-colors bg-primary-container text-on-primary font-label-md" data-path="documents" href="#">Documents</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="messages" href="#">Messages</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="invoices-and-payments" href="#">Invoices &amp; Payments</a></nav></div><div class="flex items-center gap-space-md"><button class="relative p-space-xs rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span></button><button class="hidden sm:inline-flex items-center gap-space-xs px-space-sm py-space-xs rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container-high hover:text-on-surface transition-colors shadow-[0_1px_3px_rgba(17,23,20,0.04)]" type="button"><span class="material-symbols-outlined text-[16px] text-primary">support_agent</span><span class="font-label-md text-label-md">Contact Legal Team</span></button><div class="flex items-center gap-space-xs pl-space-xs py-space-2xs pr-space-xs rounded bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div class="hidden md:flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface leading-tight">David Castellan</span><span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Castellan Property Group</span></div><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></div></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<div class="w-full px-gutter-lg py-space-md bg-surface-container-low/70 backdrop-blur-sm">
+<div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-space-sm">
+<nav aria-label="Breadcrumb" class="flex items-center gap-space-xs font-label-md text-label-md text-on-surface-variant min-w-0">
+<a class="hover:text-primary transition-colors flex items-center gap-space-2xs" href="#">
+<span class="material-symbols-outlined text-[16px]">folder_open</span>
+<span>Documents</span>
+</a>
+<span class="text-outline-variant select-none">/</span>
+<a class="hover:text-primary transition-colors" href="#">Pending Requests</a>
+<span class="text-outline-variant select-none">/</span>
+<span class="font-code-sm text-code-sm text-primary font-medium tracking-tight truncate bg-surface-container px-space-xs py-space-3xs rounded">REQ-2026-089</span>
+</nav>
+<div class="flex items-center gap-space-sm text-on-surface-variant font-code-sm text-code-sm">
+<span class="flex items-center gap-space-2xs text-secondary font-medium bg-secondary-container/40 px-space-xs py-space-3xs rounded-full">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+          Filing Countdown: 41h 22m
+        </span>
+<span class="hidden sm:inline-block text-outline-variant">•</span>
+<span class="hidden sm:inline-flex items-center gap-space-3xs">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+          256-bit AES Vault
+        </span>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto w-full px-gutter-lg py-space-lg space-y-space-lg">
+<section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden relative">
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-error via-secondary to-primary"></div>
+<div class="p-space-lg space-y-space-md">
+<div class="flex flex-col lg:flex-row lg:items-start justify-between gap-space-md">
+<div class="space-y-space-xs max-w-3xl">
+<div class="flex flex-wrap items-center gap-space-xs">
+<span class="inline-flex items-center gap-space-3xs px-space-xs py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm uppercase tracking-wider font-semibold">
+<span class="material-symbols-outlined text-[14px]">priority_high</span>
+                Urgent - Required for Court Filing
+              </span>
+<span class="font-code-sm text-code-sm text-on-surface-variant bg-surface-container px-space-xs py-0.5 rounded">
+                DOCKET: HO-2026-0042
+              </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">
+                Marsh v. Castellan Property Group
+              </span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+              Structural Engineering Survey &amp; Original Commercial Lease Rider
+            </h1>
+</div>
+<div class="flex flex-row lg:flex-col items-start lg:items-end justify-between gap-space-xs shrink-0 bg-surface-container-low p-space-sm rounded-lg">
+<div class="text-left lg:text-right">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block">Due by</span>
+<span class="font-headline-sm text-headline-sm text-error font-semibold">Oct 20, 2026 • 17:00 EST</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Expert report rebuttal filing</span>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md pt-space-xs">
+<div class="lg:col-span-8 bg-surface-container-low rounded-lg p-space-md relative overflow-hidden flex flex-col sm:flex-row gap-space-md items-start">
+<div class="shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-primary-container text-on-primary">
+<span class="material-symbols-outlined text-[24px]">balance</span>
+</div>
+<div class="space-y-space-2xs min-w-0">
+<div class="flex flex-wrap items-center gap-space-xs">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Margaret Chen</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-space-2xs py-space-3xs rounded">Lead Counsel • Senior Litigation Partner</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant italic">
+                “David, we urgently need the stamped structural report from Thornton Engineers regarding the HVAC foundation load on floors 12-16, plus the signed rider dated March 2024. Please scan all pages clearly or upload PDF copies directly here.”
+              </p>
+</div>
+</div>
+<div class="lg:col-span-4 bg-primary/5 rounded-lg p-space-md flex flex-col justify-between space-y-space-xs">
+<div class="flex items-center gap-space-xs text-primary font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+<span>Privileged Intake Channel</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Encrypted submission under Attorney-Client Privilege. Stamped directly with digital chain-of-custody hash upon receipt.
+            </p>
+<div class="pt-space-2xs flex items-center justify-between font-code-sm text-code-sm text-primary">
+<span>SHA-256 HASH PIPELINE</span>
+<span class="material-symbols-outlined text-[14px]">terminal</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg space-y-space-md">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm pb-space-xs">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Dual Intake Hub</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Submit pristine files from storage or capture physically using our calibrated real-time document scanner.</p>
+</div>
+<div class="inline-flex bg-surface-container p-space-3xs rounded-lg">
+<button class="px-space-md py-space-xs rounded font-label-md text-label-md bg-surface-container-lowest text-on-surface shadow-sm flex items-center gap-space-xs transition-all" id="tabUploadBtn" type="button">
+<span class="material-symbols-outlined text-[16px]">upload_file</span>
+<span>File Dropzone</span>
+</button>
+<button class="px-space-md py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface flex items-center gap-space-xs transition-all" id="tabCameraBtn" type="button">
+<span class="material-symbols-outlined text-[16px]">document_scanner</span>
+<span>Live Document Camera</span>
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-stretch">
+<div class="lg:col-span-5 flex flex-col justify-between bg-surface-container-low rounded-xl p-space-lg transition-all hover:bg-surface-container-high/60 group relative overflow-hidden">
+<input accept=".pdf,.docx,.png,.jpg,.jpeg,.tiff" class="hidden" id="fileInputElem" multiple="" type="file"/>
+<div class="space-y-space-md text-center flex flex-col items-center py-space-lg">
+<div class="w-16 h-16 rounded-2xl bg-surface-container-lowest shadow-sm flex items-center justify-center text-primary group-hover:scale-105 transition-transform duration-200">
+<span class="material-symbols-outlined text-[32px]">cloud_upload</span>
+</div>
+<div class="space-y-space-2xs max-w-sm">
+<span class="font-headline-sm text-headline-sm text-on-surface block">
+                Drag and drop your files here
+              </span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Drop your signed lease rider &amp; engineering reports directly into this chamber, or browse local volumes.
+              </p>
+</div>
+<button class="px-space-lg py-space-sm rounded-lg bg-surface-container-lowest hover:bg-surface-container-high text-on-surface font-label-md text-label-md shadow-sm transition-colors flex items-center gap-space-xs" onclick="document.getElementById('fileInputElem').click()" type="button">
+<span class="material-symbols-outlined text-[18px] text-primary">folder_open</span>
+<span>Choose Files from Computer</span>
+</button>
+</div>
+<div class="pt-space-md mt-auto">
+<div class="flex items-center justify-between text-on-surface-variant font-code-sm text-code-sm bg-surface-container-lowest/60 px-space-sm py-space-xs rounded-lg">
+<span class="flex items-center gap-space-3xs">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                PDF, DOCX, TIFF, PNG
+              </span>
+<span>Max 100MB / file</span>
+</div>
+</div>
+</div>
+<div class="lg:col-span-7 bg-surface-container-low rounded-xl p-space-md flex flex-col space-y-space-sm relative">
+<div class="flex items-center justify-between px-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold tracking-tight">Scanner Engine: Ready</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant bg-surface-container px-space-2xs py-space-3xs rounded">Page 1 of 3</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="p-space-2xs rounded-md bg-surface-container-lowest text-on-surface hover:bg-surface-container-high transition-colors text-on-surface-variant" title="Flash Assist" type="button">
+<span class="material-symbols-outlined text-[18px]">flash_on</span>
+</button>
+<button class="p-space-2xs rounded-md bg-primary-container text-on-primary font-label-sm text-label-sm px-space-xs flex items-center gap-space-3xs shadow-sm" title="B&amp;W OCR Enhancement" type="button">
+<span class="material-symbols-outlined text-[16px]">contrast</span>
+<span>Auto-B&amp;W</span>
+</button>
+<button class="p-space-2xs rounded-md bg-surface-container-lowest text-on-surface hover:bg-surface-container-high transition-colors font-label-sm text-label-sm px-space-xs flex items-center gap-space-3xs" title="Auto-Deskew Active" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary">straighten</span>
+<span>Deskewed</span>
+</button>
+</div>
+</div>
+<div class="relative w-full h-80 bg-tertiary rounded-lg overflow-hidden flex items-center justify-center select-none group shadow-inner">
+<div class="absolute inset-0 opacity-40 bg-[radial-gradient(#a9cfb6_1px,transparent_1px)] [background-size:16px_16px]"></div>
+<div class="relative w-64 h-72 bg-surface-container-lowest rounded-sm shadow-xl p-space-sm flex flex-col justify-between transform -rotate-1 transition-transform group-hover:rotate-0 duration-300">
+<div class="absolute -top-1.5 -left-1.5 w-4 h-4 border-t-2 border-l-2 border-primary-fixed-dim"></div>
+<div class="absolute -top-1.5 -right-1.5 w-4 h-4 border-t-2 border-r-2 border-primary-fixed-dim"></div>
+<div class="absolute -bottom-1.5 -left-1.5 w-4 h-4 border-b-2 border-l-2 border-primary-fixed-dim"></div>
+<div class="absolute -bottom-1.5 -right-1.5 w-4 h-4 border-b-2 border-r-2 border-primary-fixed-dim"></div>
+<div class="space-y-space-2xs pointer-events-none">
+<div class="flex items-center justify-between pb-space-2xs bg-surface-container-low/50 px-space-2xs rounded">
+<span class="font-code-sm text-[9px] text-on-surface-variant uppercase tracking-wider font-semibold">Thornton &amp; Co. Engineers</span>
+<span class="font-code-sm text-[9px] text-primary">STAMPED APPROVED</span>
+</div>
+<div class="h-2 w-3/4 bg-on-surface-variant/20 rounded"></div>
+<div class="h-1.5 w-full bg-on-surface-variant/15 rounded"></div>
+<div class="h-1.5 w-5/6 bg-on-surface-variant/15 rounded"></div>
+<div class="h-1.5 w-2/3 bg-on-surface-variant/15 rounded"></div>
+</div>
+<div class="space-y-space-3xs py-space-xs pointer-events-none">
+<div class="text-[10px] font-mono text-on-surface/80 uppercase font-semibold">HVAC Foundation Load Map - Fl 12-16</div>
+<div class="h-14 w-full bg-surface-container-low rounded flex items-center justify-center text-on-surface-variant/40">
+<span class="material-symbols-outlined text-[28px]">architecture</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs pointer-events-none">
+<div class="h-3 w-16 bg-on-surface-variant/20 rounded"></div>
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+</div>
+</div>
+<div class="absolute top-2 right-2 bg-primary text-on-primary font-code-sm text-[8px] px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                Edge Locked
+              </div>
+</div>
+<div class="absolute inset-x-8 top-1/2 -translate-y-1/2 flex items-center justify-between pointer-events-none opacity-60">
+<span class="material-symbols-outlined text-primary-fixed text-[24px]">chevron_left</span>
+<span class="material-symbols-outlined text-primary-fixed text-[24px]">chevron_right</span>
+</div>
+<div class="absolute top-3 left-3 bg-tertiary-container/80 backdrop-blur-md px-space-xs py-space-3xs rounded text-tertiary-fixed font-code-sm text-code-sm flex items-center gap-space-2xs">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed"></span>
+<span>Pitch: 0.2° • Roll: 0.0° (Level)</span>
+</div>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-space-sm pt-space-2xs">
+<button class="inline-flex items-center gap-space-xs px-space-sm py-space-xs rounded-lg bg-surface-container-lowest hover:bg-surface-container-high transition-colors text-on-surface font-label-md text-label-md shadow-sm" id="phoneHandshakeBtn" type="button">
+<span class="material-symbols-outlined text-[18px] text-primary">qr_code_scanner</span>
+<span>Snap with Phone Camera</span>
+<span class="font-code-sm text-code-sm bg-surface-container px-space-2xs py-space-3xs rounded text-on-surface-variant">iOS / Android</span>
+</button>
+<div class="flex items-center gap-space-sm">
+<span class="font-body-sm text-body-sm text-on-surface-variant hidden sm:inline-block">Position page flat in camera guide</span>
+<button class="px-space-lg py-space-sm rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md shadow flex items-center gap-space-xs transition-transform active:scale-95" type="button">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+<span>Capture Page (Page 1 of 3)</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg space-y-space-md">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs">
+<div class="space-y-space-3xs">
+<div class="flex items-center gap-space-xs">
+<h2 class="font-headline-md text-headline-md text-on-surface">Staging Tray &amp; Review</h2>
+<span class="bg-primary-fixed text-on-primary-fixed font-code-sm text-code-sm px-space-xs py-space-3xs rounded-full font-medium">2 Items Ready</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Review extracted metadata and cryptographic hash integrity prior to firm transmission.</p>
+</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant flex items-center gap-space-2xs bg-surface-container-low px-space-sm py-space-xs rounded-lg">
+<span class="material-symbols-outlined text-[16px] text-primary">security</span>
+<span>End-to-End Encrypted Tunnel active</span>
+</div>
+</div>
+<div class="space-y-space-sm">
+<div class="bg-surface-container-low hover:bg-surface-container rounded-lg p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-md transition-colors">
+<div class="flex items-start gap-space-md min-w-0">
+<div class="w-12 h-14 bg-surface-container-lowest rounded shadow-sm shrink-0 flex flex-col items-center justify-center text-primary relative overflow-hidden">
+<span class="material-symbols-outlined text-[24px]">picture_as_pdf</span>
+<span class="font-code-sm text-[8px] bg-primary text-on-primary w-full text-center py-0.5 mt-1 font-bold">14 PGS</span>
+</div>
+<div class="space-y-space-3xs min-w-0">
+<div class="flex flex-wrap items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface truncate font-medium">Thornton_Structural_Load_Audit_2024.pdf</span>
+<span class="bg-surface-container-highest text-on-surface font-code-sm text-code-sm px-space-xs py-0.5 rounded">3.8 MB</span>
+<span class="bg-primary-container/10 text-primary font-label-sm text-label-sm px-space-xs py-0.5 rounded-full flex items-center gap-space-3xs">
+<span class="material-symbols-outlined text-[12px]">camera</span>
+                  Scanned via Scanner Engine
+                </span>
+</div>
+<div class="flex flex-wrap items-center gap-space-sm font-code-sm text-code-sm text-on-surface-variant">
+<span>14 Pages Complete</span>
+<span>•</span>
+<span>Enhanced Black &amp; White (300 DPI OCR Verified)</span>
+<span>•</span>
+<span class="text-primary font-medium">Hash: SHA256:7f4a...90e1</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-xs shrink-0 self-end md:self-center">
+<button class="px-space-sm py-space-xs rounded bg-surface-container-lowest hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors flex items-center gap-space-2xs shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+<span>Inspect</span>
+</button>
+<button class="px-space-sm py-space-xs rounded bg-surface-container-lowest hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors flex items-center gap-space-2xs shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">replay</span>
+<span>Retake</span>
+</button>
+<button class="p-space-xs rounded bg-surface-container-lowest hover:bg-error-container hover:text-on-error-container text-on-surface-variant transition-colors" title="Delete from queue" type="button">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+</div>
+<div class="bg-surface-container-low hover:bg-surface-container rounded-lg p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-md transition-colors">
+<div class="flex items-start gap-space-md min-w-0">
+<div class="w-12 h-14 bg-surface-container-lowest rounded shadow-sm shrink-0 flex flex-col items-center justify-center text-primary relative overflow-hidden">
+<span class="material-symbols-outlined text-[24px]">description</span>
+<span class="font-code-sm text-[8px] bg-primary-container text-on-primary w-full text-center py-0.5 mt-1 font-bold">4 PGS</span>
+</div>
+<div class="space-y-space-3xs min-w-0">
+<div class="flex flex-wrap items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface truncate font-medium">Lease_Rider_Executed_Floors12-16.pdf</span>
+<span class="bg-surface-container-highest text-on-surface font-code-sm text-code-sm px-space-xs py-0.5 rounded">1.2 MB</span>
+<span class="bg-surface-container text-on-surface font-label-sm text-label-sm px-space-xs py-0.5 rounded-full flex items-center gap-space-3xs">
+<span class="material-symbols-outlined text-[12px]">cloud_done</span>
+                  Direct File Upload
+                </span>
+</div>
+<div class="flex flex-wrap items-center gap-space-sm font-code-sm text-code-sm text-on-surface-variant">
+<span>4 Pages Signed Rider</span>
+<span>•</span>
+<span>Thornton &amp; Castellan Executed Execution Stamp</span>
+<span>•</span>
+<span class="text-primary font-medium">Hash: SHA256:b21d...ca55</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-xs shrink-0 self-end md:self-center">
+<button class="px-space-sm py-space-xs rounded bg-surface-container-lowest hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors flex items-center gap-space-2xs shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+<span>Inspect</span>
+</button>
+<button class="px-space-sm py-space-xs rounded bg-surface-container-lowest hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors flex items-center gap-space-2xs shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">sync_alt</span>
+<span>Replace</span>
+</button>
+<button class="p-space-xs rounded bg-surface-container-lowest hover:bg-error-container hover:text-on-error-container text-on-surface-variant transition-colors" title="Delete from queue" type="button">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<div class="pt-space-sm space-y-space-md">
+<label class="flex items-start gap-space-sm p-space-md rounded-lg bg-surface-container-low cursor-pointer select-none">
+<input checked="" class="mt-1 w-4 h-4 rounded text-primary focus:ring-primary focus:ring-offset-0" type="checkbox"/>
+<div class="space-y-space-3xs">
+<span class="font-label-md text-label-md text-on-surface font-semibold block">
+              I confirm these documents are genuine copies of the requested commercial lease records and engineering inspections.
+            </span>
+<span class="font-body-sm text-body-sm text-on-surface-variant block">
+              Submissions are authenticated to David Castellan (Castellan Property Group) and permanently referenced in Matter HO-2026-0042 Discovery Index.
+            </span>
+</div>
+</label>
+<div class="flex flex-col sm:flex-row items-center justify-between gap-space-md pt-space-xs">
+<button class="w-full sm:w-auto px-space-lg py-space-sm rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-label-md" type="button">
+            Cancel &amp; Return to Matters
+          </button>
+<div class="flex items-center gap-space-sm w-full sm:w-auto justify-end">
+<button class="px-space-md py-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors flex items-center gap-space-xs" type="button">
+<span class="material-symbols-outlined text-[18px]">save</span>
+<span>Save Draft Staging</span>
+</button>
+<button class="w-full sm:w-auto px-space-xl py-space-sm rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-space-xs" type="button">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+<span>Transmit Securely to Margaret Chen &amp; Firm (2 Files • 5.0 MB)</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-tertiary/60 backdrop-blur-sm p-gutter" id="qrModal">
+<div class="bg-surface-container-lowest rounded-xl max-w-sm w-full p-space-lg shadow-xl space-y-space-md">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Mobile Camera Tether</h3>
+<button class="p-space-2xs text-on-surface-variant hover:text-on-surface" onclick="document.getElementById('qrModal').classList.add('hidden')" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+        Scan this QR badge with your iPhone or iPad camera. Pages photographed will stream live into this exact desktop queue.
+      </p>
+<div class="bg-surface-container-low p-space-md rounded-lg flex flex-col items-center justify-center space-y-space-xs">
+<div class="w-44 h-44 bg-surface-container-lowest p-space-sm rounded flex items-center justify-center shadow-inner">
+<svg class="w-full h-full text-primary" fill="currentColor" viewbox="0 0 100 100">
+<path d="M0,0 h30 v30 h-30 z M10,10 h10 v10 h-10 z"></path>
+<path d="M70,0 h30 v30 h-30 z M80,10 h10 v10 h-10 z"></path>
+<path d="M0,70 h30 v30 h-30 z M10,80 h10 v10 h-10 z"></path>
+<rect height="8" width="8" x="40" y="10"></rect>
+<rect height="8" width="8" x="52" y="10"></rect>
+<rect height="6" width="20" x="40" y="24"></rect>
+<rect height="20" width="10" x="10" y="40"></rect>
+<rect height="8" width="12" x="25" y="40"></rect>
+<rect height="20" width="20" x="40" y="40"></rect>
+<rect height="15" width="8" x="70" y="40"></rect>
+<rect height="10" width="10" x="82" y="45"></rect>
+<rect height="20" width="10" x="40" y="70"></rect>
+<rect height="10" width="15" x="55" y="75"></rect>
+<rect height="15" width="15" x="75" y="70"></rect>
+</svg>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface-variant">SESSION: SEC-SCAN-88910</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm">
+<span class="flex items-center gap-space-3xs text-primary font-medium">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+          Waiting for scan...
+        </span>
+<button class="font-label-md text-label-md text-primary hover:underline" onclick="document.getElementById('qrModal').classList.add('hidden')" type="button">Done</button>
+</div>
+</div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabUploadBtn = document.getElementById('tabUploadBtn');
+      const tabCameraBtn = document.getElementById('tabCameraBtn');
+      const phoneHandshakeBtn = document.getElementById('phoneHandshakeBtn');
+      const qrModal = document.getElementById('qrModal');
+
+      if (tabUploadBtn && tabCameraBtn) {
+        tabUploadBtn.addEventListener('click', () => {
+          tabUploadBtn.className = 'px-space-md py-space-xs rounded font-label-md text-label-md bg-surface-container-lowest text-on-surface shadow-sm flex items-center gap-space-xs transition-all';
+          tabCameraBtn.className = 'px-space-md py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface flex items-center gap-space-xs transition-all';
+        });
+
+        tabCameraBtn.addEventListener('click', () => {
+          tabCameraBtn.className = 'px-space-md py-space-xs rounded font-label-md text-label-md bg-surface-container-lowest text-on-surface shadow-sm flex items-center gap-space-xs transition-all';
+          tabUploadBtn.className = 'px-space-md py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface flex items-center gap-space-xs transition-all';
+        });
+      }
+
+      if (phoneHandshakeBtn && qrModal) {
+        phoneHandshakeBtn.addEventListener('click', () => {
+          qrModal.classList.remove('hidden');
+        });
+      }
+    });
+  </script>
+</div></main><footer class="w-full bg-surface-container-low py-space-lg"><div class="w-full px-gutter-lg flex flex-col sm:flex-row items-center justify-between gap-space-sm text-on-surface-variant font-body-sm text-body-sm"><div class="flex items-center gap-space-sm"><span class="font-label-md text-label-md text-on-surface">Quire Legal LLP</span><span>•</span><span>Archival Client Services &amp; Counsel</span></div><div class="flex items-center gap-space-md"><a class="hover:text-on-surface transition-colors" href="#">Security &amp; Encryption</a><a class="hover:text-on-surface transition-colors" href="#">Retainer Terms</a><a class="hover:text-on-surface transition-colors" href="#">Help Center</a></div></div></footer></body></html>

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"secondary-fixed-dim":"#e6c364","on-tertiary-fixed-variant":"#424844","on-secondary-fixed-variant":"#584400","error":"#ba1a1a","tertiary":"#1c221f","on-surface-variant":"#424843","surface-dim":"#dbdad7","inverse-on-surface":"#f1f1ee","secondary-fixed":"#ffe08f","on-tertiary":"#ffffff","surface-bright":"#faf9f6","on-tertiary-fixed":"#171d1a","secondary-container":"#fed977","on-primary-container":"#82a78f","tertiary-container":"#313733","primary-container":"#1a3c2a","surface-container":"#efeeeb","tertiary-fixed-dim":"#c2c8c3","on-error-container":"#93000a","primary":"#022616","on-primary":"#ffffff","on-tertiary-container":"#9aa09b","surface":"#faf9f6","on-secondary-container":"#785d00","surface-container-high":"#e9e8e5","outline-variant":"#c1c8c1","surface-container-highest":"#e3e2e0","primary-fixed":"#c5ecd2","on-primary-fixed-variant":"#2c4e3a","outline":"#727973","primary-fixed-dim":"#a9cfb6","inverse-primary":"#a9cfb6","secondary":"#755b00","surface-tint":"#436651","error-container":"#ffdad6","surface-container-lowest":"#ffffff","on-secondary":"#ffffff","surface-variant":"#e3e2e0","surface-container-low":"#f4f3f1","tertiary-fixed":"#dee4df","on-background":"#1a1c1a","background":"#faf9f6","on-primary-fixed":"#002112","on-error":"#ffffff","on-surface":"#1a1c1a","inverse-surface":"#2f312f","on-secondary-fixed":"#241a00"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-3xs":"0.125rem","space-sm":"0.75rem","space-xs":"0.5rem","margin":"1rem","space-3xl":"4rem","space-2xl":"3rem","gutter-lg":"1.5rem","margin-lg":"2rem","gutter":"1rem","space-md":"1rem","space-lg":"1.5rem","space-xl":"2rem","margin-md":"1.5rem","space-2xs":"0.25rem"},"fontFamily":{"label-md":["Inter"],"headline-md":["Inter"],"headline-lg":["Inter"],"code-sm":["JetBrains Mono"],"headline-sm":["Inter"],"code-md":["JetBrains Mono"],"body-lg":["Inter"],"display":["Inter"],"headline-lg-mobile":["Inter"],"body-md":["Inter"],"body-sm":["Inter"],"label-sm":["Inter"]},"fontSize":{"label-md":["0.8125rem",{"lineHeight":"1.125rem","letterSpacing":"0.01em","fontWeight":"500"}],"headline-md":["1.25rem",{"lineHeight":"1.75rem","letterSpacing":"-0.015em","fontWeight":"600"}],"headline-lg":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.02em","fontWeight":"600"}],"code-sm":["0.6875rem",{"lineHeight":"1rem","letterSpacing":"0em","fontWeight":"500"}],"headline-sm":["1rem",{"lineHeight":"1.5rem","letterSpacing":"-0.01em","fontWeight":"600"}],"code-md":["0.8125rem",{"lineHeight":"1.25rem","letterSpacing":"-0.01em","fontWeight":"400"}],"body-lg":["1rem",{"lineHeight":"1.625rem","letterSpacing":"-0.005em","fontWeight":"400"}],"display":["2.25rem",{"lineHeight":"2.75rem","letterSpacing":"-0.025em","fontWeight":"600"}],"headline-lg-mobile":["1.375rem",{"lineHeight":"1.75rem","letterSpacing":"-0.015em","fontWeight":"600"}],"body-md":["0.875rem",{"lineHeight":"1.375rem","letterSpacing":"0em","fontWeight":"400"}],"body-sm":["0.75rem",{"lineHeight":"1.125rem","letterSpacing":"0em","fontWeight":"400"}],"label-sm":["0.6875rem",{"lineHeight":"1rem","letterSpacing":"0.03em","fontWeight":"600"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-[0_1px_8px_rgba(17,23,20,0.04)]"><div class="h-16 w-full px-gutter-lg flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-xs"><img alt="Brand logo. - Primary color: #1a3c2a
+- Font: inter
+- Mode: light
+- Roundness: rounded-sm
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XDCvcMumfuKw0N2xQRpeBOPM7Ecnp7MQP4LBHgH46kFr6V1vSC4gTEB3oyajqX4M4Zw9J5fjGGIaalzcTFAxxk1wea3wlO4CevUvgkMiGWWw3nb4JOd8WcDOFvtyoFjVAKuPBfwJuHXEsLVG-_-xg2qANr--ZWvx3OQDf-EXXJcCwChtgOnXq0_SCrpR0Am3xhLev8XLPHGJvP3RR9m-Md9xT_Iy9-9Ox0vnhNFnydd_MbtsFjq3rDEfU"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-primary tracking-tight">Quire Legal</span><span class="font-code-sm text-code-sm text-on-surface-variant uppercase">Client Portal</span></div></div><nav class="hidden lg:flex items-center gap-space-2xs" data-active-classes="bg-primary-container text-on-primary font-label-md"><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="dashboard" href="#">Dashboard</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="my-matters" href="#">My Matters</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="documents" href="#">Documents</a><a class="px-space-sm py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="messages" href="#">Messages</a><a aria-current="page" class="px-space-sm py-space-xs rounded transition-colors bg-primary-container text-on-primary font-label-md" data-path="invoices-and-payments" href="#">Invoices &amp; Payments</a></nav></div><div class="flex items-center gap-space-md"><button class="relative p-space-xs rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span></button><button class="hidden sm:inline-flex items-center gap-space-xs px-space-sm py-space-xs rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container-high hover:text-on-surface transition-colors shadow-[0_1px_3px_rgba(17,23,20,0.04)]" type="button"><span class="material-symbols-outlined text-[16px] text-primary">support_agent</span><span class="font-label-md text-label-md">Contact Legal Team</span></button><div class="flex items-center gap-space-xs pl-space-xs py-space-2xs pr-space-xs rounded bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div class="hidden md:flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface leading-tight">David Castellan</span><span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Castellan Property Group</span></div><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></div></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<div class="w-full max-w-[1440px] mx-auto px-gutter-lg py-space-xl">
+<!-- Matter Context Bar & Micro-crumbs -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm mb-space-md">
+<div class="flex items-center gap-space-xs text-on-surface-variant font-code-sm text-code-sm">
+<a class="hover:text-primary transition-colors flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[14px]">arrow_back</span>
+<span>MATTERS</span>
+</a>
+<span>/</span>
+<span class="text-on-surface font-semibold tracking-tight">CPG-2024-0988L</span>
+<span>/</span>
+<span class="text-secondary font-medium">RETAINER DISBURSEMENT DOCKET</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-code-sm text-code-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+          IOLTA Trust Account: #TR-2026-CAST
+        </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+          Due in 11 Days
+        </span>
+</div>
+</div>
+<!-- Statement Primary Header Card -->
+<div class="relative bg-surface-container-lowest rounded-xl shadow-sm p-space-lg mb-space-xl overflow-hidden">
+<div class="absolute -right-16 -top-16 w-64 h-64 bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-lg relative z-10">
+<div>
+<div class="flex items-center gap-space-xs mb-space-2xs">
+<span class="font-code-sm text-code-sm uppercase tracking-wider text-primary font-bold">Billing Dossier</span>
+<span class="text-outline-variant">•</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Tax ID: 13-982341-NY</span>
+</div>
+<h1 class="font-display text-display text-on-surface tracking-tight leading-none mb-space-xs">
+            Invoice &amp; Retainer Escrow Statement
+          </h1>
+<div class="flex flex-wrap items-center gap-y-1 gap-x-space-md text-on-surface-variant font-body-sm text-body-sm">
+<span>Invoice Reference: <strong class="font-code-sm text-code-sm text-on-surface">#INV-2026-088</strong></span>
+<span>•</span>
+<span>Matter: <strong class="font-body-sm text-on-surface font-semibold">Marsh v. Castellan Property Group</strong></span>
+<span>•</span>
+<span>Period: <span class="font-body-sm">Michaelmas Term (Sept 15 – Oct 15, 2026)</span></span>
+</div>
+</div>
+<div class="flex items-center gap-space-md bg-surface-container-low px-space-lg py-space-sm rounded-lg shadow-sm">
+<div class="flex flex-col text-right">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total Net Payable</span>
+<span class="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">$14,200.00</span>
+<span class="font-code-sm text-code-sm text-secondary font-medium">Net 15 Days · Due Oct 25, 2026</span>
+</div>
+<button class="p-space-xs rounded bg-surface-container-lowest hover:bg-surface-container-high transition-colors shadow-sm text-primary flex items-center justify-center" title="Print Statement" type="button">
+<span class="material-symbols-outlined text-[20px]">print</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Main 60/40 Split Structure -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+<!-- LEFT SIDE: Itemized Legal Statement / Invoice Summary (7 Cols = ~58-60%) -->
+<div class="lg:col-span-7 flex flex-col gap-space-lg">
+<!-- Statement Paper Canvas -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+<!-- Law Firm Institutional Header Bar -->
+<div class="bg-surface-container-low px-space-lg py-space-md flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded bg-primary flex items-center justify-center text-on-primary">
+<span class="font-code-sm text-code-sm font-bold tracking-tighter">C&amp;S</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm text-primary font-semibold leading-tight">Chen &amp; Sterling LLP</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant uppercase">Quire Legal Billing Node 04 · High-Stakes Litigation Group</div>
+</div>
+</div>
+<div class="text-right">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary-fixed-variant bg-primary-fixed px-2 py-0.5 rounded font-semibold">
+<span class="material-symbols-outlined text-[13px]">verified_user</span>
+                Certified Ledger
+              </span>
+</div>
+</div>
+<div class="p-space-lg">
+<!-- Counterparty Meta Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md p-space-md bg-surface-container-low rounded-lg mb-space-lg">
+<div class="space-y-1">
+<span class="font-code-sm text-code-sm uppercase tracking-wider text-on-surface-variant font-medium">Billed To / Client Entity</span>
+<p class="font-headline-sm text-headline-sm text-on-surface font-semibold">Castellan Property Group LLC</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Attn: David Castellan, Chief Executive Officer</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">540 Madison Avenue, 28th Fl, New York, NY 10022</p>
+</div>
+<div class="space-y-1 md:text-right">
+<span class="font-code-sm text-code-sm uppercase tracking-wider text-on-surface-variant font-medium">Payment Protocol Reference</span>
+<p class="font-body-sm text-body-sm font-semibold text-on-surface">Escrow Retainer Agreement (Sch. B)</p>
+<p class="font-code-sm text-code-sm text-on-surface-variant">Client Ledger ID: #CAST-882-NY</p>
+<p class="font-code-sm text-code-sm text-on-surface-variant">Disbursement Auth: #DA-2026-10-M</p>
+</div>
+</div>
+<!-- Professional Services Breakdown -->
+<div class="mb-space-md">
+<div class="flex items-center justify-between pb-space-2xs mb-space-xs">
+<span class="font-code-sm text-code-sm uppercase tracking-wider font-bold text-primary">Itemized Billable Engagements &amp; Disbursements</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">5 Entries Recorded</span>
+</div>
+<!-- Line Item 1 -->
+<div class="py-space-sm px-space-sm rounded hover:bg-surface-container-low transition-colors">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex-1">
+<div class="flex items-center gap-space-xs mb-0.5">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Senior Partner Deposition Prep &amp; Witness Examination Strategy</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-high font-code-sm text-code-sm text-on-surface font-medium">M. Chen</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">In-person cross-examination outline synthesis; defense witness sequencing; review of co-defendant interrogatory replies.</p>
+</div>
+<div class="text-right whitespace-nowrap pl-space-sm">
+<div class="font-code-md text-code-md font-semibold text-on-surface">$7,500.00</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">12.0 hrs @ $625/hr</div>
+</div>
+</div>
+</div>
+<!-- Line Item 2 -->
+<div class="py-space-sm px-space-sm rounded hover:bg-surface-container-low transition-colors bg-surface-container-low/40">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex-1">
+<div class="flex items-center gap-space-xs mb-0.5">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Senior Associate Motion in Limine Drafting &amp; FRCP Research</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-high font-code-sm text-code-sm text-on-surface font-medium">J. Sterling</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Drafting of affirmative exclusion motion regarding unauthenticated geotechnical appraisal; precedent analysis under Southern District rules.</p>
+</div>
+<div class="text-right whitespace-nowrap pl-space-sm">
+<div class="font-code-md text-code-md font-semibold text-on-surface">$8,325.00</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">18.5 hrs @ $450/hr</div>
+</div>
+</div>
+</div>
+<!-- Line Item 3 -->
+<div class="py-space-sm px-space-sm rounded hover:bg-surface-container-low transition-colors">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex-1">
+<div class="flex items-center gap-space-xs mb-0.5">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Senior Paralegal Evidentiary Exhibit Assembly &amp; Concordance</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-high font-code-sm text-code-sm text-on-surface font-medium">E. Rostova</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Bates-stamping batches 4001–4850; cross-indexing architectural submittals with municipal zoning permit records.</p>
+</div>
+<div class="text-right whitespace-nowrap pl-space-sm">
+<div class="font-code-md text-code-md font-semibold text-on-surface">$3,300.00</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">15.0 hrs @ $220/hr</div>
+</div>
+</div>
+</div>
+<!-- Line Item 4 -->
+<div class="py-space-sm px-space-sm rounded hover:bg-surface-container-low transition-colors bg-surface-container-low/40">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex-1">
+<div class="flex items-center gap-space-xs mb-0.5">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Court Filing Fee &amp; Electronic NYCEF Filing Surcharge</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-highest font-code-sm text-code-sm text-on-surface font-medium">Disbursement</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Statutory fees paid directly to County Clerk of NY Supreme Court Commercial Division (Index #650123/2026).</p>
+</div>
+<div class="text-right whitespace-nowrap pl-space-sm">
+<div class="font-code-md text-code-md font-semibold text-on-surface">$475.00</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">Direct Cost Pass-thru</div>
+</div>
+</div>
+</div>
+<!-- Line Item 5 -->
+<div class="py-space-sm px-space-sm rounded hover:bg-surface-container-low transition-colors">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex-1">
+<div class="flex items-center gap-space-xs mb-0.5">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Expert Witness Retainer Drawdown (Thornton Structural Engineers)</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-highest font-code-sm text-code-sm text-on-surface font-medium">Reimbursable</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Independent subsurface foundation testing, concrete core density testing, and court-ready preliminary affidavit.</p>
+</div>
+<div class="text-right whitespace-nowrap pl-space-sm">
+<div class="font-code-md text-code-md font-semibold text-on-surface">$4,600.00</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">Third-Party Expert</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Financial Reconciliation Ledger Box -->
+<div class="bg-surface-container p-space-md rounded-lg space-y-2">
+<div class="flex justify-between items-center text-body-sm font-body-sm text-on-surface-variant">
+<span>Gross Professional Services &amp; Disbursements Subtotal</span>
+<span class="font-code-md text-code-md font-medium text-on-surface">$24,200.00</span>
+</div>
+<div class="flex justify-between items-center text-body-sm font-body-sm text-primary font-medium p-2 rounded bg-primary-fixed/30">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">account_balance</span>
+<span>Less Retainer Escrow Drawdown (Authorized from IOLTA Trust #TR-2026-CAST)</span>
+</div>
+<span class="font-code-md text-code-md font-semibold text-primary">-$10,000.00</span>
+</div>
+<div class="flex justify-between items-baseline pt-space-xs">
+<div>
+<div class="font-headline-sm text-headline-sm font-bold text-on-surface">Total Net Amount Due</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Payable via client portal gateway below</div>
+</div>
+<div class="font-display text-display font-bold text-primary tracking-tight">$14,200.00</div>
+</div>
+</div>
+<!-- Escrow Evergreen Trust Status Bar -->
+<div class="mt-space-md p-space-md rounded-lg bg-surface-container-low flex flex-col md:flex-row items-start md:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed-variant">
+<span class="material-symbols-outlined text-[20px]">shield</span>
+</div>
+<div>
+<div class="font-label-md text-label-md font-semibold text-on-surface">Client Trust Account Health</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">
+                    Remaining post-drawdown balance: <strong class="font-code-sm text-code-sm text-on-surface">$49,200.00</strong>
+<span class="text-outline-variant mx-1">•</span>
+                    Target evergreen threshold: $50,000.00
+                  </div>
+</div>
+</div>
+<span class="px-2 py-1 rounded bg-secondary/10 text-secondary font-code-sm text-code-sm font-semibold">
+                Evergreen: Stable (98.4%)
+              </span>
+</div>
+<!-- Conformed Signature Stamp & PDF Download -->
+<div class="mt-space-lg pt-space-md flex flex-wrap items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[28px]">approval</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Conformed Electronic Sign-off</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Marcus Chen, Managing Partner (NY Bar #2910488)</span>
+<span class="font-code-sm text-code-sm text-outline">SHA-256: 4a9f81ce0082cba127e99ff501</span>
+</div>
+</div>
+<button class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded bg-surface-container-high hover:bg-surface-container-highest transition-colors font-label-md text-label-md text-on-surface shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px] text-primary">picture_as_pdf</span>
+<span>Download Conformed PDF</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Compliance / Legal Inquiries Card -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[24px]">policy</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Audited Trust Accounting Standards</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">All retainer funds remain segregated pursuant to Rule 1.15 of the New York Rules of Professional Conduct.</span>
+</div>
+</div>
+<a class="font-label-md text-label-md text-primary font-semibold hover:underline whitespace-nowrap" href="#">Audit Trail</a>
+</div>
+</div>
+<!-- RIGHT SIDE: Secure Payment Checkout Console (5 Cols = ~40-42%) -->
+<div class="lg:col-span-5 flex flex-col gap-space-md sticky top-20">
+<!-- Payment Gateway Module -->
+<div class="bg-surface-container-lowest rounded-xl shadow-md overflow-hidden">
+<!-- Golden Accent Header -->
+<div class="bg-primary px-space-lg py-space-md text-on-primary flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[20px] text-secondary-fixed">lock</span>
+<span class="font-headline-sm text-headline-sm font-semibold tracking-tight">Secure Payment Gateway</span>
+</div>
+<div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-lowest/10 font-code-sm text-code-sm text-secondary-fixed">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed animate-pulse"></span>
+              256-Bit Encrypted
+            </div>
+</div>
+<!-- Gateway Method Tabs -->
+<div class="p-space-md bg-surface-container-low pb-0">
+<div class="grid grid-cols-3 gap-1 bg-surface-container-high p-1 rounded-lg" id="payment-tabs">
+<button class="payment-tab active py-space-xs px-space-2xs text-center rounded font-label-md text-label-md transition-all bg-surface-container-lowest text-primary font-semibold shadow-sm" data-tab="cc" type="button">
+<span class="material-symbols-outlined text-[16px] block mx-auto mb-0.5">credit_card</span>
+<span>Card</span>
+</button>
+<button class="payment-tab py-space-xs px-space-2xs text-center rounded font-label-md text-label-md transition-all text-on-surface-variant hover:text-on-surface" data-tab="ach" type="button">
+<span class="material-symbols-outlined text-[16px] block mx-auto mb-0.5">account_balance</span>
+<span>Bank ACH</span>
+</button>
+<button class="payment-tab py-space-xs px-space-2xs text-center rounded font-label-md text-label-md transition-all text-on-surface-variant hover:text-on-surface" data-tab="wire" type="button">
+<span class="material-symbols-outlined text-[16px] block mx-auto mb-0.5">swap_horiz</span>
+<span>Fedwire</span>
+</button>
+</div>
+</div>
+<!-- Checkout Content Body -->
+<div class="p-space-lg">
+<!-- CREDIT CARD PANE (Active default) -->
+<div class="space-y-space-md" id="pane-cc">
+<!-- Card Logos Indicator -->
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Accepted Tender</span>
+<div class="flex items-center gap-1.5">
+<span class="px-1.5 py-0.5 rounded bg-surface-container text-[11px] font-bold text-on-surface">VISA</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container text-[11px] font-bold text-on-surface">MC</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container text-[11px] font-bold text-on-surface">AMEX</span>
+<span class="px-1.5 py-0.5 rounded bg-primary-fixed text-primary text-[11px] font-semibold">LawPay Verified</span>
+</div>
+</div>
+<!-- Form Fields -->
+<div class="space-y-space-sm">
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Cardholder Entity / Name</label>
+<div class="relative">
+<input class="w-full h-10 px-space-sm bg-surface-container-lowest rounded text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" placeholder="Full name as it appears on card" type="text" value="David Castellan"/>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-[18px] text-on-surface-variant">badge</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Corporate Card Number</label>
+<div class="relative">
+<input class="w-full h-10 pl-space-sm pr-10 bg-surface-container-lowest rounded text-on-surface font-code-md text-code-md focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" placeholder="4000 1234 5678 9010" type="text" value="•••• •••• •••• 4092"/>
+<div class="absolute right-3 top-2.5 flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[18px]">credit_card</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-space-sm">
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Expiration</label>
+<input class="w-full h-10 px-space-sm bg-surface-container-lowest rounded text-on-surface font-code-md text-code-md focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" placeholder="MM / YY" type="text" value="08/29"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">CVV / CVC</label>
+<div class="relative">
+<input class="w-full h-10 px-space-sm bg-surface-container-lowest rounded text-on-surface font-code-md text-code-md focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" placeholder="3 or 4 digits" type="password" value="•••"/>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-[16px] text-on-surface-variant" title="Security code on back of card">info</span>
+</div>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Billing ZIP / Postal Code</label>
+<input class="w-full h-10 px-space-sm bg-surface-container-lowest rounded text-on-surface font-code-md text-code-md focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" placeholder="ZIP Code" type="text" value="10022"/>
+</div>
+</div>
+<!-- Evergreen Checkbox -->
+<label class="flex items-start gap-space-xs p-space-sm bg-surface-container-low rounded cursor-pointer hover:bg-surface-container transition-colors">
+<input checked="" class="mt-0.5 rounded text-primary focus:ring-primary accent-primary" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant leading-snug">
+                  Save this card to automatically maintain the target <strong class="text-on-surface font-medium">$50,000.00 Evergreen Retainer threshold</strong> at every billing cycle.
+                </span>
+</label>
+</div>
+<!-- ACH PANE (Hidden by default) -->
+<div class="space-y-space-md hidden" id="pane-ach">
+<div class="p-space-sm rounded bg-surface-container-low text-on-surface-variant font-body-sm text-body-sm">
+                ACH transfers settle within 1–2 business days. Direct debit from Castellan Property Group Operating Account.
+              </div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Routing Number (ABA)</label>
+<input class="w-full h-10 px-space-sm bg-surface-container-lowest rounded text-on-surface font-code-md text-code-md focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" readonly="" type="text" value="021000021 (JPMorgan Chase Bank, N.A.)"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Account Number</label>
+<input class="w-full h-10 px-space-sm bg-surface-container-lowest rounded text-on-surface font-code-md text-code-md focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" type="text" value="•••• •••• 9811"/>
+</div>
+</div>
+<!-- WIRE PANE (Hidden by default) -->
+<div class="space-y-space-sm hidden" id="pane-wire">
+<div class="p-space-sm rounded bg-surface-container-low font-code-sm text-code-sm space-y-1">
+<p><strong>Bank:</strong> Bank of New York Mellon</p>
+<p><strong>Beneficiary:</strong> Quire Legal Client Escrow TR</p>
+<p><strong>SWIFT:</strong> BNYMUS33</p>
+<p><strong>Reference:</strong> CPG-INV-2026-088</p>
+</div>
+</div>
+<!-- Financial Charge Summary -->
+<div class="mt-space-lg p-space-md bg-surface-container-low rounded-lg space-y-2">
+<div class="flex justify-between font-body-sm text-body-sm text-on-surface-variant">
+<span>Invoice Statement Balance</span>
+<span class="font-code-md text-code-md text-on-surface">$14,200.00</span>
+</div>
+<div class="flex justify-between font-body-sm text-body-sm text-on-surface-variant">
+<span class="flex items-center gap-1">
+                  Credit Processing Surcharge
+                  <span class="px-1.5 py-0.2 rounded bg-surface-container-high font-label-sm text-label-sm text-primary font-bold">Waived</span>
+</span>
+<span class="font-code-md text-code-md text-primary font-medium">$0.00 (Firm Absorbed)</span>
+</div>
+<div class="flex justify-between items-baseline pt-2">
+<span class="font-label-md text-label-md font-bold text-on-surface">Total Immediate Charge</span>
+<span class="font-headline-md text-headline-md font-bold text-primary">$14,200.00 USD</span>
+</div>
+</div>
+<!-- Large Primary CTA Button -->
+<button class="w-full mt-space-md py-space-sm px-space-md rounded-lg bg-primary hover:bg-primary-container text-on-primary font-headline-sm text-headline-sm font-semibold flex items-center justify-center gap-space-xs transition-all shadow-md active:scale-[0.99]" id="pay-button" type="button">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+<span>Pay $14,200.00 Now</span>
+</button>
+<!-- Instant Delivery Notice -->
+<div class="text-center mt-space-sm">
+<span class="font-body-sm text-body-sm text-on-surface-variant">
+                Official conformed receipt will be generated instantly and dispatched to <span class="text-on-surface font-medium">billing@castellan.com</span>
+</span>
+</div>
+<!-- Security & Compliance Footnotes -->
+<div class="mt-space-lg pt-space-md grid grid-cols-3 gap-space-xs text-center text-on-surface-variant font-code-sm text-code-sm">
+<div class="flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-primary text-[20px]">verified</span>
+<span>PCI-DSS Level 1</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-primary text-[20px]">enhanced_encryption</span>
+<span>256-Bit SSL</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-primary text-[20px]">assured_workload</span>
+<span>IOLTA Compliant</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Wire/Remittance Instructions Card -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm space-y-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-bold text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-secondary">help_outline</span>
+              Accounting Concierge Support
+            </span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Case Team 04</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-normal">
+            For institutional accounts payable split vouchers, multi-currency escrow, or direct wire confirmation, contact Senior Controller Helena Vance at <span class="text-primary font-medium underline">billing@quirelegal.com</span> or (212) 555-0199.
+          </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple Tab Switcher for Desktop Payment Selector
+  const tabs = document.querySelectorAll('.payment-tab');
+  const paneCc = document.getElementById('pane-cc');
+  const paneAch = document.getElementById('pane-ach');
+  const paneWire = document.getElementById('pane-wire');
+  const payBtn = document.getElementById('pay-button');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => {
+        t.classList.remove('bg-surface-container-lowest', 'text-primary', 'font-semibold', 'shadow-sm');
+        t.classList.add('text-on-surface-variant');
+      });
+      tab.classList.add('bg-surface-container-lowest', 'text-primary', 'font-semibold', 'shadow-sm');
+      tab.classList.remove('text-on-surface-variant');
+
+      const target = tab.getAttribute('data-tab');
+      paneCc.classList.add('hidden');
+      paneAch.classList.add('hidden');
+      paneWire.classList.add('hidden');
+
+      if (target === 'cc') {
+        paneCc.classList.remove('hidden');
+        payBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]">lock</span><span>Pay $14,200.00 Now</span>';
+      } else if (target === 'ach') {
+        paneAch.classList.remove('hidden');
+        payBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]">account_balance</span><span>Authorize ACH Debit $14,200.00</span>';
+      } else if (target === 'wire') {
+        paneWire.classList.remove('hidden');
+        payBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]">download</span><span>Generate Fedwire Remittance Slip</span>';
+      }
+    });
+  });
+
+  // Simulated button click interaction
+  payBtn.addEventListener('click', () => {
+    payBtn.disabled = true;
+    const originalContent = payBtn.innerHTML;
+    payBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span><span>Encrypting & Processing IOLTA Escrow...</span>';
+    setTimeout(() => {
+      payBtn.classList.remove('bg-primary');
+      payBtn.classList.add('bg-surface-container', 'text-on-surface');
+      payBtn.innerHTML = '<span class="material-symbols-outlined text-[20px] text-primary">check_circle</span><span class="text-primary font-bold">Transaction Confirmed · Auth #89210</span>';
+    }, 1400);
+  });
+</script></main><footer class="w-full bg-surface-container-low py-space-lg"><div class="w-full px-gutter-lg flex flex-col sm:flex-row items-center justify-between gap-space-sm text-on-surface-variant font-body-sm text-body-sm"><div class="flex items-center gap-space-sm"><span class="font-label-md text-label-md text-on-surface">Quire Legal LLP</span><span>•</span><span>Archival Client Services &amp; Counsel</span></div><div class="flex items-center gap-space-md"><a class="hover:text-on-surface transition-colors" href="#">Security &amp; Encryption</a><a class="hover:text-on-surface transition-colors" href="#">Retainer Terms</a><a class="hover:text-on-surface transition-colors" href="#">Help Center</a></div></div></footer></body></html>

@@ -1,0 +1,307 @@
+@extends('portal.layout')
+
+@section('title', 'Client Overview')
+
+@section('content')
+<div class="flex flex-col gap-8">
+    
+    <!-- Welcome Banner & Chambers Heading -->
+    <div class="bg-gradient-to-r from-[#1a3c2a] to-[#022616] rounded-2xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-[#fed977] text-[#785d00]">Active Client Account</span>
+                    <span class="text-xs text-white/70">{{ $client->name }}</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-serif font-bold tracking-tight">Namaste, {{ auth()->user()->name }}</h1>
+                <p class="text-xs sm:text-sm text-white/80 max-w-xl">
+                    Welcome to your private client portal with {{ $client->firm->name ?? 'Sharma & Associates, Advocates' }}. Review case stage updates, fulfill document requests, and manage retainer statements.
+                </p>
+            </div>
+
+            <!-- Quick Retainer Callout -->
+            <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/15 shrink-0 flex flex-col min-w-[200px]">
+                <span class="text-[11px] font-mono uppercase tracking-wider text-white/70">Available Retainer Balance</span>
+                <span class="text-2xl font-serif font-bold text-[#fed977] mt-1">{{ config('legal.currency.symbol', '₹') }}{{ number_format($client->trust_balance, 2) }}</span>
+                <span class="text-[10px] text-white/60 mt-0.5">Held in client advance account</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Metric Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Active Matters -->
+        <div class="bg-white rounded-xl p-5 border border-[#e9e8e5] shadow-sm flex items-center justify-between">
+            <div class="flex flex-col">
+                <span class="text-[11px] font-mono uppercase tracking-wider text-[#727973]">Active Cases</span>
+                <span class="text-2xl font-serif font-bold text-[#1a1c1a] mt-1">{{ $matters->count() }}</span>
+                <a href="{{ route('portal.matters.index') }}" class="text-[11px] text-[#1a3c2a] hover:underline font-medium mt-1">View case files &rarr;</a>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-[#c5ecd2]/50 text-[#1a3c2a] flex items-center justify-center">
+                <span class="material-symbols-outlined text-2xl">gavel</span>
+            </div>
+        </div>
+
+        <!-- Pending Document Requests -->
+        @php
+            $pendingCount = $documentRequests->where('status', 'pending')->count();
+        @endphp
+        <div class="bg-white rounded-xl p-5 border border-[#e9e8e5] shadow-sm flex items-center justify-between">
+            <div class="flex flex-col">
+                <span class="text-[11px] font-mono uppercase tracking-wider text-[#727973]">Document Requests</span>
+                <span class="text-2xl font-serif font-bold {{ $pendingCount > 0 ? 'text-amber-600' : 'text-[#1a1c1a]' }} mt-1">{{ $pendingCount }} Pending</span>
+                <a href="{{ route('portal.requests.index') }}" class="text-[11px] text-[#1a3c2a] hover:underline font-medium mt-1">Fulfill requests &rarr;</a>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <span class="material-symbols-outlined text-2xl">drive_folder_upload</span>
+            </div>
+        </div>
+
+        <!-- Unpaid Invoices -->
+        @php
+            $unpaidCount = $invoices->where('status', '!=', 'paid')->count();
+            $unpaidTotal = $invoices->where('status', '!=', 'paid')->sum('total_amount');
+        @endphp
+        <div class="bg-white rounded-xl p-5 border border-[#e9e8e5] shadow-sm flex items-center justify-between">
+            <div class="flex flex-col">
+                <span class="text-[11px] font-mono uppercase tracking-wider text-[#727973]">Fee Bills Due</span>
+                <span class="text-2xl font-serif font-bold text-[#1a1c1a] mt-1">{{ config('legal.currency.symbol', '₹') }}{{ number_format($unpaidTotal, 0) }}</span>
+                <a href="{{ route('portal.invoices.index') }}" class="text-[11px] text-[#1a3c2a] hover:underline font-medium mt-1">{{ $unpaidCount }} invoice(s) pending &rarr;</a>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
+                <span class="material-symbols-outlined text-2xl">receipt_long</span>
+            </div>
+        </div>
+
+        <!-- Next Hearing -->
+        @php
+            $nextHearing = $events->where('start_time', '>=', now())->sortBy('start_time')->first();
+        @endphp
+        <div class="bg-white rounded-xl p-5 border border-[#e9e8e5] shadow-sm flex items-center justify-between">
+            <div class="flex flex-col min-w-0">
+                <span class="text-[11px] font-mono uppercase tracking-wider text-[#727973]">Next Court Date</span>
+                <span class="text-base font-semibold text-[#1a1c1a] truncate mt-1">
+                    {{ $nextHearing ? \Carbon\Carbon::parse($nextHearing->start_time)->format('d M, h:i A') : 'No upcoming date' }}
+                </span>
+                <span class="text-[11px] text-[#727973] truncate">{{ $nextHearing->location ?? 'Court hearing schedule' }}</span>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-2xl">calendar_month</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main 2-Column Section: Cases & Counsel -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left 2 Cols: Active Cases Dossiers -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-serif font-bold text-[#1a1c1a]">Your Legal Matters</h2>
+                <a href="{{ route('portal.matters.index') }}" class="text-xs text-[#1a3c2a] hover:underline font-semibold flex items-center gap-1">
+                    <span>View All Cases ({{ $matters->count() }})</span>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                @forelse($matters as $matter)
+                <div class="bg-white rounded-xl border border-[#e9e8e5] p-5 shadow-sm hover:shadow-md transition-all flex flex-col gap-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#f4f3f1] pb-3">
+                        <div class="flex flex-col">
+                            <span class="font-mono text-xs font-bold text-[#1a3c2a]">{{ $matter->case_number }}</span>
+                            <h3 class="text-base font-semibold text-[#1a1c1a] mt-0.5">{{ $matter->title }}</h3>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full text-xs font-medium self-start sm:self-auto bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            {{ $matter->stage }}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs text-[#727973]">
+                        <div>
+                            <span class="block text-[10px] uppercase font-mono tracking-wider">Judicial Venue</span>
+                            <span class="font-medium text-[#1a1c1a] mt-0.5 block truncate">{{ $matter->court_name ?? 'High Court of Delhi' }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] uppercase font-mono tracking-wider">Lead Counsel</span>
+                            <span class="font-medium text-[#1a1c1a] mt-0.5 block">{{ $matter->leadAttorney->name ?? 'Adv. Rajesh Sharma' }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] uppercase font-mono tracking-wider">Practice Discipline</span>
+                            <span class="font-medium text-[#1a1c1a] mt-0.5 block truncate">{{ $matter->practice_area }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Mini Visual Stage Tracker Preview -->
+                    <div class="bg-[#faf9f6] rounded-lg p-3 border border-[#f0eee9]">
+                        <span class="text-[10px] font-mono uppercase tracking-wider text-[#727973] block mb-2 font-semibold">Procedural Stage Progress</span>
+                        <div class="flex items-center justify-between text-[11px]">
+                            @php
+                                $stages = ['Notice & Pleadings', 'Interim Relief', 'Evidence & Arguments', 'Final Hearing', 'Order'];
+                                $currentStage = $matter->stage;
+                            @endphp
+                            @foreach($stages as $index => $stage)
+                            <div class="flex items-center gap-1.5 {{ str_contains(strtolower($currentStage), strtolower(explode(' ', $stage)[0])) ? 'font-bold text-[#1a3c2a]' : 'text-[#727973]' }}">
+                                <span class="w-2 h-2 rounded-full {{ str_contains(strtolower($currentStage), strtolower(explode(' ', $stage)[0])) ? 'bg-[#1a3c2a] ring-2 ring-emerald-300' : 'bg-[#c1c8c1]' }}"></span>
+                                <span class="hidden sm:inline">{{ $stage }}</span>
+                            </div>
+                            @if(!$loop->last)
+                            <span class="text-[#c1c8c1]">&rarr;</span>
+                            @endif
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1">
+                        <span class="text-xs text-[#727973]">
+                            {{ $matter->documents->count() }} Shared Documents &middot; {{ $matter->documentRequests->count() }} Requests
+                        </span>
+                        <a href="{{ route('portal.matters.show', $matter->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#1a3c2a] text-white text-xs font-semibold hover:bg-[#022616] transition-colors">
+                            <span>Open Case Dossier</span>
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+                @empty
+                <div class="bg-white rounded-xl border border-[#e9e8e5] p-8 text-center text-[#727973]">
+                    <span class="material-symbols-outlined text-3xl mb-2 text-[#c1c8c1]">folder_off</span>
+                    <p class="text-xs">No active court matters found under your client account.</p>
+                </div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Right 1 Col: Priority Actions, Legal Counsel & Hearings -->
+        <div class="flex flex-col gap-6">
+            
+            <!-- Priority Action Items (Counsel Document Requests) -->
+            <div class="bg-white rounded-xl border {{ $pendingCount > 0 ? 'border-amber-300 shadow-sm' : 'border-[#e9e8e5]' }} overflow-hidden">
+                <div class="p-4 border-b {{ $pendingCount > 0 ? 'border-amber-100 bg-amber-50/60' : 'border-[#efeeeb]' }} flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined {{ $pendingCount > 0 ? 'text-amber-700' : 'text-[#1a3c2a]' }} text-xl">
+                            {{ $pendingCount > 0 ? 'priority_high' : 'checklist' }}
+                        </span>
+                        <h2 class="text-base font-semibold text-[#1a1c1a]">Priority Action Items</h2>
+                    </div>
+                    @if($pendingCount > 0)
+                    <span class="font-mono text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold">
+                        {{ $pendingCount }} Pending
+                    </span>
+                    @else
+                    <span class="font-mono text-xs text-emerald-700 font-semibold flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">check_circle</span> Up to date
+                    </span>
+                    @endif
+                </div>
+
+                <div class="p-4 flex flex-col gap-3">
+                    @if($pendingCount > 0)
+                        <p class="text-xs text-[#424843]">
+                            Counsel requested the following documents to finalize upcoming court filings:
+                        </p>
+                        <div class="flex flex-col gap-2.5">
+                            @foreach($documentRequests->where('status', 'pending') as $req)
+                            <div class="p-3 rounded-lg bg-[#faf9f6] border border-amber-200 hover:border-amber-300 transition-colors flex flex-col gap-1.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-semibold text-[#1a1c1a] truncate">{{ $req->title }}</span>
+                                    @if($req->due_date)
+                                    <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-semibold shrink-0">
+                                        Due {{ \Carbon\Carbon::parse($req->due_date)->format('d M') }}
+                                    </span>
+                                    @endif
+                                </div>
+                                @if($req->description)
+                                <p class="text-[11px] text-[#727973] line-clamp-2 leading-relaxed">{{ $req->description }}</p>
+                                @endif
+                                @if($req->matter)
+                                <div class="flex items-center gap-1 text-[10px] text-[#1a3c2a] font-mono font-medium mt-0.5">
+                                    <span class="material-symbols-outlined text-xs">folder</span>
+                                    <span>{{ $req->matter->case_number }} · {{ $req->matter->title }}</span>
+                                </div>
+                                @endif
+                            </div>
+                            @endforeach
+                        </div>
+                        <a href="{{ route('portal.requests.index') }}" class="w-full py-2.5 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors mt-1 shadow-sm">
+                            <span class="material-symbols-outlined text-base">upload_file</span>
+                            <span>Upload Requested Documents</span>
+                        </a>
+                    @else
+                        <div class="text-center py-4 text-[#727973] flex flex-col items-center gap-1">
+                            <span class="material-symbols-outlined text-emerald-600 text-2xl">task_alt</span>
+                            <span class="text-xs font-medium text-[#1a1c1a]">All Document Requests Complete</span>
+                            <span class="text-[11px]">You have fulfilled all pending items requested by counsel.</span>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Lead Counsel Chambers Card -->
+            <div class="bg-white rounded-xl border border-[#e9e8e5] p-5 shadow-sm flex flex-col gap-4">
+                <span class="text-xs font-mono uppercase tracking-wider text-[#727973] font-semibold">Your Legal Representation</span>
+                
+                <div class="flex items-center gap-3">
+                    <img alt="Adv. Rajesh Sharma" class="w-12 h-12 rounded-xl object-cover ring-2 ring-[#c5ecd2]" src="https://images.unsplash.com/photo-1556157382-97eda2d62296?w=150&auto=format&fit=crop&q=80"/>
+                    <div class="flex flex-col">
+                        <span class="text-sm font-bold text-[#1a1c1a]">Adv. Rajesh Sharma</span>
+                        <span class="text-xs text-[#1a3c2a] font-medium">Senior Advocate &amp; Managing Partner</span>
+                        <span class="text-[10px] font-mono text-[#727973] mt-0.5">Bar Council Enr: D/1420/2005</span>
+                    </div>
+                </div>
+
+                <div class="text-xs text-[#424843] flex flex-col gap-2 pt-2 border-t border-[#f4f3f1]">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-base text-[#1a3c2a]">location_on</span>
+                        <span>Chambers: 412, Lawyers Chambers Block, Delhi High Court</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-base text-[#1a3c2a]">mail</span>
+                        <span>rajesh@sharmalegal.in</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-base text-[#1a3c2a]">call</span>
+                        <span>+91 98110 23411</span>
+                    </div>
+                </div>
+
+                <a href="{{ route('portal.messages.index') }}" class="w-full py-2 bg-[#f4f3f1] hover:bg-[#e9e8e5] text-[#1a1c1a] rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors mt-1">
+                    <span class="material-symbols-outlined text-base text-[#1a3c2a]">chat</span>
+                    <span>Send Message to Counsel</span>
+                </a>
+            </div>
+
+            <!-- Upcoming Court Hearings & Meetings -->
+            <div class="bg-white rounded-xl border border-[#e9e8e5] p-5 shadow-sm flex flex-col gap-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-mono uppercase tracking-wider text-[#727973] font-semibold">Upcoming Court Dates</span>
+                    <a href="{{ route('portal.calendar.index') }}" class="text-[11px] text-[#1a3c2a] hover:underline font-medium">View calendar &rarr;</a>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    @forelse($events->take(3) as $event)
+                    <div class="p-3 rounded-lg bg-[#faf9f6] border border-[#f0eee9] flex items-start gap-3">
+                        <div class="w-8 h-8 rounded bg-[#1a3c2a] text-[#fed977] flex flex-col items-center justify-center font-mono text-[10px] font-bold shrink-0">
+                            <span>{{ \Carbon\Carbon::parse($event->start_time)->format('d') }}</span>
+                            <span class="text-[8px] uppercase text-white">{{ \Carbon\Carbon::parse($event->start_time)->format('M') }}</span>
+                        </div>
+                        <div class="flex flex-col min-w-0">
+                            <span class="text-xs font-semibold text-[#1a1c1a] truncate">{{ $event->title }}</span>
+                            <span class="text-[11px] text-[#727973] mt-0.5 truncate">{{ $event->location ?? 'Court Hearing' }}</span>
+                            <span class="text-[10px] font-mono text-emerald-800 mt-0.5">
+                                {{ \Carbon\Carbon::parse($event->start_time)->format('h:i A') }}
+                            </span>
+                        </div>
+                    </div>
+                    @empty
+                    <p class="text-xs text-[#727973] text-center py-4">No upcoming court hearings scheduled.</p>
+                    @endforelse
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+@endsection

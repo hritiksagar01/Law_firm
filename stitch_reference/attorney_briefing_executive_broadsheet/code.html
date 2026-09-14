@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; background-color: #F8F6F0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    .border-parchment { border-color: #E6E2D8; }
+    .bg-parchment { background-color: #F8F6F0; }
+    .bg-parchment-subtle { background-color: #F1ECE1; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "navy-heritage": "#0F172A",
+            "navy-muted": "#1E293B",
+            "terracotta": "#C2410C",
+            "terracotta-soft": "#FFEDD5",
+            "bronze": "#9A6B2F",
+            "bronze-light": "#FDF6E2",
+            "olive-slate": "#475569",
+            "parchment": "#F8F6F0",
+            "parchment-dim": "#EFECE4",
+            "line-ink": "#E2DCD2",
+            "primary": "#0F172A",
+            "surface": "#F8F6F0",
+            "on-surface": "#0F172A",
+            "on-surface-variant": "#475569"
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          letterSpacing: {
+            tighter: '-0.04em',
+            tight: '-0.025em',
+            snug: '-0.015em',
+            wide: '0.04em',
+            widest: '0.12em'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#F8F6F0] font-sans text-navy-heritage antialiased selection:bg-terracotta-soft selection:text-terracotta">
+<!-- Minimalist Left Broadside Nav / Index Masthead -->
+<aside class="fixed left-0 top-0 h-screen w-[240px] bg-[#0F172A] text-[#F8F6F0] z-50 flex flex-col justify-between border-r border-[#1E293B]">
+<div class="flex flex-col">
+<!-- Top Colophon & Mark -->
+<div class="p-6 border-b border-[#1E293B]">
+<div class="flex items-center gap-3">
+<img alt="Quire Legal Brand Logo" class="h-7 w-auto object-contain brightness-0 invert" src="https://lh3.googleusercontent.com/aida/AEtjO1XDCvcMumfuKw0N2xQRpeBOPM7Ecnp7MQP4LBHgH46kFr6V1vSC4gTEB3oyajqX4M4Zw9J5fjGGIaalzcTFAxxk1wea3wlO4CevUvgkMiGWWw3nb4JOd8WcDOFvtyoFjVAKuPBfwJuHXEsLVG-_-xg2qANr--ZWvx3OQDf-EXXJcCwChtgOnXq0_SCrpR0Am3xhLev8XLPHGJvP3RR9m-Md9xT_Iy9-9Ox0vnhNFnydd_MbtsFjq3rDEfU"/>
+<span class="text-[9px] font-mono tracking-widest text-[#94A3B8] uppercase">Vol. IV · Ed. 26</span>
+</div>
+<div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
+<div>
+<div class="text-[12px] font-semibold text-white tracking-tight">Chen &amp; Sterling LLP</div>
+<div class="text-[10px] font-mono text-slate-400">Counsel Chambers</div>
+</div>
+<span class="material-symbols-outlined text-slate-500 text-sm">unfold_more</span>
+</div>
+</div>
+<!-- Practice Indices -->
+<div class="p-4 flex flex-col gap-6">
+<div>
+<div class="px-2 pb-2 text-[10px] font-mono uppercase tracking-widest text-slate-500">I. Folio Index</div>
+<nav class="flex flex-col space-y-0.5">
+<a class="flex items-center justify-between px-3 py-2 rounded-md bg-white/10 text-white font-medium text-[13px] tracking-tight" href="#">
+<span class="flex items-center gap-2.5">
+<span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+                Executive Brief
+              </span>
+<span class="font-mono text-[10px] text-slate-400">01</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-white/5 transition-all text-[13px] tracking-tight" href="#">
+<span class="flex items-center gap-2.5">
+<span class="w-1.5 h-1.5 rounded-full bg-transparent"></span>
+                Active Matters
+              </span>
+<span class="font-mono text-[10px] text-slate-400">42</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-white/5 transition-all text-[13px] tracking-tight" href="#">
+<span class="flex items-center gap-2.5">
+<span class="w-1.5 h-1.5 rounded-full bg-transparent"></span>
+                Client Retainers
+              </span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-white/5 transition-all text-[13px] tracking-tight" href="#">
+<span class="flex items-center gap-2.5">
+<span class="w-1.5 h-1.5 rounded-full bg-transparent"></span>
+                Pleadings &amp; Filings
+              </span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-white/5 transition-all text-[13px] tracking-tight" href="#">
+<span class="flex items-center gap-2.5">
+<span class="w-1.5 h-1.5 rounded-full bg-transparent"></span>
+                Partner Correspondence
+              </span>
+<span class="font-mono text-[10px] px-1.5 py-0.2 bg-amber-400/20 text-amber-300 rounded">3</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-md text-slate-300 hover:text-white hover:bg-white/5 transition-all text-[13px] tracking-tight" href="#">
+<span class="flex items-center gap-2.5">
+<span class="w-1.5 h-1.5 rounded-full bg-transparent"></span>
+                Docket Calendar
+              </span>
+</a>
+</nav>
+</div>
+<div>
+<div class="px-2 pb-2 text-[10px] font-mono uppercase tracking-widest text-slate-500">II. Registry &amp; Trust</div>
+<nav class="flex flex-col space-y-0.5">
+<a class="px-3 py-1.5 text-slate-400 hover:text-white text-[12px] transition-colors flex items-center justify-between" href="#">
+<span>Financial Audit Trail</span>
+<span class="font-mono text-[10px] text-emerald-400">94%</span>
+</a>
+<a class="px-3 py-1.5 text-slate-400 hover:text-white text-[12px] transition-colors flex items-center justify-between" href="#">
+<span>Jurisprudence Vault</span>
+</a>
+<a class="px-3 py-1.5 text-slate-400 hover:text-white text-[12px] transition-colors flex items-center justify-between" href="#">
+<span>Chamber Directives</span>
+</a>
+</nav>
+</div>
+</div>
+</div>
+<!-- Partner Colophon Profile Footer -->
+<div class="p-4 border-t border-[#1E293B] bg-[#0A0F1D]">
+<div class="flex items-center gap-3">
+<img alt="Margaret Chen" class="w-10 h-10 rounded-full object-cover ring-1 ring-slate-700 shadow-sm" src="https://lh3.googleusercontent.com/aida/AEtjO1V0sw8VbmJZa_OHr_a1feowLMcDcjdEPB75WKpHlaimiseBgZyYJNHhJ9K-SrDjAJnaEU1HkmoBd6VImO4ifz-IBjZsFxV9osVumEBgYgK6f52qwKOHlva91o_q97QQcXjFLHFMwP3JacmV432_7fD8uEx-j9Rrqg_0HFLjxL6kg2Dtu-xF1iD-T15qII3lxo51pZGnYefQ8FqfB0-h-yaFiqPkG88ksuragPzee4qHtSciahgq6svNpJE"/>
+<div class="min-w-0 flex-1">
+<div class="text-[12px] font-semibold text-white truncate tracking-tight">Margaret Chen</div>
+<div class="text-[10px] font-mono text-slate-400 truncate">Senior Equity Partner</div>
+</div>
+<button class="text-slate-500 hover:text-white transition-colors" title="Sign out">
+<span class="material-symbols-outlined text-base">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Editorial Canvas Area -->
+<div class="pl-[240px] min-h-screen">
+<!-- Top Editorial Header & Running Head -->
+<header class="h-20 border-b border-[#E6E2D8] bg-[#F8F6F0]/90 backdrop-blur px-10 flex items-center justify-between sticky top-0 z-40">
+<div class="flex items-center gap-8">
+<div class="flex items-baseline gap-3">
+<span class="font-mono text-[11px] font-semibold text-terracotta tracking-widest uppercase">Chamber Ledger</span>
+<span class="text-[#CBD5E1]">/</span>
+<span class="font-mono text-[11px] text-slate-500 tracking-wide">MICHAELMAS TERM 2026</span>
+</div>
+<div class="hidden md:flex items-center gap-2 text-[12px] text-slate-600 bg-white border border-[#E6E2D8] px-3.5 py-1.5 rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+<span class="material-symbols-outlined text-base text-slate-400">search</span>
+<input class="bg-transparent border-0 focus:ring-0 text-[12px] p-0 w-64 placeholder-slate-400" placeholder="Search case citations, docket IDs, pleadings..." type="text"/>
+<span class="font-mono text-[10px] text-slate-400 bg-[#F1ECE1] px-1.5 py-0.5 rounded">⌘K</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<!-- Active Billable Ticker -->
+<div class="flex items-center gap-3 border-r border-[#E6E2D8] pr-6">
+<span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+<div class="text-right font-mono">
+<span class="text-[12px] font-semibold tracking-tight text-navy-heritage">02:14:00</span>
+<span class="text-[10px] text-slate-500 block leading-none">Marsh v. Castellan</span>
+</div>
+<button class="px-2.5 py-1 rounded bg-[#EFECE4] text-navy-heritage text-[11px] font-mono hover:bg-[#E2DCD2] transition-colors">
+            PAUSE
+          </button>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-2 bg-navy-heritage text-white text-[12px] font-semibold tracking-tight rounded hover:bg-slate-800 transition-all flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-sm text-amber-300">history_edu</span>
+<span>Record Billable Hour</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Broadsheet Document Body -->
+<main class="max-w-7xl mx-auto px-10 py-10 space-y-12">
+<!-- Executive Profile Greeting & Law Review Masthead -->
+<section class="border-b border-[#0F172A] pb-8 pt-2">
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+<div>
+<div class="flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-slate-500 mb-2">
+<span>Vol. 14 · No. 42</span>
+<span>•</span>
+<span>San Francisco &amp; New York Chambers</span>
+<span>•</span>
+<span class="text-terracotta font-semibold">Wednesday, October 15, 2026</span>
+</div>
+<h1 class="text-4xl lg:text-5xl font-extrabold tracking-tighter text-navy-heritage leading-none">
+              The Partner Briefing
+            </h1>
+<p class="mt-3 text-slate-600 text-base max-w-2xl font-normal leading-relaxed">
+              Daily critical assessment of proceedings, imminent statutory deadlines, and client capital disclosures prepared for Senior Litigation Partner <strong class="text-navy-heritage font-semibold">Margaret Chen</strong>.
+            </p>
+</div>
+<!-- Executive Stamp & Profile Card -->
+<div class="flex items-center gap-4 bg-white p-4 rounded border border-[#E6E2D8] shadow-sm">
+<img alt="Margaret Chen" class="w-14 h-14 rounded object-cover ring-1 ring-[#0F172A]" src="https://lh3.googleusercontent.com/aida/AEtjO1V0sw8VbmJZa_OHr_a1feowLMcDcjdEPB75WKpHlaimiseBgZyYJNHhJ9K-SrDjAJnaEU1HkmoBd6VImO4ifz-IBjZsFxV9osVumEBgYgK6f52qwKOHlva91o_q97QQcXjFLHFMwP3JacmV432_7fD8uEx-j9Rrqg_0HFLjxL6kg2Dtu-xF1iD-T15qII3lxo51pZGnYefQ8FqfB0-h-yaFiqPkG88ksuragPzee4qHtSciahgq6svNpJE"/>
+<div class="space-y-0.5">
+<div class="text-[10px] font-mono uppercase tracking-wider text-terracotta font-semibold">Lead Chambers Desk</div>
+<div class="text-sm font-bold text-navy-heritage tracking-tight">Margaret Chen, Esq.</div>
+<div class="text-[11px] text-slate-500">Senior Partner · Commercial Litigation</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Broadsheet Lead Section: Executive Docket Dispatch & Ledger Summary -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Large Lead Story: Executive Docket Dispatch (Col 8) -->
+<article class="lg:col-span-8 bg-white border border-[#E6E2D8] rounded-none p-8 sm:p-10 shadow-[0_4px_20px_rgba(15,23,42,0.03)] relative overflow-hidden">
+<div class="absolute top-0 left-0 right-0 h-1.5 bg-navy-heritage"></div>
+<div class="flex items-center justify-between border-b border-[#E6E2D8] pb-4 mb-6">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-terracotta-soft text-terracotta font-mono text-[10px] font-bold tracking-widest uppercase">
+                Critical Motion Day
+              </span>
+<span class="font-mono text-[11px] text-slate-400">DOCKET REF: HO-2026-0042</span>
+</div>
+<span class="font-mono text-[11px] text-slate-500">NY Supreme Court · Part 38</span>
+</div>
+<h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-navy-heritage leading-tight mb-4">
+            Pre-Trial Motion in Limine: Evidentiary Exclusions in <span class="underline decoration-slate-300 underline-offset-4 font-black">Marsh v. Castellan</span>
+</h2>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 mb-6 bg-[#F8F6F0] border border-[#E6E2D8] font-mono text-[11px]">
+<div>
+<span class="text-slate-500 block uppercase text-[9px]">Filing Window</span>
+<span class="font-bold text-terracotta text-[12px]">Today, 4:00 PM EDT</span>
+</div>
+<div>
+<span class="text-slate-500 block uppercase text-[9px]">Presiding Jurist</span>
+<span class="font-bold text-navy-heritage">Hon. Evelyn Keller</span>
+</div>
+<div>
+<span class="text-slate-500 block uppercase text-[9px]">Opposing Counsel</span>
+<span class="font-bold text-navy-heritage">Cravath, Swaine &amp; Moore</span>
+</div>
+</div>
+<p class="text-slate-700 leading-relaxed text-[15px] mb-4">
+            Opposing counsel submitted an eleventh-hour supplemental witness disclosure late yesterday evening citing expert valuations on the disputed pharmaceutical patent license. Our reply brief in chief has been finalized by Julian Sterling, focusing strictly on statutory preemption under New York law.
+          </p>
+<p class="text-slate-700 leading-relaxed text-[15px] mb-6">
+            Evidentiary exhibit binder Thorne-9B requires partner verification before NYCEF transmission. Client David Castellan has confirmed full retainer replenishment wire of $45,000 to cover expert witness deposits.
+          </p>
+<!-- Editorial Action Ledger for this matter -->
+<div class="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-[#E6E2D8]">
+<div class="flex items-center gap-3">
+<button class="px-5 py-2.5 bg-terracotta text-white font-semibold text-[13px] tracking-tight hover:bg-orange-700 transition-colors shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-base">verified</span>
+<span>Sign &amp; Transmit Motion</span>
+</button>
+<button class="px-4 py-2.5 bg-[#F8F6F0] hover:bg-[#EFECE4] text-navy-heritage border border-[#E6E2D8] text-[13px] font-medium transition-colors">
+                View Redline Revisions (v3.4)
+              </button>
+</div>
+<span class="font-mono text-[11px] text-slate-500">3 Associated Dossiers Attached</span>
+</div>
+</article>
+<!-- Right Broadsheet Column: Financial Stewardship & Key Ratios (Col 4) -->
+<aside class="lg:col-span-4 flex flex-col gap-6">
+<div class="bg-white border border-[#E6E2D8] p-6 shadow-sm">
+<div class="flex items-baseline justify-between border-b border-[#E6E2D8] pb-3 mb-4">
+<h3 class="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-500">Statement of Account</h3>
+<span class="font-mono text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">Q4 AUDIT GOOD</span>
+</div>
+<!-- Major Financial Metrics -->
+<div class="space-y-4">
+<div>
+<span class="text-[11px] font-mono uppercase text-slate-400 block">Unbilled WIP &amp; Outstanding AR</span>
+<div class="text-3xl font-extrabold text-navy-heritage tracking-tighter mt-0.5">$142,850.00</div>
+<div class="flex items-center justify-between text-[11px] text-slate-500 mt-1">
+<span>Target: $150,000</span>
+<span class="font-mono font-semibold text-emerald-600">94.2% Realization</span>
+</div>
+<!-- Mini Progress Bar -->
+<div class="w-full h-1.5 bg-[#F1ECE1] rounded-none mt-1.5 overflow-hidden">
+<div class="h-full bg-navy-heritage" style="width: 94.2%"></div>
+</div>
+</div>
+<div class="pt-4 border-t border-[#E6E2D8] grid grid-cols-2 gap-3">
+<div>
+<span class="text-[10px] font-mono text-slate-400 block uppercase">Client Trust Vault</span>
+<span class="text-base font-bold text-navy-heritage font-mono">$38,200</span>
+</div>
+<div>
+<span class="text-[10px] font-mono text-slate-400 block uppercase">Active Matters</span>
+<span class="text-base font-bold text-navy-heritage font-mono">24 <span class="text-[10px] text-emerald-600 font-normal">+3 mo.</span></span>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-[#E6E2D8]">
+<div class="text-[11px] text-slate-600 leading-normal">
+                Trust ledger verified compliant under NY Bar Rule 1.15. Next IOLTA reconciliation scheduled for Friday.
+              </div>
+</div>
+</div>
+<!-- Quick Actions Panel -->
+<div class="bg-[#0F172A] text-white p-6 shadow-sm">
+<div class="font-mono text-[10px] uppercase tracking-widest text-slate-400 mb-3">Expedited Chambers Action</div>
+<div class="space-y-2">
+<button class="w-full py-2 px-3 text-left bg-white/10 hover:bg-white/15 text-[12px] font-medium transition-colors flex items-center justify-between">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-amber-300">note_add</span>
+<span>Draft New Subpoena</span>
+</span>
+<span class="font-mono text-[10px] text-slate-400">⌘N</span>
+</button>
+<button class="w-full py-2 px-3 text-left bg-white/10 hover:bg-white/15 text-[12px] font-medium transition-colors flex items-center justify-between">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-slate-300">download_for_offline</span>
+<span>Export Michaelmas Docket</span>
+</span>
+<span class="font-mono text-[10px] text-slate-400">PDF</span>
+</button>
+</div>
+</div>
+</aside>
+</section>
+<!-- Broadsheet Spread Row 2: The Day's Directives & Bespoke Courtroom Ledger -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left: The Day's Directives (Numbered Legal Checklist) (Col 7) -->
+<div class="lg:col-span-7 bg-white border border-[#E6E2D8] p-8 shadow-sm">
+<div class="flex items-baseline justify-between border-b border-[#0F172A] pb-3 mb-6">
+<div>
+<span class="font-mono text-[10px] uppercase tracking-widest text-slate-400">Priority Docket Checklist</span>
+<h3 class="text-xl font-extrabold tracking-tight text-navy-heritage">The Day’s Directives</h3>
+</div>
+<span class="font-mono text-[11px] text-slate-500">18 Outstanding · 4 Urgent</span>
+</div>
+<!-- Directive 01 -->
+<div class="group border-b border-[#E6E2D8] py-4 transition-colors">
+<div class="flex items-start gap-4">
+<span class="font-mono text-2xl font-bold text-terracotta leading-none">01</span>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-2">
+<h4 class="font-bold text-navy-heritage text-[15px] tracking-tight group-hover:text-terracotta transition-colors">
+                    Finalize &amp; E-File Motion in Limine
+                  </h4>
+<span class="font-mono text-[10px] uppercase px-2 py-0.5 bg-terracotta-soft text-terracotta font-bold">
+                    4:00 PM Deadline
+                  </span>
+</div>
+<p class="text-[13px] text-slate-600 mt-1">
+                  Matter: <span class="font-semibold text-navy-heritage">Marsh v. Castellan</span> (HO-2026-0042) · Strike defendant's surprise financial expert witness testimony.
+                </p>
+<div class="flex items-center gap-4 mt-3 text-[11px] font-mono text-slate-400">
+<span>Assigned: M. Chen (Lead)</span>
+<span>•</span>
+<span class="text-navy-heritage font-semibold underline cursor-pointer">View Draft Brief (v3.4)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Directive 02 -->
+<div class="group border-b border-[#E6E2D8] py-4 transition-colors">
+<div class="flex items-start gap-4">
+<span class="font-mono text-2xl font-bold text-slate-400 leading-none">02</span>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-2">
+<h4 class="font-bold text-navy-heritage text-[15px] tracking-tight group-hover:text-navy-muted transition-colors">
+                    Review Patent Assignment Agreement Redline
+                  </h4>
+<span class="font-mono text-[10px] uppercase px-2 py-0.5 bg-[#F1ECE1] text-slate-700 font-semibold">
+                    Tomorrow, 11:30 AM
+                  </span>
+</div>
+<p class="text-[13px] text-slate-600 mt-1">
+                  Client: <span class="font-semibold text-navy-heritage">Lin BioTech IP Transfer</span> (IP-2026-0118) · Revisions needed on Section 4.2 exclusivity clauses.
+                </p>
+<div class="flex items-center gap-4 mt-3 text-[11px] font-mono text-slate-400">
+<span>Requested by: Dr. Sarah Lin</span>
+<span>•</span>
+<span class="text-navy-heritage font-semibold underline cursor-pointer">Open Redline Editor</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Directive 03 -->
+<div class="group border-b border-[#E6E2D8] py-4 transition-colors">
+<div class="flex items-start gap-4">
+<span class="font-mono text-2xl font-bold text-slate-400 leading-none">03</span>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-2">
+<h4 class="font-bold text-navy-heritage text-[15px] tracking-tight group-hover:text-navy-muted transition-colors">
+                    Prepare Deposition Exhibit Binder (Dr. Thorne)
+                  </h4>
+<span class="font-mono text-[10px] uppercase px-2 py-0.5 bg-[#F1ECE1] text-slate-700">
+                    Oct 17, 2026
+                  </span>
+</div>
+<p class="text-[13px] text-slate-600 mt-1">
+                  Coordinate with J. Sterling for physical tabbed production and digital tablet index for expert examination.
+                </p>
+<div class="flex items-center gap-4 mt-3 text-[11px] font-mono text-slate-400">
+<span>Assigned: J. Sterling</span>
+<span>•</span>
+<span>8 Exhibits Bound</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Directive 04 -->
+<div class="group py-4 transition-colors">
+<div class="flex items-start gap-4">
+<span class="font-mono text-2xl font-bold text-slate-400 leading-none">04</span>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-2">
+<h4 class="font-bold text-navy-heritage text-[15px] tracking-tight group-hover:text-navy-muted transition-colors">
+                    Ethics &amp; Conflict Clearance: Vantage Bio Intake
+                  </h4>
+<span class="font-mono text-[10px] uppercase px-2 py-0.5 bg-amber-100 text-amber-900 font-semibold">
+                    Action Required
+                  </span>
+</div>
+<p class="text-[13px] text-slate-600 mt-1">
+                  Preliminary automated database scan clear; final senior partner clearance signature required before retainer execution.
+                </p>
+<div class="flex items-center gap-4 mt-3 text-[11px] font-mono text-slate-400">
+<span>Confidential Intake</span>
+<span>•</span>
+<span class="text-emerald-700 font-semibold underline cursor-pointer">Authorize Retention</span>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-[#E6E2D8] flex items-center justify-between">
+<button class="text-[12px] font-semibold text-navy-heritage hover:underline flex items-center gap-1">
+<span>+ Add chamber directive (inline)</span>
+</button>
+<span class="font-mono text-[11px] text-slate-500">View Full Archive (18 Items) →</span>
+</div>
+</div>
+<!-- Right: Bespoke Courtroom Ledger (Col 5) -->
+<div class="lg:col-span-5 bg-white border border-[#E6E2D8] p-8 shadow-sm">
+<div class="flex items-baseline justify-between border-b border-[#0F172A] pb-3 mb-6">
+<div>
+<span class="font-mono text-[10px] uppercase tracking-widest text-slate-400">Judicial Calendar</span>
+<h3 class="text-xl font-extrabold tracking-tight text-navy-heritage">Courtroom Ledger</h3>
+</div>
+<span class="font-mono text-[11px] text-slate-500">Fortnight Horizon</span>
+</div>
+<div class="space-y-6">
+<!-- Docket Entry 1 -->
+<div class="border-l-2 border-terracotta pl-4 py-1">
+<div class="font-mono text-[11px] text-terracotta font-bold uppercase">Oct 17, 2026 · 09:30 AM</div>
+<h5 class="text-sm font-bold text-navy-heritage mt-0.5">Pre-Trial Conference &amp; Motion Hearing</h5>
+<div class="text-[12px] text-slate-600 mt-1">
+                Marsh v. Castellan · Hon. Justice Evelyn Keller
+              </div>
+<div class="text-[11px] font-mono text-slate-400 mt-1 flex items-center gap-2">
+<span>NY Supreme Court, 60 Centre St</span>
+<span>•</span>
+<span class="text-slate-700 font-semibold">Room 402B</span>
+</div>
+</div>
+<!-- Docket Entry 2 -->
+<div class="border-l-2 border-amber-600 pl-4 py-1">
+<div class="font-mono text-[11px] text-amber-700 font-bold uppercase">Oct 22, 2026 · 01:00 PM</div>
+<h5 class="text-sm font-bold text-navy-heritage mt-0.5">Expert Deposition: Dr. Aris Thorne</h5>
+<div class="text-[12px] text-slate-600 mt-1">
+                Biochemical License Valuation · Lin BioTech v. GeneCore
+              </div>
+<div class="text-[11px] font-mono text-slate-400 mt-1 flex items-center gap-2">
+<span>Secure V-Conference</span>
+<span>•</span>
+<span class="text-slate-700">Stenographer Booked</span>
+</div>
+</div>
+<!-- Docket Entry 3 -->
+<div class="border-l-2 border-navy-heritage pl-4 py-1">
+<div class="font-mono text-[11px] text-slate-700 font-bold uppercase">Oct 27, 2026 · 05:00 PM</div>
+<h5 class="text-sm font-bold text-navy-heritage mt-0.5">Summary Judgment Filing Deadline</h5>
+<div class="text-[12px] text-slate-600 mt-1">
+                Castellan Cross-Claims · Strict Statutory Cutoff
+              </div>
+<div class="text-[11px] font-mono text-slate-400 mt-1 flex items-center gap-2">
+<span>Electronic NYCEF System</span>
+<span>•</span>
+<span class="text-slate-700">Federal Docket Sync</span>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-4 border-t border-[#E6E2D8]">
+<a class="block text-center py-2.5 bg-[#F8F6F0] hover:bg-[#EFECE4] text-navy-heritage text-[12px] font-semibold border border-[#E6E2D8] transition-colors" href="#">
+              Synchronize Ledger to Chambers Calendar (iCal/Exchange)
+            </a>
+</div>
+</div>
+</section>
+<!-- Broadsheet Spread Row 3: Client Signatures & Real-Time Firm Dispatch -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pb-12">
+<!-- Left: Signatures & Client Actions Required (Col 6) -->
+<div class="lg:col-span-6 bg-white border border-[#E6E2D8] p-8 shadow-sm">
+<div class="flex items-baseline justify-between border-b border-[#0F172A] pb-3 mb-6">
+<div>
+<span class="font-mono text-[10px] uppercase tracking-widest text-slate-400">Desk Awaiting Execution</span>
+<h3 class="text-xl font-extrabold tracking-tight text-navy-heritage">Action Required: Client Dispatches</h3>
+</div>
+<span class="font-mono text-[11px] text-amber-700 font-bold bg-amber-50 px-2 py-0.5">3 PENDING</span>
+</div>
+<div class="space-y-4">
+<!-- Client 1 -->
+<div class="p-4 bg-[#F8F6F0] border border-[#E6E2D8] flex items-center justify-between gap-4">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded bg-[#0F172A] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                  DC
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-bold text-navy-heritage text-[13px] truncate">David Castellan</span>
+<span class="font-mono text-[10px] text-slate-500 uppercase">Marsh v. Castellan</span>
+</div>
+<p class="text-[12px] text-slate-600 truncate">Signed Retainer Agreement &amp; $45,000 Trust Wire</p>
+<span class="text-[10px] font-mono text-terracotta">Awaiting Senior Partner Countersignature</span>
+</div>
+</div>
+<button class="px-3 py-1.5 bg-navy-heritage text-white text-[11px] font-semibold tracking-tight hover:bg-slate-800 transition-colors shrink-0">
+                Countersign
+              </button>
+</div>
+<!-- Client 2 -->
+<div class="p-4 bg-[#F8F6F0] border border-[#E6E2D8] flex items-center justify-between gap-4">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded bg-[#9A6B2F] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                  SL
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-bold text-navy-heritage text-[13px] truncate">Dr. Sarah Lin</span>
+<span class="font-mono text-[10px] text-slate-500 uppercase">Lin BioTech</span>
+</div>
+<p class="text-[12px] text-slate-600 truncate">Section 4.2 Licensing Scope Redline</p>
+<span class="text-[10px] font-mono text-slate-500">Uploaded 2 days ago · Review Queued</span>
+</div>
+</div>
+<button class="px-3 py-1.5 bg-white border border-[#E6E2D8] text-navy-heritage text-[11px] font-semibold tracking-tight hover:bg-[#EFECE4] transition-colors shrink-0">
+                Review File
+              </button>
+</div>
+<!-- Client 3 -->
+<div class="p-4 bg-[#F8F6F0] border border-[#E6E2D8] flex items-center justify-between gap-4">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded bg-[#475569] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                  MV
+                </div>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-bold text-navy-heritage text-[13px] truncate">Marcus Vance</span>
+<span class="font-mono text-[10px] text-slate-500 uppercase">Vance Trust</span>
+</div>
+<p class="text-[12px] text-slate-600 truncate">Confidential Financial Disclosures (4 PDF Binders)</p>
+<span class="text-[10px] font-mono text-slate-500">Vault Deposit: Yesterday 5:14 PM</span>
+</div>
+</div>
+<button class="px-3 py-1.5 bg-white border border-[#E6E2D8] text-navy-heritage text-[11px] font-semibold tracking-tight hover:bg-[#EFECE4] transition-colors shrink-0">
+                Open Vault
+              </button>
+</div>
+</div>
+</div>
+<!-- Right: Chambers Chronicle & Audit Trail (Col 6) -->
+<div class="lg:col-span-6 bg-white border border-[#E6E2D8] p-8 shadow-sm">
+<div class="flex items-baseline justify-between border-b border-[#0F172A] pb-3 mb-6">
+<div>
+<span class="font-mono text-[10px] uppercase tracking-widest text-slate-400">Real-Time Chambers Chronicle</span>
+<h3 class="text-xl font-extrabold tracking-tight text-navy-heritage">Firm Audit &amp; Dispatch</h3>
+</div>
+<span class="font-mono text-[10px] text-emerald-600 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> LIVE AUDIT
+            </span>
+</div>
+<div class="space-y-4">
+<!-- Event 1 -->
+<div class="flex items-start gap-3 text-[13px] border-b border-[#E6E2D8] pb-3">
+<span class="font-mono text-[10px] text-slate-400 pt-0.5">12m</span>
+<div class="min-w-0 flex-1">
+<span class="font-bold text-navy-heritage">Julian Sterling (Junior Partner)</span>
+<p class="text-slate-600 mt-0.5">
+                  Uploaded revised expert disclosures: <code class="font-mono text-[11px] text-navy-heritage bg-[#F1ECE1] px-1 py-0.5">Exhibit_9B_Thorne_Analysis.pdf</code>
+</p>
+<span class="text-[11px] font-mono text-slate-400 block mt-1">Matter: Marsh v. Castellan (HO-2026-0042)</span>
+</div>
+</div>
+<!-- Event 2 -->
+<div class="flex items-start gap-3 text-[13px] border-b border-[#E6E2D8] pb-3">
+<span class="font-mono text-[10px] text-slate-400 pt-0.5">44m</span>
+<div class="min-w-0 flex-1">
+<span class="font-bold text-navy-heritage">Ananya Rao (Senior Associate)</span>
+<p class="text-slate-600 mt-0.5">
+                  Logged 3.2 hours billable research on trade secret statutory preemption.
+                </p>
+<span class="text-[11px] font-mono text-emerald-700 block mt-1">Verified Billable · IP-2026-0118</span>
+</div>
+</div>
+<!-- Event 3 -->
+<div class="flex items-start gap-3 text-[13px] border-b border-[#E6E2D8] pb-3">
+<span class="font-mono text-[10px] text-slate-400 pt-0.5">2h</span>
+<div class="min-w-0 flex-1">
+<span class="font-bold text-terracotta">Court Electronic Docket Watch</span>
+<p class="text-slate-600 mt-0.5">
+                  Notice of Appearance filed by opposing counsel Cravath, Swaine &amp; Moore in NY Supreme Court.
+                </p>
+<span class="text-[11px] font-mono text-slate-400 block mt-1">Docket Ref #104</span>
+</div>
+</div>
+<!-- Event 4 -->
+<div class="flex items-start gap-3 text-[13px]">
+<span class="font-mono text-[10px] text-slate-400 pt-0.5">4h</span>
+<div class="min-w-0 flex-1">
+<span class="font-bold text-navy-heritage">IOLTA Trust Accounting</span>
+<p class="text-slate-600 mt-0.5">
+                  Client wire of $50,000 received and cleared for Lin BioTech matter.
+                </p>
+<span class="text-[11px] font-mono text-slate-400 block mt-1">Transaction Ref: TR-2026-9042</span>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-[#E6E2D8] text-right">
+<a class="font-mono text-[11px] text-slate-600 hover:text-navy-heritage font-semibold" href="#">
+              Examine Full 256-Bit Cryptographic Audit Ledger →
+            </a>
+</div>
+</div>
+</section>
+<!-- Broadsheet Colophon Bottom Rule -->
+<footer class="border-t border-[#0F172A] pt-6 pb-12 flex flex-col sm:flex-row items-center justify-between text-slate-500 font-mono text-[11px] gap-4">
+<div class="flex items-center gap-4">
+<span class="font-bold text-navy-heritage tracking-wider">QUIRE LEGAL REVIEW</span>
+<span>•</span>
+<span>ESTABLISHED MCMXCVI</span>
+<span>•</span>
+<span>CONFIDENTIAL ATTORNEY-CLIENT PRIVILEGE</span>
+</div>
+<div>
+<span>ALL RIGHTS RESERVED · CHEN &amp; STERLING LLP</span>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

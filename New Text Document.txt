@@ -1,0 +1,447 @@
+⚖️ Legal Case & Document Management System
+2-Week MVP Development Plan
+Attorney & Client Portal | Laravel + MySQL | Hostinger Shared Hosting
+Version: MVP v1.0 | Target: 10 working days + stabilization/UAT
+
+1. MVP Objective
+•	Build a secure, clean, mobile-responsive legal case and document management MVP for attorneys, legal staff, and clients.
+•	The system will allow attorneys/staff to manage clients, matters, documents, document requests, communication, tasks, notes, calendars, Google Calendar, Google Drive, search, analytics, and email notifications.
+•	Explicitly excluded from MVP: OCR, AI, SMS, Stripe, Razorpay, e-signature, native mobile apps, advanced billing, complex two-way Google Drive synchronization, Elasticsearch/OpenSearch, and microservices.
+2. Recommended Technology Stack
+•	Backend: Laravel 13; PHP 8.3+.
+•	Frontend: Blade + Livewire + Alpine.js.
+•	UI: Tailwind CSS.
+•	Database: MySQL 8.
+•	Authentication: Laravel authentication, email verification, optional 2FA.
+•	Authorization: Laravel Policies + RBAC.
+•	Files: Laravel Filesystem with private storage.
+•	Search: MySQL Full-Text Search initially.
+•	Calendar: Google Calendar API + OAuth 2.0.
+•	Drive: Google Drive API + OAuth 2.0.
+•	Chat: Livewire initially; real-time WebSockets can be added later.
+•	Analytics: Laravel queries + Chart.js.
+•	Email: Laravel Mail/SMTP.
+•	Queues: Database queue initially.
+•	Testing: Pest/PHPUnit + Laravel Feature Tests.
+•	Hosting: Hostinger shared hosting.
+•	Source control: Git + GitHub.
+3. Architecture Philosophy
+•	Use a modular Laravel monolith. Keep the codebase simple, maintainable, testable, and ready to evolve.
+•	Business logic should not be embedded in Blade templates or oversized controllers.
+•	Use Actions/Services for meaningful business operations, Policies for authorization, Form Requests for validation, Jobs for asynchronous work, and Notifications for email/in-app events.
+•	Keep Google-specific logic isolated in dedicated Google services.
+•	Design storage and interfaces so the application can later migrate from Hostinger storage to S3 and from database queues to Redis without rewriting core business logic.
+4. User Roles
+•	Super Admin — platform-level administration.
+•	Firm Admin — manages law-firm users and configuration.
+•	Attorney — manages clients, matters, documents, communication, tasks and calendar.
+•	Staff/Paralegal — works on assigned matters and permitted resources.
+•	Client — accesses only their own matters and explicitly authorized information.
+5. Permission Model
+•	Use role permissions plus resource-level authorization.
+•	Examples: matter.view, matter.create, matter.edit, document.view, document.upload, document.share, document.delete, message.view, message.create, task.create, task.assign and task.complete.
+•	Every matter-related resource must be checked against the user's firm and matter access. Never rely on frontend visibility as a security boundary.
+6. Core Modules
+•	Authentication
+•	Users & Roles
+•	Firm Management
+•	Client Management
+•	Matter/Case Management
+•	Document Management
+•	Document Requests
+•	Client Portal
+•	Matter-based Chat
+•	Tasks
+•	Todo List
+•	Notes
+•	Internal Calendar
+•	Google Calendar Integration
+•	Google Drive Integration
+•	Global Search
+•	Analytics
+•	Email/In-App Notifications
+•	Audit Logs
+•	Settings
+7. Database Design
+•	Core tables: users, firms, roles, permissions, role_user, permission_role, clients, matters, matter_users, document_categories, documents, document_versions, document_shares, document_requests, message_threads, messages, message_attachments, tasks, task_comments, todos, notes, calendar_events, google_calendar_connections, google_drive_connections, google_drive_files, notifications, audit_logs.
+•	Business records should be firm-scoped. Matter-owned resources should reference the matter and inherit matter-level authorization.
+8. Navigation
+•	Attorney: Dashboard, Clients, Matters, Documents, Calendar, Messages, Tasks, Todo, Notes, Search, Analytics, Settings, Profile.
+•	Client: Dashboard, My Matters, Documents, Requests, Messages, Tasks, Calendar, Notes, Profile.
+•	Admin: Dashboard, Users, Clients, Matters, Documents, Activity, Analytics, Settings.
+9. Document Management
+•	Support upload, preview, download, categories, tags, descriptions, visibility, versioning, sharing, document requests, and activity history.
+•	Visibility levels: PRIVATE, INTERNAL, CLIENT_SHARED. Documents should default to PRIVATE.
+•	Never overwrite an existing document version. Store a parent document record plus document_versions.
+•	Legal files should not be placed in public web-accessible directories. Access should flow through authenticated Laravel routes and authorization policies.
+•	Mobile clients should be able to use the device camera to capture a photo, preview it, retake it, and upload it as a matter document.
+10. Document Request Workflow
+•	Attorney creates request → client receives email/in-app notification → client uploads document → status becomes Submitted → attorney reviews → Accept, Reject, or request replacement.
+•	Suggested statuses: Pending, Submitted, Under Review, Accepted, Rejected, Completed.
+11. Client Portal
+•	Simple, mobile-first client experience.
+•	Client dashboard should show matters, action-required items, documents, messages, tasks, upcoming events and permitted notes.
+•	Clients must never see internal attorney notes or another client's information.
+12. Matter-Based Chat
+•	Use matter-specific message threads rather than a generic social/chat product.
+•	Support text, attachments, timestamps, sender, read/unread status and appropriate notifications.
+•	Clearly distinguish client-facing communication from internal staff/attorney communication.
+13. Tasks, Todo & Notes
+•	Tasks are matter/business-related and can be assigned to attorneys, staff, or clients.
+•	Todo items are personal working items and may optionally reference a matter.
+•	Notes should support at least Internal and Client-visible types. Internal notes must never be exposed to clients.
+14. Calendar & Google Calendar
+•	Build the application's internal calendar first with month, week, day and agenda views.
+•	Support title, matter, start/end time, location, description, attendees and reminders.
+•	Google Calendar connection should use OAuth 2.0. Store tokens securely and never expose them to the browser.
+•	For the MVP, prioritize reliable calendar creation/import/update flows. Avoid complex conflict resolution and enterprise-grade two-way synchronization until Phase 2.
+15. Google Drive
+•	Allow attorneys to connect Google Drive and link a Drive folder to a matter.
+•	MVP actions: connect Drive, link a folder, import files, and upload/export files to Drive.
+•	Do not attempt perfect two-way synchronization in the two-week MVP. Full bidirectional sync can be a later module.
+16. Search
+•	Implement global search across clients, matters, documents, messages, tasks and notes.
+•	Use MySQL Full-Text Search initially.
+•	Search must be authorization-aware: filter by firm and permitted matters before returning results.
+•	Move to OpenSearch/Elasticsearch only when scale justifies it.
+17. Analytics
+•	Keep analytics operational and simple for MVP.
+•	Dashboard metrics: active/pending/closed matters, documents uploaded/shared/requested, pending/completed/overdue tasks, active/new clients, and recent activity.
+•	Use Laravel queries and Chart.js. Avoid building a separate analytics warehouse for MVP.
+18. Notifications
+•	Use email and in-app notifications; no SMS.
+•	Events include account invitation, new document, document request, new message, task assignment, task reminder, matter update and calendar event.
+•	Centralize notification logic instead of placing email code throughout controllers.
+19. Audit Logging
+•	Track critical actions such as login/logout, client creation, matter creation, document upload/download/share/delete, message creation, task completion and permission changes.
+•	Recommended fields: user, action, entity type, entity ID, matter ID, IP address, user agent and timestamp.
+•	Audit records should be append-oriented and not editable through ordinary application screens.
+20. Security Architecture
+•	Security flow: Authentication → Firm authorization → Matter authorization → Resource authorization → Action authorization.
+•	Use CSRF protection, validation, rate limiting, secure sessions/cookies, password hashing, Laravel Policies, private file storage, secure download routes, audit logs, encrypted Google tokens and HTTPS.
+•	Test for broken access control/IDOR, direct document URL access, modified IDs, cross-client matter access, cross-firm access, unauthorized messages and internal-note exposure.
+21. Hostinger Deployment
+•	Initial topology: Hostinger application + MySQL + private file storage + SMTP + database queue.
+•	Use HTTPS, production environment settings, APP_DEBUG=false, secure cookies, environment secrets, storage permissions, database backups, cache configuration, scheduler/cron where required, SMTP and Google OAuth callback configuration.
+•	Do not introduce Node servers, MongoDB, Redis, Docker, Kubernetes or microservices for this MVP.
+22. Two-Week Development Schedule
+•	Day 1 — Architecture, requirements, ERD, Laravel foundation, authentication, base responsive UI.
+•	Day 2 — Authentication hardening, users, roles, permissions, profiles.
+•	Day 3 — Clients and matters, assignments, statuses, matter dashboard.
+•	Day 4 — Document upload, categories, metadata, visibility, secure access.
+•	Day 5 — Document versioning, sharing, document requests, review workflow.
+•	Day 6 — Client portal, responsive/mobile UX, camera capture and upload.
+•	Day 7 — Matter-based chat, attachments, read/unread and notifications.
+•	Day 8 — Tasks, todo list, notes, internal/client-visible distinctions.
+•	Day 9 — Internal calendar and Google Calendar OAuth/integration.
+•	Day 10 — Google Drive connection, linked folders, import/export.
+•	Day 11 — Global permission-aware search.
+•	Day 12 — Analytics dashboards and charts.
+•	Day 13 — Email/in-app notifications, audit logs, settings and polish.
+•	Day 14 — Full QA, security/authorization testing, bug fixes, deployment and documentation.
+23. Definition of Done
+•	Every module should include database/migrations, model, validation, authorization, business logic, UI, responsive behavior, error handling, appropriate audit logging, automated tests and documentation.
+•	A feature is not considered complete merely because the screen works.
+24. Testing Strategy
+•	Test authentication, permissions, CRUD workflows, document security, client isolation, matter isolation, Google OAuth, calendar operations, Drive operations, search permissions, chat authorization, tasks and notifications.
+•	Critical security tests: Client A cannot access Client B's matter/documents; attorney/staff cannot access unauthorized firm data; clients cannot access internal notes; deleted/private documents cannot be downloaded by direct URL; manipulated IDs cannot bypass policies.
+25. Documentation Deliverables
+•	/docs/01-product-requirements.md
+•	/docs/02-architecture.md
+•	/docs/03-database.md
+•	/docs/04-roles-permissions.md
+•	/docs/05-document-security.md
+•	/docs/06-google-integrations.md
+•	/docs/07-installation.md
+•	/docs/08-deployment.md
+•	/docs/09-environment-variables.md
+•	/docs/10-testing.md
+•	/docs/11-attorney-user-guide.md
+•	/docs/12-client-user-guide.md
+•	/docs/13-admin-guide.md
+•	/docs/14-api-documentation.md
+•	/docs/15-troubleshooting.md
+•	/docs/16-change-log.md
+26. AI-Assisted Development Workflow
+•	Use ChatGPT for product architecture, requirements, security review, database design, testing strategy, debugging, code review and documentation.
+•	Use Claude for implementation-heavy work such as Laravel files, Livewire components, refactoring and tests.
+•	Do not let either model freely redesign the application. Maintain ARCHITECTURE.md as the project constitution.
+•	Recommended workflow: Requirement → Database → Model → Policy → Action/Service → Controller/Livewire → UI → Tests → Review → Commit.
+27. Project Constitution
+•	Laravel modular monolith.
+•	Thin controllers and no business logic in Blade.
+•	Policies are the authorization source of truth.
+•	Documents are private by default.
+•	No direct public document URLs.
+•	Every matter resource requires matter authorization.
+•	No unnecessary dependencies.
+•	Google integrations remain inside Google services.
+•	Credentials are never exposed to the frontend.
+•	Every meaningful feature requires automated tests.
+•	Architectural changes must be documented.
+28. Final MVP Success Criteria
+•	The complete workflow must work smoothly: Attorney creates client → creates matter → requests document → client receives notification → client logs in → takes a photo/upload → attorney reviews → attorney communicates → creates task → schedules calendar event → activity is audited.
+•	The application should be usable on desktop and mobile and should prevent cross-client/cross-matter data access.
+•	Success is measured by a reliable end-to-end workflow, clean code, secure authorization, useful documentation and a polished user experience — not by the number of features.
+29. Technology Summary
+Layer	Technology
+Backend	Laravel 13 / PHP 8.3+
+Frontend	Blade + Livewire + Alpine.js
+UI	Tailwind CSS
+Database	MySQL 8
+Storage	Laravel private filesystem
+Google	Calendar API + Drive API + OAuth 2.0
+Search	MySQL Full-Text
+Analytics	Laravel + Chart.js
+Email	Laravel Mail / SMTP
+Testing	Pest/PHPUnit
+Hosting	Hostinger Shared Hosting
+Version Control	Git + GitHub
+30. Recommended MVP Boundary
+Build the core legal workflow exceptionally well. Avoid AI, OCR, SMS, payments, e-signature and infrastructure complexity in V1. The architecture should remain modular so these capabilities can be added later without rewriting the core system.
+Page 1
+■■ Legal Case & Document Management
+System
+2-Week MVP Development Plan
+Attorney & Client Portal | Laravel + MySQL | Hostinger Shared Hosting
+Version: MVP v1.0 Target: 10 working days + stabilization/UAT
+1. MVP Objective
+• Build a secure, clean, mobile-responsive legal case and document management MVP for attorneys, legal staff, and
+clients.
+• The system will allow attorneys/staff to manage clients, matters, documents, document requests, communication, tasks,
+notes, calendars, Google Calendar, Google Drive, search, analytics, and email notifications.
+• Explicitly excluded from MVP: OCR, AI, SMS, Stripe, Razorpay, e-signature, native mobile apps, advanced billing,
+complex two-way Google Drive synchronization, Elasticsearch/OpenSearch, and microservices.
+2. Recommended Technology Stack
+• Backend: Laravel 13; PHP 8.3+.
+• Frontend: Blade + Livewire + Alpine.js.
+• UI: Tailwind CSS.
+• Database: MySQL 8.
+• Authentication: Laravel authentication, email verification, optional 2FA.
+• Authorization: Laravel Policies + RBAC.
+• Files: Laravel Filesystem with private storage.
+• Search: MySQL Full-Text Search initially.
+• Calendar: Google Calendar API + OAuth 2.0.
+• Drive: Google Drive API + OAuth 2.0.
+• Chat: Livewire initially; real-time WebSockets can be added later.
+• Analytics: Laravel queries + Chart.js.
+• Email: Laravel Mail/SMTP.
+• Queues: Database queue initially.
+• Testing: Pest/PHPUnit + Laravel Feature Tests.
+• Hosting: Hostinger shared hosting.
+• Source control: Git + GitHub.
+3. Architecture Philosophy
+• Use a modular Laravel monolith. Keep the codebase simple, maintainable, testable, and ready to evolve.
+• Business logic should not be embedded in Blade templates or oversized controllers.
+• Use Actions/Services for meaningful business operations, Policies for authorization, Form Requests for validation, Jobs
+for asynchronous work, and Notifications for email/in-app events.
+• Keep Google-specific logic isolated in dedicated Google services.
+Page 2
+• Design storage and interfaces so the application can later migrate from Hostinger storage to S3 and from database
+queues to Redis without rewriting core business logic.
+4. User Roles
+• Super Admin — platform-level administration.
+• Firm Admin — manages law-firm users and configuration.
+• Attorney — manages clients, matters, documents, communication, tasks and calendar.
+• Staff/Paralegal — works on assigned matters and permitted resources.
+• Client — accesses only their own matters and explicitly authorized information.
+5. Permission Model
+• Use role permissions plus resource-level authorization.
+• Examples: matter.view, matter.create, matter.edit, document.view, document.upload, document.share,
+document.delete, message.view, message.create, task.create, task.assign and task.complete.
+• Every matter-related resource must be checked against the user's firm and matter access. Never rely on frontend
+visibility as a security boundary.
+6. Core Modules
+• Authentication
+• Users & Roles
+• Firm Management
+• Client Management
+• Matter/Case Management
+• Document Management
+• Document Requests
+• Client Portal
+• Matter-based Chat
+• Tasks
+• Todo List
+• Notes
+• Internal Calendar
+• Google Calendar Integration
+• Google Drive Integration
+• Global Search
+• Analytics
+• Email/In-App Notifications
+• Audit Logs
+• Settings
+7. Database Design
+• Core tables: users, firms, roles, permissions, role_user, permission_role, clients, matters, matter_users,
+document_categories, documents, document_versions, document_shares, document_requests, message_threads,
+messages, message_attachments, tasks, task_comments, todos, notes, calendar_events,
+google_calendar_connections, google_drive_connections, google_drive_files, notifications, audit_logs.
+Page 3
+• Business records should be firm-scoped. Matter-owned resources should reference the matter and inherit matter-level
+authorization.
+8. Navigation
+• Attorney: Dashboard, Clients, Matters, Documents, Calendar, Messages, Tasks, Todo, Notes, Search, Analytics,
+Settings, Profile.
+• Client: Dashboard, My Matters, Documents, Requests, Messages, Tasks, Calendar, Notes, Profile.
+• Admin: Dashboard, Users, Clients, Matters, Documents, Activity, Analytics, Settings.
+9. Document Management
+• Support upload, preview, download, categories, tags, descriptions, visibility, versioning, sharing, document requests,
+and activity history.
+• Visibility levels: PRIVATE, INTERNAL, CLIENT_SHARED. Documents should default to PRIVATE.
+• Never overwrite an existing document version. Store a parent document record plus document_versions.
+• Legal files should not be placed in public web-accessible directories. Access should flow through authenticated Laravel
+routes and authorization policies.
+• Mobile clients should be able to use the device camera to capture a photo, preview it, retake it, and upload it as a matter
+document.
+10. Document Request Workflow
+• Attorney creates request → client receives email/in-app notification → client uploads document → status becomes
+Submitted → attorney reviews → Accept, Reject, or request replacement.
+• Suggested statuses: Pending, Submitted, Under Review, Accepted, Rejected, Completed.
+11. Client Portal
+• Simple, mobile-first client experience.
+• Client dashboard should show matters, action-required items, documents, messages, tasks, upcoming events and
+permitted notes.
+• Clients must never see internal attorney notes or another client's information.
+12. Matter-Based Chat
+• Use matter-specific message threads rather than a generic social/chat product.
+• Support text, attachments, timestamps, sender, read/unread status and appropriate notifications.
+• Clearly distinguish client-facing communication from internal staff/attorney communication.
+13. Tasks, Todo & Notes
+• Tasks are matter/business-related and can be assigned to attorneys, staff, or clients.
+• Todo items are personal working items and may optionally reference a matter.
+• Notes should support at least Internal and Client-visible types. Internal notes must never be exposed to clients.
+14. Calendar & Google Calendar
+• Build the application's internal calendar first with month, week, day and agenda views.
+• Support title, matter, start/end time, location, description, attendees and reminders.
+• Google Calendar connection should use OAuth 2.0. Store tokens securely and never expose them to the browser.
+• For the MVP, prioritize reliable calendar creation/import/update flows. Avoid complex conflict resolution and
+enterprise-grade two-way synchronization until Phase 2.
+Page 4
+15. Google Drive
+• Allow attorneys to connect Google Drive and link a Drive folder to a matter.
+• MVP actions: connect Drive, link a folder, import files, and upload/export files to Drive.
+• Do not attempt perfect two-way synchronization in the two-week MVP. Full bidirectional sync can be a later module.
+16. Search
+• Implement global search across clients, matters, documents, messages, tasks and notes.
+• Use MySQL Full-Text Search initially.
+• Search must be authorization-aware: filter by firm and permitted matters before returning results.
+• Move to OpenSearch/Elasticsearch only when scale justifies it.
+17. Analytics
+• Keep analytics operational and simple for MVP.
+• Dashboard metrics: active/pending/closed matters, documents uploaded/shared/requested, pending/completed/overdue
+tasks, active/new clients, and recent activity.
+• Use Laravel queries and Chart.js. Avoid building a separate analytics warehouse for MVP.
+18. Notifications
+• Use email and in-app notifications; no SMS.
+• Events include account invitation, new document, document request, new message, task assignment, task reminder,
+matter update and calendar event.
+• Centralize notification logic instead of placing email code throughout controllers.
+19. Audit Logging
+• Track critical actions such as login/logout, client creation, matter creation, document upload/download/share/delete,
+message creation, task completion and permission changes.
+• Recommended fields: user, action, entity type, entity ID, matter ID, IP address, user agent and timestamp.
+• Audit records should be append-oriented and not editable through ordinary application screens.
+20. Security Architecture
+• Security flow: Authentication → Firm authorization → Matter authorization → Resource authorization → Action
+authorization.
+• Use CSRF protection, validation, rate limiting, secure sessions/cookies, password hashing, Laravel Policies, private file
+storage, secure download routes, audit logs, encrypted Google tokens and HTTPS.
+• Test for broken access control/IDOR, direct document URL access, modified IDs, cross-client matter access, cross-firm
+access, unauthorized messages and internal-note exposure.
+21. Hostinger Deployment
+• Initial topology: Hostinger application + MySQL + private file storage + SMTP + database queue.
+• Use HTTPS, production environment settings, APP_DEBUG=false, secure cookies, environment secrets, storage
+permissions, database backups, cache configuration, scheduler/cron where required, SMTP and Google OAuth
+callback configuration.
+• Do not introduce Node servers, MongoDB, Redis, Docker, Kubernetes or microservices for this MVP.
+22. Two-Week Development Schedule
+Page 5
+• Day 1 — Architecture, requirements, ERD, Laravel foundation, authentication, base responsive UI.
+• Day 2 — Authentication hardening, users, roles, permissions, profiles.
+• Day 3 — Clients and matters, assignments, statuses, matter dashboard.
+• Day 4 — Document upload, categories, metadata, visibility, secure access.
+• Day 5 — Document versioning, sharing, document requests, review workflow.
+• Day 6 — Client portal, responsive/mobile UX, camera capture and upload.
+• Day 7 — Matter-based chat, attachments, read/unread and notifications.
+• Day 8 — Tasks, todo list, notes, internal/client-visible distinctions.
+• Day 9 — Internal calendar and Google Calendar OAuth/integration.
+• Day 10 — Google Drive connection, linked folders, import/export.
+• Day 11 — Global permission-aware search.
+• Day 12 — Analytics dashboards and charts.
+• Day 13 — Email/in-app notifications, audit logs, settings and polish.
+• Day 14 — Full QA, security/authorization testing, bug fixes, deployment and documentation.
+23. Definition of Done
+• Every module should include database/migrations, model, validation, authorization, business logic, UI, responsive
+behavior, error handling, appropriate audit logging, automated tests and documentation.
+• A feature is not considered complete merely because the screen works.
+24. Testing Strategy
+• Test authentication, permissions, CRUD workflows, document security, client isolation, matter isolation, Google OAuth,
+calendar operations, Drive operations, search permissions, chat authorization, tasks and notifications.
+• Critical security tests: Client A cannot access Client B's matter/documents; attorney/staff cannot access unauthorized
+firm data; clients cannot access internal notes; deleted/private documents cannot be downloaded by direct URL;
+manipulated IDs cannot bypass policies.
+25. Documentation Deliverables
+• /docs/01-product-requirements.md
+• /docs/02-architecture.md
+• /docs/03-database.md
+• /docs/04-roles-permissions.md
+• /docs/05-document-security.md
+• /docs/06-google-integrations.md
+• /docs/07-installation.md
+• /docs/08-deployment.md
+• /docs/09-environment-variables.md
+• /docs/10-testing.md
+• /docs/11-attorney-user-guide.md
+• /docs/12-client-user-guide.md
+• /docs/13-admin-guide.md
+• /docs/14-api-documentation.md
+• /docs/15-troubleshooting.md
+Page 6
+• /docs/16-change-log.md
+26. AI-Assisted Development Workflow
+• Use ChatGPT for product architecture, requirements, security review, database design, testing strategy, debugging,
+code review and documentation.
+• Use Claude for implementation-heavy work such as Laravel files, Livewire components, refactoring and tests.
+• Do not let either model freely redesign the application. Maintain ARCHITECTURE.md as the project constitution.
+• Recommended workflow: Requirement → Database → Model → Policy → Action/Service → Controller/Livewire → UI →
+Tests → Review → Commit.
+27. Project Constitution
+• Laravel modular monolith.
+• Thin controllers and no business logic in Blade.
+• Policies are the authorization source of truth.
+• Documents are private by default.
+• No direct public document URLs.
+• Every matter resource requires matter authorization.
+• No unnecessary dependencies.
+• Google integrations remain inside Google services.
+• Credentials are never exposed to the frontend.
+• Every meaningful feature requires automated tests.
+• Architectural changes must be documented.
+28. Final MVP Success Criteria
+• The complete workflow must work smoothly: Attorney creates client → creates matter → requests document → client
+receives notification → client logs in → takes a photo/upload → attorney reviews → attorney communicates → creates
+task → schedules calendar event → activity is audited.
+• The application should be usable on desktop and mobile and should prevent cross-client/cross-matter data access.
+• Success is measured by a reliable end-to-end workflow, clean code, secure authorization, useful documentation and a
+polished user experience — not by the number of features.
+29. Technology Summary
+Layer Technology
+Backend Laravel 13 / PHP 8.3+
+Frontend Blade + Livewire + Alpine.js
+UI Tailwind CSS
+Database MySQL 8
+Storage Laravel private filesystem
+Google Calendar API + Drive API + OAuth 2.0
+Search MySQL Full-Text
+Analytics Laravel + Chart.js
+Email Laravel Mail / SMTP
+Testing Pest/PHPUnit
+Page 7
+Layer Technology
+Hosting Hostinger Shared Hosting
+Version Control Git + GitHub
+30. Recommended MVP Boundary
+Build the core legal workflow exceptionally well. Avoid AI, OCR, SMS, payments, e-signature and infrastructure
+complexity in V1. The architecture should remain modular so these capabilities can be added later without rewriting the
+core system.
