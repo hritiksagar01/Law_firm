@@ -44,6 +44,7 @@ fi
 echo "=== [6/6] Bringing Application Back Up & Reloading PHP-FPM ==="
 php artisan up
 
-sudo systemctl reload php8.3-fpm
+PHP_FPM_SERVICE=$(systemctl list-unit-files | grep -o 'php[0-9.]*-fpm.service' | head -n 1 || echo "php-fpm")
+sudo systemctl reload "$PHP_FPM_SERVICE" || sudo systemctl restart "$PHP_FPM_SERVICE" || true
 
 echo "=== Deployment Completed Successfully at $(date) ==="
