@@ -37,7 +37,19 @@ class DatabaseSeeder extends Seeder
             'default_hourly_rate' => 7500.00,
         ]);
 
-        // 2. Create Users (Advocates, Clerks, and Client Portal)
+        // 2. Create Users (Super Admin, Advocates, Clerks, and Client Portal)
+        $superAdmin = User::create([
+            'firm_id' => $firm->id,
+            'name' => 'Platform Super Admin',
+            'email' => 'admin@sharmalegal.in',
+            'password' => Hash::make('password123'),
+            'role' => 'superadmin',
+            'title' => 'Chief Platform & Infrastructure Administrator',
+            'hourly_rate' => 0.00,
+            'phone' => '+91 99999 00001',
+            'avatar_url' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+        ]);
+
         $rajesh = User::create([
             'firm_id' => $firm->id,
             'name' => 'Adv. Rajesh Sharma',

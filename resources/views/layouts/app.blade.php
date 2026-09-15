@@ -198,6 +198,18 @@
                             </span>
                         </div>
 
+                        @if(auth()->user()->isSuperAdmin())
+                        <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 hover:bg-emerald-50 text-[#1a3c2a] font-semibold flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm text-emerald-700">admin_panel_settings</span>
+                            <span>Super Admin Platform Console</span>
+                        </a>
+                        <a href="{{ route('admin.settings.environment') }}" class="px-4 py-2 hover:bg-emerald-50 text-[#1a3c2a] flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm text-amber-600">tune</span>
+                            <span>Cloud &amp; Env Variables</span>
+                        </a>
+                        <div class="h-px bg-[#efeeeb] my-1"></div>
+                        @endif
+
                         <a href="{{ route('settings.index') }}" class="px-4 py-2 hover:bg-[#faf9f6] text-[#424843] flex items-center gap-2">
                             <span class="material-symbols-outlined text-sm">settings</span>
                             <span>Chambers Settings</span>

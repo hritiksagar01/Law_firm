@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'firm.staff' => \App\Http\Middleware\EnsureFirmStaff::class,
             'portal.client' => \App\Http\Middleware\EnsureClient::class,
+            'admin.super' => \App\Http\Middleware\EnsureSuperAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

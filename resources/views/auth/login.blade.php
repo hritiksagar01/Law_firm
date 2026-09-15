@@ -181,6 +181,24 @@
                             </div>
                         </button>
                     </form>
+
+                    <!-- Platform Super Admin -->
+                    <form action="{{ route('demo-login') }}" method="POST" class="col-span-2">
+                        @csrf
+                        <input type="hidden" name="email" value="admin@sharmalegal.in"/>
+                        <button type="submit" class="w-full p-2.5 rounded-lg bg-[#111714] text-white border border-[#2b3830] hover:bg-[#1a3c2a] transition-all text-left group flex items-center justify-between shadow-sm">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-7 h-7 rounded-full bg-[#1a3c2a] text-[#fed977] flex items-center justify-center font-bold text-xs shrink-0">
+                                    <span class="material-symbols-outlined text-sm">admin_panel_settings</span>
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="text-[11px] font-semibold text-white truncate">Platform Super Admin</span>
+                                    <span class="text-[9px] text-[#82a78f] truncate">Multi-Tenant Cloud, S3 &amp; .env Config</span>
+                                </div>
+                            </div>
+                            <span class="text-[9px] font-mono text-[#fed977] px-2 py-0.5 rounded bg-[#1a3c2a] border border-[#2e4c3a]">SuperAdmin</span>
+                        </button>
+                    </form>
                 </div>
             </div>
 

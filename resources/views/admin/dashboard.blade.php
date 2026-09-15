@@ -25,6 +25,17 @@
             </div>
         </div>
 
+        <nav class="hidden md:flex items-center gap-1 bg-[#1a231e] p-1 rounded-lg border border-[#2b3830] text-xs">
+            <a href="{{ route('admin.dashboard') }}" class="px-3 py-1.5 rounded-md bg-[#1a3c2a] text-[#fed977] font-semibold shadow-sm flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">hub</span>
+                <span>Tenant Telemetry</span>
+            </a>
+            <a href="{{ route('admin.settings.environment') }}" class="px-3 py-1.5 rounded-md text-[#a3b8aa] hover:text-white hover:bg-[#222e27] transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">tune</span>
+                <span>Environment &amp; Cloud</span>
+            </a>
+        </nav>
+
         <a href="{{ route('dashboard') }}" class="text-xs text-[#c5ecd2] hover:underline flex items-center gap-1">
             <span class="material-symbols-outlined text-sm">arrow_back</span>
             <span>Switch to Law Firm Workspace</span>
@@ -38,10 +49,16 @@
                 <h1 class="text-3xl font-serif font-bold text-[#1a1c1a]">Platform Tenant Telemetry</h1>
                 <p class="text-sm text-[#727973] mt-1">Multi-firm resource isolation, database latency, and Cloudflare R2 / S3 storage consumption</p>
             </div>
-            <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#1a3c2a] text-white text-xs font-medium hover:bg-[#022616] shadow-sm">
-                <span class="material-symbols-outlined text-base">domain_add</span>
-                <span>Provision New Law Firm</span>
-            </button>
+            <div class="flex items-center gap-2.5">
+                <a href="{{ route('admin.settings.environment') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white border border-[#c1c8c1] text-[#1a1c1a] text-xs font-medium hover:bg-[#faf9f6] shadow-sm">
+                    <span class="material-symbols-outlined text-base text-amber-600">tune</span>
+                    <span>Environment &amp; Cloud Settings</span>
+                </a>
+                <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#1a3c2a] text-white text-xs font-medium hover:bg-[#022616] shadow-sm">
+                    <span class="material-symbols-outlined text-base">domain_add</span>
+                    <span>Provision New Law Firm</span>
+                </button>
+            </div>
         </div>
 
         <!-- Infrastructure Health Telemetry -->

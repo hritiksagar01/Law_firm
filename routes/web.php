@@ -700,12 +700,19 @@ Route::middleware('auth')->group(function () {
         })->name('calendar.index');
     });
 
-    // Super Admin Platform Dashboard
-    Route::get('/admin/dashboard', function () {
-        if (!Auth::user()->isSuperAdmin()) {
-            return redirect()->route('dashboard')->with('error', 'Unauthorized: Super Admin access required.');
-        }
-        $firms = \App\Models\Firm::withCount(['users', 'matters', 'documents'])->get();
-        return view('admin.dashboard', compact('firms'));
-    })->name('admin.dashboard');
+    // Super Admin Platform Routes (Protected by auth and admin.super)
+    Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', function () {
+            $firms = \App\Models\Firm::withCount(['users', 'matters', 'documents'])->get();
+            return view('admin.dashboard', compact('firms'));
+        })->name('dashboard');
+
+        Route::get('/settings/environment', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'index'])->name('settings.environment');
+        Route::post('/settings/environment', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'update'])->name('settings.environment.update');
+        Route::post('/settings/environment/test-db', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testDatabase'])->name('settings.environment.test-db');
+        Route::post('/settings/environment/test-s3', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testS3'])->name('settings.environment.test-s3');
+        Route::post('/settings/environment/test-mail', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testMail'])->name('settings.environment.test-mail');
+        Route::post('/settings/environment/run-migrations', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'runMigrations'])->name('settings.environment.run-migrations');
+        Route::post('/settings/environment/restore-backup', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'restoreBackup'])->name('settings.environment.restore-backup');
+    });
 });
