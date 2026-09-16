@@ -11,7 +11,7 @@
             <h1 class="text-2xl font-serif font-bold text-[#222222]">Case Documents Vault</h1>
             <p class="text-xs text-[#766A5E] mt-1">Court orders, written pleadings, filings, and evidence documents shared with your organization.</p>
         </div>
-        <button type="button" @click="uploadDocModalOpen = true" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#845D33] text-white text-xs font-semibold hover:bg-[#6D4B27] shadow-sm transition-colors self-start sm:self-auto">
+        <button type="button" @click="uploadDocModalOpen = true" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm transition-colors self-start sm:self-auto">
             <span class="material-symbols-outlined text-base">upload</span>
             <span>Upload Document to Case</span>
         </button>
@@ -22,22 +22,22 @@
         $currentCat = request('category', 'all');
     @endphp
     <div class="flex items-center gap-2 border-b border-[#EFECE6] pb-2 text-xs overflow-x-auto">
-        <a href="{{ route('portal.documents.index') }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'all' ? 'bg-[#845D33] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
+        <a href="{{ route('portal.documents.index') }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'all' ? 'bg-[#9F8349] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
             All Filings ({{ $documents->count() }})
         </a>
-        <a href="{{ route('portal.documents.index', ['category' => 'Pleadings']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Pleadings' ? 'bg-[#845D33] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
+        <a href="{{ route('portal.documents.index', ['category' => 'Pleadings']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Pleadings' ? 'bg-[#9F8349] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
             Pleadings
         </a>
-        <a href="{{ route('portal.documents.index', ['category' => 'Court Orders']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Court Orders' ? 'bg-[#845D33] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
+        <a href="{{ route('portal.documents.index', ['category' => 'Court Orders']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Court Orders' ? 'bg-[#9F8349] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
             Court Orders
         </a>
-        <a href="{{ route('portal.documents.index', ['category' => 'Contracts']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Contracts' ? 'bg-[#845D33] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
+        <a href="{{ route('portal.documents.index', ['category' => 'Contracts']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Contracts' ? 'bg-[#9F8349] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
             Contracts &amp; Agreements
         </a>
-        <a href="{{ route('portal.documents.index', ['category' => 'Evidence']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Evidence' ? 'bg-[#845D33] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
+        <a href="{{ route('portal.documents.index', ['category' => 'Evidence']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Evidence' ? 'bg-[#9F8349] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
             Evidence
         </a>
-        <a href="{{ route('portal.documents.index', ['category' => 'Client Submissions']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Client Submissions' ? 'bg-[#845D33] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
+        <a href="{{ route('portal.documents.index', ['category' => 'Client Submissions']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Client Submissions' ? 'bg-[#9F8349] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
             Client Submissions
         </a>
     </div>
@@ -99,7 +99,7 @@
 
                         <td class="py-3.5 px-4 text-right">
                             <a href="{{ route('documents.download', $doc->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#EFECE6] text-[#222222] text-xs font-semibold transition-colors">
-                                <span class="material-symbols-outlined text-sm text-[#845D33]">download</span>
+                                <span class="material-symbols-outlined text-sm text-[#9F8349]">download</span>
                                 <span>Download</span>
                             </a>
                         </td>
@@ -122,7 +122,7 @@
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-[#EFECE6] flex flex-col gap-5 relative">
             <div class="flex items-start justify-between">
                 <div class="flex flex-col">
-                    <span class="font-mono text-[10px] uppercase tracking-wider text-[#845D33] font-semibold">Direct File Upload</span>
+                    <span class="font-mono text-[10px] uppercase tracking-wider text-[#9F8349] font-semibold">Direct File Upload</span>
                     <h3 class="text-base font-bold text-[#222222] mt-0.5">Upload Document to Case File</h3>
                 </div>
                 <button type="button" @click="uploadDocModalOpen = false" class="text-[#766A5E] hover:text-[#222222]">
@@ -135,7 +135,7 @@
 
                 <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-semibold text-[#222222]">Select Associated Case</label>
-                    <select name="matter_id" required class="w-full p-2.5 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:bg-white focus:border-[#845D33]">
+                    <select name="matter_id" required class="w-full p-2.5 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:bg-white focus:border-[#9F8349]">
                         @foreach($matters as $m)
                         <option value="{{ $m->id }}">{{ $m->case_number }} — {{ $m->title }}</option>
                         @endforeach
@@ -144,12 +144,12 @@
 
                 <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-semibold text-[#222222]">Document Title / Description</label>
-                    <input type="text" name="title" required placeholder="e.g. Scanned Agreement dated 12.04.2023" class="w-full p-2.5 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:bg-white focus:border-[#845D33]"/>
+                    <input type="text" name="title" required placeholder="e.g. Scanned Agreement dated 12.04.2023" class="w-full p-2.5 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:bg-white focus:border-[#9F8349]"/>
                 </div>
 
                 <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-semibold text-[#222222]">Category</label>
-                    <select name="category" class="w-full p-2.5 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:bg-white focus:border-[#845D33]">
+                    <select name="category" class="w-full p-2.5 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:bg-white focus:border-[#9F8349]">
                         <option value="Client Submissions">Client Submissions</option>
                         <option value="Contracts">Contracts &amp; Agreements</option>
                         <option value="Evidence">Evidence &amp; Records</option>
@@ -159,14 +159,14 @@
 
                 <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-semibold text-[#222222]">Choose File (PDF, DOCX, Images)</label>
-                    <input type="file" name="file" required class="w-full text-xs file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#845D33] file:text-white hover:file:bg-[#6D4B27] file:cursor-pointer p-2 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC]"/>
+                    <input type="file" name="file" required class="w-full text-xs file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#9F8349] file:text-white hover:file:bg-[#856C36] file:cursor-pointer p-2 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC]"/>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#FAF8F5]">
                     <button type="button" @click="uploadDocModalOpen = false" class="px-4 py-2 rounded-lg text-xs font-medium text-[#766A5E] hover:bg-[#FAF8F5]">
                         Cancel
                     </button>
-                    <button type="submit" class="px-5 py-2 rounded-lg bg-[#845D33] text-white text-xs font-semibold hover:bg-[#6D4B27] shadow-sm">
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm">
                         Upload to Case File
                     </button>
                 </div>

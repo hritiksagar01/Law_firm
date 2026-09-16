@@ -11,7 +11,7 @@
                 <h1 class="text-2xl font-serif font-bold text-[#222222]">Firm Settings &amp; Administration</h1>
                 <p class="text-sm text-[#766A5E]">Multi-tenant chambers profile, attorney hourly rates, and IOLTA compliance</p>
             </div>
-            <button @click="openInviteModal = true" class="inline-flex items-center gap-2 px-4 h-10 rounded-lg bg-[#845D33] text-white text-xs font-medium hover:bg-[#6D4B27] shadow-sm transition-colors">
+            <button @click="openInviteModal = true" class="inline-flex items-center gap-2 px-4 h-10 rounded-lg bg-[#9F8349] text-white text-xs font-medium hover:bg-[#856C36] shadow-sm transition-colors">
                 <span class="material-symbols-outlined text-base">person_add</span>
                 <span>Invite Team Member</span>
             </button>
@@ -25,7 +25,7 @@
                 <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
                     <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[#845D33]">badge</span>
+                            <span class="material-symbols-outlined text-[#9F8349]">badge</span>
                             <h3 class="text-sm font-semibold text-[#222222]">Chambers Counsel &amp; Staff Roster</h3>
                         </div>
                         <span class="font-mono text-xs text-[#766A5E]">{{ $users->count() }} Authorized Users</span>
@@ -53,15 +53,15 @@
                                     </div>
                                 </td>
                                 <td class="py-3.5 px-4">
-                                    <span class="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded font-bold {{ $user->role === 'partner' ? 'bg-[#F4ECE1]/50 text-[#845D33]' : 'bg-[#F4EFEA] text-[#554D45]' }}">
+                                    <span class="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded font-bold {{ $user->role === 'partner' ? 'bg-[#F4ECE1]/50 text-[#9F8349]' : 'bg-[#F4EFEA] text-[#554D45]' }}">
                                         {{ $user->title ?? ucfirst($user->role) }}
                                     </span>
                                 </td>
-                                <td class="py-3.5 px-4 font-mono font-semibold text-[#845D33]">
+                                <td class="py-3.5 px-4 font-mono font-semibold text-[#9F8349]">
                                     ${{ number_format($user->hourly_rate, 2) }}/hr
                                 </td>
                                 <td class="py-3.5 px-4">
-                                    <span class="inline-flex items-center gap-1 text-[11px] font-medium text-[#845D33]">
+                                    <span class="inline-flex items-center gap-1 text-[11px] font-medium text-[#9F8349]">
                                         <span class="w-1.5 h-1.5 rounded-full bg-[#F8F4EE]0"></span> Active
                                     </span>
                                 </td>
@@ -74,7 +74,7 @@
                 <!-- Firm Identity Details Card -->
                 <div class="bg-white rounded-xl border border-[#EFECE6] p-5 shadow-sm">
                     <h3 class="text-sm font-semibold text-[#222222] mb-3 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#845D33]">domain</span>
+                        <span class="material-symbols-outlined text-[#9F8349]">domain</span>
                         <span>Chambers Legal Entity Profile</span>
                     </h3>
                     <div class="grid grid-cols-2 gap-4 text-xs">
@@ -84,7 +84,7 @@
                         </div>
                         <div>
                             <span class="text-[#766A5E] block">Dedicated Subdomain</span>
-                            <span class="font-mono text-[#845D33]">{{ $firm->domain ?? 'chensterling.quirelegal.io' }}</span>
+                            <span class="font-mono text-[#9F8349]">{{ $firm->domain ?? 'chensterling.quirelegal.io' }}</span>
                         </div>
                         <div>
                             <span class="text-[#766A5E] block">Base Billing Currency</span>
@@ -103,24 +103,24 @@
                 <!-- State Bar Compliance Box -->
                 <div class="bg-white rounded-xl border border-[#EFECE6] p-5 shadow-sm">
                     <div class="flex items-center gap-2 mb-3">
-                        <span class="material-symbols-outlined text-[#845D33]">verified_user</span>
-                        <h3 class="text-xs font-mono uppercase tracking-wider text-[#845D33] font-bold">Fiduciary Trust Account</h3>
+                        <span class="material-symbols-outlined text-[#9F8349]">verified_user</span>
+                        <h3 class="text-xs font-mono uppercase tracking-wider text-[#9F8349] font-bold">Fiduciary Trust Account</h3>
                     </div>
                     <p class="text-xs text-[#554D45] leading-relaxed mb-4">
                         Chen &amp; Sterling LLP operates under mandatory three-way reconciliation compliance in accordance with ABA Model Rule 1.15.
                     </p>
                     <div class="p-3 rounded-lg bg-[#F8F4EE] border border-[#F4ECE1] flex flex-col gap-2 text-xs">
                         <div class="flex justify-between">
-                            <span class="text-[#845D33]">Escrow Account:</span>
+                            <span class="text-[#9F8349]">Escrow Account:</span>
                             <span class="font-mono font-semibold text-[#222222]">****4902 (Chase Trust)</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-[#845D33]">Total Escrow Balance:</span>
-                            <span class="font-mono font-bold text-[#6D4B27]">${{ number_format(\App\Models\Client::sum('trust_balance'), 2) }}</span>
+                            <span class="text-[#9F8349]">Total Escrow Balance:</span>
+                            <span class="font-mono font-bold text-[#856C36]">${{ number_format(\App\Models\Client::sum('trust_balance'), 2) }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-[#845D33]">Audit Status:</span>
-                            <span class="font-mono text-[10px] uppercase font-bold text-[#845D33] bg-[#F4ECE1] px-1.5 py-0.5 rounded">Reconciled Clean</span>
+                            <span class="text-[#9F8349]">Audit Status:</span>
+                            <span class="font-mono text-[10px] uppercase font-bold text-[#9F8349] bg-[#F4ECE1] px-1.5 py-0.5 rounded">Reconciled Clean</span>
                         </div>
                     </div>
                 </div>
@@ -146,7 +146,7 @@
             <div class="bg-white rounded-xl shadow-2xl border border-[#EFECE6] w-full max-w-md p-6 flex flex-col">
                 <div class="flex items-center justify-between pb-4 border-b border-[#F4EFEA] mb-4">
                     <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#845D33]">person_add</span>
+                        <span class="material-symbols-outlined text-[#9F8349]">person_add</span>
                         <h3 class="text-sm font-semibold text-[#222222]">Invite Attorney or Staff</h3>
                     </div>
                     <button type="button" @click="openInviteModal = false" class="text-[#766A5E] hover:text-[#222222]">
@@ -158,18 +158,18 @@
                     @csrf
                     <div class="flex flex-col gap-1">
                         <label class="font-medium text-[#222222]">Legal Professional Full Name</label>
-                        <input name="name" required type="text" placeholder="e.g. Rachel Hernandez, Esq." class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#845D33]"/>
+                        <input name="name" required type="text" placeholder="e.g. Rachel Hernandez, Esq." class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
                     </div>
 
                     <div class="flex flex-col gap-1">
                         <label class="font-medium text-[#222222]">Firm Email Address</label>
-                        <input name="email" required type="email" placeholder="rhernandez@chensterling.com" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#845D33]"/>
+                        <input name="email" required type="email" placeholder="rhernandez@chensterling.com" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1">
                             <label class="font-medium text-[#222222]">Practice Role</label>
-                            <select name="role" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#845D33]">
+                            <select name="role" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]">
                                 <option value="associate" selected>Associate Attorney</option>
                                 <option value="partner">Partner</option>
                                 <option value="paralegal">Litigation Paralegal</option>
@@ -177,13 +177,13 @@
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="font-medium text-[#222222]">Billing Rate ($/hr)</label>
-                            <input name="hourly_rate" type="number" step="25" value="450" required class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#845D33]"/>
+                            <input name="hourly_rate" type="number" step="25" value="450" required class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
                         </div>
                     </div>
 
                     <div class="pt-3 border-t border-[#F4EFEA] flex items-center justify-end gap-2">
                         <button type="button" @click="openInviteModal = false" class="px-4 py-2 rounded-lg border border-[#EAE4DC] text-[#554D45] hover:bg-[#FAF8F5]">Cancel</button>
-                        <button type="submit" class="px-4 py-2 rounded-lg bg-[#845D33] text-white font-semibold hover:bg-[#6D4B27]">Authorize &amp; Invite</button>
+                        <button type="submit" class="px-4 py-2 rounded-lg bg-[#9F8349] text-white font-semibold hover:bg-[#856C36]">Authorize &amp; Invite</button>
                     </div>
                 </form>
             </div>

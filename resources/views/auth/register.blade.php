@@ -58,10 +58,10 @@
             
             <div class="flex items-center justify-between pb-4 border-b border-[#F4EFEA] mb-6">
                 <div class="flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full bg-[#845D33] text-white flex items-center justify-center font-mono text-[11px] font-bold">§</span>
+                    <span class="w-6 h-6 rounded-full bg-[#9F8349] text-white flex items-center justify-center font-mono text-[11px] font-bold">§</span>
                     <h2 class="text-sm font-semibold text-[#222222]">Law Practice Onboarding Protocol</h2>
                 </div>
-                <button type="button" @click="fillDemo()" class="text-[11px] font-mono text-[#845D33] hover:underline flex items-center gap-1 bg-[#F4ECE1]/40 px-2 py-1 rounded">
+                <button type="button" @click="fillDemo()" class="text-[11px] font-mono text-[#9F8349] hover:underline flex items-center gap-1 bg-[#F4ECE1]/40 px-2 py-1 rounded">
                     <span class="material-symbols-outlined text-xs">bolt</span>
                     <span>1-Click Fast Fill</span>
                 </button>
@@ -74,18 +74,18 @@
                 <!-- Section 1: Firm Identity -->
                 <div class="bg-[#FAF8F5] p-4 rounded-lg border border-[#EFECE6] flex flex-col gap-3">
                     <span class="text-[10px] font-mono uppercase tracking-wider text-[#766A5E] font-semibold flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm text-[#845D33]">domain</span>
+                        <span class="material-symbols-outlined text-sm text-[#9F8349]">domain</span>
                         <span>01 · Law Firm / Advocates Chambers Identity</span>
                     </span>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-medium text-[#222222]">Official Law Firm / Chambers Name</label>
-                            <input name="firm_name" x-model="firmName" type="text" required placeholder="e.g. Sharma &amp; Associates, Advocates" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#845D33] transition-all"/>
+                            <input name="firm_name" x-model="firmName" type="text" required placeholder="e.g. Sharma &amp; Associates, Advocates" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#9F8349] transition-all"/>
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-medium text-[#222222]">Primary Practice Discipline</label>
-                            <select name="practice_area" x-model="practiceArea" required class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#845D33] transition-all">
+                            <select name="practice_area" x-model="practiceArea" required class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#9F8349] transition-all">
                                 @foreach(config('legal.practice_areas', ['Commercial Litigation & Arbitration', 'Corporate & Insolvency (IBC / NCLT)', 'Criminal Defense & Bail Matters']) as $area)
                                     <option value="{{ $area }}">{{ $area }}</option>
                                 @endforeach
@@ -96,11 +96,11 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-medium text-[#222222]">Bar Council Enrollment No. / License</label>
-                            <input name="bar_number" x-model="barNumber" type="text" placeholder="e.g. D/1420/2012" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] font-mono outline-none focus:border-[#845D33]"/>
+                            <input name="bar_number" x-model="barNumber" type="text" placeholder="e.g. D/1420/2012" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] font-mono outline-none focus:border-[#9F8349]"/>
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-medium text-[#222222]">Primary Judicial Forum</label>
-                            <select class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#845D33]">
+                            <select class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#9F8349]">
                                 @foreach(config('legal.courts', ['Supreme Court of India', 'High Court of Delhi']) as $court)
                                     <option value="{{ $court }}">{{ $court }}</option>
                                 @endforeach
@@ -112,42 +112,42 @@
                 <!-- Section 2: Managing Advocate Account -->
                 <div class="bg-[#FAF8F5] p-4 rounded-lg border border-[#EFECE6] flex flex-col gap-3">
                     <span class="text-[10px] font-mono uppercase tracking-wider text-[#766A5E] font-semibold flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm text-[#845D33]">badge</span>
+                        <span class="material-symbols-outlined text-sm text-[#9F8349]">badge</span>
                         <span>02 · Managing Advocate / Lead Counsel Account</span>
                     </span>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-medium text-[#222222]">Managing Advocate Full Name</label>
-                            <input name="name" x-model="partnerName" type="text" required placeholder="Adv. Rajesh Sharma" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#845D33]"/>
+                            <input name="name" x-model="partnerName" type="text" required placeholder="Adv. Rajesh Sharma" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#9F8349]"/>
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-medium text-[#222222]">Chambers Email Address</label>
-                            <input name="email" x-model="email" type="email" required placeholder="counsel@sharmalegal.in" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#845D33]"/>
+                            <input name="email" x-model="email" type="email" required placeholder="counsel@sharmalegal.in" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#9F8349]"/>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-medium text-[#222222]">Master Password</label>
-                            <input name="password" x-ref="passwordInput" value="Chambers@2026" type="password" required placeholder="Minimum 8 characters" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#845D33]"/>
+                            <input name="password" x-ref="passwordInput" value="Chambers@2026" type="password" required placeholder="Minimum 8 characters" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#9F8349]"/>
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-medium text-[#222222]">Confirm Password</label>
-                            <input name="password_confirmation" x-ref="passwordConfirmInput" value="Chambers@2026" type="password" required placeholder="Re-enter password" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#845D33]"/>
+                            <input name="password_confirmation" x-ref="passwordConfirmInput" value="Chambers@2026" type="password" required placeholder="Re-enter password" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#9F8349]"/>
                         </div>
                     </div>
                 </div>
 
                 <!-- Terms & Bar Council Reassurance -->
-                <div class="p-3 bg-[#F8F4EE] rounded-lg border border-[#F4ECE1] flex items-start gap-2 text-xs text-[#845D33]">
-                    <span class="material-symbols-outlined text-base text-[#845D33] shrink-0 mt-0.5">verified</span>
+                <div class="p-3 bg-[#F8F4EE] rounded-lg border border-[#F4ECE1] flex items-start gap-2 text-xs text-[#9F8349]">
+                    <span class="material-symbols-outlined text-base text-[#9F8349] shrink-0 mt-0.5">verified</span>
                     <p class="leading-relaxed">
                         Advocate-client privilege, client advance retainers, and case records are maintained in compliance with the Advocates Act 1961 and Bar Council standards.
                     </p>
                 </div>
 
-                <button type="submit" class="w-full py-3 px-4 rounded-lg bg-[#845D33] text-white text-xs font-semibold flex items-center justify-center gap-2 hover:bg-[#6D4B27] shadow-md transition-all active:scale-[0.99] mt-2">
+                <button type="submit" class="w-full py-3 px-4 rounded-lg bg-[#9F8349] text-white text-xs font-semibold flex items-center justify-center gap-2 hover:bg-[#856C36] shadow-md transition-all active:scale-[0.99] mt-2">
                     <span>Establish Practice &amp; Enter Dashboard</span>
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </button>
@@ -155,7 +155,7 @@
 
             <div class="mt-6 pt-4 border-t border-[#F4EFEA] flex items-center justify-between text-xs">
                 <span class="text-[#766A5E]">Already have a chambers workspace?</span>
-                <a href="{{ route('login') }}" class="font-semibold text-[#845D33] hover:underline flex items-center gap-1">
+                <a href="{{ route('login') }}" class="font-semibold text-[#9F8349] hover:underline flex items-center gap-1">
                     <span>Sign In to Chambers</span>
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
@@ -166,15 +166,15 @@
         <!-- Compliance & Trust Badges -->
         <div class="w-full mt-4 grid grid-cols-3 gap-2 text-center">
             <div class="bg-white/80 rounded-lg p-2 border border-[#EFECE6] flex flex-col items-center">
-                <span class="material-symbols-outlined text-sm text-[#845D33]">balance</span>
+                <span class="material-symbols-outlined text-sm text-[#9F8349]">balance</span>
                 <span class="text-[10px] font-mono text-[#766A5E] mt-0.5">Bar Council Ready</span>
             </div>
             <div class="bg-white/80 rounded-lg p-2 border border-[#EFECE6] flex flex-col items-center">
-                <span class="material-symbols-outlined text-sm text-[#845D33]">shield</span>
+                <span class="material-symbols-outlined text-sm text-[#9F8349]">shield</span>
                 <span class="text-[10px] font-mono text-[#766A5E] mt-0.5">Advocate Privilege</span>
             </div>
             <div class="bg-white/80 rounded-lg p-2 border border-[#EFECE6] flex flex-col items-center">
-                <span class="material-symbols-outlined text-sm text-[#845D33]">currency_rupee</span>
+                <span class="material-symbols-outlined text-sm text-[#9F8349]">currency_rupee</span>
                 <span class="text-[10px] font-mono text-[#766A5E] mt-0.5">₹ INR Accounting</span>
             </div>
         </div>

@@ -18,7 +18,7 @@
 
         <!-- Quick Action Toolbar -->
         <div class="flex items-center gap-2 shrink-0 flex-wrap">
-            <button @click="openTimeModal = true" class="inline-flex items-center gap-2 px-4 h-10 rounded-lg bg-[#845D33] text-white text-xs font-medium hover:bg-[#6D4B27] shadow-sm transition-all group">
+            <button @click="openTimeModal = true" class="inline-flex items-center gap-2 px-4 h-10 rounded-lg bg-[#9F8349] text-white text-xs font-medium hover:bg-[#856C36] shadow-sm transition-all group">
                 <span class="material-symbols-outlined text-[#B88B56] text-base group-hover:rotate-12 transition-transform">timer</span>
                 <span>Log Professional Hours</span>
                 <span class="font-mono text-[10px] bg-black/30 text-[#F4ECE1] px-1.5 py-0.5 rounded ml-1">⌘T</span>
@@ -43,12 +43,12 @@
                     <span class="font-mono text-[11px] uppercase tracking-wider text-[#766A5E]">Active Case Dossiers</span>
                     <div class="text-3xl font-serif font-bold text-[#222222] mt-1">{{ \App\Models\Matter::count() }}</div>
                 </div>
-                <div class="w-10 h-10 rounded-lg bg-[#F4EFEA] flex items-center justify-center text-[#845D33]">
+                <div class="w-10 h-10 rounded-lg bg-[#F4EFEA] flex items-center justify-center text-[#9F8349]">
                     <span class="material-symbols-outlined text-xl">gavel</span>
                 </div>
             </div>
             <div class="mt-4 pt-3 border-t border-[#F4EFEA] flex items-center justify-between text-xs">
-                <span class="text-[#845D33] font-medium flex items-center gap-1">
+                <span class="text-[#9F8349] font-medium flex items-center gap-1">
                     <span class="material-symbols-outlined text-sm">trending_up</span> Active Practice
                 </span>
                 <span class="font-mono text-[11px] text-[#766A5E]">High Court &amp; Tribunals</span>
@@ -62,12 +62,12 @@
                     <span class="font-mono text-[11px] uppercase tracking-wider text-[#766A5E]">Professional Hours (MTD)</span>
                     <div class="text-3xl font-mono font-bold text-[#222222] mt-1">142.5 <span class="text-xs text-[#766A5E] font-normal">hrs</span></div>
                 </div>
-                <div class="w-10 h-10 rounded-lg bg-[#B88B56]/30 flex items-center justify-center text-[#845D33]">
+                <div class="w-10 h-10 rounded-lg bg-[#B88B56]/30 flex items-center justify-center text-[#9F8349]">
                     <span class="material-symbols-outlined text-xl">timelapse</span>
                 </div>
             </div>
             <div class="mt-4 pt-3 border-t border-[#F4EFEA] flex items-center justify-between text-xs">
-                <span class="text-[#845D33] font-medium font-mono">{{ config('legal.currency_symbol', '₹') }}1,92,625 Realized</span>
+                <span class="text-[#9F8349] font-medium font-mono">{{ config('legal.currency_symbol', '₹') }}1,92,625 Realized</span>
                 <span class="font-mono text-[11px] text-[#766A5E]">94.2% Realization</span>
             </div>
         </div>
@@ -79,12 +79,12 @@
                     <span class="font-mono text-[11px] uppercase tracking-wider text-[#766A5E]">Client Retainer &amp; Trust Balance</span>
                     <div class="text-3xl font-mono font-bold text-[#222222] mt-1">{{ config('legal.currency_symbol', '₹') }}{{ number_format(\App\Models\Client::sum('trust_balance'), 2) }}</div>
                 </div>
-                <div class="w-10 h-10 rounded-lg bg-[#845D33]/10 flex items-center justify-center text-[#845D33]">
+                <div class="w-10 h-10 rounded-lg bg-[#9F8349]/10 flex items-center justify-center text-[#9F8349]">
                     <span class="material-symbols-outlined text-xl">account_balance</span>
                 </div>
             </div>
             <div class="mt-4 pt-3 border-t border-[#F4EFEA] flex items-center justify-between text-xs">
-                <span class="inline-flex items-center gap-1 text-[#845D33] font-medium">
+                <span class="inline-flex items-center gap-1 text-[#9F8349] font-medium">
                     <span class="w-2 h-2 rounded-full bg-[#F8F4EE]0"></span> Verified Ledger
                 </span>
                 <span class="font-mono text-[11px] text-[#766A5E]">{{ \App\Models\Client::count() }} Retained Clients</span>
@@ -119,10 +119,10 @@
             <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
                 <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#845D33] text-xl">cases</span>
+                        <span class="material-symbols-outlined text-[#9F8349] text-xl">cases</span>
                         <h2 class="text-base font-semibold text-[#222222]">Active Litigation &amp; Transaction Matters</h2>
                     </div>
-                    <a href="{{ route('matters.index') }}" class="text-xs font-medium text-[#845D33] hover:underline flex items-center gap-1">
+                    <a href="{{ route('matters.index') }}" class="text-xs font-medium text-[#9F8349] hover:underline flex items-center gap-1">
                         <span>View All Matters</span>
                         <span class="material-symbols-outlined text-sm">arrow_forward</span>
                     </a>
@@ -145,7 +145,7 @@
                             <tr class="hover:bg-[#FAF8F5] transition-colors group">
                                 <td class="py-3 px-4">
                                     <div class="flex flex-col">
-                                        <a href="{{ route('matters.show', $matter->id) }}" class="font-medium text-[#222222] group-hover:text-[#845D33] transition-colors">
+                                        <a href="{{ route('matters.show', $matter->id) }}" class="font-medium text-[#222222] group-hover:text-[#9F8349] transition-colors">
                                             {{ $matter->title }}
                                         </a>
                                         <span class="font-mono text-xs text-[#766A5E]">{{ $matter->case_number }} <span class="mx-1">·</span> {{ $matter->practice_area }}</span>
@@ -155,7 +155,7 @@
                                     {{ $matter->client->name }}
                                 </td>
                                 <td class="py-3 px-4">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#F8F4EE] text-[#845D33] border border-[#E8DAC8] font-semibold">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#F8F4EE] text-[#9F8349] border border-[#E8DAC8] font-semibold">
                                         {{ $matter->stage }}
                                     </span>
                                 </td>
@@ -176,7 +176,7 @@
                                      </div>
                                  </td>
                                  <td class="py-3 px-4 text-center">
-                                     <a href="{{ route('matters.show', $matter->id) }}" class="p-1.5 text-[#766A5E] hover:text-[#845D33] hover:bg-[#F4EFEA] rounded inline-flex" title="Open Dossier">
+                                     <a href="{{ route('matters.show', $matter->id) }}" class="p-1.5 text-[#766A5E] hover:text-[#9F8349] hover:bg-[#F4EFEA] rounded inline-flex" title="Open Dossier">
                                          <span class="material-symbols-outlined text-lg">folder_open</span>
                                      </a>
                                  </td>
@@ -191,10 +191,10 @@
             <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
                 <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#845D33] text-xl">timer</span>
+                        <span class="material-symbols-outlined text-[#9F8349] text-xl">timer</span>
                         <h2 class="text-base font-semibold text-[#222222]">Recent Professional Time Entries</h2>
                     </div>
-                    <button @click="openTimeModal = true" class="text-xs font-medium text-[#845D33] hover:underline flex items-center gap-1">
+                    <button @click="openTimeModal = true" class="text-xs font-medium text-[#9F8349] hover:underline flex items-center gap-1">
                         <span class="material-symbols-outlined text-sm">add</span>
                         <span>Log Hours</span>
                     </button>
@@ -204,13 +204,13 @@
                     @foreach(\App\Models\TimeEntry::with(['matter', 'user'])->latest()->take(4)->get() as $entry)
                     <div class="p-4 hover:bg-[#FAF8F5] transition-colors flex items-start justify-between gap-4">
                         <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-full bg-[#FAF8F5] flex items-center justify-center text-[#845D33] shrink-0 font-mono text-xs font-semibold">
+                            <div class="w-8 h-8 rounded-full bg-[#FAF8F5] flex items-center justify-center text-[#9F8349] shrink-0 font-mono text-xs font-semibold">
                                 {{ $entry->hours }}h
                             </div>
                             <div class="flex flex-col">
                                 <div class="flex items-center gap-2">
                                     <span class="font-medium text-sm text-[#222222]">{{ $entry->matter->title }}</span>
-                                    <span class="font-mono text-[11px] px-1.5 py-0.5 rounded bg-[#B88B56]/60 text-[#845D33] font-semibold">{{ $entry->activity_code }}</span>
+                                    <span class="font-mono text-[11px] px-1.5 py-0.5 rounded bg-[#B88B56]/60 text-[#9F8349] font-semibold">{{ $entry->activity_code }}</span>
                                     <span class="text-xs text-[#766A5E]">{{ $entry->activity_name }}</span>
                                 </div>
                                 <p class="text-xs text-[#554D45] mt-1 leading-relaxed">{{ $entry->narrative }}</p>
@@ -223,7 +223,7 @@
                         </div>
                         <div class="flex flex-col items-end shrink-0">
                             <span class="font-mono text-sm font-semibold text-[#222222]">{{ config('legal.currency_symbol', '₹') }}{{ number_format($entry->total_amount, 2) }}</span>
-                            <span class="text-[10px] text-[#845D33] font-medium uppercase tracking-wider mt-0.5">Unbilled</span>
+                            <span class="text-[10px] text-[#9F8349] font-medium uppercase tracking-wider mt-0.5">Unbilled</span>
                         </div>
                     </div>
                     @endforeach
@@ -248,7 +248,7 @@
                     @foreach(\App\Models\Event::with('matter')->orderBy('start_time')->get() as $event)
                     <div class="p-3.5 rounded-lg border {{ $event->is_statutory_deadline ? 'border-red-200 bg-red-50/50' : 'border-[#EFECE6] bg-[#FAF8F5]' }} flex flex-col gap-1.5">
                         <div class="flex items-center justify-between">
-                            <span class="font-mono text-xs font-semibold {{ $event->is_statutory_deadline ? 'text-red-700' : 'text-[#845D33]' }}">
+                            <span class="font-mono text-xs font-semibold {{ $event->is_statutory_deadline ? 'text-red-700' : 'text-[#9F8349]' }}">
                                 {{ $event->start_time->format('D, M d · g:i A') }}
                             </span>
                             @if($event->is_statutory_deadline)
@@ -276,7 +276,7 @@
             <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
                 <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#845D33] text-xl">check_box</span>
+                        <span class="material-symbols-outlined text-[#9F8349] text-xl">check_box</span>
                         <h2 class="text-base font-semibold text-[#222222]">Priority Action Items</h2>
                     </div>
                     <span class="font-mono text-xs text-[#766A5E]">2 Pending</span>
@@ -285,11 +285,11 @@
                 <div class="p-4 flex flex-col gap-2.5">
                     @foreach(\App\Models\Task::with(['assignee', 'matter'])->get() as $task)
                     <div class="p-3 rounded-lg border border-[#EFECE6] hover:border-[#EAE4DC] transition-colors flex items-start gap-3">
-                        <input type="checkbox" class="w-4 h-4 rounded text-[#845D33] accent-[#845D33] mt-0.5 cursor-pointer"/>
+                        <input type="checkbox" class="w-4 h-4 rounded text-[#9F8349] accent-[#9F8349] mt-0.5 cursor-pointer"/>
                         <div class="flex flex-col min-w-0 flex-1">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-semibold text-[#222222] truncate">{{ $task->title }}</span>
-                                <span class="font-mono text-[10px] px-1.5 py-0.2 rounded font-bold uppercase {{ $task->priority === 'urgent' ? 'bg-red-100 text-red-700' : 'bg-[#B88B56]/60 text-[#845D33]' }}">
+                                <span class="font-mono text-[10px] px-1.5 py-0.2 rounded font-bold uppercase {{ $task->priority === 'urgent' ? 'bg-red-100 text-red-700' : 'bg-[#B88B56]/60 text-[#9F8349]' }}">
                                     {{ $task->priority }}
                                 </span>
                             </div>

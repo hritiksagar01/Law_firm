@@ -23,13 +23,13 @@
             <div class="flex flex-col gap-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <div class="w-10 h-10 rounded-xl bg-[#845D33] text-[#B88B56] flex flex-col items-center justify-center font-mono text-xs font-bold shrink-0">
+                        <div class="w-10 h-10 rounded-xl bg-[#9F8349] text-[#B88B56] flex flex-col items-center justify-center font-mono text-xs font-bold shrink-0">
                             <span>{{ \Carbon\Carbon::parse($event->start_time)->format('d') }}</span>
                             <span class="text-[9px] uppercase text-white">{{ \Carbon\Carbon::parse($event->start_time)->format('M') }}</span>
                         </div>
                         <div class="flex flex-col min-w-0">
                             <span class="text-[10px] font-mono text-[#766A5E]">{{ \Carbon\Carbon::parse($event->start_time)->format('l, Y') }}</span>
-                            <span class="text-xs font-bold text-[#6D4B27]">{{ \Carbon\Carbon::parse($event->start_time)->format('h:i A') }}</span>
+                            <span class="text-xs font-bold text-[#856C36]">{{ \Carbon\Carbon::parse($event->start_time)->format('h:i A') }}</span>
                         </div>
                     </div>
                     <span class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#FAF8F5] text-[#554D45]">
@@ -41,14 +41,14 @@
 
                 @if($event->matter)
                 <div class="p-2.5 rounded-lg bg-[#FAF8F5] border border-[#f0eee9] text-xs">
-                    <span class="font-mono text-[10px] text-[#845D33] font-bold block">{{ $event->matter->case_number }}</span>
+                    <span class="font-mono text-[10px] text-[#9F8349] font-bold block">{{ $event->matter->case_number }}</span>
                     <span class="text-[#554D45] truncate block mt-0.5">{{ $event->matter->title }}</span>
                 </div>
                 @endif
 
                 @if($event->location)
                 <div class="flex items-start gap-1.5 text-xs text-[#766A5E]">
-                    <span class="material-symbols-outlined text-base text-[#845D33] shrink-0 mt-0.5">location_on</span>
+                    <span class="material-symbols-outlined text-base text-[#9F8349] shrink-0 mt-0.5">location_on</span>
                     <span>{{ $event->location }}</span>
                 </div>
                 @endif
@@ -60,7 +60,7 @@
 
             @if($event->matter)
             <div class="pt-3 border-t border-[#FAF8F5] flex justify-end">
-                <a href="{{ route('portal.matters.show', $event->matter->id) }}" class="text-xs text-[#845D33] hover:underline font-semibold flex items-center gap-1">
+                <a href="{{ route('portal.matters.show', $event->matter->id) }}" class="text-xs text-[#9F8349] hover:underline font-semibold flex items-center gap-1">
                     <span>View Case File</span>
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>

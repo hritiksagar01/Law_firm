@@ -7,7 +7,7 @@
             <span class="font-mono text-xs text-[#766A5E] uppercase tracking-wider">Unified LexisCore Index</span>
         </div>
         <h1 class="text-2xl font-serif font-bold text-[#222222]">Global Search Results</h1>
-        <p class="text-sm text-[#766A5E]">Query: <span class="font-mono text-[#845D33] font-semibold bg-[#F4EFEA] px-2 py-0.5 rounded">"{{ $q }}"</span></p>
+        <p class="text-sm text-[#766A5E]">Query: <span class="font-mono text-[#9F8349] font-semibold bg-[#F4EFEA] px-2 py-0.5 rounded">"{{ $q }}"</span></p>
     </div>
 
     <!-- Search Results Sections -->
@@ -17,7 +17,7 @@
         <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
             <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[#845D33]">cases</span>
+                    <span class="material-symbols-outlined text-[#9F8349]">cases</span>
                     <h3 class="text-sm font-semibold text-[#222222]">Matters &amp; Case Dossiers</h3>
                 </div>
                 <span class="font-mono text-xs text-[#766A5E]">{{ $matters->count() }} Matches</span>
@@ -28,12 +28,12 @@
                 <a href="{{ route('matters.show', $m->id) }}" class="p-4 flex items-center justify-between hover:bg-[#FAF8F5] transition-colors block group">
                     <div class="flex flex-col min-w-0">
                         <div class="flex items-center gap-2">
-                            <span class="font-mono text-xs font-semibold text-[#845D33]">{{ $m->case_number }}</span>
-                            <span class="text-xs font-semibold text-[#222222] group-hover:text-[#845D33] transition-colors">{{ $m->title }}</span>
+                            <span class="font-mono text-xs font-semibold text-[#9F8349]">{{ $m->case_number }}</span>
+                            <span class="text-xs font-semibold text-[#222222] group-hover:text-[#9F8349] transition-colors">{{ $m->title }}</span>
                         </div>
                         <span class="text-[11px] text-[#766A5E] mt-0.5">{{ $m->client->name }} · {{ $m->court_name ?? 'Chambers Arbitral Forum' }}</span>
                     </div>
-                    <span class="font-mono text-[10px] uppercase px-2 py-0.5 rounded bg-[#F4ECE1]/50 text-[#845D33] font-bold shrink-0">
+                    <span class="font-mono text-[10px] uppercase px-2 py-0.5 rounded bg-[#F4ECE1]/50 text-[#9F8349] font-bold shrink-0">
                         {{ $m->stage }}
                     </span>
                 </a>
@@ -47,7 +47,7 @@
         <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
             <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[#845D33]">group</span>
+                    <span class="material-symbols-outlined text-[#9F8349]">group</span>
                     <h3 class="text-sm font-semibold text-[#222222]">Clients &amp; Retainers</h3>
                 </div>
                 <span class="font-mono text-xs text-[#766A5E]">{{ $clients->count() }} Matches</span>
@@ -60,7 +60,7 @@
                         <span class="text-xs font-semibold text-[#222222]">{{ $c->name }}</span>
                         <span class="text-[11px] text-[#766A5E]">{{ $c->email }} · {{ $c->contact_person }}</span>
                     </div>
-                    <span class="font-mono text-xs font-bold text-[#845D33]">Trust: ${{ number_format($c->trust_balance, 2) }}</span>
+                    <span class="font-mono text-xs font-bold text-[#9F8349]">Trust: ${{ number_format($c->trust_balance, 2) }}</span>
                 </div>
                 @empty
                 <div class="p-4 text-xs text-[#766A5E] text-center">No clients matching "{{ $q }}".</div>
@@ -72,7 +72,7 @@
         <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
             <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[#845D33]">description</span>
+                    <span class="material-symbols-outlined text-[#9F8349]">description</span>
                     <h3 class="text-sm font-semibold text-[#222222]">Vault Evidence &amp; Filings</h3>
                 </div>
                 <span class="font-mono text-xs text-[#766A5E]">{{ $documents->count() }} Matches</span>
@@ -88,7 +88,7 @@
                             <span class="font-mono text-[10px] text-[#766A5E]">{{ $doc->filename }} ({{ $doc->matter->case_number }})</span>
                         </div>
                     </div>
-                    <a href="{{ route('documents.download', $doc->id) }}" class="p-1.5 text-[#845D33] hover:bg-[#F4EFEA] rounded flex items-center gap-1 text-xs">
+                    <a href="{{ route('documents.download', $doc->id) }}" class="p-1.5 text-[#9F8349] hover:bg-[#F4EFEA] rounded flex items-center gap-1 text-xs">
                         <span class="material-symbols-outlined text-base">download</span>
                         <span>Download</span>
                     </a>
@@ -103,7 +103,7 @@
         <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
             <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[#845D33]">checklist</span>
+                    <span class="material-symbols-outlined text-[#9F8349]">checklist</span>
                     <h3 class="text-sm font-semibold text-[#222222]">Tasks &amp; Obligations</h3>
                 </div>
                 <span class="font-mono text-xs text-[#766A5E]">{{ $tasks->count() }} Matches</span>

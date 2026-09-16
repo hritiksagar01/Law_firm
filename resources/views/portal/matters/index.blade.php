@@ -24,10 +24,10 @@
         <div class="bg-white rounded-xl border border-[#EFECE6] p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-5">
             <div class="flex flex-col gap-3">
                 <div class="flex items-center justify-between gap-2">
-                    <span class="font-mono text-xs font-bold text-[#845D33] bg-[#F4ECE1]/40 px-2 py-0.5 rounded">
+                    <span class="font-mono text-xs font-bold text-[#9F8349] bg-[#F4ECE1]/40 px-2 py-0.5 rounded">
                         {{ $matter->case_number }}
                     </span>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F8F4EE] text-[#6D4B27] border border-[#E8DAC8]">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F8F4EE] text-[#856C36] border border-[#E8DAC8]">
                         {{ $matter->stage }}
                     </span>
                 </div>
@@ -58,7 +58,7 @@
             <div class="bg-[#FAF8F5] rounded-lg p-3 border border-[#f0eee9]">
                 <div class="flex items-center justify-between text-[11px] mb-1.5">
                     <span class="font-mono text-[10px] uppercase tracking-wider text-[#766A5E] font-semibold">Progress Stage</span>
-                    <span class="text-[11px] font-semibold text-[#845D33]">{{ $matter->stage }}</span>
+                    <span class="text-[11px] font-semibold text-[#9F8349]">{{ $matter->stage }}</span>
                 </div>
                 <div class="w-full bg-[#EFECE6] rounded-full h-1.5 overflow-hidden flex">
                     @php
@@ -71,14 +71,14 @@
                             default => '35%'
                         };
                     @endphp
-                    <div class="bg-[#845D33] h-full rounded-full transition-all" style="width: {{ $stagePercent }};"></div>
+                    <div class="bg-[#9F8349] h-full rounded-full transition-all" style="width: {{ $stagePercent }};"></div>
                 </div>
             </div>
 
             <div class="flex items-center justify-between pt-2 border-t border-[#FAF8F5]">
                 <div class="flex items-center gap-3 text-xs text-[#766A5E]">
                     <span class="flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm text-[#845D33]">folder</span>
+                        <span class="material-symbols-outlined text-sm text-[#9F8349]">folder</span>
                         <span>{{ $matter->documents->count() }} filings</span>
                     </span>
                     <span class="flex items-center gap-1">
@@ -87,7 +87,7 @@
                     </span>
                 </div>
 
-                <a href="{{ route('portal.matters.show', $matter->id) }}" class="inline-flex items-center gap-1 px-3.5 py-2 rounded-lg bg-[#845D33] text-white text-xs font-semibold hover:bg-[#6D4B27] transition-colors shadow-sm">
+                <a href="{{ route('portal.matters.show', $matter->id) }}" class="inline-flex items-center gap-1 px-3.5 py-2 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] transition-colors shadow-sm">
                     <span>View Case File</span>
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>

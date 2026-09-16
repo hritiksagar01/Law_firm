@@ -15,10 +15,10 @@
 </head>
 <body class="bg-[#FAF8F5] font-sans text-[#222222] antialiased min-h-screen">
     
-    <!-- Executive Top Header (Neutral Dark #222222 with Warm Cognac #845D33 Accents) -->
+    <!-- Executive Top Header (Neutral Dark #222222 with Warm Cognac #9F8349 Accents) -->
     <header class="h-16 bg-[#222222] text-white px-6 flex items-center justify-between shadow-md">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-[#845D33] text-white flex items-center justify-center font-bold">
+            <div class="w-8 h-8 rounded-lg bg-[#9F8349] text-white flex items-center justify-center font-bold">
                 <span class="material-symbols-outlined text-lg">admin_panel_settings</span>
             </div>
             <div>
@@ -28,7 +28,7 @@
         </div>
 
         <nav class="hidden md:flex items-center gap-1 bg-[#2E2823] p-1 rounded-lg border border-[#3E352E] text-xs">
-            <a href="{{ route('admin.dashboard') }}" class="px-3 py-1.5 rounded-md bg-[#845D33] text-white font-semibold shadow-sm flex items-center gap-1.5">
+            <a href="{{ route('admin.dashboard') }}" class="px-3 py-1.5 rounded-md bg-[#9F8349] text-white font-semibold shadow-sm flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-sm">hub</span>
                 <span>Tenant Telemetry</span>
             </a>
@@ -53,10 +53,10 @@
             </div>
             <div class="flex items-center gap-2.5">
                 <a href="{{ route('admin.settings.environment') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white border border-[#EAE4DC] text-[#222222] text-xs font-semibold hover:bg-[#FAF8F5] shadow-xs">
-                    <span class="material-symbols-outlined text-base text-[#845D33]">tune</span>
+                    <span class="material-symbols-outlined text-base text-[#9F8349]">tune</span>
                     <span>Environment &amp; Cloud Settings</span>
                 </a>
-                <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#845D33] text-white text-xs font-semibold hover:bg-[#6D4B27] shadow-sm">
+                <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm">
                     <span class="material-symbols-outlined text-base">domain_add</span>
                     <span>Provision New Law Firm</span>
                 </button>
@@ -68,24 +68,24 @@
             <div class="p-5 rounded-2xl bg-white border border-[#EFECE6] shadow-xs">
                 <span class="font-mono text-[10px] uppercase tracking-wider text-[#766A5E]">Tenants Active</span>
                 <span class="text-2xl font-serif font-bold text-[#222222] mt-1 block">{{ $firms->count() }} Firm(s)</span>
-                <span class="text-xs text-[#845D33] mt-2 block font-mono font-semibold">100% Provisioned</span>
+                <span class="text-xs text-[#9F8349] mt-2 block font-mono font-semibold">100% Provisioned</span>
             </div>
 
             <div class="p-5 rounded-2xl bg-white border border-[#EFECE6] shadow-xs">
                 <span class="font-mono text-[10px] uppercase tracking-wider text-[#766A5E]">Dual Database Mode</span>
-                <span class="text-xl font-mono font-bold text-[#845D33] mt-1 block">Postgres / MySQL</span>
+                <span class="text-xl font-mono font-bold text-[#9F8349] mt-1 block">Postgres / MySQL</span>
                 <span class="text-xs text-[#766A5E] mt-2 block font-mono">Driver: SQLite (Local)</span>
             </div>
 
             <div class="p-5 rounded-2xl bg-white border border-[#EFECE6] shadow-xs">
                 <span class="font-mono text-[10px] uppercase tracking-wider text-[#766A5E]">Encrypted Vault Storage</span>
                 <span class="text-2xl font-mono font-bold text-[#222222] mt-1 block">35.2 <span class="text-xs font-normal">MB</span></span>
-                <span class="text-xs text-[#845D33] mt-2 block font-mono font-semibold">AWS S3 / Cloudflare R2</span>
+                <span class="text-xs text-[#9F8349] mt-2 block font-mono font-semibold">AWS S3 / Cloudflare R2</span>
             </div>
 
             <div class="p-5 rounded-2xl bg-white border border-[#EFECE6] shadow-xs">
                 <span class="font-mono text-[10px] uppercase tracking-wider text-[#766A5E]">Platform Health</span>
-                <span class="text-2xl font-serif font-bold text-[#845D33] mt-1 block">Optimal</span>
+                <span class="text-2xl font-serif font-bold text-[#9F8349] mt-1 block">Optimal</span>
                 <span class="text-xs text-[#766A5E] mt-2 block font-mono">Latency: 2.4ms · Queues Active</span>
             </div>
         </div>
@@ -127,7 +127,7 @@
                             {{ $firm->documents_count }}
                         </td>
                         <td class="py-3.5 px-4 text-center">
-                            <a href="{{ route('dashboard') }}" class="px-3 py-1 rounded-lg bg-[#845D33] text-white text-xs font-semibold hover:bg-[#6D4B27] shadow-2xs">
+                            <a href="{{ route('dashboard') }}" class="px-3 py-1 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-2xs">
                                 Impersonate Chambers
                             </a>
                         </td>

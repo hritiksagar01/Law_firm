@@ -7,11 +7,11 @@
     
     <!-- Top Bar Navigation Back -->
     <div class="flex items-center justify-between">
-        <a href="{{ route('portal.matters.index') }}" class="inline-flex items-center gap-1 text-xs text-[#766A5E] hover:text-[#845D33] font-medium transition-colors">
+        <a href="{{ route('portal.matters.index') }}" class="inline-flex items-center gap-1 text-xs text-[#766A5E] hover:text-[#9F8349] font-medium transition-colors">
             <span class="material-symbols-outlined text-base">arrow_back</span>
             <span>Back to All Cases</span>
         </a>
-        <span class="font-mono text-xs font-bold text-[#845D33] bg-[#F4ECE1]/40 px-2.5 py-1 rounded">
+        <span class="font-mono text-xs font-bold text-[#9F8349] bg-[#F4ECE1]/40 px-2.5 py-1 rounded">
             Docket Ref: {{ $matter->case_number }}
         </span>
     </div>
@@ -21,7 +21,7 @@
         <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
             <div class="flex flex-col gap-2">
                 <div class="flex items-center gap-2">
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F8F4EE] text-[#6D4B27] border border-[#E8DAC8]">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F8F4EE] text-[#856C36] border border-[#E8DAC8]">
                         {{ $matter->stage }}
                     </span>
                     <span class="text-xs text-[#766A5E] font-mono">{{ $matter->practice_area }}</span>
@@ -29,24 +29,24 @@
                 <h1 class="text-2xl sm:text-3xl font-serif font-bold text-[#222222]">{{ $matter->title }}</h1>
                 <div class="flex flex-wrap items-center gap-4 text-xs text-[#766A5E] mt-1">
                     <span class="flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm text-[#845D33]">account_balance</span>
+                        <span class="material-symbols-outlined text-sm text-[#9F8349]">account_balance</span>
                         <span>{{ $matter->court_name ?? 'High Court of Delhi' }}</span>
                     </span>
                     @if($matter->judge_name)
                     <span class="flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm text-[#845D33]">person</span>
+                        <span class="material-symbols-outlined text-sm text-[#9F8349]">person</span>
                         <span>Bench: {{ $matter->judge_name }}</span>
                     </span>
                     @endif
                     <span class="flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm text-[#845D33]">calendar_today</span>
+                        <span class="material-symbols-outlined text-sm text-[#9F8349]">calendar_today</span>
                         <span>Filing Date: {{ \Carbon\Carbon::parse($matter->opened_at)->format('d M Y') }}</span>
                     </span>
                 </div>
             </div>
 
             <div class="flex items-center gap-2 shrink-0">
-                <a href="{{ route('portal.messages.index', ['matter_id' => $matter->id]) }}" class="px-4 py-2 bg-[#845D33] hover:bg-[#6D4B27] text-white text-xs font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1.5">
+                <a href="{{ route('portal.messages.index', ['matter_id' => $matter->id]) }}" class="px-4 py-2 bg-[#9F8349] hover:bg-[#856C36] text-white text-xs font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1.5">
                     <span class="material-symbols-outlined text-base">chat</span>
                     <span>Message Counsel</span>
                 </a>
@@ -57,7 +57,7 @@
         <div class="pt-6 border-t border-[#FAF8F5] flex flex-col gap-3">
             <div class="flex items-center justify-between">
                 <span class="font-mono text-xs uppercase tracking-wider text-[#766A5E] font-semibold">Procedural Stage Tracker</span>
-                <span class="text-xs font-bold text-[#845D33] bg-[#F4ECE1]/50 px-2 py-0.5 rounded">Active Stage: {{ $matter->stage }}</span>
+                <span class="text-xs font-bold text-[#9F8349] bg-[#F4ECE1]/50 px-2 py-0.5 rounded">Active Stage: {{ $matter->stage }}</span>
             </div>
 
             @php
@@ -87,13 +87,13 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-2">
                 @foreach($stages as $idx => $s)
-                <div class="flex flex-col gap-1.5 p-3 rounded-xl border {{ $idx === $activeIndex ? 'bg-[#845D33] text-white border-[#845D33] shadow-md' : ($idx < $activeIndex ? 'bg-[#F8F4EE] text-[#442E15] border-[#E8DAC8]' : 'bg-[#FAF8F5] text-[#766A5E] border-[#EFECE6]') }}">
+                <div class="flex flex-col gap-1.5 p-3 rounded-xl border {{ $idx === $activeIndex ? 'bg-[#9F8349] text-white border-[#9F8349] shadow-md' : ($idx < $activeIndex ? 'bg-[#F8F4EE] text-[#442E15] border-[#E8DAC8]' : 'bg-[#FAF8F5] text-[#766A5E] border-[#EFECE6]') }}">
                     <div class="flex items-center justify-between">
-                        <span class="font-mono text-[10px] font-bold {{ $idx === $activeIndex ? 'text-[#B88B56]' : ($idx < $activeIndex ? 'text-[#845D33]' : 'text-[#766A5E]') }}">
+                        <span class="font-mono text-[10px] font-bold {{ $idx === $activeIndex ? 'text-[#B88B56]' : ($idx < $activeIndex ? 'text-[#9F8349]' : 'text-[#766A5E]') }}">
                             STAGE 0{{ $idx + 1 }}
                         </span>
                         @if($idx < $activeIndex)
-                        <span class="material-symbols-outlined text-sm text-[#845D33]">check_circle</span>
+                        <span class="material-symbols-outlined text-sm text-[#9F8349]">check_circle</span>
                         @elseif($idx === $activeIndex)
                         <span class="material-symbols-outlined text-sm text-[#B88B56] animate-pulse">radio_button_checked</span>
                         @else
@@ -125,7 +125,7 @@
                         <span class="material-symbols-outlined text-amber-600">assignment</span>
                         <h2 class="text-base font-bold text-[#222222]">Document Requests for this Case</h2>
                     </div>
-                    <a href="{{ route('portal.requests.index') }}" class="text-xs text-[#845D33] hover:underline font-semibold">View All Requests &rarr;</a>
+                    <a href="{{ route('portal.requests.index') }}" class="text-xs text-[#9F8349] hover:underline font-semibold">View All Requests &rarr;</a>
                 </div>
 
                 <div class="flex flex-col gap-3">
@@ -134,7 +134,7 @@
                         <div class="flex flex-col">
                             <div class="flex items-center gap-2">
                                 <span class="text-xs font-bold text-[#222222]">{{ $req->title }}</span>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold {{ $req->status === 'pending' ? 'bg-amber-100 text-amber-800' : ($req->status === 'submitted' ? 'bg-blue-100 text-blue-800' : 'bg-[#F4ECE1] text-[#6D4B27]') }}">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold {{ $req->status === 'pending' ? 'bg-amber-100 text-amber-800' : ($req->status === 'submitted' ? 'bg-blue-100 text-blue-800' : 'bg-[#F4ECE1] text-[#856C36]') }}">
                                     {{ ucfirst($req->status) }}
                                 </span>
                             </div>
@@ -146,7 +146,7 @@
                             Upload Now
                         </a>
                         @else
-                        <span class="text-xs text-[#845D33] font-medium flex items-center gap-1">
+                        <span class="text-xs text-[#9F8349] font-medium flex items-center gap-1">
                             <span class="material-symbols-outlined text-sm">done</span>
                             <span>Submitted</span>
                         </span>
@@ -161,10 +161,10 @@
             <div class="bg-white rounded-xl border border-[#EFECE6] p-6 shadow-sm flex flex-col gap-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#845D33]">folder_open</span>
+                        <span class="material-symbols-outlined text-[#9F8349]">folder_open</span>
                         <h2 class="text-base font-bold text-[#222222]">Court Pleadings &amp; Filed Documents</h2>
                     </div>
-                    <a href="{{ route('portal.documents.index') }}" class="text-xs text-[#845D33] hover:underline font-semibold">Open Documents Vault &rarr;</a>
+                    <a href="{{ route('portal.documents.index') }}" class="text-xs text-[#9F8349] hover:underline font-semibold">Open Documents Vault &rarr;</a>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -198,7 +198,7 @@
                                     {{ \Carbon\Carbon::parse($doc->created_at)->format('d M Y') }}
                                 </td>
                                 <td class="py-3 text-right">
-                                    <a href="{{ route('documents.download', $doc->id) }}" class="inline-flex items-center gap-1 text-xs text-[#845D33] hover:underline font-medium">
+                                    <a href="{{ route('documents.download', $doc->id) }}" class="inline-flex items-center gap-1 text-xs text-[#9F8349] hover:underline font-medium">
                                         <span class="material-symbols-outlined text-sm">download</span>
                                         <span>Download</span>
                                     </a>
@@ -228,12 +228,12 @@
                     <img alt="Counsel" class="w-12 h-12 rounded-xl object-cover ring-2 ring-[#F4ECE1]" src="{{ $matter->leadAttorney->avatar_url ?? 'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=150&auto=format&fit=crop&q=80' }}"/>
                     <div class="flex flex-col">
                         <span class="text-sm font-bold text-[#222222]">{{ $matter->leadAttorney->name ?? 'Adv. Rajesh Sharma' }}</span>
-                        <span class="text-xs text-[#845D33]">{{ $matter->leadAttorney->title ?? 'Senior Advocate' }}</span>
+                        <span class="text-xs text-[#9F8349]">{{ $matter->leadAttorney->title ?? 'Senior Advocate' }}</span>
                         <span class="text-[10px] font-mono text-[#766A5E] mt-0.5">{{ $matter->leadAttorney->email }}</span>
                     </div>
                 </div>
 
-                <a href="{{ route('portal.messages.index', ['matter_id' => $matter->id]) }}" class="w-full py-2 bg-[#845D33] text-white hover:bg-[#6D4B27] rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-sm">
+                <a href="{{ route('portal.messages.index', ['matter_id' => $matter->id]) }}" class="w-full py-2 bg-[#9F8349] text-white hover:bg-[#856C36] rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-sm">
                     <span class="material-symbols-outlined text-base">chat</span>
                     <span>Direct Message Counsel</span>
                 </a>
@@ -245,14 +245,14 @@
                 <div class="flex flex-col gap-3">
                     @forelse($matter->events as $event)
                     <div class="p-3 rounded-lg bg-[#FAF8F5] border border-[#f0eee9] flex items-start gap-3">
-                        <div class="w-8 h-8 rounded bg-[#845D33] text-[#B88B56] flex flex-col items-center justify-center font-mono text-[10px] font-bold shrink-0">
+                        <div class="w-8 h-8 rounded bg-[#9F8349] text-[#B88B56] flex flex-col items-center justify-center font-mono text-[10px] font-bold shrink-0">
                             <span>{{ \Carbon\Carbon::parse($event->start_time)->format('d') }}</span>
                             <span class="text-[8px] uppercase text-white">{{ \Carbon\Carbon::parse($event->start_time)->format('M') }}</span>
                         </div>
                         <div class="flex flex-col min-w-0">
                             <span class="text-xs font-semibold text-[#222222] truncate">{{ $event->title }}</span>
                             <span class="text-[11px] text-[#766A5E] mt-0.5 truncate">{{ $event->location }}</span>
-                            <span class="text-[10px] font-mono text-[#6D4B27] mt-0.5">
+                            <span class="text-[10px] font-mono text-[#856C36] mt-0.5">
                                 {{ \Carbon\Carbon::parse($event->start_time)->format('h:i A') }}
                             </span>
                         </div>

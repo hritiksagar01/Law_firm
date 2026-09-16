@@ -16,7 +16,7 @@
     <!-- Financial Ledger Overview Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
         <!-- Retainer Balance -->
-        <div class="bg-gradient-to-br from-[#845D33] to-[#6D4B27] text-white rounded-2xl p-6 shadow-md flex flex-col justify-between">
+        <div class="bg-gradient-to-br from-[#9F8349] to-[#856C36] text-white rounded-2xl p-6 shadow-md flex flex-col justify-between">
             <span class="text-[11px] font-mono uppercase tracking-wider text-white/70 font-semibold">Available Advance Retainer</span>
             <div class="my-2">
                 <span class="text-3xl font-serif font-bold text-[#B88B56]">{{ config('legal.currency.symbol', '₹') }}{{ number_format($client->trust_balance, 2) }}</span>
@@ -37,14 +37,14 @@
                 <span class="text-3xl font-serif font-bold text-[#222222]">{{ config('legal.currency.symbol', '₹') }}{{ number_format($totalInvoiced, 2) }}</span>
                 <span class="block text-[11px] text-[#766A5E] mt-1">{{ $invoices->count() }} formal bills generated to date</span>
             </div>
-            <span class="text-[10px] font-mono text-[#6D4B27]">{{ config('legal.currency.symbol', '₹') }}{{ number_format($totalPaid, 2) }} Settled</span>
+            <span class="text-[10px] font-mono text-[#856C36]">{{ config('legal.currency.symbol', '₹') }}{{ number_format($totalPaid, 2) }} Settled</span>
         </div>
 
         <!-- Outstanding Due -->
         <div class="bg-white rounded-2xl p-6 border border-[#EFECE6] shadow-sm flex flex-col justify-between">
             <span class="text-[11px] font-mono uppercase tracking-wider text-[#766A5E] font-semibold">Outstanding Due Balance</span>
             <div class="my-2">
-                <span class="text-3xl font-serif font-bold {{ $totalOutstanding > 0 ? 'text-amber-600' : 'text-[#845D33]' }}">
+                <span class="text-3xl font-serif font-bold {{ $totalOutstanding > 0 ? 'text-amber-600' : 'text-[#9F8349]' }}">
                     {{ config('legal.currency.symbol', '₹') }}{{ number_format($totalOutstanding, 2) }}
                 </span>
                 <span class="block text-[11px] text-[#766A5E] mt-1">
@@ -79,7 +79,7 @@
                 <tbody class="divide-y divide-[#FAF8F5]">
                     @forelse($invoices as $inv)
                     <tr class="hover:bg-[#FAF8F5]/60 transition-colors">
-                        <td class="py-4 px-4 font-mono font-bold text-[#845D33]">
+                        <td class="py-4 px-4 font-mono font-bold text-[#9F8349]">
                             {{ $inv->invoice_number }}
                         </td>
 
@@ -109,8 +109,8 @@
 
                         <td class="py-4 px-4">
                             @if($inv->status === 'paid')
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F8F4EE] text-[#6D4B27] border border-[#E8DAC8]">
-                                <span class="material-symbols-outlined text-xs text-[#845D33]">check_circle</span>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F8F4EE] text-[#856C36] border border-[#E8DAC8]">
+                                <span class="material-symbols-outlined text-xs text-[#9F8349]">check_circle</span>
                                 <span>Paid in Full</span>
                             </span>
                             @else
@@ -123,12 +123,12 @@
 
                         <td class="py-4 px-4 text-right">
                             @if($inv->status !== 'paid')
-                            <button type="button" @click="selectedInvoice = {{ json_encode($inv) }}; payModalOpen = true" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#845D33] text-white text-xs font-semibold hover:bg-[#6D4B27] transition-colors shadow-sm">
+                            <button type="button" @click="selectedInvoice = {{ json_encode($inv) }}; payModalOpen = true" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] transition-colors shadow-sm">
                                 <span class="material-symbols-outlined text-sm">payments</span>
                                 <span>Pay Invoice</span>
                             </button>
                             @else
-                            <span class="font-mono text-[11px] text-[#845D33] flex items-center justify-end gap-1">
+                            <span class="font-mono text-[11px] text-[#9F8349] flex items-center justify-end gap-1">
                                 <span class="material-symbols-outlined text-sm">verified</span>
                                 <span>Settled</span>
                             </span>
@@ -152,7 +152,7 @@
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#EFECE6] flex flex-col gap-5 relative">
             <div class="flex items-start justify-between">
                 <div class="flex flex-col">
-                    <span class="font-mono text-[10px] uppercase tracking-wider text-[#845D33] font-semibold">Invoice Settlement</span>
+                    <span class="font-mono text-[10px] uppercase tracking-wider text-[#9F8349] font-semibold">Invoice Settlement</span>
                     <h3 class="text-base font-bold text-[#222222] mt-0.5" x-text="selectedInvoice ? 'Pay ' + selectedInvoice.invoice_number : 'Pay Invoice'"></h3>
                 </div>
                 <button type="button" @click="payModalOpen = false" class="text-[#766A5E] hover:text-[#222222]">
@@ -172,7 +172,7 @@
                 <div class="h-px bg-[#EFECE6] my-1"></div>
                 <div class="flex items-center justify-between text-sm">
                     <span class="font-bold text-[#222222]">Total Due:</span>
-                    <span class="font-mono font-bold text-base text-[#845D33]" x-text="selectedInvoice ? '{{ config('legal.currency.symbol', '₹') }}' + parseFloat(selectedInvoice.total_amount).toLocaleString('en-IN', {minimumFractionDigits: 2}) : ''"></span>
+                    <span class="font-mono font-bold text-base text-[#9F8349]" x-text="selectedInvoice ? '{{ config('legal.currency.symbol', '₹') }}' + parseFloat(selectedInvoice.total_amount).toLocaleString('en-IN', {minimumFractionDigits: 2}) : ''"></span>
                 </div>
             </div>
 
@@ -184,19 +184,19 @@
                     <span class="text-xs font-semibold text-[#222222]">Choose Settlement Method:</span>
 
                     <!-- Option 1: Retainer Account Deduction -->
-                    <label class="p-3.5 rounded-xl border border-[#F4ECE1] bg-[#F8F4EE] flex items-start gap-3 cursor-pointer hover:border-[#845D33] transition-all">
-                        <input type="radio" name="payment_method" value="retainer" checked class="mt-0.5 text-[#845D33] accent-[#845D33]"/>
+                    <label class="p-3.5 rounded-xl border border-[#F4ECE1] bg-[#F8F4EE] flex items-start gap-3 cursor-pointer hover:border-[#9F8349] transition-all">
+                        <input type="radio" name="payment_method" value="retainer" checked class="mt-0.5 text-[#9F8349] accent-[#9F8349]"/>
                         <div class="flex flex-col">
                             <span class="text-xs font-bold text-[#222222]">Settle from Advance Retainer</span>
-                            <span class="text-[11px] text-[#845D33] mt-0.5">
+                            <span class="text-[11px] text-[#9F8349] mt-0.5">
                                 Current Retainer: {{ config('legal.currency.symbol', '₹') }}{{ number_format($client->trust_balance, 2) }}
                             </span>
                         </div>
                     </label>
 
                     <!-- Option 2: UPI / Net Banking -->
-                    <label class="p-3.5 rounded-xl border border-[#EFECE6] bg-white flex items-start gap-3 cursor-pointer hover:border-[#845D33] transition-all">
-                        <input type="radio" name="payment_method" value="gateway" class="mt-0.5 text-[#845D33] accent-[#845D33]"/>
+                    <label class="p-3.5 rounded-xl border border-[#EFECE6] bg-white flex items-start gap-3 cursor-pointer hover:border-[#9F8349] transition-all">
+                        <input type="radio" name="payment_method" value="gateway" class="mt-0.5 text-[#9F8349] accent-[#9F8349]"/>
                         <div class="flex flex-col">
                             <span class="text-xs font-bold text-[#222222]">Instant UPI / Corporate NetBanking</span>
                             <span class="text-[11px] text-[#766A5E] mt-0.5">Simulate instant bank wire or GST invoice clearance</span>
@@ -208,7 +208,7 @@
                     <button type="button" @click="payModalOpen = false" class="px-4 py-2 rounded-lg text-xs font-medium text-[#766A5E] hover:bg-[#FAF8F5]">
                         Cancel
                     </button>
-                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-[#845D33] text-white text-xs font-semibold hover:bg-[#6D4B27] shadow-sm flex items-center gap-1.5">
+                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-sm">lock</span>
                         <span>Authorize &amp; Pay</span>
                     </button>

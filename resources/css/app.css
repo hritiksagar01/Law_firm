@@ -11,19 +11,19 @@
     --font-mono: 'JetBrains Mono', monospace;
 
     /* Juris Prestige Color Palette */
-    --color-primary: #845D33;
+    --color-primary: #9F8349;
     --color-primary-container: #F8F4EE;
     --color-on-primary: #ffffff;
-    --color-on-primary-container: #845D33;
+    --color-on-primary-container: #9F8349;
     --color-primary-fixed: #F4ECE1;
     --color-primary-fixed-dim: #E8DAC8;
     --color-on-primary-fixed: #442E15;
-    --color-on-primary-fixed-variant: #6D4B27;
+    --color-on-primary-fixed-variant: #856C36;
 
     --color-secondary: #B88B56;
     --color-secondary-container: #FAF4EB;
     --color-on-secondary: #ffffff;
-    --color-on-secondary-container: #6D4B27;
+    --color-on-secondary-container: #856C36;
     --color-secondary-fixed: #F5EADB;
     --color-secondary-fixed-dim: #E8D3B8;
 
@@ -47,7 +47,7 @@
     --color-surface-container-high: #F5F1EB;
     --color-surface-container-highest: #EFECE6;
     --color-surface-variant: #F4EFEA;
-    --color-surface-tint: #845D33;
+    --color-surface-tint: #9F8349;
 
     --color-background: #FAF8F5;
     --color-on-background: #222222;
@@ -85,19 +85,19 @@
 
 /* Juris Prestige Buttons & UI Components */
 .btn-primary {
-    background-color: #845D33;
+    background-color: #9F8349;
     color: #ffffff;
     font-family: var(--font-sans);
     font-weight: 600;
     transition: all 0.15s ease-in-out;
 }
 .btn-primary:hover {
-    background-color: #6D4B27;
+    background-color: #856C36;
 }
 
 .btn-secondary {
     background-color: #F8F4EE;
-    color: #845D33;
+    color: #9F8349;
     border: 1px solid #E6DDD1;
     font-family: var(--font-sans);
     font-weight: 600;
@@ -109,14 +109,14 @@
 
 .btn-outline {
     background-color: #ffffff;
-    color: #845D33;
-    border: 1px solid #845D33;
+    color: #9F8349;
+    border: 1px solid #9F8349;
     font-family: var(--font-sans);
     font-weight: 600;
     transition: all 0.15s ease-in-out;
 }
 .btn-outline:hover {
-    background-color: #845D33;
+    background-color: #9F8349;
     color: #ffffff;
 }
 

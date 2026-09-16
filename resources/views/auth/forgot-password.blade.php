@@ -17,7 +17,7 @@
     <div class="w-full max-w-md flex flex-col items-center my-8">
         
         <div class="flex flex-col items-center text-center mb-6">
-            <div class="w-12 h-12 rounded-xl bg-[#845D33] flex items-center justify-center text-white shadow-md mb-3">
+            <div class="w-12 h-12 rounded-xl bg-[#9F8349] flex items-center justify-center text-white shadow-md mb-3">
                 <span class="material-symbols-outlined text-2xl text-[#B88B56]">lock_reset</span>
             </div>
             <h1 class="text-2xl font-serif font-bold text-[#222222] tracking-tight">Recover Chambers Access</h1>
@@ -27,7 +27,7 @@
         </div>
 
         @if(session('status'))
-        <div class="w-full mb-4 p-3 rounded-lg bg-[#F8F4EE] border border-[#E8DAC8] text-xs text-[#6D4B27] flex items-center gap-2">
+        <div class="w-full mb-4 p-3 rounded-lg bg-[#F8F4EE] border border-[#E8DAC8] text-xs text-[#856C36] flex items-center gap-2">
             <span class="material-symbols-outlined text-base">mark_email_read</span>
             <span>{{ session('status') }}</span>
         </div>
@@ -40,17 +40,17 @@
                     <label class="text-xs font-medium text-[#222222]">Email Address</label>
                     <div class="relative flex items-center">
                         <span class="material-symbols-outlined absolute left-3 text-[#766A5E] text-lg pointer-events-none">mail</span>
-                        <input name="email" type="email" required placeholder="counsel@chensterling.com" class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:bg-white focus:border-[#845D33]"/>
+                        <input name="email" type="email" required placeholder="counsel@chensterling.com" class="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:bg-white focus:border-[#9F8349]"/>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full py-2.5 px-4 rounded-lg bg-[#845D33] text-white text-xs font-semibold hover:bg-[#6D4B27] shadow-sm transition-all">
+                <button type="submit" class="w-full py-2.5 px-4 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm transition-all">
                     Send Encrypted Reset Dispatch
                 </button>
             </form>
 
             <div class="pt-3 border-t border-[#F4EFEA] text-center">
-                <a href="{{ route('login') }}" class="text-xs text-[#845D33] hover:underline flex items-center justify-center gap-1 font-medium">
+                <a href="{{ route('login') }}" class="text-xs text-[#9F8349] hover:underline flex items-center justify-center gap-1 font-medium">
                     <span class="material-symbols-outlined text-sm">arrow_back</span>
                     <span>Return to Chambers Sign In</span>
                 </a>

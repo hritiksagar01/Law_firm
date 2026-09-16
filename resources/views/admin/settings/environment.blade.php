@@ -38,7 +38,7 @@
                 <span class="font-serif text-base font-bold text-white tracking-wide">Vennamraj Associates Platform Console</span>
                 <div class="flex items-center gap-2">
                     <span class="text-[10px] font-mono text-[#8C7F72]">Super Administrator Access</span>
-                    <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#845D33] animate-pulse"></span>
+                    <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#9F8349] animate-pulse"></span>
                 </div>
             </div>
         </div>
@@ -48,7 +48,7 @@
                 <span class="material-symbols-outlined text-sm">hub</span>
                 <span>Tenant Telemetry</span>
             </a>
-            <a href="{{ route('admin.settings.environment') }}" class="px-3 py-1.5 rounded-md bg-[#845D33] text-[#B88B56] font-semibold shadow-sm flex items-center gap-1.5">
+            <a href="{{ route('admin.settings.environment') }}" class="px-3 py-1.5 rounded-md bg-[#9F8349] text-[#B88B56] font-semibold shadow-sm flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-sm">tune</span>
                 <span>Environment &amp; Cloud</span>
             </a>
@@ -74,7 +74,7 @@
                 <div class="flex items-center gap-2 text-xs font-mono text-[#766A5E] uppercase tracking-wider mb-1">
                     <a href="{{ route('admin.dashboard') }}" class="hover:underline">Super Admin</a>
                     <span>/</span>
-                    <span class="text-[#845D33] font-semibold">Environment Variables</span>
+                    <span class="text-[#9F8349] font-semibold">Environment Variables</span>
                 </div>
                 <h1 class="text-3xl font-serif font-bold text-[#222222]">Cloud &amp; Infrastructure Settings</h1>
                 <p class="text-sm text-[#766A5E] mt-1">Configure AWS S3 storage buckets, PostgreSQL/MySQL database clusters, SMTP mail, and application parameters safely.</p>
@@ -82,7 +82,7 @@
 
             <div class="flex items-center gap-2">
                 <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-[#EFECE6] text-xs font-mono text-[#554D45] shadow-sm">
-                    <span class="material-symbols-outlined text-sm text-[#845D33]">verified_user</span>
+                    <span class="material-symbols-outlined text-sm text-[#9F8349]">verified_user</span>
                     <span>Safe .env Manager v2.0</span>
                 </span>
             </div>
@@ -92,10 +92,10 @@
         @if(session('success'))
         <div class="mb-6 p-4 rounded-xl bg-[#F8F4EE] border border-[#E8DAC8] text-xs text-[#442E15] flex items-center justify-between shadow-sm">
             <div class="flex items-center gap-2.5">
-                <span class="material-symbols-outlined text-lg text-[#845D33]">check_circle</span>
+                <span class="material-symbols-outlined text-lg text-[#9F8349]">check_circle</span>
                 <span class="font-medium">{{ session('success') }}</span>
             </div>
-            <span class="text-[10px] font-mono uppercase text-[#845D33] font-bold">Applied &amp; Cached</span>
+            <span class="text-[10px] font-mono uppercase text-[#9F8349] font-bold">Applied &amp; Cached</span>
         </div>
         @endif
 
@@ -111,10 +111,10 @@
 
         <!-- Safeguard Notice Banner -->
         <div class="mb-6 p-4 rounded-xl bg-[#FAF8F5] border border-[#E8DAC8] text-xs text-[#3E352E] flex items-start gap-3 shadow-sm">
-            <span class="material-symbols-outlined text-lg text-[#845D33] shrink-0 mt-0.5">security</span>
+            <span class="material-symbols-outlined text-lg text-[#9F8349] shrink-0 mt-0.5">security</span>
             <div class="leading-relaxed">
                 <strong class="font-semibold text-[#222222]">Automatic Snapshot Protection Active:</strong>
-                Every save automatically writes a timestamped snapshot of your <code class="bg-white px-1.5 py-0.5 rounded border border-[#E8DAC8] text-[#845D33] font-mono">.env</code> to <code class="bg-white px-1.5 py-0.5 rounded border border-[#E8DAC8] font-mono">storage/app/env-backups/</code>. Sensitive keys (AWS Secret Key, DB Password, SMTP Password) are masked with <span class="font-mono">••••••••</span> and will not be overwritten unless you type a replacement.
+                Every save automatically writes a timestamped snapshot of your <code class="bg-white px-1.5 py-0.5 rounded border border-[#E8DAC8] text-[#9F8349] font-mono">.env</code> to <code class="bg-white px-1.5 py-0.5 rounded border border-[#E8DAC8] font-mono">storage/app/env-backups/</code>. Sensitive keys (AWS Secret Key, DB Password, SMTP Password) are masked with <span class="font-mono">••••••••</span> and will not be overwritten unless you type a replacement.
             </div>
         </div>
 
@@ -144,7 +144,7 @@
             <button @click="activeTab = 'app'" 
                 :class="activeTab === 'app' ? 'bg-white text-[#222222] shadow-sm font-semibold' : 'text-[#766A5E] hover:text-[#222222] font-medium'"
                 class="py-2.5 px-4 rounded-lg text-xs flex items-center gap-2 transition-all">
-                <span class="material-symbols-outlined text-base text-[#845D33]">settings_applications</span>
+                <span class="material-symbols-outlined text-base text-[#9F8349]">settings_applications</span>
                 <span>App &amp; Indian Localization</span>
             </button>
 
@@ -202,11 +202,11 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Active Storage Driver (FILESYSTEM_DISK)
                         </label>
-                        <select name="FILESYSTEM_DISK" id="s3_disk" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]">
+                        <select name="FILESYSTEM_DISK" id="s3_disk" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]">
                             <option value="local" {{ ($settings['storage']['FILESYSTEM_DISK'] ?? '') === 'local' ? 'selected' : '' }}>local (Server Local Disk - Default)</option>
                             <option value="s3" {{ ($settings['storage']['FILESYSTEM_DISK'] ?? '') === 's3' ? 'selected' : '' }}>s3 (Amazon Web Services S3 / Cloudflare R2 / Supabase)</option>
                         </select>
-                        <span class="text-[11px] text-[#766A5E] mt-1 block">Set to <code class="font-mono text-[#845D33]">s3</code> when using an external cloud bucket.</span>
+                        <span class="text-[11px] text-[#766A5E] mt-1 block">Set to <code class="font-mono text-[#9F8349]">s3</code> when using an external cloud bucket.</span>
                     </div>
 
                     <!-- AWS Default Region -->
@@ -214,8 +214,8 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Cloud Region (AWS_DEFAULT_REGION)
                         </label>
-                        <input type="text" name="AWS_DEFAULT_REGION" id="s3_region" value="{{ $settings['storage']['AWS_DEFAULT_REGION'] ?? 'ap-south-1' }}" placeholder="ap-south-1" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
-                        <span class="text-[11px] text-[#766A5E] mt-1 block font-mono">Recommended: <span class="text-[#845D33] font-bold">ap-south-1</span> (Mumbai, India) or <span class="text-[#845D33]">auto</span> (Cloudflare R2).</span>
+                        <input type="text" name="AWS_DEFAULT_REGION" id="s3_region" value="{{ $settings['storage']['AWS_DEFAULT_REGION'] ?? 'ap-south-1' }}" placeholder="ap-south-1" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
+                        <span class="text-[11px] text-[#766A5E] mt-1 block font-mono">Recommended: <span class="text-[#9F8349] font-bold">ap-south-1</span> (Mumbai, India) or <span class="text-[#9F8349]">auto</span> (Cloudflare R2).</span>
                     </div>
 
                     <!-- AWS Bucket Name -->
@@ -223,7 +223,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             S3 Bucket Name (AWS_BUCKET)
                         </label>
-                        <input type="text" name="AWS_BUCKET" id="s3_bucket" value="{{ $settings['storage']['AWS_BUCKET'] ?? '' }}" placeholder="lawfirm-vault-files" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="AWS_BUCKET" id="s3_bucket" value="{{ $settings['storage']['AWS_BUCKET'] ?? '' }}" placeholder="lawfirm-vault-files" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                         <span class="text-[11px] text-[#766A5E] mt-1 block">The exact name of your bucket created in AWS S3 or Cloudflare R2.</span>
                     </div>
 
@@ -232,7 +232,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Custom Endpoint (AWS_ENDPOINT) — Optional
                         </label>
-                        <input type="text" name="AWS_ENDPOINT" id="s3_endpoint" value="{{ $settings['storage']['AWS_ENDPOINT'] ?? '' }}" placeholder="https://<account_id>.r2.cloudflarestorage.com" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="AWS_ENDPOINT" id="s3_endpoint" value="{{ $settings['storage']['AWS_ENDPOINT'] ?? '' }}" placeholder="https://<account_id>.r2.cloudflarestorage.com" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                         <span class="text-[11px] text-[#766A5E] mt-1 block">Leave blank for standard AWS S3. Fill in for Cloudflare R2, MinIO, or Supabase Storage.</span>
                     </div>
 
@@ -241,7 +241,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Access Key ID (AWS_ACCESS_KEY_ID)
                         </label>
-                        <input type="text" name="AWS_ACCESS_KEY_ID" id="s3_key" value="{{ $settings['storage']['AWS_ACCESS_KEY_ID'] ?? '' }}" placeholder="AKIAIOSFODNN7EXAMPLE" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="AWS_ACCESS_KEY_ID" id="s3_key" value="{{ $settings['storage']['AWS_ACCESS_KEY_ID'] ?? '' }}" placeholder="AKIAIOSFODNN7EXAMPLE" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                     </div>
 
                     <!-- AWS Secret Access Key -->
@@ -249,11 +249,11 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Secret Access Key (AWS_SECRET_ACCESS_KEY)
                             @if($settings['storage']['AWS_HAS_SECRET'])
-                                <span class="text-[10px] text-[#845D33] font-mono font-normal">(Configured)</span>
+                                <span class="text-[10px] text-[#9F8349] font-mono font-normal">(Configured)</span>
                             @endif
                         </label>
                         <div class="relative">
-                            <input :type="showSecret ? 'text' : 'password'" name="AWS_SECRET_ACCESS_KEY" id="s3_secret" value="{{ $settings['storage']['AWS_SECRET_ACCESS_KEY'] ?? '' }}" placeholder="{{ $settings['storage']['AWS_HAS_SECRET'] ? '••••••••' : 'Enter Secret Key' }}" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 pr-10 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                            <input :type="showSecret ? 'text' : 'password'" name="AWS_SECRET_ACCESS_KEY" id="s3_secret" value="{{ $settings['storage']['AWS_SECRET_ACCESS_KEY'] ?? '' }}" placeholder="{{ $settings['storage']['AWS_HAS_SECRET'] ? '••••••••' : 'Enter Secret Key' }}" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 pr-10 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                             <button type="button" @click="showSecret = !showSecret" class="absolute right-2.5 top-2.5 text-[#766A5E] hover:text-[#222222]">
                                 <span class="material-symbols-outlined text-base" x-text="showSecret ? 'visibility_off' : 'visibility'"></span>
                             </button>
@@ -266,7 +266,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Path Style Endpoint (AWS_USE_PATH_STYLE_ENDPOINT)
                         </label>
-                        <select name="AWS_USE_PATH_STYLE_ENDPOINT" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]">
+                        <select name="AWS_USE_PATH_STYLE_ENDPOINT" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]">
                             <option value="false" {{ ($settings['storage']['AWS_USE_PATH_STYLE_ENDPOINT'] ?? '') === 'false' ? 'selected' : '' }}>false (Default for standard AWS S3 / Cloudflare R2)</option>
                             <option value="true" {{ ($settings['storage']['AWS_USE_PATH_STYLE_ENDPOINT'] ?? '') === 'true' ? 'selected' : '' }}>true (Required for MinIO and self-hosted S3)</option>
                         </select>
@@ -276,7 +276,7 @@
 
                 <div class="mt-8 pt-5 border-t border-[#F4EFEA] flex items-center justify-between">
                     <span class="text-xs text-[#766A5E]">Takes effect immediately across all file uploads.</span>
-                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-[#845D33] hover:bg-[#6D4B27] text-white text-xs font-semibold shadow-sm flex items-center gap-2">
+                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-[#9F8349] hover:bg-[#856C36] text-white text-xs font-semibold shadow-sm flex items-center gap-2">
                         <span class="material-symbols-outlined text-base text-[#B88B56]">save</span>
                         <span>Save Cloud Storage Settings</span>
                     </button>
@@ -308,7 +308,7 @@
                     <button type="button" 
                         @click="runMigrations()"
                         :disabled="runningMigrations"
-                        class="px-3.5 py-2 rounded-lg bg-[#845D33] hover:bg-[#6D4B27] text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
+                        class="px-3.5 py-2 rounded-lg bg-[#9F8349] hover:bg-[#856C36] text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
                         <span x-show="!runningMigrations" class="material-symbols-outlined text-sm text-[#B88B56]">schema</span>
                         <span x-show="runningMigrations" class="material-symbols-outlined text-sm animate-spin">refresh</span>
                         <span x-text="runningMigrations ? 'Running Migrations...' : 'Run Migrations'"></span>
@@ -317,8 +317,8 @@
                     <button type="button" 
                         @click="seedDatabase()"
                         :disabled="seedingDb"
-                        class="px-3.5 py-2 rounded-lg bg-[#F8F4EE] hover:bg-[#F0EAE0] text-[#845D33] border border-[#E8DAC8] text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
-                        <span x-show="!seedingDb" class="material-symbols-outlined text-sm text-[#845D33]">group_add</span>
+                        class="px-3.5 py-2 rounded-lg bg-[#F8F4EE] hover:bg-[#F0EAE0] text-[#9F8349] border border-[#E8DAC8] text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
+                        <span x-show="!seedingDb" class="material-symbols-outlined text-sm text-[#9F8349]">group_add</span>
                         <span x-show="seedingDb" class="material-symbols-outlined text-sm animate-spin">refresh</span>
                         <span x-text="seedingDb ? 'Seeding Practice Data...' : 'Seed Practice Data &amp; Users'"></span>
                     </button>
@@ -360,20 +360,20 @@
 
             <!-- Supabase on AWS EC2 IPv4 Advisory -->
             <div class="mb-6 p-4 rounded-xl bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] flex items-start gap-3 shadow-xs">
-                <span class="material-symbols-outlined text-[#845D33] text-lg shrink-0 mt-0.5">info</span>
+                <span class="material-symbols-outlined text-[#9F8349] text-lg shrink-0 mt-0.5">info</span>
                 <div class="space-y-1">
-                    <strong class="font-bold text-[#845D33] block">Connecting to Supabase PostgreSQL from AWS EC2?</strong>
+                    <strong class="font-bold text-[#9F8349] block">Connecting to Supabase PostgreSQL from AWS EC2?</strong>
                     <p class="text-[#554D45] leading-relaxed">
-                        Supabase direct connection hosts (<code class="font-mono text-[#845D33]">db.[ref].supabase.co</code>) resolve to <strong>IPv6-only</strong> addresses, which standard AWS EC2 instances cannot route to directly, causing <code class="font-mono text-red-700">Network is unreachable</code>.
+                        Supabase direct connection hosts (<code class="font-mono text-[#9F8349]">db.[ref].supabase.co</code>) resolve to <strong>IPv6-only</strong> addresses, which standard AWS EC2 instances cannot route to directly, causing <code class="font-mono text-red-700">Network is unreachable</code>.
                     </p>
                     <p class="text-[#554D45] leading-relaxed font-medium">
                         Always use the <strong>Supabase Connection Pooler (IPv4)</strong> in your configuration:
                     </p>
                     <ul class="list-disc list-inside text-[11px] font-mono text-[#766A5E] space-y-0.5 mt-1 bg-white p-2.5 rounded-lg border border-[#EFECE6]">
-                        <li>Host: <span class="text-[#845D33] font-bold">aws-0-[region].pooler.supabase.com</span> (e.g. <span class="text-[#845D33]">aws-0-ap-south-1.pooler.supabase.com</span>)</li>
-                        <li>Port: <span class="text-[#845D33] font-bold">5432</span> (Session Mode for Laravel)</li>
-                        <li>Username: <span class="text-[#845D33] font-bold">postgres.[project-ref]</span> (Must include <span class="text-[#845D33]">.[project-ref]</span>)</li>
-                        <li>Database: <span class="text-[#845D33] font-bold">postgres</span></li>
+                        <li>Host: <span class="text-[#9F8349] font-bold">aws-0-[region].pooler.supabase.com</span> (e.g. <span class="text-[#9F8349]">aws-0-ap-south-1.pooler.supabase.com</span>)</li>
+                        <li>Port: <span class="text-[#9F8349] font-bold">5432</span> (Session Mode for Laravel)</li>
+                        <li>Username: <span class="text-[#9F8349] font-bold">postgres.[project-ref]</span> (Must include <span class="text-[#9F8349]">.[project-ref]</span>)</li>
+                        <li>Database: <span class="text-[#9F8349] font-bold">postgres</span></li>
                     </ul>
                 </div>
             </div>
@@ -381,11 +381,11 @@
             <!-- Quick 1-Click Database Presets -->
             <div class="mb-5 flex flex-wrap items-center justify-between gap-3 p-3.5 bg-[#FAF8F5] rounded-xl border border-[#EAE4DC]">
                 <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-base text-[#845D33]">auto_fix_high</span>
+                    <span class="material-symbols-outlined text-base text-[#9F8349]">auto_fix_high</span>
                     <span class="text-xs text-[#222222] font-semibold">1-Click Configuration Presets:</span>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <button type="button" @click="applyPreset('supabase-tokyo')" class="px-3 py-1.5 rounded-lg text-xs bg-[#845D33] hover:bg-[#6D4B27] text-white border border-[#6D4B27] font-semibold flex items-center gap-1.5 shadow-xs transition-colors">
+                    <button type="button" @click="applyPreset('supabase-tokyo')" class="px-3 py-1.5 rounded-lg text-xs bg-[#9F8349] hover:bg-[#856C36] text-white border border-[#856C36] font-semibold flex items-center gap-1.5 shadow-xs transition-colors">
                         <span class="material-symbols-outlined text-sm text-[#E8DAC8]">verified</span>
                         <span>Supabase Pooler (Tokyo — Your Project)</span>
                     </button>
@@ -411,12 +411,12 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Database Connection Driver (DB_CONNECTION)
                         </label>
-                        <select name="DB_CONNECTION" id="db_driver" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]">
+                        <select name="DB_CONNECTION" id="db_driver" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]">
                             <option value="sqlite" {{ ($settings['database']['DB_CONNECTION'] ?? '') === 'sqlite' ? 'selected' : '' }}>sqlite (SQLite File — Zero Config / Local)</option>
                             <option value="pgsql" {{ ($settings['database']['DB_CONNECTION'] ?? '') === 'pgsql' ? 'selected' : '' }}>pgsql (PostgreSQL — Recommended for Supabase / Neon / AWS RDS)</option>
                             <option value="mysql" {{ ($settings['database']['DB_CONNECTION'] ?? '') === 'mysql' ? 'selected' : '' }}>mysql (MySQL / MariaDB / Amazon Aurora)</option>
                         </select>
-                        <span class="text-[11px] text-[#766A5E] mt-1 block">Choose <code class="font-mono text-[#845D33]">pgsql</code> for Supabase.</span>
+                        <span class="text-[11px] text-[#766A5E] mt-1 block">Choose <code class="font-mono text-[#9F8349]">pgsql</code> for Supabase.</span>
                     </div>
 
                     <!-- Database Host -->
@@ -424,7 +424,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Database Host (DB_HOST)
                         </label>
-                        <input type="text" name="DB_HOST" id="db_host" value="{{ $settings['database']['DB_HOST'] ?? '127.0.0.1' }}" placeholder="aws-0-ap-south-1.pooler.supabase.com" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="DB_HOST" id="db_host" value="{{ $settings['database']['DB_HOST'] ?? '127.0.0.1' }}" placeholder="aws-0-ap-south-1.pooler.supabase.com" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                         <span class="text-[11px] text-[#766A5E] mt-1 block">Ignored when using SQLite. For Supabase, use your pooler or direct host.</span>
                     </div>
 
@@ -433,7 +433,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Database Port (DB_PORT)
                         </label>
-                        <input type="text" name="DB_PORT" id="db_port" value="{{ $settings['database']['DB_PORT'] ?? '3306' }}" placeholder="5432" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="DB_PORT" id="db_port" value="{{ $settings['database']['DB_PORT'] ?? '3306' }}" placeholder="5432" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                         <span class="text-[11px] text-[#766A5E] mt-1 block font-mono">Standard: <span class="font-bold">5432</span> (PostgreSQL/Supabase) or <span class="font-bold">3306</span> (MySQL).</span>
                     </div>
 
@@ -442,7 +442,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Database Name / Path (DB_DATABASE)
                         </label>
-                        <input type="text" name="DB_DATABASE" id="db_database" value="{{ $settings['database']['DB_DATABASE'] ?? '' }}" placeholder="postgres or database/database.sqlite" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="DB_DATABASE" id="db_database" value="{{ $settings['database']['DB_DATABASE'] ?? '' }}" placeholder="postgres or database/database.sqlite" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                         <span class="text-[11px] text-[#766A5E] mt-1 block">For Supabase, usually <code class="font-mono">postgres</code>. For SQLite, the path to <code class="font-mono">.sqlite</code> file.</span>
                     </div>
 
@@ -451,7 +451,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Database Username (DB_USERNAME)
                         </label>
-                        <input type="text" name="DB_USERNAME" id="db_username" value="{{ $settings['database']['DB_USERNAME'] ?? '' }}" placeholder="postgres.yourprojectid" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="DB_USERNAME" id="db_username" value="{{ $settings['database']['DB_USERNAME'] ?? '' }}" placeholder="postgres.yourprojectid" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                     </div>
 
                     <!-- Database Password -->
@@ -459,11 +459,11 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Database Password (DB_PASSWORD)
                             @if($settings['database']['DB_HAS_PASSWORD'])
-                                <span class="text-[10px] text-[#845D33] font-mono font-normal">(Configured)</span>
+                                <span class="text-[10px] text-[#9F8349] font-mono font-normal">(Configured)</span>
                             @endif
                         </label>
                         <div class="relative">
-                            <input :type="showDbPass ? 'text' : 'password'" name="DB_PASSWORD" id="db_password" value="{{ $settings['database']['DB_PASSWORD'] ?? '' }}" placeholder="{{ $settings['database']['DB_HAS_PASSWORD'] ? '••••••••' : 'Enter DB Password' }}" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 pr-10 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                            <input :type="showDbPass ? 'text' : 'password'" name="DB_PASSWORD" id="db_password" value="{{ $settings['database']['DB_PASSWORD'] ?? '' }}" placeholder="{{ $settings['database']['DB_HAS_PASSWORD'] ? '••••••••' : 'Enter DB Password' }}" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 pr-10 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                             <button type="button" @click="showDbPass = !showDbPass" class="absolute right-2.5 top-2.5 text-[#766A5E] hover:text-[#222222]">
                                 <span class="material-symbols-outlined text-base" x-text="showDbPass ? 'visibility_off' : 'visibility'"></span>
                             </button>
@@ -475,7 +475,7 @@
 
                 <div class="mt-8 pt-5 border-t border-[#F4EFEA] flex items-center justify-between">
                     <span class="text-xs text-[#766A5E]">Laravel cache will be cleared immediately upon saving.</span>
-                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-[#845D33] hover:bg-[#6D4B27] text-white text-xs font-semibold shadow-sm flex items-center gap-2">
+                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-[#9F8349] hover:bg-[#856C36] text-white text-xs font-semibold shadow-sm flex items-center gap-2">
                         <span class="material-symbols-outlined text-base text-[#B88B56]">save</span>
                         <span>Save Database Settings</span>
                     </button>
@@ -529,12 +529,12 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Mail Delivery Engine (MAIL_MAILER)
                         </label>
-                        <select name="MAIL_MAILER" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]">
+                        <select name="MAIL_MAILER" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]">
                             <option value="smtp" {{ ($settings['mail']['MAIL_MAILER'] ?? '') === 'smtp' ? 'selected' : '' }}>smtp (Live SMTP Relay — Recommended)</option>
                             <option value="log" {{ ($settings['mail']['MAIL_MAILER'] ?? '') === 'log' ? 'selected' : '' }}>log (Log to storage/logs/laravel.log — Local Testing)</option>
                             <option value="ses" {{ ($settings['mail']['MAIL_MAILER'] ?? '') === 'ses' ? 'selected' : '' }}>ses (Amazon Simple Email Service)</option>
                         </select>
-                        <span class="text-[11px] text-[#766A5E] mt-1 block">Set to <code class="font-mono text-[#845D33]">smtp</code> for Brevo (Sendinblue), Mailgun, or Postmark.</span>
+                        <span class="text-[11px] text-[#766A5E] mt-1 block">Set to <code class="font-mono text-[#9F8349]">smtp</code> for Brevo (Sendinblue), Mailgun, or Postmark.</span>
                     </div>
 
                     <!-- SMTP Host -->
@@ -542,7 +542,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             SMTP Server Host (MAIL_HOST)
                         </label>
-                        <input type="text" name="MAIL_HOST" id="mail_host" value="{{ $settings['mail']['MAIL_HOST'] ?? 'smtp.brevo.com' }}" placeholder="smtp-relay.brevo.com" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="MAIL_HOST" id="mail_host" value="{{ $settings['mail']['MAIL_HOST'] ?? 'smtp.brevo.com' }}" placeholder="smtp-relay.brevo.com" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                     </div>
 
                     <!-- SMTP Port -->
@@ -550,7 +550,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             SMTP Port (MAIL_PORT)
                         </label>
-                        <input type="text" name="MAIL_PORT" id="mail_port" value="{{ $settings['mail']['MAIL_PORT'] ?? '587' }}" placeholder="587" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="MAIL_PORT" id="mail_port" value="{{ $settings['mail']['MAIL_PORT'] ?? '587' }}" placeholder="587" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                         <span class="text-[11px] text-[#766A5E] mt-1 block font-mono">Standard ports: <span class="font-bold">587</span> (TLS), <span class="font-bold">465</span> (SSL), or <span class="font-bold">2525</span>.</span>
                     </div>
 
@@ -559,7 +559,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Encryption Security (MAIL_ENCRYPTION)
                         </label>
-                        <select name="MAIL_ENCRYPTION" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]">
+                        <select name="MAIL_ENCRYPTION" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]">
                             <option value="tls" {{ ($settings['mail']['MAIL_ENCRYPTION'] ?? '') === 'tls' ? 'selected' : '' }}>tls (Transport Layer Security — Recommended for port 587)</option>
                             <option value="ssl" {{ ($settings['mail']['MAIL_ENCRYPTION'] ?? '') === 'ssl' ? 'selected' : '' }}>ssl (Secure Sockets Layer — Recommended for port 465)</option>
                             <option value="null" {{ ($settings['mail']['MAIL_ENCRYPTION'] ?? '') === 'null' ? 'selected' : '' }}>none (Unencrypted)</option>
@@ -571,7 +571,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             SMTP Username (MAIL_USERNAME)
                         </label>
-                        <input type="text" name="MAIL_USERNAME" value="{{ $settings['mail']['MAIL_USERNAME'] ?? '' }}" placeholder="7b3d9... or api-key-login" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="MAIL_USERNAME" value="{{ $settings['mail']['MAIL_USERNAME'] ?? '' }}" placeholder="7b3d9... or api-key-login" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                     </div>
 
                     <!-- SMTP Password -->
@@ -579,11 +579,11 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             SMTP Password / API Key (MAIL_PASSWORD)
                             @if($settings['mail']['MAIL_HAS_PASSWORD'])
-                                <span class="text-[10px] text-[#845D33] font-mono font-normal">(Configured)</span>
+                                <span class="text-[10px] text-[#9F8349] font-mono font-normal">(Configured)</span>
                             @endif
                         </label>
                         <div class="relative">
-                            <input :type="showMailPass ? 'text' : 'password'" name="MAIL_PASSWORD" value="{{ $settings['mail']['MAIL_PASSWORD'] ?? '' }}" placeholder="{{ $settings['mail']['MAIL_HAS_PASSWORD'] ? '••••••••' : 'Enter SMTP Key' }}" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 pr-10 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                            <input :type="showMailPass ? 'text' : 'password'" name="MAIL_PASSWORD" value="{{ $settings['mail']['MAIL_PASSWORD'] ?? '' }}" placeholder="{{ $settings['mail']['MAIL_HAS_PASSWORD'] ? '••••••••' : 'Enter SMTP Key' }}" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 pr-10 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                             <button type="button" @click="showMailPass = !showMailPass" class="absolute right-2.5 top-2.5 text-[#766A5E] hover:text-[#222222]">
                                 <span class="material-symbols-outlined text-base" x-text="showMailPass ? 'visibility_off' : 'visibility'"></span>
                             </button>
@@ -595,7 +595,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Outgoing Sender Address (MAIL_FROM_ADDRESS)
                         </label>
-                        <input type="email" name="MAIL_FROM_ADDRESS" value="{{ $settings['mail']['MAIL_FROM_ADDRESS'] ?? 'chambers@sharmalegal.in' }}" placeholder="notifications@sharmalegal.in" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="email" name="MAIL_FROM_ADDRESS" value="{{ $settings['mail']['MAIL_FROM_ADDRESS'] ?? 'chambers@sharmalegal.in' }}" placeholder="notifications@sharmalegal.in" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                         <span class="text-[11px] text-[#766A5E] mt-1 block">Must match the verified sending domain configured in your SMTP provider.</span>
                     </div>
 
@@ -604,14 +604,14 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Outgoing Sender Display Name (MAIL_FROM_NAME)
                         </label>
-                        <input type="text" name="MAIL_FROM_NAME" value="{{ $settings['mail']['MAIL_FROM_NAME'] ?? 'Sharma & Associates, Advocates' }}" placeholder="Sharma & Associates, Advocates" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="MAIL_FROM_NAME" value="{{ $settings['mail']['MAIL_FROM_NAME'] ?? 'Sharma & Associates, Advocates' }}" placeholder="Sharma & Associates, Advocates" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                     </div>
 
                 </div>
 
                 <div class="mt-8 pt-5 border-t border-[#F4EFEA] flex items-center justify-between">
                     <span class="text-xs text-[#766A5E]">Applies to all client email notifications and billing dispatches.</span>
-                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-[#845D33] hover:bg-[#6D4B27] text-white text-xs font-semibold shadow-sm flex items-center gap-2">
+                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-[#9F8349] hover:bg-[#856C36] text-white text-xs font-semibold shadow-sm flex items-center gap-2">
                         <span class="material-symbols-outlined text-base text-[#B88B56]">save</span>
                         <span>Save Email Settings</span>
                     </button>
@@ -624,7 +624,7 @@
             <div class="flex items-start justify-between border-b border-[#F4EFEA] pb-5 mb-6">
                 <div>
                     <h2 class="text-lg font-serif font-bold text-[#222222] flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#845D33]">settings_applications</span>
+                        <span class="material-symbols-outlined text-[#9F8349]">settings_applications</span>
                         <span>Application Identity &amp; Indian Legal Localization</span>
                     </h2>
                     <p class="text-xs text-[#766A5E] mt-1">Platform branding, Indian Rupee currency standards (₹ INR), timezones, and environment status.</p>
@@ -642,7 +642,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             System Application Name (APP_NAME)
                         </label>
-                        <input type="text" name="APP_NAME" value="{{ $settings['app']['APP_NAME'] ?? 'Vennamraj Associates' }}" placeholder="Vennamraj Associates" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="APP_NAME" value="{{ $settings['app']['APP_NAME'] ?? 'Vennamraj Associates' }}" placeholder="Vennamraj Associates" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                     </div>
 
                     <!-- LEGAL_APP_NAME -->
@@ -650,7 +650,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Client-Facing Chambers Title (LEGAL_APP_NAME)
                         </label>
-                        <input type="text" name="LEGAL_APP_NAME" value="{{ $settings['app']['LEGAL_APP_NAME'] ?? 'Vennamraj Associates' }}" placeholder="Vennamraj Associates, Advocates &amp; Legal Consultants" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="LEGAL_APP_NAME" value="{{ $settings['app']['LEGAL_APP_NAME'] ?? 'Vennamraj Associates' }}" placeholder="Vennamraj Associates, Advocates &amp; Legal Consultants" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                         <span class="text-[11px] text-[#766A5E] mt-1 block">Displayed in sidebar, client portal headers, and legal document watermarks.</span>
                     </div>
 
@@ -659,7 +659,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Root Application URL (APP_URL)
                         </label>
-                        <input type="url" name="APP_URL" value="{{ $settings['app']['APP_URL'] ?? 'http://localhost:8000' }}" placeholder="https://chambers.sharmalegal.in" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="url" name="APP_URL" value="{{ $settings['app']['APP_URL'] ?? 'http://localhost:8000' }}" placeholder="https://chambers.sharmalegal.in" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                         <span class="text-[11px] text-[#766A5E] mt-1 block">Used to generate password reset links and client portal access invites.</span>
                     </div>
 
@@ -668,7 +668,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Deployment Environment (APP_ENV)
                         </label>
-                        <select name="APP_ENV" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]">
+                        <select name="APP_ENV" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]">
                             <option value="local" {{ ($settings['app']['APP_ENV'] ?? '') === 'local' ? 'selected' : '' }}>local (Development Mode)</option>
                             <option value="production" {{ ($settings['app']['APP_ENV'] ?? '') === 'production' ? 'selected' : '' }}>production (Live Production Server)</option>
                             <option value="staging" {{ ($settings['app']['APP_ENV'] ?? '') === 'staging' ? 'selected' : '' }}>staging (Staging / Pre-Release)</option>
@@ -680,7 +680,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Default Currency Symbol (LEGAL_CURRENCY_SYMBOL)
                         </label>
-                        <input type="text" name="LEGAL_CURRENCY_SYMBOL" value="{{ $settings['app']['LEGAL_CURRENCY_SYMBOL'] ?? '₹' }}" placeholder="₹" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-bold text-[#845D33] focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="LEGAL_CURRENCY_SYMBOL" value="{{ $settings['app']['LEGAL_CURRENCY_SYMBOL'] ?? '₹' }}" placeholder="₹" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-bold text-[#9F8349] focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                     </div>
 
                     <!-- Currency Code -->
@@ -688,7 +688,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             ISO Currency Code (LEGAL_CURRENCY_CODE)
                         </label>
-                        <input type="text" name="LEGAL_CURRENCY_CODE" value="{{ $settings['app']['LEGAL_CURRENCY_CODE'] ?? 'INR' }}" placeholder="INR" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="LEGAL_CURRENCY_CODE" value="{{ $settings['app']['LEGAL_CURRENCY_CODE'] ?? 'INR' }}" placeholder="INR" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white font-mono focus:ring-1 focus:ring-[#9F8349] focus:border-[#9F8349]"/>
                     </div>
 
                     <!-- Debug Mode -->
@@ -699,7 +699,7 @@
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" name="APP_DEBUG" value="true" class="sr-only peer" {{ ($settings['app']['APP_DEBUG'] ?? '') === 'true' ? 'checked' : '' }}/>
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#845D33]"></div>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#9F8349]"></div>
                         </label>
                     </div>
 
@@ -707,7 +707,7 @@
 
                 <div class="mt-8 pt-5 border-t border-[#F4EFEA] flex items-center justify-between">
                     <span class="text-xs text-[#766A5E]">Instant cache invalidation runs automatically upon saving.</span>
-                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-[#845D33] hover:bg-[#6D4B27] text-white text-xs font-semibold shadow-sm flex items-center gap-2">
+                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-[#9F8349] hover:bg-[#856C36] text-white text-xs font-semibold shadow-sm flex items-center gap-2">
                         <span class="material-symbols-outlined text-base text-[#B88B56]">save</span>
                         <span>Save Application Settings</span>
                     </button>
@@ -793,7 +793,7 @@
                     <form action="{{ route('admin.settings.environment.update') }}" method="POST" onsubmit="return confirm('Save raw .env content? Ensure syntax is correct.');">
                         @csrf
                         <div class="mb-4">
-                            <textarea name="raw_env_content" rows="18" class="w-full bg-[#222222] text-[#8C7F72] font-mono text-xs p-4 rounded-xl border border-[#3E352E] focus:ring-1 focus:ring-[#845D33] leading-relaxed">{{ $rawEnv }}</textarea>
+                            <textarea name="raw_env_content" rows="18" class="w-full bg-[#222222] text-[#8C7F72] font-mono text-xs p-4 rounded-xl border border-[#3E352E] focus:ring-1 focus:ring-[#9F8349] leading-relaxed">{{ $rawEnv }}</textarea>
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="text-xs text-red-700 font-medium flex items-center gap-1">

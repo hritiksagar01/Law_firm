@@ -11,7 +11,7 @@
             <p class="text-sm text-[#766A5E]">Centralized case files, judicial forums, orders, and procedural schedules</p>
         </div>
         <div class="flex items-center gap-2">
-            <a href="{{ route('matters.create') }}" class="inline-flex items-center gap-2 px-4 h-10 rounded-lg bg-[#845D33] text-white text-xs font-medium hover:bg-[#6D4B27] shadow-sm transition-colors">
+            <a href="{{ route('matters.create') }}" class="inline-flex items-center gap-2 px-4 h-10 rounded-lg bg-[#9F8349] text-white text-xs font-medium hover:bg-[#856C36] shadow-sm transition-colors">
                 <span class="material-symbols-outlined text-base">add</span>
                 <span>Initiate Case File</span>
             </a>
@@ -22,16 +22,16 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <!-- Stage Filters -->
         <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
-            <a href="{{ route('matters.index') }}" class="px-3 py-1.5 rounded-lg text-xs font-medium {{ !request('stage') || request('stage') == 'all' ? 'bg-[#845D33] text-white' : 'bg-white border border-[#EAE4DC] text-[#554D45] hover:bg-[#F4EFEA]' }}">
+            <a href="{{ route('matters.index') }}" class="px-3 py-1.5 rounded-lg text-xs font-medium {{ !request('stage') || request('stage') == 'all' ? 'bg-[#9F8349] text-white' : 'bg-white border border-[#EAE4DC] text-[#554D45] hover:bg-[#F4EFEA]' }}">
                 All ({{ \App\Models\Matter::count() }})
             </a>
-            <a href="{{ route('matters.index', ['stage' => 'Discovery']) }}" class="px-3 py-1.5 rounded-lg text-xs font-medium {{ request('stage') == 'Discovery' ? 'bg-[#845D33] text-white' : 'bg-white border border-[#EAE4DC] text-[#554D45] hover:bg-[#F4EFEA]' }}">
+            <a href="{{ route('matters.index', ['stage' => 'Discovery']) }}" class="px-3 py-1.5 rounded-lg text-xs font-medium {{ request('stage') == 'Discovery' ? 'bg-[#9F8349] text-white' : 'bg-white border border-[#EAE4DC] text-[#554D45] hover:bg-[#F4EFEA]' }}">
                 Discovery ({{ \App\Models\Matter::where('stage', 'Discovery')->count() }})
             </a>
-            <a href="{{ route('matters.index', ['stage' => 'Pleadings']) }}" class="px-3 py-1.5 rounded-lg text-xs font-medium {{ request('stage') == 'Pleadings' ? 'bg-[#845D33] text-white' : 'bg-white border border-[#EAE4DC] text-[#554D45] hover:bg-[#F4EFEA]' }}">
+            <a href="{{ route('matters.index', ['stage' => 'Pleadings']) }}" class="px-3 py-1.5 rounded-lg text-xs font-medium {{ request('stage') == 'Pleadings' ? 'bg-[#9F8349] text-white' : 'bg-white border border-[#EAE4DC] text-[#554D45] hover:bg-[#F4EFEA]' }}">
                 Pleadings ({{ \App\Models\Matter::where('stage', 'Pleadings')->count() }})
             </a>
-            <a href="{{ route('matters.index', ['stage' => 'Pre-Trial']) }}" class="px-3 py-1.5 rounded-lg text-xs font-medium {{ request('stage') == 'Pre-Trial' ? 'bg-[#845D33] text-white' : 'bg-white border border-[#EAE4DC] text-[#554D45] hover:bg-[#F4EFEA]' }}">
+            <a href="{{ route('matters.index', ['stage' => 'Pre-Trial']) }}" class="px-3 py-1.5 rounded-lg text-xs font-medium {{ request('stage') == 'Pre-Trial' ? 'bg-[#9F8349] text-white' : 'bg-white border border-[#EAE4DC] text-[#554D45] hover:bg-[#F4EFEA]' }}">
                 Pre-Trial ({{ \App\Models\Matter::where('stage', 'Pre-Trial')->count() }})
             </a>
         </div>
@@ -39,7 +39,7 @@
         <!-- Search Input -->
         <form action="{{ route('matters.index') }}" method="GET" class="relative w-full md:w-72">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#766A5E] text-lg">search</span>
-            <input name="q" value="{{ request('q') }}" placeholder="Filter case or docket #..." class="w-full h-9 pl-9 pr-3 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] focus:outline-none focus:border-[#845D33]"/>
+            <input name="q" value="{{ request('q') }}" placeholder="Filter case or docket #..." class="w-full h-9 pl-9 pr-3 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] focus:outline-none focus:border-[#9F8349]"/>
         </form>
     </div>
 
@@ -61,13 +61,13 @@
                 @forelse($matters as $matter)
                 <tr class="hover:bg-[#FAF8F5] transition-colors group">
                     <td class="py-3.5 px-4 font-mono text-xs font-medium text-[#222222]">
-                        <span class="px-2 py-1 rounded bg-[#F4EFEA] text-[#845D33] font-semibold border border-[#EAE4DC]">
+                        <span class="px-2 py-1 rounded bg-[#F4EFEA] text-[#9F8349] font-semibold border border-[#EAE4DC]">
                             {{ $matter->case_number }}
                         </span>
                     </td>
                     <td class="py-3.5 px-4">
                         <div class="flex flex-col">
-                            <a href="{{ route('matters.show', $matter->id) }}" class="font-semibold text-[#222222] hover:text-[#845D33] transition-colors">
+                            <a href="{{ route('matters.show', $matter->id) }}" class="font-semibold text-[#222222] hover:text-[#9F8349] transition-colors">
                                 {{ $matter->title }}
                             </a>
                             <span class="text-xs text-[#766A5E] mt-0.5">{{ $matter->court_name }} <span class="mx-1">·</span> {{ $matter->judge_name }}</span>
@@ -80,7 +80,7 @@
                         </div>
                     </td>
                     <td class="py-3.5 px-4">
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#F8F4EE] text-[#845D33] border border-[#E8DAC8] font-semibold">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#F8F4EE] text-[#9F8349] border border-[#E8DAC8] font-semibold">
                             {{ $matter->stage }}
                         </span>
                     </td>
@@ -97,7 +97,7 @@
                         </div>
                     </td>
                     <td class="py-3.5 px-4 text-center">
-                        <a href="{{ route('matters.show', $matter->id) }}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#F4EFEA] text-[#222222] hover:bg-[#845D33] hover:text-white transition-colors text-xs font-medium">
+                        <a href="{{ route('matters.show', $matter->id) }}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#F4EFEA] text-[#222222] hover:bg-[#9F8349] hover:text-white transition-colors text-xs font-medium">
                             <span>Open</span>
                             <span class="material-symbols-outlined text-sm">arrow_forward</span>
                         </a>

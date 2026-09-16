@@ -20,7 +20,7 @@
                 <h1 class="text-2xl font-serif font-bold text-[#222222]">Client Directory</h1>
                 <p class="text-sm text-[#766A5E]">Retainers, client advance ledger balances, and active matters</p>
             </div>
-            <button @click="openCreateModal = true" class="inline-flex items-center gap-2 px-4 h-10 rounded-lg bg-[#845D33] text-white text-xs font-medium hover:bg-[#6D4B27] shadow-sm transition-colors">
+            <button @click="openCreateModal = true" class="inline-flex items-center gap-2 px-4 h-10 rounded-lg bg-[#9F8349] text-white text-xs font-medium hover:bg-[#856C36] shadow-sm transition-colors">
                 <span class="material-symbols-outlined text-base">person_add</span>
                 <span>New Client Onboarding</span>
             </button>
@@ -35,7 +35,7 @@
                         <span class="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-[#F4EFEA] text-[#554D45]">
                             {{ $client->type }}
                         </span>
-                        <span class="inline-flex items-center gap-1 text-[11px] font-medium text-[#845D33]">
+                        <span class="inline-flex items-center gap-1 text-[11px] font-medium text-[#9F8349]">
                             <span class="w-1.5 h-1.5 rounded-full bg-[#F8F4EE]0"></span> Active
                         </span>
                     </div>
@@ -57,7 +57,7 @@
                     <div class="flex items-center justify-between text-xs">
                         <div>
                             <span class="text-[10px] text-[#766A5E] block uppercase font-mono">Advance Retainer</span>
-                            <span class="font-mono font-bold text-[#845D33]">{{ config('legal.currency_symbol', '₹') }}{{ number_format($client->trust_balance, 2) }}</span>
+                            <span class="font-mono font-bold text-[#9F8349]">{{ config('legal.currency_symbol', '₹') }}{{ number_format($client->trust_balance, 2) }}</span>
                         </div>
                         <div class="text-right">
                             <span class="text-[10px] text-[#766A5E] block uppercase font-mono">Matters</span>
@@ -65,7 +65,7 @@
                         </div>
                     </div>
 
-                    <button type="button" @click="openDeposit({{ $client->id }}, '{{ addslashes($client->name) }}')" class="w-full py-1.5 text-center text-[11px] font-medium text-[#845D33] bg-[#F8F4EE] hover:bg-[#F4ECE1]/50 rounded transition-colors flex items-center justify-center gap-1">
+                    <button type="button" @click="openDeposit({{ $client->id }}, '{{ addslashes($client->name) }}')" class="w-full py-1.5 text-center text-[11px] font-medium text-[#9F8349] bg-[#F8F4EE] hover:bg-[#F4ECE1]/50 rounded transition-colors flex items-center justify-center gap-1">
                         <span class="material-symbols-outlined text-xs">add_card</span>
                         <span>Credit Advance Deposit</span>
                     </button>
@@ -79,7 +79,7 @@
             <div class="bg-white rounded-xl shadow-2xl border border-[#EFECE6] w-full max-w-lg p-6 flex flex-col">
                 <div class="flex items-center justify-between pb-4 border-b border-[#F4EFEA] mb-4">
                     <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#845D33]">person_add</span>
+                        <span class="material-symbols-outlined text-[#9F8349]">person_add</span>
                         <h3 class="text-sm font-semibold text-[#222222]">New Client Representation Intake</h3>
                     </div>
                     <button type="button" @click="openCreateModal = false" class="text-[#766A5E] hover:text-[#222222]">
@@ -92,11 +92,11 @@
                     <div class="grid grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1">
                             <label class="font-medium text-[#222222]">Client / Entity Name</label>
-                            <input name="name" required type="text" placeholder="e.g. Malhotra Enterprises Pvt Ltd" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#845D33]"/>
+                            <input name="name" required type="text" placeholder="e.g. Malhotra Enterprises Pvt Ltd" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="font-medium text-[#222222]">Client Classification</label>
-                            <select name="type" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#845D33]">
+                            <select name="type" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]">
                                 <option value="corporate" selected>Corporate Entity (Pvt Ltd / Ltd)</option>
                                 <option value="individual">Individual Private Client</option>
                             </select>
@@ -106,33 +106,33 @@
                     <div class="grid grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1">
                             <label class="font-medium text-[#222222]">Primary Contact Person</label>
-                            <input name="contact_person" type="text" placeholder="e.g. Vikram Malhotra, Managing Director" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#845D33]"/>
+                            <input name="contact_person" type="text" placeholder="e.g. Vikram Malhotra, Managing Director" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="font-medium text-[#222222]">Official Email</label>
-                            <input name="email" required type="email" placeholder="client@company.in" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#845D33]"/>
+                            <input name="email" required type="email" placeholder="client@company.in" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1">
                             <label class="font-medium text-[#222222]">Telephone / Mobile</label>
-                            <input name="phone" type="text" placeholder="+91 98100 12345" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#845D33]"/>
+                            <input name="phone" type="text" placeholder="+91 98100 12345" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="font-medium text-[#222222]">GSTIN / PAN</label>
-                            <input name="tax_id" type="text" placeholder="07AAACM1234F1Z5" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#845D33]"/>
+                            <input name="tax_id" type="text" placeholder="07AAACM1234F1Z5" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
                         </div>
                     </div>
 
                     <div class="flex flex-col gap-1">
                         <label class="font-medium text-[#222222]">Initial Advance Retainer Deposit ({{ config('legal.currency_symbol', '₹') }})</label>
-                        <input name="trust_balance" type="number" step="1000" value="50000" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#845D33]"/>
+                        <input name="trust_balance" type="number" step="1000" value="50000" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
                     </div>
 
                     <div class="pt-3 border-t border-[#F4EFEA] flex items-center justify-end gap-2">
                         <button type="button" @click="openCreateModal = false" class="px-4 py-2 rounded-lg border border-[#EAE4DC] text-[#554D45] hover:bg-[#FAF8F5]">Cancel</button>
-                        <button type="submit" class="px-4 py-2 rounded-lg bg-[#845D33] text-white font-semibold hover:bg-[#6D4B27]">Onboard Client</button>
+                        <button type="submit" class="px-4 py-2 rounded-lg bg-[#9F8349] text-white font-semibold hover:bg-[#856C36]">Onboard Client</button>
                     </div>
                 </form>
             </div>
@@ -143,7 +143,7 @@
             <div class="bg-white rounded-xl shadow-2xl border border-[#EFECE6] w-full max-w-sm p-6 flex flex-col">
                 <div class="flex items-center justify-between pb-4 border-b border-[#F4EFEA] mb-4">
                     <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#6D4B27]">account_balance</span>
+                        <span class="material-symbols-outlined text-[#856C36]">account_balance</span>
                         <h3 class="text-sm font-semibold text-[#222222]">Credit Advance Account</h3>
                     </div>
                     <button type="button" @click="openDepositModal = false" class="text-[#766A5E] hover:text-[#222222]">
@@ -160,16 +160,16 @@
 
                     <div class="flex flex-col gap-1">
                         <label class="font-medium text-[#222222]">Deposit Amount ({{ config('legal.currency_symbol', '₹') }} INR)</label>
-                        <input name="amount" type="number" step="1000" value="25000" required class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#845D33] font-mono text-sm font-bold"/>
+                        <input name="amount" type="number" step="1000" value="25000" required class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349] font-mono text-sm font-bold"/>
                     </div>
 
-                    <div class="p-2.5 rounded bg-[#F8F4EE] text-[#845D33] text-[11px]">
+                    <div class="p-2.5 rounded bg-[#F8F4EE] text-[#9F8349] text-[11px]">
                         Deposit will be credited to client's advance retainer ledger for legal fees and court expenses.
                     </div>
 
                     <div class="pt-3 border-t border-[#F4EFEA] flex items-center justify-end gap-2">
                         <button type="button" @click="openDepositModal = false" class="px-4 py-2 rounded-lg border border-[#EAE4DC] text-[#554D45] hover:bg-[#FAF8F5]">Cancel</button>
-                        <button type="submit" class="px-4 py-2 rounded-lg bg-[#845D33] text-white font-semibold hover:bg-[#6D4B27]">Record Deposit</button>
+                        <button type="submit" class="px-4 py-2 rounded-lg bg-[#9F8349] text-white font-semibold hover:bg-[#856C36]">Record Deposit</button>
                     </div>
                 </form>
             </div>
