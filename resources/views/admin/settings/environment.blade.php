@@ -35,7 +35,7 @@
                 <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-9 w-auto object-contain rounded-md bg-white p-0.5"/>
             </a>
             <div>
-                <span class="font-serif text-base font-bold text-white tracking-wide">Vennamraj Associates Platform Console</span>
+                <span class="font-serif text-base font-bold text-white tracking-wide">Platform Administration Console</span>
                 <div class="flex items-center gap-2">
                     <span class="text-[10px] font-mono text-[#8C7F72]">Super Administrator Access</span>
                     <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#9F8349] animate-pulse"></span>

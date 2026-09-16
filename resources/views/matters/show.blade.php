@@ -26,12 +26,8 @@
                 </p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
-                <button onclick="document.getElementById('quickTimeModal').classList.remove('hidden')" class="inline-flex items-center gap-1.5 px-3.5 h-9 rounded-lg bg-[#9F8349] text-white text-xs font-medium hover:bg-[#856C36] shadow-sm transition-colors">
-                    <span class="material-symbols-outlined text-base text-[#B88B56]">timer</span>
-                    <span>Log Time on Matter</span>
-                </button>
-                <a href="{{ route('documents.index') }}" class="inline-flex items-center gap-1.5 px-3.5 h-9 rounded-lg bg-white border border-[#EAE4DC] text-[#222222] text-xs font-medium hover:bg-[#F4EFEA] shadow-sm transition-colors">
-                    <span class="material-symbols-outlined text-[#766A5E] text-base">upload_file</span>
+                <a href="{{ route('documents.index') }}" class="inline-flex items-center gap-1.5 px-3.5 h-9 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm transition-colors">
+                    <span class="material-symbols-outlined text-base">upload_file</span>
                     <span>Upload Filing</span>
                 </a>
             </div>
@@ -46,10 +42,6 @@
             <button class="px-4 py-2 text-xs font-medium text-[#766A5E] hover:text-[#222222] flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-base">description</span>
                 <span>Filings &amp; Evidence ({{ $matter->documents->count() }})</span>
-            </button>
-            <button class="px-4 py-2 text-xs font-medium text-[#766A5E] hover:text-[#222222] flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-base">timer</span>
-                <span>Time &amp; Ledger (${{ number_format($matter->totalBilledAmount(), 2) }})</span>
             </button>
             <button class="px-4 py-2 text-xs font-medium text-[#766A5E] hover:text-[#222222] flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-base">calendar_month</span>
@@ -126,37 +118,7 @@
                 </div>
             </div>
 
-            <!-- Matter Time Ledger -->
-            <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
-                <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#9F8349] text-xl">payments</span>
-                        <h3 class="text-sm font-semibold text-[#222222]">Matter Time &amp; Ledger Entries</h3>
-                    </div>
-                    <span class="font-mono text-xs text-[#222222] font-bold">Total: ${{ number_format($matter->totalBilledAmount(), 2) }}</span>
-                </div>
 
-                <div class="divide-y divide-[#F4EFEA]">
-                    @forelse($matter->timeEntries as $time)
-                    <div class="p-4 flex items-start justify-between gap-4 hover:bg-[#FAF8F5]">
-                        <div class="flex items-start gap-3">
-                            <span class="font-mono text-xs font-bold text-[#9F8349] w-12">{{ $time->hours }}h</span>
-                            <div class="flex flex-col">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-mono text-[10px] px-1.5 py-0.2 rounded bg-[#F4EFEA] text-[#9F8349] font-semibold">{{ $time->activity_code }}</span>
-                                    <span class="text-xs font-semibold text-[#222222]">{{ $time->activity_name }}</span>
-                                    <span class="text-xs text-[#766A5E]">· {{ $time->user->name }}</span>
-                                </div>
-                                <p class="text-xs text-[#554D45] mt-1">{{ $time->narrative }}</p>
-                            </div>
-                        </div>
-                        <span class="font-mono text-xs font-semibold text-[#222222] shrink-0">${{ number_format($time->total_amount, 2) }}</span>
-                    </div>
-                    @empty
-                    <div class="p-6 text-center text-xs text-[#766A5E]">No billable hours recorded for this matter.</div>
-                    @endforelse
-                </div>
-            </div>
 
             <!-- Privileged Attorney-Client Communications (Stitch: secure_communications_client_messages) -->
             <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
@@ -220,10 +182,6 @@
                         <span class="text-[#766A5E] block text-[11px]">Presiding Judge</span>
                         <span class="font-medium text-[#222222]">{{ $matter->judge_name ?? 'Magistrate Pending' }}</span>
                     </div>
-                    <div>
-                        <span class="text-[#766A5E] block text-[11px]">Billing Structure</span>
-                        <span class="font-mono text-[#9F8349] font-medium uppercase">{{ $matter->billing_type }} (Budget: ${{ number_format($matter->budget, 0) }})</span>
-                    </div>
                 </div>
             </div>
 
@@ -243,10 +201,6 @@
                         <span class="text-[#766A5E] block text-[11px]">Email &amp; Direct Phone</span>
                         <span>{{ $matter->client->email }}</span>
                     </div>
-                    <div class="pt-3 border-t border-[#F4EFEA] flex items-center justify-between">
-                        <span class="text-xs text-[#766A5E]">Retainer in Trust</span>
-                        <span class="font-mono text-sm font-bold text-[#856C36]">${{ number_format($matter->client->trust_balance, 2) }}</span>
-                    </div>
                 </div>
             </div>
 
@@ -258,7 +212,7 @@
                         <img alt="{{ $matter->leadAttorney?->name }}" class="w-8 h-8 rounded-full object-cover ring-1 ring-[#EAE4DC]" src="{{ $matter->leadAttorney?->avatar_url }}"/>
                         <div class="flex flex-col min-w-0">
                             <span class="text-xs font-semibold text-[#222222]">{{ $matter->leadAttorney?->name }}</span>
-                            <span class="text-[10px] text-[#766A5E]">Lead Trial Counsel · ${{ $matter->leadAttorney?->hourly_rate }}/hr</span>
+                            <span class="text-[10px] text-[#766A5E]">Lead Trial Counsel</span>
                         </div>
                     </div>
                 </div>

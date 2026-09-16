@@ -1,17 +1,7 @@
 <x-app-layout>
     <x-slot name="title">Clients &amp; Corporate Entities — {{ config('legal.app_name', 'Vennamraj Associates') }}</x-slot>
 
-    <div x-data="{ 
-        openCreateModal: false, 
-        openDepositModal: false, 
-        depositClientId: '', 
-        depositClientName: '',
-        openDeposit(id, name) {
-            this.depositClientId = id;
-            this.depositClientName = name;
-            this.openDepositModal = true;
-        }
-    }">
+    <div x-data="{ openCreateModal: false }">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#EFECE6] mb-6">
             <div>
                 <div class="flex items-center gap-2 mb-1">
@@ -53,22 +43,15 @@
                     @endif
                 </div>
 
-                <div class="mt-4 pt-3 border-t border-[#F4EFEA] flex flex-col gap-2">
-                    <div class="flex items-center justify-between text-xs">
-                        <div>
-                            <span class="text-[10px] text-[#766A5E] block uppercase font-mono">Advance Retainer</span>
-                            <span class="font-mono font-bold text-[#9F8349]">{{ config('legal.currency_symbol', '₹') }}{{ number_format($client->trust_balance, 2) }}</span>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-[10px] text-[#766A5E] block uppercase font-mono">Matters</span>
-                            <span class="font-mono font-semibold text-[#222222]">{{ $client->matters->count() }} active</span>
-                        </div>
+                <div class="mt-4 pt-3 border-t border-[#F4EFEA] flex items-center justify-between text-xs">
+                    <div>
+                        <span class="text-[10px] text-[#766A5E] block uppercase font-mono">Matters &amp; Dossiers</span>
+                        <span class="font-mono font-semibold text-[#222222]">{{ $client->matters->count() }} active</span>
                     </div>
-
-                    <button type="button" @click="openDeposit({{ $client->id }}, '{{ addslashes($client->name) }}')" class="w-full py-1.5 text-center text-[11px] font-medium text-[#9F8349] bg-[#F8F4EE] hover:bg-[#F4ECE1]/50 rounded transition-colors flex items-center justify-center gap-1">
-                        <span class="material-symbols-outlined text-xs">add_card</span>
-                        <span>Credit Advance Deposit</span>
-                    </button>
+                    <a href="{{ route('matters.index') }}" class="py-1 px-2.5 text-center text-[11px] font-medium text-[#9F8349] bg-[#F8F4EE] hover:bg-[#F4ECE1]/50 rounded transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">folder_open</span>
+                        <span>View Cases</span>
+                    </a>
                 </div>
             </div>
             @endforeach
@@ -125,10 +108,7 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col gap-1">
-                        <label class="font-medium text-[#222222]">Initial Advance Retainer Deposit ({{ config('legal.currency_symbol', '₹') }})</label>
-                        <input name="trust_balance" type="number" step="1000" value="50000" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
-                    </div>
+                    <input type="hidden" name="trust_balance" value="0"/>
 
                     <div class="pt-3 border-t border-[#F4EFEA] flex items-center justify-end gap-2">
                         <button type="button" @click="openCreateModal = false" class="px-4 py-2 rounded-lg border border-[#EAE4DC] text-[#554D45] hover:bg-[#FAF8F5]">Cancel</button>
@@ -138,41 +118,5 @@
             </div>
         </div>
 
-        <!-- Trust Deposit Modal -->
-        <div x-show="openDepositModal" @click.away="openDepositModal = false" x-transition class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl shadow-2xl border border-[#EFECE6] w-full max-w-sm p-6 flex flex-col">
-                <div class="flex items-center justify-between pb-4 border-b border-[#F4EFEA] mb-4">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#856C36]">account_balance</span>
-                        <h3 class="text-sm font-semibold text-[#222222]">Credit Advance Account</h3>
-                    </div>
-                    <button type="button" @click="openDepositModal = false" class="text-[#766A5E] hover:text-[#222222]">
-                        <span class="material-symbols-outlined">close</span>
-                    </button>
-                </div>
-
-                <form :action="'/clients/' + depositClientId + '/trust-deposit'" method="POST" class="flex flex-col gap-3 text-xs">
-                    @csrf
-                    <div>
-                        <span class="text-[#766A5E] block text-[11px]">Client Sub-Ledger</span>
-                        <span class="font-semibold text-[#222222] text-sm" x-text="depositClientName"></span>
-                    </div>
-
-                    <div class="flex flex-col gap-1">
-                        <label class="font-medium text-[#222222]">Deposit Amount ({{ config('legal.currency_symbol', '₹') }} INR)</label>
-                        <input name="amount" type="number" step="1000" value="25000" required class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349] font-mono text-sm font-bold"/>
-                    </div>
-
-                    <div class="p-2.5 rounded bg-[#F8F4EE] text-[#9F8349] text-[11px]">
-                        Deposit will be credited to client's advance retainer ledger for legal fees and court expenses.
-                    </div>
-
-                    <div class="pt-3 border-t border-[#F4EFEA] flex items-center justify-end gap-2">
-                        <button type="button" @click="openDepositModal = false" class="px-4 py-2 rounded-lg border border-[#EAE4DC] text-[#554D45] hover:bg-[#FAF8F5]">Cancel</button>
-                        <button type="submit" class="px-4 py-2 rounded-lg bg-[#9F8349] text-white font-semibold hover:bg-[#856C36]">Record Deposit</button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </div>
 </x-app-layout>

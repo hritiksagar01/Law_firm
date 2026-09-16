@@ -16,15 +16,8 @@
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-serif font-bold tracking-tight">Namaste, {{ auth()->user()->name }}</h1>
                 <p class="text-xs sm:text-sm text-white/80 max-w-xl">
-                    Welcome to your private client portal with {{ $client->firm->name ?? 'Vennamraj Associates' }}. Review case stage updates, fulfill document requests, and manage retainer statements.
+                    Welcome to your private client portal. Review case stage updates, fulfill document requests, and track upcoming court proceedings.
                 </p>
-            </div>
-
-            <!-- Quick Retainer Callout -->
-            <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/15 shrink-0 flex flex-col min-w-[200px]">
-                <span class="text-[11px] font-mono uppercase tracking-wider text-white/70">Available Retainer Balance</span>
-                <span class="text-2xl font-serif font-bold text-[#B88B56] mt-1">{{ config('legal.currency.symbol', '₹') }}{{ number_format($client->trust_balance, 2) }}</span>
-                <span class="text-[10px] text-white/60 mt-0.5">Held in client advance account</span>
             </div>
         </div>
     </div>
@@ -58,19 +51,15 @@
             </div>
         </div>
 
-        <!-- Unpaid Invoices -->
-        @php
-            $unpaidCount = $invoices->where('status', '!=', 'paid')->count();
-            $unpaidTotal = $invoices->where('status', '!=', 'paid')->sum('total_amount');
-        @endphp
+        <!-- Vault Documents -->
         <div class="bg-white rounded-xl p-5 border border-[#EFECE6] shadow-sm flex items-center justify-between">
             <div class="flex flex-col">
-                <span class="text-[11px] font-mono uppercase tracking-wider text-[#766A5E]">Fee Bills Due</span>
-                <span class="text-2xl font-serif font-bold text-[#222222] mt-1">{{ config('legal.currency.symbol', '₹') }}{{ number_format($unpaidTotal, 0) }}</span>
-                <a href="{{ route('portal.invoices.index') }}" class="text-[11px] text-[#9F8349] hover:underline font-medium mt-1">{{ $unpaidCount }} invoice(s) pending &rarr;</a>
+                <span class="text-[11px] font-mono uppercase tracking-wider text-[#766A5E]">Vault Documents</span>
+                <span class="text-2xl font-serif font-bold text-[#222222] mt-1">{{ \App\Models\Document::count() }} Files</span>
+                <a href="{{ route('portal.documents.index') }}" class="text-[11px] text-[#9F8349] hover:underline font-medium mt-1">Access vault &rarr;</a>
             </div>
-            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
-                <span class="material-symbols-outlined text-2xl">receipt_long</span>
+            <div class="w-12 h-12 rounded-xl bg-[#F8F4EE] text-[#9F8349] flex items-center justify-center">
+                <span class="material-symbols-outlined text-2xl">folder_shared</span>
             </div>
         </div>
 

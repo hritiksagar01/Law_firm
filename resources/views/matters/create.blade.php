@@ -76,21 +76,9 @@
                 </div>
             </div>
 
-            <!-- Billing Model & Budget -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="flex flex-col gap-1">
-                    <label class="text-xs font-semibold text-[#554D45] uppercase tracking-wider">Fee Arrangement</label>
-                    <select name="billing_type" class="w-full h-10 px-3 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-sm text-[#222222] focus:outline-none focus:border-[#9F8349] focus:bg-white">
-                        <option value="hourly">Appearance Fee &amp; Hourly Billing</option>
-                        <option value="flat_fee">Fixed Case Retainer / Lump Sum</option>
-                        <option value="contingency">Stage-wise Fee (Milestone)</option>
-                    </select>
-                </div>
-                <div class="flex flex-col gap-1">
-                    <label class="text-xs font-semibold text-[#554D45] uppercase tracking-wider">Approved Budget ({{ config('legal.currency_symbol', '₹') }} INR)</label>
-                    <input name="budget" type="number" step="5000" value="250000" class="w-full h-10 px-3 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-sm font-mono text-[#222222] focus:outline-none focus:border-[#9F8349] focus:bg-white"/>
-                </div>
-            </div>
+            <!-- System Matter Attributes -->
+            <input type="hidden" name="billing_type" value="flat_fee"/>
+            <input type="hidden" name="budget" value="0"/>
 
             <div class="pt-4 border-t border-[#F4EFEA] flex items-center justify-end gap-3">
                 <a href="{{ route('matters.index') }}" class="px-4 py-2 rounded-lg text-xs font-medium text-[#554D45] hover:bg-[#F4EFEA]">Cancel</a>

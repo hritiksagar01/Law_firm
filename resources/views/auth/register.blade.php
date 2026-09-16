@@ -38,10 +38,10 @@
         
         <!-- Brand Emblem & Official Logo -->
         <div class="flex flex-col items-center text-center mb-6">
-            <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-14 w-auto object-contain rounded-xl shadow-md mb-3 border border-[#E8DAC8]/60 bg-white p-1.5"/>
+            <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-16 w-auto object-contain rounded-xl shadow-md mb-3 border border-[#E8DAC8]/60 bg-white p-2"/>
             <h1 class="text-2xl font-serif font-bold text-[#222222] tracking-tight">Establish Your Practice</h1>
             <p class="text-[11px] font-mono uppercase tracking-widest text-[#766A5E] font-medium mt-1">
-                Multi-Advocate Chambers · Court Dockets · Client Trust Ledger
+                Multi-Advocate Chambers · Court Dockets · Client Portal
             </p>
         </div>
 

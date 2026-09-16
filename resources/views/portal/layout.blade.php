@@ -31,13 +31,9 @@
         <div class="flex flex-col">
             <!-- Brand & Client Portal Header -->
             <div class="p-4 border-b border-[#EFECE6]">
-                <div class="flex items-center gap-2.5 mb-3">
-                    <a href="{{ route('portal.dashboard') }}" class="flex items-center gap-2 min-w-0">
-                        <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-9 w-auto object-contain rounded-md shadow-xs"/>
-                        <div class="flex flex-col min-w-0">
-                            <span class="font-serif text-sm text-[#222222] font-bold tracking-tight truncate leading-tight">{{ config('legal.app_name', 'Vennamraj Associates') }}</span>
-                            <span class="font-mono text-[9px] uppercase tracking-widest text-[#9F8349] font-semibold mt-0.5">Client Portal</span>
-                        </div>
+                <div class="flex items-center justify-center mb-3">
+                    <a href="{{ route('portal.dashboard') }}" class="block">
+                        <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-11 w-auto object-contain rounded-md shadow-xs"/>
                     </a>
                 </div>
 
@@ -97,14 +93,6 @@
                     <div class="flex items-center gap-2.5">
                         <span class="material-symbols-outlined text-lg {{ request()->routeIs('portal.messages.*') ? 'text-white' : 'text-[#9F8349]' }}">chat</span>
                         <span>Counsel Messages</span>
-                    </div>
-                </a>
-
-                <!-- Invoices & Retainer -->
-                <a href="{{ route('portal.invoices.index') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('portal.invoices.*') ? 'bg-[#9F8349] text-white font-semibold shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
-                    <div class="flex items-center gap-2.5">
-                        <span class="material-symbols-outlined text-lg {{ request()->routeIs('portal.invoices.*') ? 'text-white' : 'text-[#9F8349]' }}">account_balance_wallet</span>
-                        <span>Invoices &amp; Retainer</span>
                     </div>
                 </a>
 
@@ -218,15 +206,8 @@
                 </div>
             </div>
 
-            <!-- Right Header: Trust Balance & Fast Logout -->
+            <!-- Right Header: Fast Logout -->
             <div class="flex items-center gap-3">
-                @if($portalClient)
-                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-[#FAF8F5] border border-[#EAE4DC] rounded-lg shadow-2xs">
-                    <span class="w-2 h-2 rounded-full bg-[#9F8349]"></span>
-                    <span class="text-xs text-[#766A5E] font-mono">Retainer Balance:</span>
-                    <span class="text-xs font-serif font-bold text-[#9F8349]">{{ config('legal.currency.symbol', '₹') }}{{ number_format($portalClient->trust_balance, 2) }}</span>
-                </div>
-                @endif
 
                 <form action="{{ route('logout') }}" method="POST" class="inline">
                     @csrf
