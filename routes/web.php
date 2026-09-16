@@ -31,8 +31,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
 });
 
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout.get')->middleware('auth');
+Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
 |--------------------------------------------------------------------------
@@ -699,21 +698,32 @@ Route::middleware('auth')->group(function () {
             return view('portal.calendar.index', compact('client', 'events'));
         })->name('calendar.index');
     });
+});
 
-    // Super Admin Platform Routes (Protected by auth and admin.super)
-    Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', function () {
+/*
+|--------------------------------------------------------------------------
+| Super Admin Platform Routes (Protected strictly by EnsureSuperAdmin)
+|--------------------------------------------------------------------------
+| Decoupled from Laravel's default 'auth' middleware so administrators can
+| access environment settings even during emergency database outages.
+*/
+Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', function () {
+        try {
             $firms = \App\Models\Firm::withCount(['users', 'matters', 'documents'])->get();
             return view('admin.dashboard', compact('firms'));
-        })->name('dashboard');
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.settings.environment')
+                ->with('error', 'Active Database is offline or unreachable. Redirected to Environment & Cloud Console.');
+        }
+    })->name('dashboard');
 
-        Route::get('/settings/environment', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'index'])->name('settings.environment');
-        Route::post('/settings/environment', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'update'])->name('settings.environment.update');
-        Route::post('/settings/environment/test-db', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testDatabase'])->name('settings.environment.test-db');
-        Route::post('/settings/environment/test-s3', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testS3'])->name('settings.environment.test-s3');
-        Route::post('/settings/environment/test-mail', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testMail'])->name('settings.environment.test-mail');
-        Route::post('/settings/environment/run-migrations', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'runMigrations'])->name('settings.environment.run-migrations');
-        Route::post('/settings/environment/seed-db', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'seedDatabase'])->name('settings.environment.seed-db');
-        Route::post('/settings/environment/restore-backup', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'restoreBackup'])->name('settings.environment.restore-backup');
-    });
+    Route::get('/settings/environment', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'index'])->name('settings.environment');
+    Route::post('/settings/environment', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'update'])->name('settings.environment.update');
+    Route::post('/settings/environment/test-db', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testDatabase'])->name('settings.environment.test-db');
+    Route::post('/settings/environment/test-s3', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testS3'])->name('settings.environment.test-s3');
+    Route::post('/settings/environment/test-mail', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testMail'])->name('settings.environment.test-mail');
+    Route::post('/settings/environment/run-migrations', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'runMigrations'])->name('settings.environment.run-migrations');
+    Route::post('/settings/environment/seed-db', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'seedDatabase'])->name('settings.environment.seed-db');
+    Route::post('/settings/environment/restore-backup', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'restoreBackup'])->name('settings.environment.restore-backup');
 });

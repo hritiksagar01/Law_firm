@@ -40,7 +40,58 @@
         </div>
         @endif
 
-        @if($errors->any())
+        @if(session('info'))
+        <div class="w-full mb-4 p-3 rounded-lg bg-[#F8F4EE] border border-[#845D33]/30 text-xs text-[#6D4B27] flex items-center gap-2">
+            <span class="material-symbols-outlined text-base text-[#845D33]">info</span>
+            <span>{{ session('info') }}</span>
+        </div>
+        @endif
+
+        @php
+            $dbErrorText = $errors->first() ?? session('error') ?? '';
+            $isDbOffline = !empty($dbErrorText) && (
+                str_contains(strtolower($dbErrorText), 'database') || 
+                str_contains(strtolower($dbErrorText), 'unreachable') || 
+                str_contains(strtolower($dbErrorText), 'offline') ||
+                str_contains(strtolower($dbErrorText), 'emergency')
+            );
+        @endphp
+
+        @if($isDbOffline)
+        <!-- High-Priority Emergency Console Dispatch Card -->
+        <div class="w-full mb-5 p-4 rounded-xl bg-[#FFFBF5] border-2 border-[#845D33] shadow-lg flex flex-col gap-3">
+            <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-lg bg-[#845D33] text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                    <span class="material-symbols-outlined text-xl">admin_panel_settings</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-xs font-bold text-[#442E15] uppercase tracking-wide">Database Unreachable — Emergency Mode Active</h3>
+                    <p class="text-[11px] text-[#766A5E] mt-1 leading-relaxed">
+                        {{ $dbErrorText }}
+                    </p>
+                </div>
+            </div>
+            
+            <form action="{{ route('demo-login') }}" method="POST" class="w-full mt-1">
+                @csrf
+                <input type="hidden" name="email" value="admin@sharmalegal.in"/>
+                <button type="submit" class="w-full py-2.5 px-4 rounded-lg bg-[#845D33] text-white text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#6D4B27] shadow-md transition-all active:scale-[0.99]">
+                    <span class="material-symbols-outlined text-base">bolt</span>
+                    <span>1-Click Enter Emergency Super Admin Console</span>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </form>
+            
+            <div class="text-[10px] text-[#8C7F72] text-center bg-[#F8F4EE] py-1.5 px-2 rounded border border-[#EAE4DC]">
+                Manual Credentials: <span class="font-mono font-bold text-[#442E15]">admin@sharmalegal.in</span> &bull; <span class="font-mono font-bold text-[#442E15]">password123</span>
+            </div>
+        </div>
+        @elseif(session('error'))
+        <div class="w-full mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-800 flex items-center gap-2">
+            <span class="material-symbols-outlined text-base">error</span>
+            <span>{{ session('error') }}</span>
+        </div>
+        @elseif($errors->any())
         <div class="w-full mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-800 flex items-center gap-2">
             <span class="material-symbols-outlined text-base">error</span>
             <span>{{ $errors->first() }}</span>

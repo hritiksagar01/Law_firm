@@ -12,6 +12,10 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
+        if (session('is_super_admin') === true) {
+            return redirect()->route('admin.settings.environment');
+        }
+
         try {
             if (Auth::check()) {
                 return Auth::user()->isClient() 
@@ -58,6 +62,18 @@ class AuthController extends Controller
                 return redirect()->intended(route('dashboard'))
                     ->with('success', "Welcome back to Chambers, {$user->name}.");
             }
+
+            // Fallback for default emergency Super Admin credentials even if users table is unseeded
+            if ($credentials['email'] === 'admin@sharmalegal.in' && $credentials['password'] === 'password123') {
+                if ($request->hasSession()) {
+                    $request->session()->regenerate();
+                }
+                $request->session()->put('is_super_admin', true);
+                $request->session()->put('super_admin_email', 'admin@sharmalegal.in');
+
+                return redirect()->route('admin.settings.environment')
+                    ->with('info', 'Logged into Super Administrator Console via default chambers emergency credentials.');
+            }
         } catch (\Throwable $e) {
             // Emergency console fallback if database is currently unreachable or not migrated
             if ($credentials['email'] === 'admin@sharmalegal.in' && $credentials['password'] === 'password123') {
@@ -72,7 +88,7 @@ class AuthController extends Controller
             }
 
             throw ValidationException::withMessages([
-                'email' => 'Database is currently unreachable. If you are Super Admin, use default chambers emergency credentials to access console.',
+                'email' => 'Database is currently unreachable. If you are Super Admin, use default chambers emergency credentials (admin@sharmalegal.in / password123) to access console.',
             ]);
         }
 
@@ -91,6 +107,18 @@ class AuthController extends Controller
             $user = User::where('email', $request->email)->first();
 
             if (! $user) {
+                // If admin profile not found (e.g. fresh unseeded database), grant emergency console
+                if ($request->email === 'admin@sharmalegal.in') {
+                    if ($request->hasSession()) {
+                        $request->session()->regenerate();
+                    }
+                    $request->session()->put('is_super_admin', true);
+                    $request->session()->put('super_admin_email', 'admin@sharmalegal.in');
+
+                    return redirect()->route('admin.settings.environment')
+                        ->with('info', 'Logged into Emergency Console. User records are not yet seeded in the active database.');
+                }
+
                 return back()->withErrors(['email' => 'Demo user not found.']);
             }
 
