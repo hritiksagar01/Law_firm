@@ -97,7 +97,13 @@ class AdminSettingsController extends Controller
             }
         }
 
-        $envManager->update($payload);
+        try {
+            $envManager->update($payload);
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.settings.environment')
+                ->withInput()
+                ->with('error', "Failed to update .env: " . $e->getMessage());
+        }
 
         return redirect()->route('admin.settings.environment')
             ->with('success', 'Environment variables updated and configuration caches cleared successfully.');

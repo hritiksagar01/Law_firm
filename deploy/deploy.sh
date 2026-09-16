@@ -28,6 +28,8 @@ fi
 
 # Self-healing safeguard: Ensure SESSION_DRIVER=file so database drops never crash sessions
 if [ -f "$APP_DIR/.env" ]; then
+    sudo chown ubuntu:www-data "$APP_DIR/.env" || true
+    sudo chmod 666 "$APP_DIR/.env" || true
     sed -i 's/^SESSION_DRIVER=database/SESSION_DRIVER=file/' "$APP_DIR/.env"
     # Auto-convert direct Supabase IPv6 host or wrong pooler region to Tokyo IPv4 pooler
     sed -i 's/db\.vfeqqwdewvqpjieqktml\.supabase\.co/aws-0-ap-northeast-1.pooler.supabase.com/g' "$APP_DIR/.env"
@@ -44,11 +46,12 @@ php artisan route:cache || php artisan route:clear || true
 php artisan view:cache || php artisan view:clear || true
 php artisan event:cache || php artisan event:clear || true
 
-# Ensure storage and database permissions remain correct
+# Ensure storage, database, and .env permissions allow www-data to read and write
 sudo chown -R ubuntu:www-data "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/database"
 sudo chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/database"
 if [ -f "$APP_DIR/.env" ]; then
-    sudo chmod 664 "$APP_DIR/.env"
+    sudo chown ubuntu:www-data "$APP_DIR/.env"
+    sudo chmod 666 "$APP_DIR/.env"
 fi
 
 echo "=== [6/6] Bringing Application Back Up & Reloading PHP-FPM ==="

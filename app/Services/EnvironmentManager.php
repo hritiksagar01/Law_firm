@@ -242,7 +242,19 @@ class EnvironmentManager
             }
         }
 
-        File::put($this->envPath, $content, true);
+        // Self-heal permissions if possible
+        if (File::exists($this->envPath) && !is_writable($this->envPath)) {
+            @chmod($this->envPath, 0666);
+        }
+
+        try {
+            File::put($this->envPath, $content, true);
+        } catch (\Throwable $e) {
+            // Fallback without lock in case lock acquisition failed
+            if (@file_put_contents($this->envPath, $content) === false) {
+                throw new \RuntimeException("Server permission denied writing to .env file at {$this->envPath}. Please grant write permission to web server user (www-data).");
+            }
+        }
 
         $this->clearCaches();
 
