@@ -365,10 +365,25 @@ class EnvironmentManager
             ];
         } catch (PDOException $e) {
             $msg = $e->getMessage();
-            if (str_contains($host, 'supabase.co') || str_contains($msg, 'Network is unreachable') || str_contains($msg, '08006')) {
+
+            if (str_contains($msg, 'Network is unreachable')) {
                 return [
                     'success' => false,
-                    'message' => "Connection Failed (IPv6 Unreachable): Supabase direct endpoint ('{$host}') resolves to an IPv6 address that standard AWS EC2 instances cannot route to directly. Fix: Switch to the Supabase Connection Pooler: Host: 'aws-0-[region].pooler.supabase.com' (e.g. 'aws-0-ap-south-1.pooler.supabase.com'), Port: '5432' (Session) or '6543' (Transaction), Username: 'postgres.[project-ref]'. Error details: {$msg}",
+                    'message' => "Connection Failed (IPv6 Unreachable): Supabase direct host ('{$host}') resolves to IPv6 which AWS EC2 cannot route. Switch to the IPv4 Connection Pooler: Host: 'aws-0-ap-northeast-1.pooler.supabase.com', Port: '5432', Username: 'postgres.vfeqqwdewvqpjieqktml'.",
+                ];
+            }
+
+            if (str_contains($msg, 'tenant/user') && str_contains($msg, 'not found')) {
+                return [
+                    'success' => false,
+                    'message' => "Supabase Region Mismatch: Tenant '{$username}' was not found on '{$host}'. Your Supabase project is hosted in Tokyo (ap-northeast-1). Please set Host to 'aws-0-ap-northeast-1.pooler.supabase.com' and Port to '5432'.",
+                ];
+            }
+
+            if (str_contains($msg, 'password authentication failed')) {
+                return [
+                    'success' => false,
+                    'message' => "Supabase Endpoint & Project Verified! The host ('{$host}') and tenant username ('{$username}') connected successfully, but the database password was incorrect. Please type your correct Supabase database password in the field below.",
                 ];
             }
 

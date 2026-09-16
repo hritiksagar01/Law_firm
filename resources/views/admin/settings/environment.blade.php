@@ -380,13 +380,17 @@
                     <span class="text-xs text-[#222222] font-semibold">1-Click Configuration Presets:</span>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <button type="button" @click="applyPreset('supabase')" class="px-3 py-1.5 rounded-lg text-xs bg-white hover:bg-[#F8F4EE] text-[#845D33] border border-[#E8DAC8] font-semibold flex items-center gap-1.5 shadow-2xs transition-colors">
-                        <span class="material-symbols-outlined text-sm text-[#B88B56]">cloud_sync</span>
-                        <span>Supabase IPv4 Pooler (Mumbai)</span>
+                    <button type="button" @click="applyPreset('supabase-tokyo')" class="px-3 py-1.5 rounded-lg text-xs bg-[#845D33] hover:bg-[#6D4B27] text-white border border-[#6D4B27] font-semibold flex items-center gap-1.5 shadow-xs transition-colors">
+                        <span class="material-symbols-outlined text-sm text-[#E8DAC8]">verified</span>
+                        <span>Supabase Pooler (Tokyo — Your Project)</span>
                     </button>
                     <button type="button" @click="applyPreset('sqlite')" class="px-3 py-1.5 rounded-lg text-xs bg-white hover:bg-[#FAF8F5] text-[#554D45] border border-[#EAE4DC] font-medium flex items-center gap-1.5 shadow-2xs transition-colors">
                         <span class="material-symbols-outlined text-sm text-[#766A5E]">save_as</span>
                         <span>Local SQLite (Safe Failsafe)</span>
+                    </button>
+                    <button type="button" @click="applyPreset('supabase-mumbai')" class="px-2.5 py-1.5 rounded-lg text-xs bg-white hover:bg-[#F8F4EE] text-[#766A5E] border border-[#E8DAC8] font-medium flex items-center gap-1.5 transition-colors">
+                        <span class="material-symbols-outlined text-sm text-[#B88B56]">cloud_sync</span>
+                        <span>Supabase (Mumbai)</span>
                     </button>
                 </div>
             </div>
@@ -963,16 +967,20 @@
         }
 
         function applyPreset(type) {
-            if (type === 'supabase') {
+            if (type === 'supabase-tokyo' || type === 'supabase') {
+                document.getElementById('db_driver').value = 'pgsql';
+                document.getElementById('db_host').value = 'aws-0-ap-northeast-1.pooler.supabase.com';
+                document.getElementById('db_port').value = '5432';
+                document.getElementById('db_database').value = 'postgres';
+                document.getElementById('db_username').value = 'postgres.vfeqqwdewvqpjieqktml';
+                alert('Supabase Tokyo Pooler (ap-northeast-1) preset applied!\n\nHost: aws-0-ap-northeast-1.pooler.supabase.com\nUsername: postgres.vfeqqwdewvqpjieqktml\n\nEnter your Supabase database password, then click "Test DB Connection".');
+            } else if (type === 'supabase-mumbai') {
                 document.getElementById('db_driver').value = 'pgsql';
                 document.getElementById('db_host').value = 'aws-0-ap-south-1.pooler.supabase.com';
                 document.getElementById('db_port').value = '5432';
                 document.getElementById('db_database').value = 'postgres';
-                const currUser = document.getElementById('db_username').value;
-                if (!currUser || currUser === 'postgres' || currUser === 'root') {
-                    document.getElementById('db_username').value = 'postgres.vfeqqwdewvqpjieqktml';
-                }
-                alert('Supabase IPv4 Pooler preset applied! Make sure to verify your Supabase Database Password, then click "Test DB Connection".');
+                document.getElementById('db_username').value = 'postgres.vfeqqwdewvqpjieqktml';
+                alert('Supabase Mumbai Pooler (ap-south-1) preset applied! Note: Project vfeqqwdewvqpjieqktml is hosted in Tokyo.');
             } else if (type === 'sqlite') {
                 document.getElementById('db_driver').value = 'sqlite';
                 document.getElementById('db_host').value = '127.0.0.1';

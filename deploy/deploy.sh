@@ -29,8 +29,9 @@ fi
 # Self-healing safeguard: Ensure SESSION_DRIVER=file so database drops never crash sessions
 if [ -f "$APP_DIR/.env" ]; then
     sed -i 's/^SESSION_DRIVER=database/SESSION_DRIVER=file/' "$APP_DIR/.env"
-    # Auto-convert direct Supabase IPv6 host to IPv4 pooler if present
-    sed -i 's/db\.vfeqqwdewvqpjieqktml\.supabase\.co/aws-0-ap-south-1.pooler.supabase.com/g' "$APP_DIR/.env"
+    # Auto-convert direct Supabase IPv6 host or wrong pooler region to Tokyo IPv4 pooler
+    sed -i 's/db\.vfeqqwdewvqpjieqktml\.supabase\.co/aws-0-ap-northeast-1.pooler.supabase.com/g' "$APP_DIR/.env"
+    sed -i 's/aws-0-ap-south-1\.pooler\.supabase\.co/aws-0-ap-northeast-1.pooler.supabase.com/g' "$APP_DIR/.env"
     sed -i 's/DB_USERNAME=postgres$/DB_USERNAME=postgres.vfeqqwdewvqpjieqktml/g' "$APP_DIR/.env"
 fi
 
