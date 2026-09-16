@@ -21,12 +21,13 @@ use Illuminate\Support\Facades\Storage;
 | Authentication Routes (Guest Only)
 |--------------------------------------------------------------------------
 */
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/demo-login', [AuthController::class, 'demoLogin'])->name('demo-login');
+
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/demo-login', [AuthController::class, 'demoLogin'])->name('demo-login');
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
     Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
 });

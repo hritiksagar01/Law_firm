@@ -12,20 +12,6 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        if (session('is_super_admin') === true) {
-            return redirect()->route('admin.settings.environment');
-        }
-
-        try {
-            if (Auth::check()) {
-                return Auth::user()->isClient() 
-                    ? redirect()->route('portal.dashboard') 
-                    : redirect()->route('dashboard');
-            }
-        } catch (\Throwable $e) {
-            // Suppress database connection exception so login view can always render
-        }
-
         return view('auth.login');
     }
 

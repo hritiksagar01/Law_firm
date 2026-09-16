@@ -53,10 +53,14 @@
             </a>
         </nav>
 
-        <div class="flex items-center gap-3">
-            <a href="{{ route('dashboard') }}" class="text-xs bg-[#2E2823] hover:bg-[#2E2823] text-[#F4ECE1] border border-[#3E352E] px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm">arrow_back</span>
-                <span>Law Firm Chambers</span>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('dashboard') }}" class="text-xs bg-[#2E2823] hover:bg-[#3E352E] text-[#F4ECE1] border border-[#3E352E] px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">balance</span>
+                <span>Chambers</span>
+            </a>
+            <a href="{{ route('logout') }}" class="text-xs bg-red-950/40 hover:bg-red-900/60 text-red-200 border border-red-900/50 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">logout</span>
+                <span>Sign Out</span>
             </a>
         </div>
     </header>
