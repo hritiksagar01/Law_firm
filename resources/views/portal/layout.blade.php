@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>@yield('title', 'Client Portal') — {{ config('legal.app_name', 'Law Firm Management') }}</title>
+    <title>@yield('title', 'Client Portal') — {{ config('legal.app_name', 'Vennamraj Associates') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}"/>
 
     <!-- Juris Prestige Typography: EB Garamond & Manrope -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -31,13 +32,13 @@
             <!-- Brand & Client Portal Header -->
             <div class="p-4 border-b border-[#EFECE6]">
                 <div class="flex items-center gap-2.5 mb-3">
-                    <div class="w-8 h-8 rounded-lg bg-[#845D33] flex items-center justify-center text-white shadow-sm">
-                        <span class="material-symbols-outlined text-xl">balance</span>
-                    </div>
-                    <div class="flex flex-col min-w-0">
-                        <span class="font-serif text-lg text-[#222222] font-bold tracking-tight truncate leading-none">{{ config('legal.app_name', 'Law Firm Management') }}</span>
-                        <span class="font-mono text-[9px] uppercase tracking-widest text-[#845D33] font-semibold mt-1">Client Portal</span>
-                    </div>
+                    <a href="{{ route('portal.dashboard') }}" class="flex items-center gap-2 min-w-0">
+                        <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-9 w-auto object-contain rounded-md shadow-xs"/>
+                        <div class="flex flex-col min-w-0">
+                            <span class="font-serif text-sm text-[#222222] font-bold tracking-tight truncate leading-tight">{{ config('legal.app_name', 'Vennamraj Associates') }}</span>
+                            <span class="font-mono text-[9px] uppercase tracking-widest text-[#845D33] font-semibold mt-0.5">Client Portal</span>
+                        </div>
+                    </a>
                 </div>
 
                 @if($portalClient)
@@ -211,7 +212,7 @@
                     <span class="material-symbols-outlined text-2xl">menu</span>
                 </button>
                 <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                    <span class="text-xs font-semibold text-[#222222]">{{ $portalClient->firm->name ?? 'Sharma & Associates, Advocates' }}</span>
+                    <span class="text-xs font-semibold text-[#222222]">{{ $portalClient->firm->name ?? 'Vennamraj Associates' }}</span>
                     <span class="hidden sm:inline text-xs text-[#8C7F72]">/</span>
                     <span class="text-[11px] font-mono text-[#766A5E]">Confidential Client Portal</span>
                 </div>
@@ -260,7 +261,7 @@
         <!-- Footer -->
         <footer class="bg-white border-t border-[#EFECE6] py-4 px-6 text-xs text-[#766A5E]">
             <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
-                <span>&copy; {{ date('Y') }} {{ config('legal.app_name', 'Law Firm Management') }}. Client Portal.</span>
+                <span>&copy; {{ date('Y') }} {{ config('legal.app_name', 'Vennamraj Associates') }}. Client Portal.</span>
                 <span class="text-[11px] font-mono text-[#845D33] font-semibold">Legal Communications Strictly Privileged</span>
             </div>
         </footer>

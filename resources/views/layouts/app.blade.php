@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>{{ $title ?? 'Sharma & Associates — Legal Practice Platform' }}</title>
+    <title>{{ $title ?? (config('legal.app_name', 'Vennamraj Associates') . ' — Legal Practice Platform') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}"/>
     
     <!-- Juris Prestige Typography: EB Garamond (Headline) & Manrope (Body/Label) -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -24,14 +25,14 @@
             <!-- Brand & Chambers Header -->
             <div class="p-4 border-b border-[#EFECE6]">
                 <div class="flex items-center gap-2.5 mb-3">
-                    <div class="w-8 h-8 rounded-lg bg-[#845D33] flex items-center justify-center text-white shadow-sm">
-                        <span class="material-symbols-outlined text-xl">balance</span>
-                    </div>
-                    <span class="font-serif text-lg text-[#222222] font-bold tracking-tight">{{ config('legal.app_name', 'Law Firm Management') }}</span>
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2 min-w-0">
+                        <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-9 w-auto object-contain rounded-md shadow-xs"/>
+                        <span class="font-serif text-sm text-[#222222] font-bold tracking-tight truncate leading-tight">{{ config('legal.app_name', 'Vennamraj Associates') }}</span>
+                    </a>
                 </div>
                 <button class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#F5F0E8] transition-colors text-left border border-[#EFECE6]">
                     <div class="flex flex-col min-w-0">
-                        <span class="text-xs text-[#222222] truncate font-semibold">{{ auth()->user()->firm->name ?? 'Sharma & Associates' }}</span>
+                        <span class="text-xs text-[#222222] truncate font-semibold">{{ auth()->user()->firm->name ?? 'Vennamraj Associates' }}</span>
                         <span class="font-mono text-[10px] text-[#766A5E] truncate">{{ auth()->user()->firm->address ? Str::limit(auth()->user()->firm->address, 30) : 'Delhi High Court Chambers' }}</span>
                     </div>
                     <span class="material-symbols-outlined text-[#766A5E] text-base">unfold_more</span>

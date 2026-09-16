@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Sign In — {{ config('legal.app_name', 'Law Firm Management') }}</title>
+    <title>Sign In — {{ config('legal.app_name', 'Vennamraj Associates') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}"/>
 
     <!-- Juris Prestige Typography: EB Garamond (Headline) & Manrope (Body/Label) -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -21,14 +22,12 @@
 
     <div class="w-full max-w-md flex flex-col items-center my-8">
         
-        <!-- Brand Emblem -->
+        <!-- Brand Emblem & Official Logo -->
         <div class="flex flex-col items-center text-center mb-6">
-            <div class="w-12 h-12 rounded-xl bg-[#845D33] flex items-center justify-center text-white shadow-md mb-3">
-                <span class="material-symbols-outlined text-2xl text-[#FAF8F5]">balance</span>
-            </div>
-            <h1 class="text-2xl font-serif font-bold text-[#222222] tracking-tight">{{ config('legal.app_name', 'Law Firm Management') }}</h1>
+            <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-16 w-auto object-contain rounded-xl shadow-md mb-3 border border-[#E8DAC8]/60 bg-white p-1.5"/>
+            <h1 class="text-2xl font-serif font-bold text-[#222222] tracking-tight">{{ config('legal.app_name', 'Vennamraj Associates') }}</h1>
             <p class="text-[11px] font-mono uppercase tracking-widest text-[#766A5E] font-semibold mt-1">
-                Court Dockets · Case Files · Client Accounts
+                Advocates and Legal Consultants · Court Dockets · Client Portal
             </p>
         </div>
 

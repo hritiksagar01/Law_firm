@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">Case Dossiers — {{ config('legal.app_name', 'Law Firm Management') }}</x-slot>
+    <x-slot name="title">Case Dossiers — {{ config('legal.app_name', 'Vennamraj Associates') }}</x-slot>
 
     <!-- Header & Action Ribbon -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#EFECE6] mb-6">

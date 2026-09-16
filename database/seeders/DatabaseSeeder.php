@@ -22,9 +22,9 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Create Firm (Indian Law Firm / Chambers)
         $firm = Firm::create([
-            'name' => 'Sharma & Associates, Advocates & Solicitors',
-            'slug' => 'sharma-associates',
-            'email' => 'chambers@sharmalegal.in',
+            'name' => 'Vennamraj Associates, Advocates & Legal Consultants',
+            'slug' => 'vennamraj-associates',
+            'email' => 'contact@vennamraj.com',
             'phone' => '+91 (11) 4920-8100',
             'address' => 'Chamber No. 412, Lawyers Chambers Block, High Court of Delhi, New Delhi 110003',
             'practice_areas' => [

@@ -10,8 +10,9 @@ return [
     | Can be overridden in your .env via LEGAL_APP_NAME.
     |
     */
-    'app_name' => env('LEGAL_APP_NAME', 'Law Firm Management'),
-    'tagline' => 'Indian Legal Practice, Docket & Client Trust Accounting',
+    'app_name' => env('LEGAL_APP_NAME', 'Vennamraj Associates'),
+    'tagline' => 'Advocates and Legal Consultants',
+    'logo_path' => env('LEGAL_LOGO_PATH', '/logo.png'),
 
     /*
     |--------------------------------------------------------------------------

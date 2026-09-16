@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">Litigation Tasks &amp; Deadlines — {{ config('legal.app_name', 'Law Firm Management') }}</x-slot>
+    <x-slot name="title">Litigation Tasks &amp; Deadlines — {{ config('legal.app_name', 'Vennamraj Associates') }}</x-slot>
 
     <div x-data="{ openCreateModal: false, filter: 'all' }">
         <!-- Header & Action Ribbon -->

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">Clients &amp; Corporate Entities — {{ config('legal.app_name', 'Law Firm Management') }}</x-slot>
+    <x-slot name="title">Clients &amp; Corporate Entities — {{ config('legal.app_name', 'Vennamraj Associates') }}</x-slot>
 
     <div x-data="{ 
         openCreateModal: false, 

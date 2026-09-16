@@ -37,6 +37,9 @@ if [ -f "$APP_DIR/.env" ]; then
     sed -i 's/^DB_DATABASE=.*/DB_DATABASE=postgres/' "$APP_DIR/.env"
     sed -i 's/^DB_USERNAME=.*/DB_USERNAME=postgres.vfeqqwdewvqpjieqktml/' "$APP_DIR/.env"
     sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=w0eeeDQBxopjhRBZ/' "$APP_DIR/.env"
+    sed -i 's/^APP_NAME=.*/APP_NAME="Vennamraj Associates"/' "$APP_DIR/.env"
+    sed -i 's/^LEGAL_APP_NAME=.*/LEGAL_APP_NAME="Vennamraj Associates"/' "$APP_DIR/.env"
+    grep -q '^LEGAL_APP_NAME=' "$APP_DIR/.env" || echo 'LEGAL_APP_NAME="Vennamraj Associates"' >> "$APP_DIR/.env"
     sed -i 's/^APP_URL=.*/APP_URL=https:\/\/lawfirm.pllatinum.me/' "$APP_DIR/.env"
 fi
 
@@ -44,6 +47,9 @@ echo "=== [5/6] Running Database Migrations & Seeding ==="
 php artisan config:clear || true
 php artisan migrate --force || echo "Notice: Database migration completed or skipped."
 php artisan db:seed --force || echo "Notice: Database seed completed or skipped."
+
+# Ensure existing database firm record reflects Vennamraj Associates branding
+php artisan tinker --execute="App\Models\Firm::first()?->update(['name' => 'Vennamraj Associates, Advocates & Legal Consultants', 'slug' => 'vennamraj-associates', 'email' => 'contact@vennamraj.com']);" || true
 
 php artisan config:cache || php artisan config:clear || true
 php artisan route:cache || php artisan route:clear || true

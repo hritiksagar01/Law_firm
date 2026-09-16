@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Register Law Practice — {{ config('legal.app_name', 'Law Firm Management') }}</title>
+    <title>Register Law Practice — {{ config('legal.app_name', 'Vennamraj Associates') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}"/>
 
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -35,12 +36,10 @@
 
     <div class="w-full max-w-xl flex flex-col items-center my-8">
         
-        <!-- Brand Emblem -->
+        <!-- Brand Emblem & Official Logo -->
         <div class="flex flex-col items-center text-center mb-6">
-            <div class="w-12 h-12 rounded-xl bg-[#845D33] flex items-center justify-center text-white shadow-md mb-3">
-                <span class="material-symbols-outlined text-2xl text-[#B88B56]">balance</span>
-            </div>
-            <h1 class="text-2xl font-serif font-bold text-[#222222] tracking-tight">Establish Your Law Practice</h1>
+            <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-14 w-auto object-contain rounded-xl shadow-md mb-3 border border-[#E8DAC8]/60 bg-white p-1.5"/>
+            <h1 class="text-2xl font-serif font-bold text-[#222222] tracking-tight">Establish Your Practice</h1>
             <p class="text-[11px] font-mono uppercase tracking-widest text-[#766A5E] font-medium mt-1">
                 Multi-Advocate Chambers · Court Dockets · Client Trust Ledger
             </p>

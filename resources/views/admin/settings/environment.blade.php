@@ -4,6 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Cloud &amp; Environment Settings — Super Admin Console</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}"/>
     
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -30,11 +31,11 @@
     <!-- Top Executive Navigation Bar -->
     <header class="h-16 bg-[#222222] text-white px-6 flex items-center justify-between shadow-md sticky top-0 z-40">
         <div class="flex items-center gap-4">
-            <div class="w-9 h-9 rounded-lg bg-[#845D33] text-[#B88B56] flex items-center justify-center font-bold shadow-inner">
-                <span class="material-symbols-outlined text-xl">admin_panel_settings</span>
-            </div>
+            <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
+                <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-9 w-auto object-contain rounded-md bg-white p-0.5"/>
+            </a>
             <div>
-                <span class="font-serif text-base font-bold text-white tracking-wide">LexisCore Platform Console</span>
+                <span class="font-serif text-base font-bold text-white tracking-wide">Vennamraj Associates Platform Console</span>
                 <div class="flex items-center gap-2">
                     <span class="text-[10px] font-mono text-[#8C7F72]">Super Administrator Access</span>
                     <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#845D33] animate-pulse"></span>
@@ -641,7 +642,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             System Application Name (APP_NAME)
                         </label>
-                        <input type="text" name="APP_NAME" value="{{ $settings['app']['APP_NAME'] ?? 'Law Firm Management' }}" placeholder="Law Firm Management" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="APP_NAME" value="{{ $settings['app']['APP_NAME'] ?? 'Vennamraj Associates' }}" placeholder="Vennamraj Associates" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
                     </div>
 
                     <!-- LEGAL_APP_NAME -->
@@ -649,7 +650,7 @@
                         <label class="block text-xs font-semibold text-[#222222] mb-1.5">
                             Client-Facing Chambers Title (LEGAL_APP_NAME)
                         </label>
-                        <input type="text" name="LEGAL_APP_NAME" value="{{ $settings['app']['LEGAL_APP_NAME'] ?? 'Sharma & Associates, Advocates' }}" placeholder="Sharma & Associates, Advocates & Solicitors" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
+                        <input type="text" name="LEGAL_APP_NAME" value="{{ $settings['app']['LEGAL_APP_NAME'] ?? 'Vennamraj Associates' }}" placeholder="Vennamraj Associates, Advocates &amp; Legal Consultants" class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] focus:bg-white focus:ring-1 focus:ring-[#845D33] focus:border-[#845D33]"/>
                         <span class="text-[11px] text-[#766A5E] mt-1 block">Displayed in sidebar, client portal headers, and legal document watermarks.</span>
                     </div>
 

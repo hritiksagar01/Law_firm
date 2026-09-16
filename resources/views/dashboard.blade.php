@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">{{ config('legal.app_name', 'Law Firm Management') }} — Chambers Dashboard</x-slot>
+    <x-slot name="title">{{ config('legal.app_name', 'Vennamraj Associates') }} — Chambers Dashboard</x-slot>
 
     <!-- Top Greeting & Header Actions -->
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 mb-2">
@@ -13,7 +13,7 @@
                 <span class="text-xs font-semibold text-[#554D45] uppercase tracking-wider">{{ auth()->user()->title ?? 'Senior Advocate & Managing Partner' }}</span>
             </div>
             <h1 class="text-3xl font-serif text-[#222222] font-bold tracking-tight">Good afternoon, {{ auth()->user()->name ?? 'Counsel' }}</h1>
-            <p class="text-sm text-[#766A5E]">{{ now()->format('l, F j, Y') }} <span class="mx-1.5">·</span> {{ auth()->user()->firm->name ?? 'Sharma & Associates, Advocates' }} <span class="mx-1.5">·</span> Chambers</p>
+            <p class="text-sm text-[#766A5E]">{{ now()->format('l, F j, Y') }} <span class="mx-1.5">·</span> {{ auth()->user()->firm->name ?? 'Vennamraj Associates, Advocates' }} <span class="mx-1.5">·</span> Chambers</p>
         </div>
 
         <!-- Quick Action Toolbar -->

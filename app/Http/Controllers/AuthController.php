@@ -253,7 +253,7 @@ class AuthController extends Controller
         }
 
         return redirect()->route('dashboard')
-            ->with('success', "Chambers established for {$firm->name}. Welcome to " . config('legal.app_name', 'Law Firm Management') . ", {$user->name}!");
+            ->with('success', "Chambers established for {$firm->name}. Welcome to " . config('legal.app_name', 'Vennamraj Associates') . ", {$user->name}!");
     }
 
     public function showForgotPassword()

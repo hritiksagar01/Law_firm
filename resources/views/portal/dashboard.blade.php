@@ -16,7 +16,7 @@
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-serif font-bold tracking-tight">Namaste, {{ auth()->user()->name }}</h1>
                 <p class="text-xs sm:text-sm text-white/80 max-w-xl">
-                    Welcome to your private client portal with {{ $client->firm->name ?? 'Sharma & Associates, Advocates' }}. Review case stage updates, fulfill document requests, and manage retainer statements.
+                    Welcome to your private client portal with {{ $client->firm->name ?? 'Vennamraj Associates' }}. Review case stage updates, fulfill document requests, and manage retainer statements.
                 </p>
             </div>
 

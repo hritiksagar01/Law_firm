@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">Open New Case Dossier — {{ config('legal.app_name', 'Law Firm Management') }}</x-slot>
+    <x-slot name="title">Open New Case Dossier — {{ config('legal.app_name', 'Vennamraj Associates') }}</x-slot>
 
     <div class="max-w-3xl mx-auto pb-12">
         <div class="mb-6 flex items-center justify-between">
