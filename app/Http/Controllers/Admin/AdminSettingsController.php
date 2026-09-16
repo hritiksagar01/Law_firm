@@ -79,6 +79,24 @@ class AdminSettingsController extends Controller
             $payload['APP_DEBUG'] = $request->has('APP_DEBUG') ? 'true' : 'false';
         }
 
+        // Proactive Safety Shield: Verify database connection BEFORE saving to .env
+        if ($request->input('_form_section') === 'database' && ! $request->boolean('force_save')) {
+            $testResult = $envManager->testDatabase([
+                'driver' => $request->input('DB_CONNECTION', 'sqlite'),
+                'host' => $request->input('DB_HOST', ''),
+                'port' => $request->input('DB_PORT', ''),
+                'database' => $request->input('DB_DATABASE', ''),
+                'username' => $request->input('DB_USERNAME', ''),
+                'password' => $request->input('DB_PASSWORD', ''),
+            ]);
+
+            if (! $testResult['success']) {
+                return redirect()->route('admin.settings.environment')
+                    ->withInput()
+                    ->with('error', "Database Connection Test Failed! Active configuration was NOT changed to protect site availability. Details: " . $testResult['message']);
+            }
+        }
+
         $envManager->update($payload);
 
         return redirect()->route('admin.settings.environment')
@@ -106,6 +124,12 @@ class AdminSettingsController extends Controller
     public function runMigrations(EnvironmentManager $envManager): JsonResponse
     {
         $result = $envManager->runMigrations();
+        return response()->json($result);
+    }
+
+    public function seedDatabase(EnvironmentManager $envManager): JsonResponse
+    {
+        $result = $envManager->seedDatabase();
         return response()->json($result);
     }
 

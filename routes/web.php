@@ -713,6 +713,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings/environment/test-s3', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testS3'])->name('settings.environment.test-s3');
         Route::post('/settings/environment/test-mail', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testMail'])->name('settings.environment.test-mail');
         Route::post('/settings/environment/run-migrations', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'runMigrations'])->name('settings.environment.run-migrations');
+        Route::post('/settings/environment/seed-db', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'seedDatabase'])->name('settings.environment.seed-db');
         Route::post('/settings/environment/restore-backup', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'restoreBackup'])->name('settings.environment.restore-backup');
     });
 });

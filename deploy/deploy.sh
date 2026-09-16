@@ -26,13 +26,22 @@ if command -v npm &> /dev/null; then
     npm run build
 fi
 
-echo "=== [5/6] Running Database Migrations & Rebuilding Caches ==="
-php artisan migrate --force
+# Self-healing safeguard: Ensure SESSION_DRIVER=file so database drops never crash sessions
+if [ -f "$APP_DIR/.env" ]; then
+    sed -i 's/^SESSION_DRIVER=database/SESSION_DRIVER=file/' "$APP_DIR/.env"
+    # Auto-convert direct Supabase IPv6 host to IPv4 pooler if present
+    sed -i 's/db\.vfeqqwdewvqpjieqktml\.supabase\.co/aws-0-ap-south-1.pooler.supabase.com/g' "$APP_DIR/.env"
+    sed -i 's/DB_USERNAME=postgres$/DB_USERNAME=postgres.vfeqqwdewvqpjieqktml/g' "$APP_DIR/.env"
+fi
 
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-php artisan event:cache
+echo "=== [5/6] Running Database Migrations & Rebuilding Caches ==="
+php artisan config:clear || true
+php artisan migrate --force || echo "Notice: Database migration skipped or database currently unreachable."
+
+php artisan config:cache || php artisan config:clear || true
+php artisan route:cache || php artisan route:clear || true
+php artisan view:cache || php artisan view:clear || true
+php artisan event:cache || php artisan event:clear || true
 
 # Ensure storage and database permissions remain correct
 sudo chown -R ubuntu:www-data "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/database"

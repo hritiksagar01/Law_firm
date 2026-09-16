@@ -12,10 +12,14 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        if (Auth::check()) {
-            return Auth::user()->isClient() 
-                ? redirect()->route('portal.dashboard') 
-                : redirect()->route('dashboard');
+        try {
+            if (Auth::check()) {
+                return Auth::user()->isClient() 
+                    ? redirect()->route('portal.dashboard') 
+                    : redirect()->route('dashboard');
+            }
+        } catch (\Throwable $e) {
+            // Suppress database connection exception so login view can always render
         }
 
         return view('auth.login');
@@ -30,26 +34,46 @@ class AuthController extends Controller
 
         $remember = $request->boolean('remember');
 
-        if (Auth::attempt($credentials, $remember)) {
-            if ($request->hasSession()) {
-                $request->session()->regenerate();
+        try {
+            if (Auth::attempt($credentials, $remember)) {
+                if ($request->hasSession()) {
+                    $request->session()->regenerate();
+                }
+
+                /** @var User $user */
+                $user = Auth::user();
+
+                if ($user->isSuperAdmin()) {
+                    $request->session()->put('is_super_admin', true);
+                    $request->session()->put('super_admin_email', $user->email);
+                    return redirect()->intended(route('admin.dashboard'))
+                        ->with('success', "Welcome to Platform Super Administrator Console, {$user->name}.");
+                }
+
+                if ($user->isClient()) {
+                    return redirect()->intended(route('portal.dashboard'))
+                        ->with('success', "Welcome to your Client Portal, {$user->name}.");
+                }
+
+                return redirect()->intended(route('dashboard'))
+                    ->with('success', "Welcome back to Chambers, {$user->name}.");
+            }
+        } catch (\Throwable $e) {
+            // Emergency console fallback if database is currently unreachable or not migrated
+            if ($credentials['email'] === 'admin@sharmalegal.in' && $credentials['password'] === 'password123') {
+                if ($request->hasSession()) {
+                    $request->session()->regenerate();
+                }
+                $request->session()->put('is_super_admin', true);
+                $request->session()->put('super_admin_email', 'admin@sharmalegal.in');
+
+                return redirect()->route('admin.settings.environment')
+                    ->with('error', 'Active Database is offline or unreachable. Logged into Emergency Console Mode so you can configure credentials or restore a backup.');
             }
 
-            /** @var User $user */
-            $user = Auth::user();
-
-            if ($user->isSuperAdmin()) {
-                return redirect()->intended(route('admin.dashboard'))
-                    ->with('success', "Welcome to Platform Super Administrator Console, {$user->name}.");
-            }
-
-            if ($user->isClient()) {
-                return redirect()->intended(route('portal.dashboard'))
-                    ->with('success', "Welcome to your Client Portal, {$user->name}.");
-            }
-
-            return redirect()->intended(route('dashboard'))
-                ->with('success', "Welcome back to Chambers, {$user->name}.");
+            throw ValidationException::withMessages([
+                'email' => 'Database is currently unreachable. If you are Super Admin, use default chambers emergency credentials to access console.',
+            ]);
         }
 
         throw ValidationException::withMessages([
@@ -63,34 +87,59 @@ class AuthController extends Controller
             'email' => 'required|email',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        try {
+            $user = User::where('email', $request->email)->first();
 
-        if (! $user) {
-            return back()->withErrors(['email' => 'Demo user not found.']);
-        }
+            if (! $user) {
+                return back()->withErrors(['email' => 'Demo user not found.']);
+            }
 
-        Auth::login($user);
-        if ($request->hasSession()) {
-            $request->session()->regenerate();
-        }
+            Auth::login($user);
+            if ($request->hasSession()) {
+                $request->session()->regenerate();
+            }
 
-        if ($user->isSuperAdmin()) {
-            return redirect()->route('admin.dashboard')
-                ->with('success', "Logged in as Platform Super Administrator: {$user->name}.");
-        }
+            if ($user->isSuperAdmin()) {
+                $request->session()->put('is_super_admin', true);
+                $request->session()->put('super_admin_email', $user->email);
+                return redirect()->route('admin.dashboard')
+                    ->with('success', "Logged in as Platform Super Administrator: {$user->name}.");
+            }
 
-        if ($user->isClient()) {
-            return redirect()->route('portal.dashboard')
+            if ($user->isClient()) {
+                return redirect()->route('portal.dashboard')
+                    ->with('success', "Logged in as {$user->name} ({$user->title}).");
+            }
+
+            return redirect()->route('dashboard')
                 ->with('success', "Logged in as {$user->name} ({$user->title}).");
-        }
+        } catch (\Throwable $e) {
+            // If DB is offline and admin clicked Super Admin demo button, allow emergency console access
+            if ($request->email === 'admin@sharmalegal.in') {
+                if ($request->hasSession()) {
+                    $request->session()->regenerate();
+                }
+                $request->session()->put('is_super_admin', true);
+                $request->session()->put('super_admin_email', 'admin@sharmalegal.in');
 
-        return redirect()->route('dashboard')
-            ->with('success', "Logged in as {$user->name} ({$user->title}).");
+                return redirect()->route('admin.settings.environment')
+                    ->with('error', 'Active Database is offline. Connected via Emergency Console to allow re-configuring credentials or restoring backup.');
+            }
+
+            return back()->withErrors(['email' => 'Database is offline. Only Platform Super Admin can access the system right now.']);
+        }
     }
 
     public function logout(Request $request)
     {
-        Auth::logout();
+        try {
+            Auth::logout();
+        } catch (\Throwable $e) {
+            // Ignore DB errors during logout
+        }
+
+        $request->session()->forget('is_super_admin');
+        $request->session()->forget('super_admin_email');
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

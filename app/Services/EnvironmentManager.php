@@ -478,4 +478,27 @@ class EnvironmentManager
             ];
         }
     }
+
+    /**
+     * Run database seeding to populate default users & practice dossiers.
+     */
+    public function seedDatabase(): array
+    {
+        try {
+            Artisan::call('db:seed', ['--force' => true]);
+            $output = Artisan::output();
+
+            return [
+                'success' => true,
+                'message' => 'Chambers database seeded with default users and matters successfully!',
+                'output' => trim($output),
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Database seeding failed: ' . $e->getMessage(),
+                'output' => $e->getTraceAsString(),
+            ];
+        }
+    }
 }

@@ -22,6 +22,7 @@
     testingMail: false,
     mailResult: null,
     runningMigrations: false,
+    seedingDb: false,
     migrationResult: null,
     showMigrationModal: false
 }">
@@ -305,7 +306,16 @@
                         class="px-3.5 py-2 rounded-lg bg-[#845D33] hover:bg-[#6D4B27] text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
                         <span x-show="!runningMigrations" class="material-symbols-outlined text-sm text-[#B88B56]">schema</span>
                         <span x-show="runningMigrations" class="material-symbols-outlined text-sm animate-spin">refresh</span>
-                        <span x-text="runningMigrations ? 'Running Migrations...' : 'Run Migrations &amp; Seed'"></span>
+                        <span x-text="runningMigrations ? 'Running Migrations...' : 'Run Migrations'"></span>
+                    </button>
+
+                    <button type="button" 
+                        @click="seedDatabase()"
+                        :disabled="seedingDb"
+                        class="px-3.5 py-2 rounded-lg bg-[#F8F4EE] hover:bg-[#F0EAE0] text-[#845D33] border border-[#E8DAC8] text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
+                        <span x-show="!seedingDb" class="material-symbols-outlined text-sm text-[#845D33]">group_add</span>
+                        <span x-show="seedingDb" class="material-symbols-outlined text-sm animate-spin">refresh</span>
+                        <span x-text="seedingDb ? 'Seeding Practice Data...' : 'Seed Practice Data &amp; Users'"></span>
                     </button>
                 </div>
             </div>
@@ -315,7 +325,7 @@
                 <span class="material-symbols-outlined text-base text-amber-700 shrink-0 mt-0.5">warning</span>
                 <div class="leading-relaxed">
                     <strong class="font-semibold text-amber-950">Important Database Safety Notice:</strong>
-                    Always click <strong class="font-semibold">"Test DB Connection"</strong> before saving new database credentials. If you point to a fresh empty database (e.g. on Supabase or AWS RDS), click <strong class="font-semibold">"Run Migrations &amp; Seed"</strong> to provision all law firm tables.
+                    Always click <strong class="font-semibold">"Test DB Connection"</strong> before saving new database credentials. If you point to a fresh empty database (e.g. on Supabase or AWS RDS), click <strong class="font-semibold">"Run Migrations"</strong> and then <strong class="font-semibold">"Seed Practice Data &amp; Users"</strong> to provision all law firm tables and user profiles.
                 </div>
             </div>
 
@@ -360,6 +370,24 @@
                         <li>Username: <span class="text-[#845D33] font-bold">postgres.[project-ref]</span> (Must include <span class="text-[#845D33]">.[project-ref]</span>)</li>
                         <li>Database: <span class="text-[#845D33] font-bold">postgres</span></li>
                     </ul>
+                </div>
+            </div>
+
+            <!-- Quick 1-Click Database Presets -->
+            <div class="mb-5 flex flex-wrap items-center justify-between gap-3 p-3.5 bg-[#FAF8F5] rounded-xl border border-[#EAE4DC]">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-base text-[#845D33]">auto_fix_high</span>
+                    <span class="text-xs text-[#222222] font-semibold">1-Click Configuration Presets:</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" @click="applyPreset('supabase')" class="px-3 py-1.5 rounded-lg text-xs bg-white hover:bg-[#F8F4EE] text-[#845D33] border border-[#E8DAC8] font-semibold flex items-center gap-1.5 shadow-2xs transition-colors">
+                        <span class="material-symbols-outlined text-sm text-[#B88B56]">cloud_sync</span>
+                        <span>Supabase IPv4 Pooler (Mumbai)</span>
+                    </button>
+                    <button type="button" @click="applyPreset('sqlite')" class="px-3 py-1.5 rounded-lg text-xs bg-white hover:bg-[#FAF8F5] text-[#554D45] border border-[#EAE4DC] font-medium flex items-center gap-1.5 shadow-2xs transition-colors">
+                        <span class="material-symbols-outlined text-sm text-[#766A5E]">save_as</span>
+                        <span>Local SQLite (Safe Failsafe)</span>
+                    </button>
                 </div>
             </div>
 
@@ -904,6 +932,56 @@
                 alpine.runningMigrations = false;
                 alpine.migrationResult = { success: false, message: 'Migration execution error', output: err.message };
             });
+        }
+
+        function seedDatabase() {
+            if (!confirm('Seed chambers practice data now? This will insert default legal matters, client files, and user profiles (Rajesh Sharma, Priya Nair, Platform Super Admin) into the active database.')) {
+                return;
+            }
+
+            const alpine = Alpine.$data(document.body);
+            alpine.seedingDb = true;
+            alpine.migrationResult = null;
+
+            fetch('{{ route('admin.settings.environment.seed-db') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                alpine.seedingDb = false;
+                alpine.migrationResult = data;
+            })
+            .catch(err => {
+                alpine.seedingDb = false;
+                alpine.migrationResult = { success: false, message: 'Database seeding error', output: err.message };
+            });
+        }
+
+        function applyPreset(type) {
+            if (type === 'supabase') {
+                document.getElementById('db_driver').value = 'pgsql';
+                document.getElementById('db_host').value = 'aws-0-ap-south-1.pooler.supabase.com';
+                document.getElementById('db_port').value = '5432';
+                document.getElementById('db_database').value = 'postgres';
+                const currUser = document.getElementById('db_username').value;
+                if (!currUser || currUser === 'postgres' || currUser === 'root') {
+                    document.getElementById('db_username').value = 'postgres.vfeqqwdewvqpjieqktml';
+                }
+                alert('Supabase IPv4 Pooler preset applied! Make sure to verify your Supabase Database Password, then click "Test DB Connection".');
+            } else if (type === 'sqlite') {
+                document.getElementById('db_driver').value = 'sqlite';
+                document.getElementById('db_host').value = '127.0.0.1';
+                document.getElementById('db_port').value = '3306';
+                document.getElementById('db_database').value = 'database/database.sqlite';
+                document.getElementById('db_username').value = '';
+                document.getElementById('db_password').value = '';
+                alert('Local SQLite (Safe Failsafe) preset applied! Click "Test DB Connection" or "Save Database Settings".');
+            }
         }
     </script>
 </body>
