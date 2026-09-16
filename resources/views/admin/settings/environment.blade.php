@@ -343,6 +343,26 @@
                 </div>
             </template>
 
+            <!-- Supabase on AWS EC2 IPv4 Advisory -->
+            <div class="mb-6 p-4 rounded-xl bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] flex items-start gap-3 shadow-xs">
+                <span class="material-symbols-outlined text-[#845D33] text-lg shrink-0 mt-0.5">info</span>
+                <div class="space-y-1">
+                    <strong class="font-bold text-[#845D33] block">Connecting to Supabase PostgreSQL from AWS EC2?</strong>
+                    <p class="text-[#554D45] leading-relaxed">
+                        Supabase direct connection hosts (<code class="font-mono text-[#845D33]">db.[ref].supabase.co</code>) resolve to <strong>IPv6-only</strong> addresses, which standard AWS EC2 instances cannot route to directly, causing <code class="font-mono text-red-700">Network is unreachable</code>.
+                    </p>
+                    <p class="text-[#554D45] leading-relaxed font-medium">
+                        Always use the <strong>Supabase Connection Pooler (IPv4)</strong> in your configuration:
+                    </p>
+                    <ul class="list-disc list-inside text-[11px] font-mono text-[#766A5E] space-y-0.5 mt-1 bg-white p-2.5 rounded-lg border border-[#EFECE6]">
+                        <li>Host: <span class="text-[#845D33] font-bold">aws-0-[region].pooler.supabase.com</span> (e.g. <span class="text-[#845D33]">aws-0-ap-south-1.pooler.supabase.com</span>)</li>
+                        <li>Port: <span class="text-[#845D33] font-bold">5432</span> (Session Mode for Laravel)</li>
+                        <li>Username: <span class="text-[#845D33] font-bold">postgres.[project-ref]</span> (Must include <span class="text-[#845D33]">.[project-ref]</span>)</li>
+                        <li>Database: <span class="text-[#845D33] font-bold">postgres</span></li>
+                    </ul>
+                </div>
+            </div>
+
             <form action="{{ route('admin.settings.environment.update') }}" method="POST" id="dbForm">
                 @csrf
                 <input type="hidden" name="_form_section" value="database"/>

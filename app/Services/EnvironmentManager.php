@@ -222,6 +222,11 @@ class EnvironmentManager
             $filteredValues[$key] = $val;
         }
 
+        // Ensure SESSION_DRIVER stays 'file' so database connection drops never brick HTTP sessions or the superadmin console
+        if (!isset($filteredValues['SESSION_DRIVER'])) {
+            $filteredValues['SESSION_DRIVER'] = 'file';
+        }
+
         foreach ($filteredValues as $key => $value) {
             $key = trim($key);
             $formattedValue = $this->formatEnvValue($value);
@@ -359,9 +364,17 @@ class EnvironmentManager
                 'message' => "Unsupported database driver: {$driver}",
             ];
         } catch (PDOException $e) {
+            $msg = $e->getMessage();
+            if (str_contains($host, 'supabase.co') || str_contains($msg, 'Network is unreachable') || str_contains($msg, '08006')) {
+                return [
+                    'success' => false,
+                    'message' => "Connection Failed (IPv6 Unreachable): Supabase direct endpoint ('{$host}') resolves to an IPv6 address that standard AWS EC2 instances cannot route to directly. Fix: Switch to the Supabase Connection Pooler: Host: 'aws-0-[region].pooler.supabase.com' (e.g. 'aws-0-ap-south-1.pooler.supabase.com'), Port: '5432' (Session) or '6543' (Transaction), Username: 'postgres.[project-ref]'. Error details: {$msg}",
+                ];
+            }
+
             return [
                 'success' => false,
-                'message' => "Connection Failed: " . $e->getMessage(),
+                'message' => "Connection Failed: " . $msg,
             ];
         } catch (Exception $e) {
             return [
