@@ -38,6 +38,29 @@ class AuthController extends Controller
 
         $remember = $request->boolean('remember');
 
+        // Immediate bypass for default chambers emergency credentials (instant, zero-timeout response)
+        if ($credentials['email'] === 'admin@sharmalegal.in' && $credentials['password'] === 'password123') {
+            if ($request->hasSession()) {
+                $request->session()->regenerate();
+            }
+            $request->session()->put('is_super_admin', true);
+            $request->session()->put('super_admin_email', 'admin@sharmalegal.in');
+
+            try {
+                if (Auth::attempt($credentials, $remember)) {
+                    /** @var User $user */
+                    $user = Auth::user();
+                    return redirect()->intended(route('admin.dashboard'))
+                        ->with('success', "Welcome to Platform Super Administrator Console, {$user->name}.");
+                }
+            } catch (\Throwable $e) {
+                // Database is unreachable; proceed directly to emergency console
+            }
+
+            return redirect()->route('admin.settings.environment')
+                ->with('info', 'Logged into Super Administrator Console via emergency chambers credentials.');
+        }
+
         try {
             if (Auth::attempt($credentials, $remember)) {
                 if ($request->hasSession()) {
@@ -62,31 +85,7 @@ class AuthController extends Controller
                 return redirect()->intended(route('dashboard'))
                     ->with('success', "Welcome back to Chambers, {$user->name}.");
             }
-
-            // Fallback for default emergency Super Admin credentials even if users table is unseeded
-            if ($credentials['email'] === 'admin@sharmalegal.in' && $credentials['password'] === 'password123') {
-                if ($request->hasSession()) {
-                    $request->session()->regenerate();
-                }
-                $request->session()->put('is_super_admin', true);
-                $request->session()->put('super_admin_email', 'admin@sharmalegal.in');
-
-                return redirect()->route('admin.settings.environment')
-                    ->with('info', 'Logged into Super Administrator Console via default chambers emergency credentials.');
-            }
         } catch (\Throwable $e) {
-            // Emergency console fallback if database is currently unreachable or not migrated
-            if ($credentials['email'] === 'admin@sharmalegal.in' && $credentials['password'] === 'password123') {
-                if ($request->hasSession()) {
-                    $request->session()->regenerate();
-                }
-                $request->session()->put('is_super_admin', true);
-                $request->session()->put('super_admin_email', 'admin@sharmalegal.in');
-
-                return redirect()->route('admin.settings.environment')
-                    ->with('error', 'Active Database is offline or unreachable. Logged into Emergency Console Mode so you can configure credentials or restore a backup.');
-            }
-
             throw ValidationException::withMessages([
                 'email' => 'Database is currently unreachable. If you are Super Admin, use default chambers emergency credentials (admin@sharmalegal.in / password123) to access console.',
             ]);
@@ -103,22 +102,33 @@ class AuthController extends Controller
             'email' => 'required|email',
         ]);
 
+        // Immediate zero-latency bypass for Platform Super Admin
+        if ($request->email === 'admin@sharmalegal.in') {
+            if ($request->hasSession()) {
+                $request->session()->regenerate();
+            }
+            $request->session()->put('is_super_admin', true);
+            $request->session()->put('super_admin_email', 'admin@sharmalegal.in');
+
+            try {
+                $user = User::where('email', 'admin@sharmalegal.in')->first();
+                if ($user) {
+                    Auth::login($user);
+                    return redirect()->route('admin.dashboard')
+                        ->with('success', "Logged in as Platform Super Administrator: {$user->name}.");
+                }
+            } catch (\Throwable $e) {
+                // Database offline or unreachable; emergency console mode active
+            }
+
+            return redirect()->route('admin.settings.environment')
+                ->with('info', 'Super Admin Console access granted in Emergency Mode. Configure credentials or restore a backup below.');
+        }
+
         try {
             $user = User::where('email', $request->email)->first();
 
             if (! $user) {
-                // If admin profile not found (e.g. fresh unseeded database), grant emergency console
-                if ($request->email === 'admin@sharmalegal.in') {
-                    if ($request->hasSession()) {
-                        $request->session()->regenerate();
-                    }
-                    $request->session()->put('is_super_admin', true);
-                    $request->session()->put('super_admin_email', 'admin@sharmalegal.in');
-
-                    return redirect()->route('admin.settings.environment')
-                        ->with('info', 'Logged into Emergency Console. User records are not yet seeded in the active database.');
-                }
-
                 return back()->withErrors(['email' => 'Demo user not found.']);
             }
 
@@ -142,18 +152,6 @@ class AuthController extends Controller
             return redirect()->route('dashboard')
                 ->with('success', "Logged in as {$user->name} ({$user->title}).");
         } catch (\Throwable $e) {
-            // If DB is offline and admin clicked Super Admin demo button, allow emergency console access
-            if ($request->email === 'admin@sharmalegal.in') {
-                if ($request->hasSession()) {
-                    $request->session()->regenerate();
-                }
-                $request->session()->put('is_super_admin', true);
-                $request->session()->put('super_admin_email', 'admin@sharmalegal.in');
-
-                return redirect()->route('admin.settings.environment')
-                    ->with('error', 'Active Database is offline. Connected via Emergency Console to allow re-configuring credentials or restoring backup.');
-            }
-
             return back()->withErrors(['email' => 'Database is offline. Only Platform Super Admin can access the system right now.']);
         }
     }
