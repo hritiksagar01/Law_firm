@@ -825,7 +825,7 @@
             alpine.testingDb = true;
             alpine.dbResult = null;
 
-            fetch('{{ route('admin.settings.environment.test-db') }}', {
+            fetch('/admin/settings/environment/test-db', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -859,7 +859,7 @@
             alpine.testingS3 = true;
             alpine.s3Result = null;
 
-            fetch('{{ route('admin.settings.environment.test-s3') }}', {
+            fetch('/admin/settings/environment/test-s3', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -890,7 +890,7 @@
             alpine.testingMail = true;
             alpine.mailResult = null;
 
-            fetch('{{ route('admin.settings.environment.test-mail') }}', {
+            fetch('/admin/settings/environment/test-mail', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -919,7 +919,7 @@
             alpine.runningMigrations = true;
             alpine.migrationResult = null;
 
-            fetch('{{ route('admin.settings.environment.run-migrations') }}', {
+            fetch('/admin/settings/environment/run-migrations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -947,7 +947,7 @@
             alpine.seedingDb = true;
             alpine.migrationResult = null;
 
-            fetch('{{ route('admin.settings.environment.seed-db') }}', {
+            fetch('/admin/settings/environment/seed-db', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

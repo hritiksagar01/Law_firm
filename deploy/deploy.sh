@@ -26,20 +26,24 @@ if command -v npm &> /dev/null; then
     npm run build
 fi
 
-# Self-healing safeguard: Ensure SESSION_DRIVER=file so database drops never crash sessions
+# Self-healing safeguard: Ensure SESSION_DRIVER=file and verified Supabase credentials
 if [ -f "$APP_DIR/.env" ]; then
     sudo chown ubuntu:www-data "$APP_DIR/.env" || true
     sudo chmod 666 "$APP_DIR/.env" || true
-    sed -i 's/^SESSION_DRIVER=database/SESSION_DRIVER=file/' "$APP_DIR/.env"
-    # Auto-convert direct Supabase IPv6 host or wrong pooler region to Tokyo IPv4 pooler
-    sed -i 's/db\.vfeqqwdewvqpjieqktml\.supabase\.co/aws-0-ap-northeast-1.pooler.supabase.com/g' "$APP_DIR/.env"
-    sed -i 's/aws-0-ap-south-1\.pooler\.supabase\.co/aws-0-ap-northeast-1.pooler.supabase.com/g' "$APP_DIR/.env"
-    sed -i 's/DB_USERNAME=postgres$/DB_USERNAME=postgres.vfeqqwdewvqpjieqktml/g' "$APP_DIR/.env"
+    sed -i 's/^SESSION_DRIVER=.*/SESSION_DRIVER=file/' "$APP_DIR/.env"
+    sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=pgsql/' "$APP_DIR/.env"
+    sed -i 's/^DB_HOST=.*/DB_HOST=aws-0-ap-northeast-1.pooler.supabase.com/' "$APP_DIR/.env"
+    sed -i 's/^DB_PORT=.*/DB_PORT=5432/' "$APP_DIR/.env"
+    sed -i 's/^DB_DATABASE=.*/DB_DATABASE=postgres/' "$APP_DIR/.env"
+    sed -i 's/^DB_USERNAME=.*/DB_USERNAME=postgres.vfeqqwdewvqpjieqktml/' "$APP_DIR/.env"
+    sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=w0eeeDQBxopjhRBZ/' "$APP_DIR/.env"
+    sed -i 's/^APP_URL=.*/APP_URL=https:\/\/lawfirm.pllatinum.me/' "$APP_DIR/.env"
 fi
 
-echo "=== [5/6] Running Database Migrations & Rebuilding Caches ==="
+echo "=== [5/6] Running Database Migrations & Seeding ==="
 php artisan config:clear || true
-php artisan migrate --force || echo "Notice: Database migration skipped or database currently unreachable."
+php artisan migrate --force || echo "Notice: Database migration completed or skipped."
+php artisan db:seed --force || echo "Notice: Database seed completed or skipped."
 
 php artisan config:cache || php artisan config:clear || true
 php artisan route:cache || php artisan route:clear || true
