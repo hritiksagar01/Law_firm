@@ -319,15 +319,29 @@ class EnvironmentManager
         try {
             if ($driver === 'sqlite') {
                 $path = empty($database) ? database_path('database.sqlite') : $database;
-                if (!File::exists($path)) {
-                    $dir = dirname($path);
-                    if (!File::isWritable($dir)) {
-                        return [
-                            'success' => false,
-                            'message' => "SQLite directory is not writable: {$dir}",
-                        ];
-                    }
+
+                // If path is relative (e.g. database/database.sqlite), resolve relative to application base path
+                if (!str_starts_with($path, '/') && !preg_match('/^[A-Za-z]:[\\\\\/]/', $path)) {
+                    $path = base_path($path);
                 }
+
+                $dir = dirname($path);
+                if (!File::isDirectory($dir)) {
+                    File::makeDirectory($dir, 0775, true, true);
+                }
+
+                if (!File::exists($path)) {
+                    @touch($path);
+                    @chmod($path, 0666);
+                }
+
+                if (!is_writable($path) && !is_writable($dir)) {
+                    return [
+                        'success' => false,
+                        'message' => "SQLite database file or directory is not writable: {$path}",
+                    ];
+                }
+
                 $pdo = new PDO("sqlite:" . $path);
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $stmt = $pdo->query('SELECT sqlite_version() as version');
@@ -335,7 +349,7 @@ class EnvironmentManager
 
                 return [
                     'success' => true,
-                    'message' => "SQLite connected successfully! Engine Version: {$version}. File: {$path}",
+                    'message' => "SQLite connected successfully! Engine Version: {$version}. Database: {$path}",
                 ];
             }
 
