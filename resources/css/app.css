@@ -5,62 +5,144 @@
 @source '../views/**/*.blade.php';
 
 @theme {
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-    --font-serif: 'Playfair Display', Georgia, serif;
+    /* Juris Prestige Typography */
+    --font-sans: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-serif: 'EB Garamond', Garamond, Georgia, serif;
     --font-mono: 'JetBrains Mono', monospace;
 
-    --color-primary: #022616;
-    --color-primary-container: #1a3c2a;
+    /* Juris Prestige Color Palette */
+    --color-primary: #845D33;
+    --color-primary-container: #F8F4EE;
     --color-on-primary: #ffffff;
-    --color-on-primary-container: #82a78f;
-    --color-primary-fixed: #c5ecd2;
-    --color-primary-fixed-dim: #a9cfb6;
-    --color-on-primary-fixed: #002112;
-    --color-on-primary-fixed-variant: #2c4e3a;
+    --color-on-primary-container: #845D33;
+    --color-primary-fixed: #F4ECE1;
+    --color-primary-fixed-dim: #E8DAC8;
+    --color-on-primary-fixed: #442E15;
+    --color-on-primary-fixed-variant: #6D4B27;
 
-    --color-secondary: #755b00;
-    --color-secondary-container: #fed977;
+    --color-secondary: #B88B56;
+    --color-secondary-container: #FAF4EB;
     --color-on-secondary: #ffffff;
-    --color-on-secondary-container: #785d00;
-    --color-secondary-fixed: #ffe08f;
-    --color-secondary-fixed-dim: #e6c364;
+    --color-on-secondary-container: #6D4B27;
+    --color-secondary-fixed: #F5EADB;
+    --color-secondary-fixed-dim: #E8D3B8;
 
-    --color-tertiary: #1c221f;
-    --color-tertiary-container: #313733;
+    --color-tertiary: #9E7244;
+    --color-tertiary-container: #FAF1E6;
     --color-on-tertiary: #ffffff;
-    --color-on-tertiary-container: #9aa09b;
-    --color-tertiary-fixed: #dee4df;
-    --color-tertiary-fixed-dim: #c2c8c3;
+    --color-on-tertiary-container: #5E3F1F;
+    --color-tertiary-fixed: #F5E6D3;
+    --color-tertiary-fixed-dim: #E5CCB0;
 
-    --color-surface: #faf9f6;
-    --color-surface-dim: #dbdad7;
-    --color-surface-bright: #faf9f6;
+    --color-neutral: #222222;
+    --color-neutral-variant: #554D45;
+
+    /* Clean White & Warm Ivory Surfaces (Zero Cold Slate Gray) */
+    --color-surface: #ffffff;
+    --color-surface-dim: #FAF8F5;
+    --color-surface-bright: #ffffff;
     --color-surface-container-lowest: #ffffff;
-    --color-surface-container-low: #f4f3f1;
-    --color-surface-container: #efeeeb;
-    --color-surface-container-high: #e9e8e5;
-    --color-surface-container-highest: #e3e2e0;
-    --color-surface-variant: #e3e2e0;
-    --color-surface-tint: #436651;
+    --color-surface-container-low: #FDFCFB;
+    --color-surface-container: #FAF8F5;
+    --color-surface-container-high: #F5F1EB;
+    --color-surface-container-highest: #EFECE6;
+    --color-surface-variant: #F4EFEA;
+    --color-surface-tint: #845D33;
 
-    --color-background: #faf9f6;
-    --color-on-background: #1a1c1a;
-    --color-on-surface: #1a1c1a;
-    --color-on-surface-variant: #424843;
+    --color-background: #FAF8F5;
+    --color-on-background: #222222;
+    --color-on-surface: #222222;
+    --color-on-surface-variant: #6B5E51;
 
-    --color-outline: #727973;
-    --color-outline-variant: #c1c8c1;
-    --color-error: #ba1a1a;
-    --color-error-container: #ffdad6;
+    --color-outline: #EFECE6;
+    --color-outline-variant: #E2DDD5;
+
+    --color-error: #9E2A2B;
+    --color-error-container: #FDF2F2;
     --color-on-error: #ffffff;
-    --color-on-error-container: #93000a;
+    --color-on-error-container: #781D1E;
 }
 
 @layer base {
+    html {
+        font-family: var(--font-sans);
+        color: #222222;
+        background-color: #FAF8F5;
+    }
+
     body {
         font-family: var(--font-sans);
-        background-color: var(--color-background);
-        color: var(--color-on-surface);
+        background-color: #FAF8F5;
+        color: #222222;
         -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
+
+    h1, h2, h3, .font-serif {
+        font-family: var(--font-serif);
+    }
+}
+
+/* Juris Prestige Buttons & UI Components */
+.btn-primary {
+    background-color: #845D33;
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    transition: all 0.15s ease-in-out;
+}
+.btn-primary:hover {
+    background-color: #6D4B27;
+}
+
+.btn-secondary {
+    background-color: #F8F4EE;
+    color: #845D33;
+    border: 1px solid #E6DDD1;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    transition: all 0.15s ease-in-out;
+}
+.btn-secondary:hover {
+    background-color: #F0EAE0;
+}
+
+.btn-outline {
+    background-color: #ffffff;
+    color: #845D33;
+    border: 1px solid #845D33;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    transition: all 0.15s ease-in-out;
+}
+.btn-outline:hover {
+    background-color: #845D33;
+    color: #ffffff;
+}
+
+.btn-inverted {
+    background-color: #222222;
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    transition: all 0.15s ease-in-out;
+}
+.btn-inverted:hover {
+    background-color: #383838;
+}
+
+/* Warm Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #FAF8F5;
+}
+::-webkit-scrollbar-thumb {
+    background: #E0D7CD;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #B88B56;
 }

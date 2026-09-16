@@ -7,12 +7,12 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#faf9f6] text-[#1a1c1a] font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4 relative" x-data="{
+<body class="bg-[#FAF8F5] text-[#222222] font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4 relative" x-data="{
     firmName: 'Verma & Associates, Advocates & Solicitors',
     practiceArea: 'Commercial Litigation & Arbitration',
     barNumber: 'D/1892/2010 (Bar Council of Delhi)',
@@ -30,18 +30,18 @@
 }">
 
     <!-- Atmospheric Warm Blur Accents -->
-    <div class="absolute top-1/6 -left-16 w-96 h-96 bg-[#c5ecd2]/25 rounded-full blur-3xl pointer-events-none -z-10"></div>
-    <div class="absolute bottom-10 -right-12 w-96 h-96 bg-[#fed977]/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="absolute top-1/6 -left-16 w-96 h-96 bg-[#F4ECE1]/25 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="absolute bottom-10 -right-12 w-96 h-96 bg-[#B88B56]/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
     <div class="w-full max-w-xl flex flex-col items-center my-8">
         
         <!-- Brand Emblem -->
         <div class="flex flex-col items-center text-center mb-6">
-            <div class="w-12 h-12 rounded-xl bg-[#1a3c2a] flex items-center justify-center text-white shadow-md mb-3">
-                <span class="material-symbols-outlined text-2xl text-[#fed977]">balance</span>
+            <div class="w-12 h-12 rounded-xl bg-[#845D33] flex items-center justify-center text-white shadow-md mb-3">
+                <span class="material-symbols-outlined text-2xl text-[#B88B56]">balance</span>
             </div>
-            <h1 class="text-2xl font-serif font-bold text-[#1a1c1a] tracking-tight">Establish Your Law Practice</h1>
-            <p class="text-[11px] font-mono uppercase tracking-widest text-[#727973] font-medium mt-1">
+            <h1 class="text-2xl font-serif font-bold text-[#222222] tracking-tight">Establish Your Law Practice</h1>
+            <p class="text-[11px] font-mono uppercase tracking-widest text-[#766A5E] font-medium mt-1">
                 Multi-Advocate Chambers · Court Dockets · Client Trust Ledger
             </p>
         </div>
@@ -55,14 +55,14 @@
         @endif
 
         <!-- Registration Dossier Card -->
-        <div class="w-full bg-white rounded-xl shadow-xl border border-[#e9e8e5] p-6 sm:p-8 flex flex-col relative">
+        <div class="w-full bg-white rounded-xl shadow-xl border border-[#EFECE6] p-6 sm:p-8 flex flex-col relative">
             
-            <div class="flex items-center justify-between pb-4 border-b border-[#efeeeb] mb-6">
+            <div class="flex items-center justify-between pb-4 border-b border-[#F4EFEA] mb-6">
                 <div class="flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full bg-[#1a3c2a] text-white flex items-center justify-center font-mono text-[11px] font-bold">§</span>
-                    <h2 class="text-sm font-semibold text-[#1a1c1a]">Law Practice Onboarding Protocol</h2>
+                    <span class="w-6 h-6 rounded-full bg-[#845D33] text-white flex items-center justify-center font-mono text-[11px] font-bold">§</span>
+                    <h2 class="text-sm font-semibold text-[#222222]">Law Practice Onboarding Protocol</h2>
                 </div>
-                <button type="button" @click="fillDemo()" class="text-[11px] font-mono text-[#1a3c2a] hover:underline flex items-center gap-1 bg-[#c5ecd2]/40 px-2 py-1 rounded">
+                <button type="button" @click="fillDemo()" class="text-[11px] font-mono text-[#845D33] hover:underline flex items-center gap-1 bg-[#F4ECE1]/40 px-2 py-1 rounded">
                     <span class="material-symbols-outlined text-xs">bolt</span>
                     <span>1-Click Fast Fill</span>
                 </button>
@@ -73,20 +73,20 @@
                 @csrf
 
                 <!-- Section 1: Firm Identity -->
-                <div class="bg-[#faf9f6] p-4 rounded-lg border border-[#e9e8e5] flex flex-col gap-3">
-                    <span class="text-[10px] font-mono uppercase tracking-wider text-[#727973] font-semibold flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm text-[#1a3c2a]">domain</span>
+                <div class="bg-[#FAF8F5] p-4 rounded-lg border border-[#EFECE6] flex flex-col gap-3">
+                    <span class="text-[10px] font-mono uppercase tracking-wider text-[#766A5E] font-semibold flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm text-[#845D33]">domain</span>
                         <span>01 · Law Firm / Advocates Chambers Identity</span>
                     </span>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-medium text-[#1a1c1a]">Official Law Firm / Chambers Name</label>
-                            <input name="firm_name" x-model="firmName" type="text" required placeholder="e.g. Sharma &amp; Associates, Advocates" class="w-full px-3 py-2 rounded-lg bg-white border border-[#c1c8c1] text-xs text-[#1a1c1a] outline-none focus:border-[#1a3c2a] transition-all"/>
+                            <label class="text-xs font-medium text-[#222222]">Official Law Firm / Chambers Name</label>
+                            <input name="firm_name" x-model="firmName" type="text" required placeholder="e.g. Sharma &amp; Associates, Advocates" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#845D33] transition-all"/>
                         </div>
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-medium text-[#1a1c1a]">Primary Practice Discipline</label>
-                            <select name="practice_area" x-model="practiceArea" required class="w-full px-3 py-2 rounded-lg bg-white border border-[#c1c8c1] text-xs text-[#1a1c1a] outline-none focus:border-[#1a3c2a] transition-all">
+                            <label class="text-xs font-medium text-[#222222]">Primary Practice Discipline</label>
+                            <select name="practice_area" x-model="practiceArea" required class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#845D33] transition-all">
                                 @foreach(config('legal.practice_areas', ['Commercial Litigation & Arbitration', 'Corporate & Insolvency (IBC / NCLT)', 'Criminal Defense & Bail Matters']) as $area)
                                     <option value="{{ $area }}">{{ $area }}</option>
                                 @endforeach
@@ -96,12 +96,12 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-medium text-[#1a1c1a]">Bar Council Enrollment No. / License</label>
-                            <input name="bar_number" x-model="barNumber" type="text" placeholder="e.g. D/1420/2012" class="w-full px-3 py-2 rounded-lg bg-white border border-[#c1c8c1] text-xs text-[#1a1c1a] font-mono outline-none focus:border-[#1a3c2a]"/>
+                            <label class="text-xs font-medium text-[#222222]">Bar Council Enrollment No. / License</label>
+                            <input name="bar_number" x-model="barNumber" type="text" placeholder="e.g. D/1420/2012" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] font-mono outline-none focus:border-[#845D33]"/>
                         </div>
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-medium text-[#1a1c1a]">Primary Judicial Forum</label>
-                            <select class="w-full px-3 py-2 rounded-lg bg-white border border-[#c1c8c1] text-xs text-[#1a1c1a] outline-none focus:border-[#1a3c2a]">
+                            <label class="text-xs font-medium text-[#222222]">Primary Judicial Forum</label>
+                            <select class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#845D33]">
                                 @foreach(config('legal.courts', ['Supreme Court of India', 'High Court of Delhi']) as $court)
                                     <option value="{{ $court }}">{{ $court }}</option>
                                 @endforeach
@@ -111,52 +111,52 @@
                 </div>
 
                 <!-- Section 2: Managing Advocate Account -->
-                <div class="bg-[#faf9f6] p-4 rounded-lg border border-[#e9e8e5] flex flex-col gap-3">
-                    <span class="text-[10px] font-mono uppercase tracking-wider text-[#727973] font-semibold flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm text-[#1a3c2a]">badge</span>
+                <div class="bg-[#FAF8F5] p-4 rounded-lg border border-[#EFECE6] flex flex-col gap-3">
+                    <span class="text-[10px] font-mono uppercase tracking-wider text-[#766A5E] font-semibold flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm text-[#845D33]">badge</span>
                         <span>02 · Managing Advocate / Lead Counsel Account</span>
                     </span>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-medium text-[#1a1c1a]">Managing Advocate Full Name</label>
-                            <input name="name" x-model="partnerName" type="text" required placeholder="Adv. Rajesh Sharma" class="w-full px-3 py-2 rounded-lg bg-white border border-[#c1c8c1] text-xs text-[#1a1c1a] outline-none focus:border-[#1a3c2a]"/>
+                            <label class="text-xs font-medium text-[#222222]">Managing Advocate Full Name</label>
+                            <input name="name" x-model="partnerName" type="text" required placeholder="Adv. Rajesh Sharma" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#845D33]"/>
                         </div>
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-medium text-[#1a1c1a]">Chambers Email Address</label>
-                            <input name="email" x-model="email" type="email" required placeholder="counsel@sharmalegal.in" class="w-full px-3 py-2 rounded-lg bg-white border border-[#c1c8c1] text-xs text-[#1a1c1a] outline-none focus:border-[#1a3c2a]"/>
+                            <label class="text-xs font-medium text-[#222222]">Chambers Email Address</label>
+                            <input name="email" x-model="email" type="email" required placeholder="counsel@sharmalegal.in" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#845D33]"/>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-medium text-[#1a1c1a]">Master Password</label>
-                            <input name="password" x-ref="passwordInput" value="Chambers@2026" type="password" required placeholder="Minimum 8 characters" class="w-full px-3 py-2 rounded-lg bg-white border border-[#c1c8c1] text-xs text-[#1a1c1a] outline-none focus:border-[#1a3c2a]"/>
+                            <label class="text-xs font-medium text-[#222222]">Master Password</label>
+                            <input name="password" x-ref="passwordInput" value="Chambers@2026" type="password" required placeholder="Minimum 8 characters" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#845D33]"/>
                         </div>
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-medium text-[#1a1c1a]">Confirm Password</label>
-                            <input name="password_confirmation" x-ref="passwordConfirmInput" value="Chambers@2026" type="password" required placeholder="Re-enter password" class="w-full px-3 py-2 rounded-lg bg-white border border-[#c1c8c1] text-xs text-[#1a1c1a] outline-none focus:border-[#1a3c2a]"/>
+                            <label class="text-xs font-medium text-[#222222]">Confirm Password</label>
+                            <input name="password_confirmation" x-ref="passwordConfirmInput" value="Chambers@2026" type="password" required placeholder="Re-enter password" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:border-[#845D33]"/>
                         </div>
                     </div>
                 </div>
 
                 <!-- Terms & Bar Council Reassurance -->
-                <div class="p-3 bg-[#f0f9f4] rounded-lg border border-[#c5ecd2] flex items-start gap-2 text-xs text-[#2c4e3a]">
-                    <span class="material-symbols-outlined text-base text-[#1a3c2a] shrink-0 mt-0.5">verified</span>
+                <div class="p-3 bg-[#F8F4EE] rounded-lg border border-[#F4ECE1] flex items-start gap-2 text-xs text-[#845D33]">
+                    <span class="material-symbols-outlined text-base text-[#845D33] shrink-0 mt-0.5">verified</span>
                     <p class="leading-relaxed">
                         Advocate-client privilege, client advance retainers, and case records are maintained in compliance with the Advocates Act 1961 and Bar Council standards.
                     </p>
                 </div>
 
-                <button type="submit" class="w-full py-3 px-4 rounded-lg bg-[#1a3c2a] text-white text-xs font-semibold flex items-center justify-center gap-2 hover:bg-[#022616] shadow-md transition-all active:scale-[0.99] mt-2">
+                <button type="submit" class="w-full py-3 px-4 rounded-lg bg-[#845D33] text-white text-xs font-semibold flex items-center justify-center gap-2 hover:bg-[#6D4B27] shadow-md transition-all active:scale-[0.99] mt-2">
                     <span>Establish Practice &amp; Enter Dashboard</span>
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </button>
             </form>
 
-            <div class="mt-6 pt-4 border-t border-[#efeeeb] flex items-center justify-between text-xs">
-                <span class="text-[#727973]">Already have a chambers workspace?</span>
-                <a href="{{ route('login') }}" class="font-semibold text-[#1a3c2a] hover:underline flex items-center gap-1">
+            <div class="mt-6 pt-4 border-t border-[#F4EFEA] flex items-center justify-between text-xs">
+                <span class="text-[#766A5E]">Already have a chambers workspace?</span>
+                <a href="{{ route('login') }}" class="font-semibold text-[#845D33] hover:underline flex items-center gap-1">
                     <span>Sign In to Chambers</span>
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
@@ -166,17 +166,17 @@
 
         <!-- Compliance & Trust Badges -->
         <div class="w-full mt-4 grid grid-cols-3 gap-2 text-center">
-            <div class="bg-white/80 rounded-lg p-2 border border-[#e9e8e5] flex flex-col items-center">
-                <span class="material-symbols-outlined text-sm text-[#1a3c2a]">balance</span>
-                <span class="text-[10px] font-mono text-[#727973] mt-0.5">Bar Council Ready</span>
+            <div class="bg-white/80 rounded-lg p-2 border border-[#EFECE6] flex flex-col items-center">
+                <span class="material-symbols-outlined text-sm text-[#845D33]">balance</span>
+                <span class="text-[10px] font-mono text-[#766A5E] mt-0.5">Bar Council Ready</span>
             </div>
-            <div class="bg-white/80 rounded-lg p-2 border border-[#e9e8e5] flex flex-col items-center">
-                <span class="material-symbols-outlined text-sm text-[#1a3c2a]">shield</span>
-                <span class="text-[10px] font-mono text-[#727973] mt-0.5">Advocate Privilege</span>
+            <div class="bg-white/80 rounded-lg p-2 border border-[#EFECE6] flex flex-col items-center">
+                <span class="material-symbols-outlined text-sm text-[#845D33]">shield</span>
+                <span class="text-[10px] font-mono text-[#766A5E] mt-0.5">Advocate Privilege</span>
             </div>
-            <div class="bg-white/80 rounded-lg p-2 border border-[#e9e8e5] flex flex-col items-center">
-                <span class="material-symbols-outlined text-sm text-[#755b00]">currency_rupee</span>
-                <span class="text-[10px] font-mono text-[#727973] mt-0.5">₹ INR Accounting</span>
+            <div class="bg-white/80 rounded-lg p-2 border border-[#EFECE6] flex flex-col items-center">
+                <span class="material-symbols-outlined text-sm text-[#845D33]">currency_rupee</span>
+                <span class="text-[10px] font-mono text-[#766A5E] mt-0.5">₹ INR Accounting</span>
             </div>
         </div>
 
