@@ -236,12 +236,12 @@
 
                                 <!-- Delete Firm -->
                                 <form method="POST" action="{{ route('admin.firms.destroy', $firm) }}" class="inline" 
-                                      onsubmit="return confirm('Are you sure you want to delete law firm \'{{ addslashes($firm->name) }}\'? This cannot be undone.');">
+                                      onsubmit="return confirm('Permanently delete law firm \'{{ addslashes($firm->name) }}\'? All cases, documents, clients, and tenant accounts will be permanently purged. This action cannot be undone.');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" 
                                             class="p-1.5 rounded-lg text-[#766A5E] hover:text-rose-600 hover:bg-rose-50 transition-colors" 
-                                            title="Delete Firm">
+                                            title="Delete & Purge Firm">
                                         <span class="material-symbols-outlined text-lg">delete</span>
                                     </button>
                                 </form>

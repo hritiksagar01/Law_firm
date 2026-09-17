@@ -6,8 +6,10 @@
 @section('content')
 <div class="space-y-8" x-data="{ 
     addPlanModal: false,
+    editPlanModal: false,
     upgradeModal: false,
-    selectedFirm: null
+    selectedFirm: null,
+    editingPlan: { id: null, name: '', price: 0, max_users: 1, max_matters: 1, max_storage_gb: 1 }
 }">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -92,14 +94,24 @@
 
             <!-- Card Bottom Controls -->
             <div class="mt-6 pt-4 border-t border-[#EFECE6] flex items-center justify-between">
-                <!-- Toggle Active -->
-                <form method="POST" action="{{ route('admin.plans.toggle-active', $plan) }}">
-                    @csrf
-                    <button type="submit" 
-                            class="text-xs font-medium {{ $plan->is_active ? 'text-amber-700 hover:text-amber-800' : 'text-emerald-700 hover:text-emerald-800' }}">
-                        {{ $plan->is_active ? 'Deactivate' : 'Activate' }}
+                <div class="flex items-center gap-2">
+                    <!-- Toggle Active -->
+                    <form method="POST" action="{{ route('admin.plans.toggle-active', $plan) }}">
+                        @csrf
+                        <button type="submit" 
+                                class="text-xs font-medium {{ $plan->is_active ? 'text-amber-700 hover:text-amber-800' : 'text-emerald-700 hover:text-emerald-800' }}">
+                            {{ $plan->is_active ? 'Deactivate' : 'Activate' }}
+                        </button>
+                    </form>
+                    <span class="text-gray-300">•</span>
+                    <!-- Edit Plan Action -->
+                    <button type="button" 
+                            @click="editingPlan = { id: {{ $plan->id }}, name: '{{ addslashes($plan->name) }}', price: {{ $plan->price }}, max_users: {{ $plan->max_users }}, max_matters: {{ $plan->max_matters }}, max_storage_gb: {{ $plan->max_storage_gb }} }; editPlanModal = true"
+                            class="text-xs text-[#9F8349] hover:text-[#856C36] font-semibold inline-flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-sm">edit</span>
+                        <span>Edit</span>
                     </button>
-                </form>
+                </div>
 
                 <!-- Delete Action (Page 4) -->
                 <form method="POST" action="{{ route('admin.plans.destroy', $plan) }}" 
@@ -260,6 +272,53 @@
                 <div class="pt-3 border-t border-[#EFECE6] flex justify-end gap-2">
                     <button type="button" @click="addPlanModal = false" class="px-4 py-2 rounded-xl border border-[#EAE4DC] text-[#554D45]">Cancel</button>
                     <button type="submit" class="px-5 py-2 rounded-xl bg-[#9F8349] text-white font-semibold hover:bg-[#856C36]">Create Tier</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT PLAN TIER -->
+    <div x-show="editPlanModal" x-cloak class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div @click.away="editPlanModal = false" class="bg-white rounded-3xl shadow-2xl border border-[#EFECE6] w-full max-w-md p-6">
+            <div class="flex items-center justify-between border-b border-[#EFECE6] pb-3 mb-4">
+                <div class="flex items-center gap-2.5">
+                    <span class="material-symbols-outlined text-[#9F8349]">edit_note</span>
+                    <h3 class="font-serif font-bold text-lg text-[#222222]">Edit Subscription Plan Tier</h3>
+                </div>
+                <button @click="editPlanModal = false" class="text-[#766A5E] hover:text-[#222222]">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form :action="'/admin/plans/' + editingPlan.id" method="POST" class="space-y-3.5 text-xs">
+                @csrf
+                @method('PUT')
+                <div>
+                    <label class="block text-xs font-semibold text-[#554D45] mb-1">Plan Display Name *</label>
+                    <input type="text" name="name" x-model="editingPlan.name" required 
+                           class="w-full h-9 px-3 rounded-xl border border-[#EAE4DC] focus:border-[#9F8349] focus:outline-none"/>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-[#554D45] mb-1">Price (₹) *</label>
+                    <input type="number" name="price" x-model="editingPlan.price" required 
+                           class="w-full h-9 px-3 rounded-xl border border-[#EAE4DC] font-mono focus:border-[#9F8349] focus:outline-none"/>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-[#554D45] mb-1">Max Users</label>
+                        <input type="number" name="max_users" x-model="editingPlan.max_users" required class="w-full h-9 px-2 rounded-xl border border-[#EAE4DC] font-mono"/>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[#554D45] mb-1">Max Matters</label>
+                        <input type="number" name="max_matters" x-model="editingPlan.max_matters" required class="w-full h-9 px-2 rounded-xl border border-[#EAE4DC] font-mono"/>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[#554D45] mb-1">Storage (GB)</label>
+                        <input type="number" name="max_storage_gb" x-model="editingPlan.max_storage_gb" required class="w-full h-9 px-2 rounded-xl border border-[#EAE4DC] font-mono"/>
+                    </div>
+                </div>
+                <div class="pt-3 border-t border-[#EFECE6] flex justify-end gap-2">
+                    <button type="button" @click="editPlanModal = false" class="px-4 py-2 rounded-xl border border-[#EAE4DC] text-[#554D45]">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-[#9F8349] text-white font-semibold hover:bg-[#856C36]">Save Changes</button>
                 </div>
             </form>
         </div>

@@ -57,6 +57,15 @@
                     <span>{{ $firm->status === 'active' ? 'Suspend Practice' : 'Activate Practice' }}</span>
                 </button>
             </form>
+            <form method="POST" action="{{ route('admin.firms.destroy', $firm) }}" 
+                  onsubmit="return confirm('Permanently delete law firm \'{{ addslashes($firm->name) }}\'? All cases, documents, clients, and tenant accounts will be permanently purged. This action cannot be undone.');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 text-xs font-semibold hover:bg-rose-100 transition-all shadow-xs" title="Permanently Delete Law Firm">
+                    <span class="material-symbols-outlined text-base">delete</span>
+                    <span>Delete</span>
+                </button>
+            </form>
         </div>
     </div>
 

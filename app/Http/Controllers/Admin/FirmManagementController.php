@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 use App\Models\Plan;
 use App\Models\Subscription;
 
@@ -305,18 +307,60 @@ class FirmManagementController extends Controller
     }
 
     /**
-     * Delete firm if safe.
+     * Delete or permanently purge a law firm and its associated tenant data.
      */
-    public function destroy(Firm $firm): RedirectResponse
+    public function destroy(Request $request, Firm $firm): RedirectResponse
     {
-        if ($firm->matters()->count() > 0) {
-            return back()->with('error', "Cannot delete '{$firm->name}' because it has active legal matters. Mark it as Inactive instead.");
-        }
-
         $name = $firm->name;
-        $firm->delete();
+
+        DB::transaction(function () use ($firm) {
+            // 1. Clean up physical documents from storage
+            if (class_exists(\App\Models\Document::class)) {
+                $documents = \App\Models\Document::where('firm_id', $firm->id)->get();
+                foreach ($documents as $doc) {
+                    if (!empty($doc->file_path)) {
+                        try {
+                            Storage::disk('public')->delete($doc->file_path);
+                            Storage::delete($doc->file_path);
+                        } catch (\Throwable $e) {}
+                    }
+                }
+            }
+
+            // 2. Remove all related tenant data across all child tables to prevent foreign key errors
+            $childTables = [
+                'matter_user', 'time_entries', 'documents', 'document_requests',
+                'events', 'tasks', 'messages', 'opinions', 'appointments',
+                'case_notes', 'note_categories', 'invoices', 'expenses',
+                'transactions', 'bank_accounts', 'matters', 'clients',
+                'practice_area_tasks', 'practice_areas', 'holidays',
+                'email_templates', 'letter_templates', 'notification_templates',
+                'activity_categories', 'id_types', 'user_groups', 'roles',
+                'subscriptions'
+            ];
+
+            foreach ($childTables as $table) {
+                if (Schema::hasTable($table)) {
+                    if (Schema::hasColumn($table, 'firm_id')) {
+                        DB::table($table)->where('firm_id', $firm->id)->delete();
+                    }
+                }
+            }
+
+            // 3. Remove tenant-specific user accounts (preserving any superadmin)
+            User::where('firm_id', $firm->id)
+                ->where('role', '!=', 'superadmin')
+                ->delete();
+
+            User::where('firm_id', $firm->id)
+                ->where('role', 'superadmin')
+                ->update(['firm_id' => null]);
+
+            // 4. Delete the firm itself
+            $firm->delete();
+        });
 
         return redirect()->route('admin.firms.index')
-            ->with('success', "Law firm '{$name}' was deleted.");
+            ->with('success', "Law firm '{$name}' and all associated tenant records were permanently deleted.");
     }
 }
