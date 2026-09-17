@@ -32,7 +32,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <span class="font-mono text-[11px] uppercase tracking-wider text-[#766A5E]">Active Case Dossiers</span>
-                    <div class="text-3xl font-serif font-bold text-[#222222] mt-1">{{ \App\Models\Matter::count() }}</div>
+                    <div class="text-3xl font-serif font-bold text-[#222222] mt-1">{{ $mattersCount ?? \App\Models\Matter::where('firm_id', auth()->user()->firm_id ?? 1)->count() }}</div>
                 </div>
                 <div class="w-10 h-10 rounded-lg bg-[#F4EFEA] flex items-center justify-center text-[#9F8349]">
                     <span class="material-symbols-outlined text-xl">gavel</span>
@@ -51,7 +51,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <span class="font-mono text-[11px] uppercase tracking-wider text-[#766A5E]">Filings &amp; Hearings</span>
-                    <div class="text-3xl font-serif font-bold text-[#222222] mt-1">{{ \App\Models\Event::count() }}</div>
+                    <div class="text-3xl font-serif font-bold text-[#222222] mt-1">{{ $eventsCount ?? \App\Models\Event::where('firm_id', auth()->user()->firm_id ?? 1)->count() }}</div>
                 </div>
                 <div class="w-10 h-10 rounded-lg bg-[#F4EFEA] flex items-center justify-center text-[#9F8349]">
                     <span class="material-symbols-outlined text-xl">calendar_month</span>
@@ -70,7 +70,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <span class="font-mono text-[11px] uppercase tracking-wider text-[#766A5E]">Priority Action Items</span>
-                    <div class="text-3xl font-serif font-bold text-[#222222] mt-1">{{ \App\Models\Task::count() }}</div>
+                    <div class="text-3xl font-serif font-bold text-[#222222] mt-1">{{ $tasksCount ?? \App\Models\Task::where('firm_id', auth()->user()->firm_id ?? 1)->count() }}</div>
                 </div>
                 <div class="w-10 h-10 rounded-lg bg-[#F4EFEA] flex items-center justify-center text-[#9F8349]">
                     <span class="material-symbols-outlined text-xl">task_alt</span>
@@ -89,7 +89,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <span class="font-mono text-[11px] uppercase tracking-wider text-[#766A5E]">Retained Clients &amp; Entities</span>
-                    <div class="text-3xl font-serif font-bold text-[#222222] mt-1">{{ \App\Models\Client::count() }}</div>
+                    <div class="text-3xl font-serif font-bold text-[#222222] mt-1">{{ $clientsCount ?? \App\Models\Client::where('firm_id', auth()->user()->firm_id ?? 1)->count() }}</div>
                 </div>
                 <div class="w-10 h-10 rounded-lg bg-[#F4EFEA] flex items-center justify-center text-[#9F8349]">
                     <span class="material-symbols-outlined text-xl">corporate_fare</span>
@@ -135,7 +135,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#F4EFEA] text-sm">
-                            @foreach(\App\Models\Matter::with(['client', 'leadAttorney'])->get() as $matter)
+                            @foreach($matters as $matter)
                             <tr class="hover:bg-[#FAF8F5] transition-colors group">
                                 <td class="py-3 px-4">
                                     <div class="flex flex-col">
@@ -186,7 +186,7 @@
                 </div>
 
                 <div class="p-4 flex flex-col gap-3">
-                    @foreach(\App\Models\Event::with('matter')->orderBy('start_time')->get() as $event)
+                    @foreach($events as $event)
                     <div class="p-3.5 rounded-lg border {{ $event->is_statutory_deadline ? 'border-red-200 bg-red-50/50' : 'border-[#EFECE6] bg-[#FAF8F5]' }} flex flex-col gap-1.5">
                         <div class="flex items-center justify-between">
                             <span class="font-mono text-xs font-semibold {{ $event->is_statutory_deadline ? 'text-red-700' : 'text-[#9F8349]' }}">
@@ -224,7 +224,7 @@
                 </div>
 
                 <div class="p-4 flex flex-col gap-2.5">
-                    @foreach(\App\Models\Task::with(['assignee', 'matter'])->get() as $task)
+                    @foreach($tasks as $task)
                     <div class="p-3 rounded-lg border border-[#EFECE6] hover:border-[#EAE4DC] transition-colors flex items-start gap-3">
                         <input type="checkbox" class="w-4 h-4 rounded text-[#9F8349] accent-[#9F8349] mt-0.5 cursor-pointer"/>
                         <div class="flex flex-col min-w-0 flex-1">

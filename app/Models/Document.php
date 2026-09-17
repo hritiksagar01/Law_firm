@@ -12,6 +12,10 @@ class Document extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'is_client_visible' => 'boolean',
+    ];
+
     public function firm(): BelongsTo
     {
         return $this->belongsTo(Firm::class);

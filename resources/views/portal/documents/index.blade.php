@@ -98,7 +98,7 @@
                         </td>
 
                         <td class="py-3.5 px-4 text-right">
-                            <a href="{{ route('documents.download', $doc->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#EFECE6] text-[#222222] text-xs font-semibold transition-colors">
+                            <a href="{{ route('portal.documents.download', $doc->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#EFECE6] text-[#222222] text-xs font-semibold transition-colors">
                                 <span class="material-symbols-outlined text-sm text-[#9F8349]">download</span>
                                 <span>Download</span>
                             </a>

@@ -65,6 +65,20 @@
                     </div>
                 </a>
 
+                <a href="{{ route('opinions.index') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('opinions.*') ? 'bg-[#9F8349] text-white font-medium shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
+                    <div class="flex items-center gap-2.5">
+                        <span class="material-symbols-outlined text-lg">draw</span>
+                        <span>Legal Opinions</span>
+                    </div>
+                </a>
+
+                <a href="{{ route('appointments.index') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('appointments.*') ? 'bg-[#9F8349] text-white font-medium shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
+                    <div class="flex items-center gap-2.5">
+                        <span class="material-symbols-outlined text-lg">event_available</span>
+                        <span>Appointments</span>
+                    </div>
+                </a>
+
                 <a href="{{ route('calendar.index') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('calendar.*') ? 'bg-[#9F8349] text-white font-medium shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
                     <div class="flex items-center gap-2.5">
                         <span class="material-symbols-outlined text-lg">calendar_today</span>
@@ -76,6 +90,27 @@
                     <div class="flex items-center gap-2.5">
                         <span class="material-symbols-outlined text-lg">task_alt</span>
                         <span>Tasks &amp; Notes</span>
+                    </div>
+                </a>
+
+                <a href="{{ route('billing.index') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('billing.*') ? 'bg-[#9F8349] text-white font-medium shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
+                    <div class="flex items-center gap-2.5">
+                        <span class="material-symbols-outlined text-lg">receipt_long</span>
+                        <span>Billing &amp; Accounts</span>
+                    </div>
+                </a>
+
+                <a href="{{ route('users.index') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('users.*') || request()->routeIs('user-groups.*') ? 'bg-[#9F8349] text-white font-medium shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
+                    <div class="flex items-center gap-2.5">
+                        <span class="material-symbols-outlined text-lg">people</span>
+                        <span>Advocates &amp; Staff</span>
+                    </div>
+                </a>
+
+                <a href="{{ route('reports.index') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('reports.*') ? 'bg-[#9F8349] text-white font-medium shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
+                    <div class="flex items-center gap-2.5">
+                        <span class="material-symbols-outlined text-lg">analytics</span>
+                        <span>Legal Reports</span>
                     </div>
                 </a>
 
@@ -91,7 +126,7 @@
         <!-- User Profile Footer -->
         <div class="p-3 border-t border-[#EFECE6] bg-[#FAF8F5]">
             <div class="flex items-center justify-between p-2 rounded-lg bg-white border border-[#EFECE6] shadow-xs">
-                <div class="flex items-center gap-2.5 min-w-0">
+                <a href="{{ route('profile.show') }}" class="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity">
                     <div class="relative shrink-0">
                         <img alt="{{ auth()->user()->name ?? 'Counsel' }}" class="w-8 h-8 rounded-full object-cover ring-1 ring-[#9F8349]/30" src="{{ auth()->user()->avatar_url ?? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80' }}"/>
                         <span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-[#9F8349] ring-2 ring-white"></span>
@@ -100,7 +135,7 @@
                         <span class="text-xs text-[#222222] font-semibold truncate">{{ auth()->user()->name ?? 'Counsel' }}</span>
                         <span class="text-[10px] text-[#766A5E] truncate">{{ auth()->user()->title ?? ucfirst(auth()->user()->role ?? 'Attorney') }}</span>
                     </div>
-                </div>
+                </a>
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" title="Sign Out of Chambers" class="p-1.5 text-[#766A5E] hover:text-[#9F8349] hover:bg-[#F8F4EE] transition-colors rounded">
@@ -169,6 +204,11 @@
                         <div class="h-px bg-[#EFECE6] my-1"></div>
                         @endif
 
+                        <a href="{{ route('profile.show') }}" class="px-4 py-2 hover:bg-[#FAF8F5] text-[#554D45] flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm text-[#9F8349]">person</span>
+                            <span>My Profile &amp; Security</span>
+                        </a>
+
                         <a href="{{ route('settings.index') }}" class="px-4 py-2 hover:bg-[#FAF8F5] text-[#554D45] flex items-center gap-2">
                             <span class="material-symbols-outlined text-sm">settings</span>
                             <span>Chambers Settings</span>
@@ -180,7 +220,7 @@
                             @csrf
                             <button type="submit" class="w-full text-left px-4 py-2 text-red-700 hover:bg-red-50 flex items-center gap-2 font-medium">
                                 <span class="material-symbols-outlined text-sm">logout</span>
-                                <span>Sign Out to Login Form</span>
+                                <span>Sign Out</span>
                             </button>
                         </form>
                     </div>
@@ -200,17 +240,18 @@
             </div>
             @endif
 
-            @if(session('error') || $errors->any())
+            @if(session('error') || (isset($errors) && $errors->any()))
             <div class="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-xs text-red-900 flex items-center justify-between shadow-xs">
                 <div class="flex items-center gap-2.5">
                     <span class="material-symbols-outlined text-lg text-red-700">error</span>
-                    <span class="font-medium">{{ session('error') ?? $errors->first() }}</span>
+                    <span class="font-medium">{{ session('error') ?? ($errors->first() ?? '') }}</span>
                 </div>
                 <span class="text-[10px] font-mono uppercase text-red-700 font-bold">Alert</span>
             </div>
             @endif
 
-            {{ $slot }}
+            {{ $slot ?? '' }}
+            @yield('content')
         </main>
     </div>
 

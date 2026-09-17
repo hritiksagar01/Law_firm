@@ -75,6 +75,26 @@ class Matter extends Model
         return $this->hasMany(DocumentRequest::class);
     }
 
+    public function opinions(): HasMany
+    {
+        return $this->hasMany(Opinion::class);
+    }
+
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
     public function totalBilledAmount(): float
     {
         return (float) $this->timeEntries()->where('is_billable', true)->sum('total_amount');
@@ -85,3 +105,4 @@ class Matter extends Model
         return (float) $this->timeEntries()->sum('hours');
     }
 }
+

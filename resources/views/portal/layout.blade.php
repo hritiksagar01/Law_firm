@@ -103,6 +103,14 @@
                         <span>Court Hearings</span>
                     </div>
                 </a>
+
+                <!-- Invoices & Retainer Ledger -->
+                <a href="{{ route('portal.invoices.index') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('portal.invoices.*') ? 'bg-[#9F8349] text-white font-semibold shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
+                    <div class="flex items-center gap-2.5">
+                        <span class="material-symbols-outlined text-lg {{ request()->routeIs('portal.invoices.*') ? 'text-white' : 'text-[#9F8349]' }}">receipt_long</span>
+                        <span>Fee Bills &amp; Ledger</span>
+                    </div>
+                </a>
             </div>
         </div>
 
@@ -229,7 +237,7 @@
             </div>
             @endif
 
-            @if($errors->any())
+            @if(isset($errors) && $errors->any())
             <div class="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-900 text-xs flex items-center gap-3 shadow-xs">
                 <span class="material-symbols-outlined text-lg text-red-700">error</span>
                 <span class="font-medium">{{ $errors->first() }}</span>

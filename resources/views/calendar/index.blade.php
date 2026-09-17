@@ -64,6 +64,64 @@
                         @endforelse
                     </div>
                 </div>
+
+                <!-- Scheduled Appointments & Client Consultations -->
+                <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden mt-4">
+                    <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm text-[#9F8349]">event_available</span>
+                            <h3 class="text-sm font-semibold text-[#222222]">Chambers Consultations &amp; Conferences</h3>
+                        </div>
+                        <a href="{{ route('appointments.create') }}" class="text-xs text-[#9F8349] font-medium hover:underline flex items-center gap-1">
+                            <span>Book Consultation</span>
+                            <span class="material-symbols-outlined text-sm">add</span>
+                        </a>
+                    </div>
+
+                    <div class="divide-y divide-[#F4EFEA]">
+                        @forelse($appointments as $apt)
+                        <div class="p-4 flex items-start justify-between gap-4 hover:bg-[#FAF8F5] transition-colors">
+                            <div class="flex items-start gap-3">
+                                <div class="w-12 h-12 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] flex flex-col items-center justify-center shrink-0">
+                                    <span class="font-mono text-[9px] uppercase font-bold text-[#9F8349]">{{ $apt->scheduled_at->format('M') }}</span>
+                                    <span class="font-serif font-bold text-base text-[#222222]">{{ $apt->scheduled_at->format('d') }}</span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2 mb-0.5">
+                                        <span class="font-mono text-xs font-semibold text-[#222222]">{{ $apt->scheduled_at->format('g:i A') }}</span>
+                                        <span class="text-[10px] font-mono px-2 py-0.5 rounded capitalize bg-[#F4EFEA] text-[#554D45]">
+                                            {{ str_replace('_', ' ', $apt->type) }}
+                                        </span>
+                                        <span class="text-[10px] text-[#766A5E] font-mono">{{ $apt->duration_minutes }}m</span>
+                                    </div>
+                                    <a href="{{ route('appointments.show', $apt) }}" class="text-xs font-semibold text-[#222222] hover:text-[#9F8349] hover:underline">
+                                        {{ $apt->title }}
+                                    </a>
+                                    <div class="flex flex-wrap items-center gap-3 text-[11px] text-[#766A5E] mt-1">
+                                        <span>Counsel: {{ $apt->attorney->name ?? 'Advocate' }}</span>
+                                        @if($apt->client)
+                                        <span>• Client: {{ $apt->client->name }}</span>
+                                        @endif
+                                        @if($apt->location)
+                                        <span>• {{ $apt->location }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <span class="px-2 py-0.5 rounded text-[10px] font-mono capitalize 
+                                @if($apt->status === 'completed') bg-emerald-50 text-emerald-700
+                                @elseif($apt->status === 'adjourned') bg-amber-50 text-amber-700
+                                @elseif($apt->status === 'cancelled') bg-rose-50 text-rose-700
+                                @else bg-blue-50 text-blue-700 @endif">
+                                {{ $apt->status }}
+                            </span>
+                        </div>
+                        @empty
+                        <div class="p-6 text-center text-xs text-[#766A5E]">No consultations scheduled.</div>
+                        @endforelse
+                    </div>
+                </div>
             </div>
 
             <!-- Right Side: Statutory Rules Guide -->

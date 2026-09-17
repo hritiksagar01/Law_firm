@@ -70,7 +70,8 @@
                 <div class="p-3 bg-white border border-[#EFECE6] rounded flex flex-col gap-1">
                     <span class="font-mono text-[10px] uppercase text-[#766A5E]">Unbilled WIP Hours</span>
                     <span class="text-2xl font-serif font-bold text-[#222222]">$28,450.00</span>
-                    <span class="text-xs text-[#9F8349]">4 Active Matters ready for billing run</span>
+                    <span class="text-xs text-[#9F8349]">4 Active Matters in Active Litigation</span>
+
                 </div>
 
                 <div class="flex flex-col gap-2 mt-2">

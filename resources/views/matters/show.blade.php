@@ -26,6 +26,14 @@
                 </p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
+                <a href="{{ route('opinions.create', ['matter_id' => $matter->id]) }}" class="inline-flex items-center gap-1.5 px-3 h-9 rounded-lg border border-[#EAE4DC] bg-white text-xs font-semibold text-[#222222] hover:bg-[#FAF8F5] shadow-xs transition-colors">
+                    <span class="material-symbols-outlined text-base text-[#9F8349]">draw</span>
+                    <span>Draft Opinion</span>
+                </a>
+                <a href="{{ route('appointments.create', ['matter_id' => $matter->id]) }}" class="inline-flex items-center gap-1.5 px-3 h-9 rounded-lg border border-[#EAE4DC] bg-white text-xs font-semibold text-[#222222] hover:bg-[#FAF8F5] shadow-xs transition-colors">
+                    <span class="material-symbols-outlined text-base text-[#9F8349]">event</span>
+                    <span>Book Hearing</span>
+                </a>
                 <a href="{{ route('documents.index') }}" class="inline-flex items-center gap-1.5 px-3.5 h-9 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm transition-colors">
                     <span class="material-symbols-outlined text-base">upload_file</span>
                     <span>Upload Filing</span>
@@ -34,23 +42,27 @@
         </div>
 
         <!-- Dossier Navigation Tabs -->
-        <div class="flex items-center gap-2 border-b border-[#F4EFEA] pt-2 -mb-6">
+        <div class="flex flex-wrap items-center gap-2 border-b border-[#F4EFEA] pt-2 -mb-6">
             <button class="px-4 py-2 text-xs font-semibold border-b-2 border-[#9F8349] text-[#9F8349] flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-base">dashboard</span>
                 <span>Case Overview</span>
             </button>
-            <button class="px-4 py-2 text-xs font-medium text-[#766A5E] hover:text-[#222222] flex items-center gap-1.5">
+            <a href="#opinions-section" class="px-4 py-2 text-xs font-medium text-[#766A5E] hover:text-[#222222] flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-base">draw</span>
+                <span>Opinions &amp; Strategy ({{ $matter->opinions->count() }})</span>
+            </a>
+            <a href="#hearings-section" class="px-4 py-2 text-xs font-medium text-[#766A5E] hover:text-[#222222] flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-base">calendar_month</span>
+                <span>Hearings &amp; Docket ({{ $matter->appointments->count() + $matter->events->count() }})</span>
+            </a>
+            <a href="#filings-section" class="px-4 py-2 text-xs font-medium text-[#766A5E] hover:text-[#222222] flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-base">description</span>
                 <span>Filings &amp; Evidence ({{ $matter->documents->count() }})</span>
-            </button>
-            <button class="px-4 py-2 text-xs font-medium text-[#766A5E] hover:text-[#222222] flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-base">calendar_month</span>
-                <span>Docket &amp; Hearings ({{ $matter->events->count() }})</span>
-            </button>
-            <button class="px-4 py-2 text-xs font-medium text-[#766A5E] hover:text-[#222222] flex items-center gap-1.5">
+            </a>
+            <a href="#dispatches-section" class="px-4 py-2 text-xs font-medium text-[#766A5E] hover:text-[#222222] flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-base">forum</span>
                 <span>Privileged Messages ({{ $matter->messages->count() }})</span>
-            </button>
+            </a>
         </div>
     </div>
 
@@ -81,8 +93,99 @@
                 </div>
             </div>
 
+            <!-- Legal Opinions & Strategy Memoranda -->
+            <div id="opinions-section" class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[#9F8349] text-xl">draw</span>
+                        <h3 class="text-sm font-semibold text-[#222222]">Legal Opinions &amp; Case Strategy</h3>
+                    </div>
+                    <a href="{{ route('opinions.create', ['matter_id' => $matter->id]) }}" class="text-xs text-[#9F8349] hover:underline font-medium flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">add</span>
+                        <span>Draft Opinion</span>
+                    </a>
+                </div>
+
+                <div class="divide-y divide-[#F4EFEA]">
+                    @forelse($matter->opinions as $op)
+                    <div class="p-4 flex items-center justify-between hover:bg-[#FAF8F5] transition-colors">
+                        <div>
+                            <a href="{{ route('opinions.show', $op) }}" class="text-xs font-semibold text-[#222222] hover:text-[#9F8349] hover:underline">
+                                {{ $op->title }}
+                            </a>
+                            <div class="flex items-center gap-2 mt-1 text-[11px] text-[#766A5E]">
+                                <span class="font-mono text-[#9F8349]">{{ $op->opinion_number }}</span>
+                                <span>•</span>
+                                <span class="capitalize">{{ str_replace('_', ' ', $op->type) }}</span>
+                                <span>•</span>
+                                <span>{{ $op->author->name ?? 'Advocate' }}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-mono capitalize 
+                                @if($op->status === 'published') bg-emerald-50 text-emerald-700
+                                @elseif($op->status === 'under_review') bg-amber-50 text-amber-700
+                                @elseif($op->status === 'approved') bg-blue-50 text-blue-700
+                                @else bg-gray-50 text-gray-700 @endif">
+                                {{ $op->status }}
+                            </span>
+                            <a href="{{ route('opinions.show', $op) }}" class="p-1 rounded text-[#766A5E] hover:text-[#9F8349]">
+                                <span class="material-symbols-outlined text-base">visibility</span>
+                            </a>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="p-5 text-center text-xs text-[#766A5E]">No formal legal opinions drafted for this matter yet.</div>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- Hearings & Court Docket Appearances -->
+            <div id="hearings-section" class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[#9F8349] text-xl">calendar_month</span>
+                        <h3 class="text-sm font-semibold text-[#222222]">Scheduled Hearings &amp; Appearances</h3>
+                    </div>
+                    <a href="{{ route('appointments.create', ['matter_id' => $matter->id]) }}" class="text-xs text-[#9F8349] hover:underline font-medium flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">add</span>
+                        <span>Book Appearance</span>
+                    </a>
+                </div>
+
+                <div class="divide-y divide-[#F4EFEA]">
+                    @forelse($matter->appointments as $apt)
+                    <div class="p-4 flex items-center justify-between hover:bg-[#FAF8F5] transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] flex flex-col items-center justify-center shrink-0">
+                                <span class="font-mono text-[8px] uppercase font-bold text-[#9F8349]">{{ $apt->scheduled_at->format('M') }}</span>
+                                <span class="font-serif font-bold text-sm text-[#222222]">{{ $apt->scheduled_at->format('d') }}</span>
+                            </div>
+                            <div>
+                                <a href="{{ route('appointments.show', $apt) }}" class="text-xs font-semibold text-[#222222] hover:text-[#9F8349] hover:underline">
+                                    {{ $apt->title }}
+                                </a>
+                                <div class="text-[11px] text-[#766A5E] mt-0.5">
+                                    <span>{{ $apt->scheduled_at->format('h:i A') }}</span>
+                                    @if($apt->location) <span>• {{ $apt->location }}</span> @endif
+                                </div>
+                            </div>
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono capitalize 
+                            @if($apt->status === 'completed') bg-emerald-50 text-emerald-700
+                            @elseif($apt->status === 'adjourned') bg-amber-50 text-amber-700
+                            @else bg-blue-50 text-blue-700 @endif">
+                            {{ $apt->status }}
+                        </span>
+                    </div>
+                    @empty
+                    <div class="p-5 text-center text-xs text-[#766A5E]">No court appearances currently scheduled.</div>
+                    @endforelse
+                </div>
+            </div>
+
             <!-- Documents & Evidence in Matter -->
-            <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
+            <div id="filings-section" class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
                 <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <span class="material-symbols-outlined text-[#9F8349] text-xl">folder</span>

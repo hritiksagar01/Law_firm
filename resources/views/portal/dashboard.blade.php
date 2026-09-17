@@ -55,7 +55,7 @@
         <div class="bg-white rounded-xl p-5 border border-[#EFECE6] shadow-sm flex items-center justify-between">
             <div class="flex flex-col">
                 <span class="text-[11px] font-mono uppercase tracking-wider text-[#766A5E]">Vault Documents</span>
-                <span class="text-2xl font-serif font-bold text-[#222222] mt-1">{{ \App\Models\Document::count() }} Files</span>
+                <span class="text-2xl font-serif font-bold text-[#222222] mt-1">{{ $documentsCount ?? $matters->flatMap->documents->count() }} Files</span>
                 <a href="{{ route('portal.documents.index') }}" class="text-[11px] text-[#9F8349] hover:underline font-medium mt-1">Access vault &rarr;</a>
             </div>
             <div class="w-12 h-12 rounded-xl bg-[#F8F4EE] text-[#9F8349] flex items-center justify-center">

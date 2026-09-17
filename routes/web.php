@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Mail\DocumentRequestedMail;
 use App\Models\Client;
 use App\Models\Document;
 use App\Models\DocumentRequest;
@@ -13,6 +14,8 @@ use App\Models\TimeEntry;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -49,482 +52,683 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('dashboard');
     });
 
+    // User Profile & Password Security (Available to all authenticated personnel and clients)
+    Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [\App\Http\Controllers\ProfileController::class, 'changePassword'])->name('profile.password');
+
     // Firm Workspace Routes (Strictly for Advocates & Staff)
     Route::middleware(['firm.staff'])->group(function () {
 
+        // Personnel & Practice Groups Administration
+        Route::resource('users', \App\Http\Controllers\UserController::class);
+        Route::post('/users/{user}/toggle-status', [\App\Http\Controllers\UserController::class, 'toggleStatus'])->name('users.toggle-status');
+        Route::resource('user-groups', \App\Http\Controllers\UserGroupController::class);
+
+        // Legal Opinions & Strategy Advisory
+        Route::resource('opinions', \App\Http\Controllers\OpinionController::class);
+        Route::post('/opinions/{opinion}/change-status', [\App\Http\Controllers\OpinionController::class, 'changeStatus'])->name('opinions.change-status');
+
+        // Appointments, Consultations & Court Hearings
+        Route::resource('appointments', \App\Http\Controllers\AppointmentController::class);
+        Route::post('/appointments/{appointment}/status', [\App\Http\Controllers\AppointmentController::class, 'updateStatus'])->name('appointments.update-status');
+
         // Attorney Operations Hub
         Route::get('/dashboard', function () {
-            return view('dashboard');
+            $firmId = Auth::user()->firm_id ?? 1;
+            $mattersCount = Matter::where('firm_id', $firmId)->count();
+            $eventsCount = Event::where('firm_id', $firmId)->count();
+            $tasksCount = Task::where('firm_id', $firmId)->count();
+            $clientsCount = Client::where('firm_id', $firmId)->count();
+            $matters = Matter::where('firm_id', $firmId)->with(['client', 'leadAttorney'])->latest()->get();
+            $events = Event::where('firm_id', $firmId)->with('matter')->orderBy('start_time')->get();
+            $tasks = Task::where('firm_id', $firmId)->with(['assignee', 'matter'])->get();
+
+            return view('dashboard', compact(
+                'mattersCount',
+                'eventsCount',
+                'tasksCount',
+                'clientsCount',
+                'matters',
+                'events',
+                'tasks'
+            ));
         })->name('dashboard');
 
-    // Matters Directory
-    Route::get('/matters', function (Request $request) {
-        $query = Matter::with(['client', 'leadAttorney']);
-        if ($request->has('stage') && $request->stage != 'all') {
-            $query->where('stage', $request->stage);
-        }
-        if ($request->has('q') && !empty($request->q)) {
-            $q = $request->q;
-            $query->where(function($sub) use ($q) {
-                $sub->where('title', 'like', "%{$q}%")
-                    ->orWhere('case_number', 'like', "%{$q}%");
-            });
-        }
-        $matters = $query->latest()->get();
-        return view('matters.index', compact('matters'));
-    })->name('matters.index');
+        // Matters Directory
+        Route::get('/matters', function (Request $request) {
+            $firmId = Auth::user()->firm_id ?? 1;
+            $query = Matter::where('firm_id', $firmId)->with(['client', 'leadAttorney']);
+            if ($request->has('stage') && $request->stage != 'all') {
+                $query->where('stage', $request->stage);
+            }
+            if ($request->has('q') && !empty($request->q)) {
+                $q = $request->q;
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('title', 'like', "%{$q}%")
+                        ->orWhere('case_number', 'like', "%{$q}%");
+                });
+            }
+            $user = Auth::user();
+            if (!in_array($user->role, ['superadmin', 'partner'])) {
+                // Associate / paralegal: only matters where they are lead attorney or team member
+                $query->where(function ($q) use ($user) {
+                    $q->where('lead_attorney_id', $user->id)
+                        ->orWhereHas('users', fn($uq) => $uq->where('users.id', $user->id));
+                });
+            }
+            $matters = $query->latest()->get();
+            $totalCount = $matters->count();
+            $discoveryCount = $matters->where('stage', 'Discovery')->count();
+            $pleadingsCount = $matters->where('stage', 'Pleadings')->count();
+            $preTrialCount = $matters->where('stage', 'Pre-Trial')->count();
+            return view('matters.index', compact('matters', 'totalCount', 'discoveryCount', 'pleadingsCount', 'preTrialCount'));
+        })->name('matters.index');
 
-    // Create Matter
-    Route::get('/matters/create', function () {
-        $clients = Client::all();
-        $attorneys = User::whereIn('role', ['partner', 'associate'])->get();
-        return view('matters.create', compact('clients', 'attorneys'));
-    })->name('matters.create');
+        // Create Matter
+        Route::get('/matters/create', function () {
+            $firmId = Auth::user()->firm_id ?? 1;
+            $clients = Client::where('firm_id', $firmId)->get();
+            $attorneys = User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate'])->get();
+            return view('matters.create', compact('clients', 'attorneys'));
+        })->name('matters.create');
 
-    Route::post('/matters', function (Request $request) {
-        $validated = $request->validate([
-            'client_id' => 'required|exists:clients,id',
-            'title' => 'required|string|max:255',
-            'practice_area' => 'required|string',
-            'court_name' => 'nullable|string',
-            'judge_name' => 'nullable|string',
-            'stage' => 'required|string',
-            'lead_attorney_id' => 'required|exists:users,id',
-            'billing_type' => 'required|string',
-            'budget' => 'nullable|numeric',
-        ]);
+        Route::post('/matters', function (Request $request) {
+            $validated = $request->validate([
+                'client_id' => 'required|exists:clients,id',
+                'title' => 'required|string|max:255',
+                'practice_area' => 'required|string',
+                'court_name' => 'nullable|string',
+                'judge_name' => 'nullable|string',
+                'stage' => 'required|string',
+                'lead_attorney_id' => 'required|exists:users,id',
+                'billing_type' => 'required|string',
+                'budget' => 'nullable|numeric',
+            ]);
 
-        $year = date('Y');
-        $randomSeq = str_pad((string) (Matter::count() + 1), 4, '0', STR_PAD_LEFT);
-        $caseNumber = "HO-{$year}-{$randomSeq}";
+            $year = date('Y');
+            $randomSeq = str_pad((string) (Matter::where('firm_id', Auth::user()->firm_id ?? 1)->count() + 1), 4, '0', STR_PAD_LEFT);
+            $caseNumber = "HO-{$year}-{$randomSeq}";
 
-        $matter = Matter::create([
-            'firm_id' => Auth::user()->firm_id ?? 1,
-            'client_id' => $validated['client_id'],
-            'case_number' => $caseNumber,
-            'title' => $validated['title'],
-            'practice_area' => $validated['practice_area'],
-            'court_name' => $validated['court_name'],
-            'judge_name' => $validated['judge_name'],
-            'stage' => $validated['stage'],
-            'status' => 'active',
-            'lead_attorney_id' => $validated['lead_attorney_id'],
-            'billing_type' => $validated['billing_type'],
-            'budget' => $validated['budget'] ?? 100000,
-            'opened_at' => now()->toDateString(),
-        ]);
+            $matter = Matter::create([
+                'firm_id' => Auth::user()->firm_id ?? 1,
+                'client_id' => $validated['client_id'],
+                'case_number' => $caseNumber,
+                'title' => $validated['title'],
+                'practice_area' => $validated['practice_area'],
+                'court_name' => $validated['court_name'],
+                'judge_name' => $validated['judge_name'],
+                'stage' => $validated['stage'],
+                'status' => 'active',
+                'lead_attorney_id' => $validated['lead_attorney_id'],
+                'billing_type' => $validated['billing_type'],
+                'budget' => $validated['budget'] ?? 100000,
+                'opened_at' => now()->toDateString(),
+            ]);
 
-        return redirect()->route('matters.show', $matter->id)
-            ->with('success', "Matter {$caseNumber} ({$matter->title}) has been successfully opened.");
-    })->name('matters.store');
+            // Auto-assign lead attorney to matter team
+            $matter->users()->syncWithoutDetaching([$validated['lead_attorney_id']]);
 
-    // Matter Detail Dossier
-    Route::get('/matters/{matter}', function (Matter $matter) {
-        $matter->load([
-            'client', 
-            'leadAttorney', 
-            'documents', 
-            'timeEntries.user', 
-            'events', 
-            'tasks.assignee', 
-            'messages.sender'
-        ]);
-        return view('matters.show', compact('matter'));
-    })->name('matters.show');
+            return redirect()->route('matters.show', $matter->id)
+                ->with('success', "Matter {$caseNumber} ({$matter->title}) has been successfully opened.");
+        })->name('matters.store');
 
-    // Clients Directory & Creation
-    Route::get('/clients', function () {
-        $clients = Client::with('matters')->get();
-        return view('clients.index', compact('clients'));
-    })->name('clients.index');
+        // Matter Detail Dossier
+        Route::get('/matters/{matter}', function (Matter $matter) {
+            $user = Auth::user();
+            if ($matter->firm_id !== ($user->firm_id ?? 1)) {
+                abort(403, 'Unauthorized case dossier.');
+            }
 
-    Route::post('/clients', function (Request $request) {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:corporate,individual',
-            'contact_person' => 'nullable|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'nullable|string|max:50',
-            'tax_id' => 'nullable|string|max:50',
-            'trust_balance' => 'nullable|numeric|min:0',
-        ]);
+            // Lawyer-level access restriction: non-partners must be assigned
+            if (!in_array($user->role, ['superadmin', 'partner'])) {
+                $isAssigned = ($matter->lead_attorney_id === $user->id) || $matter->users()->where('users.id', $user->id)->exists();
+                if (!$isAssigned) {
+                    abort(403, 'Unauthorized: You are not assigned to this case dossier.');
+                }
+            }
 
-        Client::create([
-            'firm_id' => Auth::user()->firm_id ?? 1,
-            'type' => $validated['type'],
-            'name' => $validated['name'],
-            'contact_person' => $validated['contact_person'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'],
-            'tax_id' => $validated['tax_id'],
-            'trust_balance' => $validated['trust_balance'] ?? 0.00,
-            'status' => 'active',
-        ]);
+            $matter->load([
+                'client',
+                'leadAttorney',
+                'documents',
+                'opinions.author',
+                'appointments.attorney',
+                'events',
+                'tasks.assignee',
+                'messages.sender'
+            ]);
+            return view('matters.show', compact('matter'));
+        })->name('matters.show');
 
-        return redirect()->route('clients.index')->with('success', "Client '{$validated['name']}' added to firm roster.");
-    })->name('clients.store');
+        // Clients Directory & Creation
+        Route::get('/clients', function () {
+            $user = Auth::user();
+            $firmId = $user->firm_id ?? 1;
 
-    // Documents Vault
-    Route::get('/documents', function () {
-        $documents = Document::with(['matter', 'uploader'])->latest()->get();
-        $matters = Matter::all();
-        return view('documents.index', compact('documents', 'matters'));
-    })->name('documents.index');
+            if (in_array($user->role, ['superadmin', 'partner'])) {
+                $clients = Client::where('firm_id', $firmId)->with(['matters', 'primaryAttorney'])->get();
+            } else {
+                // Associate / paralegal: only clients they consult or have assigned matters with
+                $clients = Client::where('firm_id', $firmId)
+                    ->where(function ($q) use ($user) {
+                        $q->where('primary_attorney_id', $user->id)
+                            ->orWhereHas('matters', function ($mq) use ($user) {
+                                $mq->where('lead_attorney_id', $user->id)
+                                    ->orWhereHas('users', fn($uq) => $uq->where('users.id', $user->id));
+                            });
+                    })
+                    ->with(['matters', 'primaryAttorney'])->get();
+            }
 
-    Route::post('/documents/upload', function (Request $request) {
-        $request->validate([
-            'matter_id' => 'required|exists:matters,id',
-            'title' => 'required|string|max:255',
-            'category' => 'required|string',
-            'privilege' => 'required|string',
-            'file' => 'required|file|max:51200', // 50MB max
-        ]);
+            $attorneys = User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate'])->get();
+            return view('clients.index', compact('clients', 'attorneys'));
+        })->name('clients.index');
 
-        $file = $request->file('file');
-        $sha256 = hash_file('sha256', $file->getRealPath());
-        $path = $file->store('documents', 'local');
+        Route::post('/clients', function (Request $request) {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'type' => 'required|in:corporate,individual',
+                'contact_person' => 'nullable|string|max:255',
+                'email' => 'required|email|max:255',
+                'phone' => 'nullable|string|max:50',
+                'tax_id' => 'nullable|string|max:50',
+                'trust_balance' => 'nullable|numeric|min:0',
+                'primary_attorney_id' => 'nullable|exists:users,id',
+            ]);
 
-        Document::create([
-            'firm_id' => Auth::user()->firm_id ?? 1,
-            'matter_id' => $request->matter_id,
-            'user_id' => Auth::id(),
-            'title' => $request->title,
-            'filename' => $file->getClientOriginalName(),
-            'file_path' => $path,
-            'file_size' => $file->getSize(),
-            'mime_type' => $file->getClientMimeType(),
-            'sha256' => $sha256,
-            'category' => $request->category,
-            'privilege' => $request->privilege,
-            'version' => 1,
-        ]);
+            $firmId = Auth::user()->firm_id ?? 1;
+            $attorneyId = $validated['primary_attorney_id'] ?? Auth::id();
 
-        return back()->with('success', 'Filing securely uploaded and SHA-256 authenticated.');
-    })->name('documents.upload');
+            $client = Client::create([
+                'firm_id' => $firmId,
+                'primary_attorney_id' => $attorneyId,
+                'type' => $validated['type'],
+                'name' => $validated['name'],
+                'contact_person' => $validated['contact_person'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'],
+                'tax_id' => $validated['tax_id'],
+                'trust_balance' => $validated['trust_balance'] ?? 0.00,
+                'status' => 'active',
+            ]);
 
-    Route::get('/documents/{document}/download', function (Document $document) {
-        if ($document->file_path && Storage::disk('local')->exists($document->file_path)) {
-            return Storage::disk('local')->download($document->file_path, $document->filename);
-        }
+            // Provision Client Portal user login automatically if requested
+            if ($request->boolean('invite_portal', true)) {
+                $portalUser = User::firstOrCreate(
+                    ['email' => $validated['email']],
+                    [
+                        'firm_id' => $firmId,
+                        'name' => $validated['contact_person'] ?: $validated['name'],
+                        'password' => Hash::make('Client@1234'),
+                        'role' => 'client',
+                        'title' => 'Client Representative',
+                        'phone' => $validated['phone'],
+                    ]
+                );
+                $client->update(['user_id' => $portalUser->id]);
 
-        // Demo sample fallback
-        return response("DEMO VERIFIED LEGAL FILING\nDocument: {$document->title}\nSHA256: {$document->sha256}\nChambers: Chen & Sterling LLP", 200, [
-            'Content-Type' => 'text/plain',
-            'Content-Disposition' => "attachment; filename=\"{$document->filename}.txt\"",
-        ]);
-    })->name('documents.download');
+                return redirect()->route('clients.index')
+                    ->with('success', "Client '{$validated['name']}' onboarded and invited to Client Portal. Temporary Password: Client@1234");
+            }
 
-    // Chambers Calendar & Court Docket
-    Route::get('/calendar', function () {
-        $events = Event::with('matter')->orderBy('start_time')->get();
-        $matters = Matter::all();
-        return view('calendar.index', compact('events', 'matters'));
-    })->name('calendar.index');
+            return redirect()->route('clients.index')->with('success', "Client '{$validated['name']}' added to firm roster.");
+        })->name('clients.store');
 
-    Route::post('/calendar', function (Request $request) {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'event_type' => 'required|string',
-            'start_time' => 'required|date',
-            'matter_id' => 'nullable|exists:matters,id',
-            'location' => 'nullable|string',
-            'is_statutory_deadline' => 'nullable',
-        ]);
+        Route::post('/clients/{client}/invite', function (Client $client) {
+            $firmId = Auth::user()->firm_id ?? 1;
+            if ($client->firm_id !== $firmId) {
+                abort(403, 'Unauthorized.');
+            }
 
-        Event::create([
-            'firm_id' => Auth::user()->firm_id ?? 1,
-            'matter_id' => $validated['matter_id'] ?? null,
-            'user_id' => Auth::id(),
-            'title' => $validated['title'],
-            'event_type' => $validated['event_type'],
-            'start_time' => $validated['start_time'],
-            'location' => $validated['location'],
-            'is_statutory_deadline' => $request->has('is_statutory_deadline'),
-        ]);
+            $portalUser = User::firstOrCreate(
+                ['email' => $client->email],
+                [
+                    'firm_id' => $firmId,
+                    'name' => $client->contact_person ?: $client->name,
+                    'password' => Hash::make('Client@1234'),
+                    'role' => 'client',
+                    'title' => 'Client Representative',
+                    'phone' => $client->phone,
+                ]
+            );
 
-        return back()->with('success', 'Docket event registered on chambers calendar.');
-    })->name('calendar.store');
+            $client->update(['user_id' => $portalUser->id]);
 
-    // Billing & Trust Accounting
-    Route::get('/billing', function () {
-        $timeEntries = TimeEntry::with(['matter', 'user'])->latest()->get();
-        $invoices = Invoice::with(['client', 'matter'])->latest()->get();
-        $clients = Client::all();
-        $matters = Matter::all();
-        return view('billing.index', compact('timeEntries', 'invoices', 'clients', 'matters'));
-    })->name('billing.index');
+            return back()->with('success', "Portal access active for {$client->name} ({$client->email}). Password: Client@1234");
+        })->name('clients.invite');
 
-    // Log Billable Time Entry
-    Route::post('/time-entries', function (Request $request) {
-        $validated = $request->validate([
-            'matter_id' => 'required|exists:matters,id',
-            'hours' => 'required|numeric|min:0.1',
-            'activity_code' => 'required|string',
-            'narrative' => 'nullable|string',
-            'is_billable' => 'nullable',
-        ]);
+        // Documents Vault
+        Route::get('/documents', function () {
+            $user = Auth::user();
+            $firmId = $user->firm_id ?? 1;
 
-        $activityNames = [
-            'L120' => 'Analysis & Strategy',
-            'L110' => 'Fact Investigation',
-            'L330' => 'Depositions & Prep',
-            'A104' => 'Document Review',
-            'B110' => 'Written Pleadings',
-        ];
+            if (in_array($user->role, ['superadmin', 'partner'])) {
+                $matters = Matter::where('firm_id', $firmId)->get();
+                $documents = Document::where('firm_id', $firmId)->with(['matter', 'uploader'])->latest()->get();
+            } else {
+                // Associate / paralegal: only documents for matters they are assigned to
+                $matters = Matter::where('firm_id', $firmId)
+                    ->where(function ($q) use ($user) {
+                        $q->where('lead_attorney_id', $user->id)
+                            ->orWhereHas('users', fn($uq) => $uq->where('users.id', $user->id));
+                    })->get();
 
-        $rate = Auth::user()->hourly_rate ?? 550.00;
-        $hours = (float) $validated['hours'];
+                $documents = Document::where('firm_id', $firmId)
+                    ->whereIn('matter_id', $matters->pluck('id'))
+                    ->with(['matter', 'uploader'])->latest()->get();
+            }
 
-        TimeEntry::create([
-            'firm_id' => Auth::user()->firm_id ?? 1,
-            'matter_id' => $validated['matter_id'],
-            'user_id' => Auth::id(),
-            'hours' => $hours,
-            'rate' => $rate,
-            'total_amount' => $hours * $rate,
-            'activity_code' => $validated['activity_code'],
-            'activity_name' => $activityNames[$validated['activity_code']] ?? 'Legal Services',
-            'narrative' => $validated['narrative'] ?? 'Professional legal services rendered.',
-            'is_billable' => $request->has('is_billable') ? true : false,
-            'status' => 'unbilled',
-            'entry_date' => now()->toDateString(),
-        ]);
+            return view('documents.index', compact('documents', 'matters'));
+        })->name('documents.index');
 
-        return back()->with('success', "Logged {$hours} hrs billable under {$validated['activity_code']}.");
-    })->name('time-entries.store');
+        Route::post('/documents/upload', function (Request $request) {
+            // Detect PHP-level upload errors before Laravel validation
+            if ($request->hasFile('file') && !$request->file('file')->isValid()) {
+                $errorCode = $request->file('file')->getError();
+                $maxUpload = ini_get('upload_max_filesize');
+                $msg = match ($errorCode) {
+                    UPLOAD_ERR_INI_SIZE => "Uploaded file exceeds PHP server limit ({$maxUpload}). Please select a file smaller than {$maxUpload}.",
+                    UPLOAD_ERR_FORM_SIZE => "Uploaded file exceeds form limit.",
+                    UPLOAD_ERR_PARTIAL => "File was only partially uploaded. Please try again.",
+                    UPLOAD_ERR_NO_FILE => "No file was selected for upload.",
+                    UPLOAD_ERR_NO_TMP_DIR => "Temporary upload directory missing.",
+                    UPLOAD_ERR_CANT_WRITE => "Failed to write file to storage disk.",
+                    default => "File upload failed with error code {$errorCode}."
+                };
+                return back()->withInput()->with('error', $msg);
+            }
 
-    // Generate Invoice from WIP unbilled entries
-    Route::post('/invoices/generate', function (Request $request) {
-        $matter = Matter::with('client')->find($request->matter_id) ?? Matter::first();
-        
-        $unbilledAmount = TimeEntry::where('matter_id', $matter->id)
-            ->where('status', 'unbilled')
-            ->sum('total_amount');
+            $request->validate([
+                'matter_id' => 'required|exists:matters,id',
+                'title' => 'required|string|max:255',
+                'category' => 'required|string',
+                'privilege' => 'required|string',
+                'is_client_visible' => 'nullable',
+                'file' => 'required|file|max:51200', // 50MB max
+            ]);
 
-        if ($unbilledAmount <= 0) {
-            $unbilledAmount = 2412.50; // default sample
-        }
+            $user = Auth::user();
+            $firmId = $user->firm_id ?? 1;
+            $matter = Matter::where('id', $request->matter_id)->where('firm_id', $firmId)->firstOrFail();
 
-        $invNum = 'INV-2026-00' . rand(50, 99);
+            // Lawyer authorization check
+            if (!in_array($user->role, ['superadmin', 'partner'])) {
+                $isAssigned = ($matter->lead_attorney_id === $user->id) || $matter->users()->where('users.id', $user->id)->exists();
+                if (!$isAssigned) {
+                    abort(403, 'Unauthorized: You are not assigned to this case dossier.');
+                }
+            }
 
-        $invoice = Invoice::create([
-            'firm_id' => Auth::user()->firm_id ?? 1,
-            'matter_id' => $matter->id,
-            'client_id' => $matter->client_id,
-            'invoice_number' => $invNum,
-            'issue_date' => now()->toDateString(),
-            'due_date' => now()->addDays(30)->toDateString(),
-            'subtotal' => $unbilledAmount,
-            'tax_rate' => 0.00,
-            'tax_amount' => 0.00,
-            'total_amount' => $unbilledAmount,
-            'amount_paid' => 0.00,
-            'status' => 'sent',
-        ]);
+            $file = $request->file('file');
+            $sha256 = hash_file('sha256', $file->getRealPath());
+            $disk = config('filesystems.default', 'local');
+            $path = $file->store('documents', $disk);
 
-        TimeEntry::where('matter_id', $matter->id)->where('status', 'unbilled')->update(['status' => 'billed']);
+            // Determine client visibility
+            $isClientVisible = $request->has('is_client_visible')
+                ? $request->boolean('is_client_visible')
+                : ($request->privilege !== 'Work Product');
 
-        return back()->with('success', "Invoice {$invNum} generated for \${$unbilledAmount} and dispatched to {$matter->client->name}.");
-    })->name('invoices.generate');
+            Document::create([
+                'firm_id' => $firmId,
+                'matter_id' => $matter->id,
+                'user_id' => $user->id,
+                'title' => $request->title,
+                'filename' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'file_size' => $file->getSize(),
+                'mime_type' => $file->getClientMimeType() ?: 'application/pdf',
+                'sha256' => $sha256,
+                'category' => $request->category,
+                'privilege' => $request->privilege,
+                'is_client_visible' => $isClientVisible,
+                'version' => 1,
+            ]);
 
-    // Toggle Task status
-    Route::post('/tasks/{task}/toggle', function (Task $task) {
-        $task->status = ($task->status === 'completed') ? 'todo' : 'completed';
-        $task->save();
-        return back()->with('success', "Task status updated.");
-    })->name('tasks.toggle');
+            return back()->with('success', 'Filing securely uploaded and SHA-256 authenticated.');
+        })->name('documents.upload');
 
-    // Send Matter Privileged Message
-    Route::post('/messages', function (Request $request) {
-        $request->validate([
-            'matter_id' => 'required|exists:matters,id',
-            'body' => 'required|string|max:1000',
-        ]);
+        Route::get('/documents/{document}/download', function (Document $document) {
+            $user = Auth::user();
+            if ($document->firm_id !== ($user->firm_id ?? 1)) {
+                abort(403, 'Unauthorized document access across firms.');
+            }
 
-        Message::create([
-            'firm_id' => Auth::user()->firm_id ?? 1,
-            'matter_id' => $request->matter_id,
-            'sender_id' => Auth::id(),
-            'body' => $request->body,
-            'is_privileged' => true,
-        ]);
+            // Lawyer-level isolation: non-partners must be assigned to this matter
+            if (!in_array($user->role, ['superadmin', 'partner'])) {
+                $assigned = $document->matter && (
+                    $document->matter->lead_attorney_id === $user->id ||
+                    $document->matter->users()->where('users.id', $user->id)->exists()
+                );
+                if (!$assigned) {
+                    abort(403, 'Unauthorized: You are not assigned to this case dossier.');
+                }
+            }
 
-        return back()->with('success', 'Privileged attorney-client communication dispatched.');
-    })->name('messages.store');
+            $defaultDisk = config('filesystems.default', 'local');
+            if ($document->file_path && Storage::disk($defaultDisk)->exists($document->file_path)) {
+                return Storage::disk($defaultDisk)->download($document->file_path, $document->filename, [
+                    'Content-Type' => $document->mime_type ?: 'application/pdf',
+                ]);
+            }
+            if ($document->file_path && Storage::disk('local')->exists($document->file_path)) {
+                return Storage::disk('local')->download($document->file_path, $document->filename, [
+                    'Content-Type' => $document->mime_type ?: 'application/pdf',
+                ]);
+            }
+            if ($document->file_path && Storage::disk('s3')->exists($document->file_path)) {
+                return Storage::disk('s3')->download($document->file_path, $document->filename, [
+                    'Content-Type' => $document->mime_type ?: 'application/pdf',
+                ]);
+            }
 
-    // Pay / Settle Invoice
-    Route::post('/invoices/{invoice}/pay', function (Invoice $invoice) {
-        $invoice->status = 'paid';
-        $invoice->amount_paid = $invoice->total_amount;
-        $invoice->save();
-        return back()->with('success', "Invoice {$invoice->invoice_number} settled in full ($" . number_format($invoice->total_amount, 2) . ").");
-    })->name('invoices.pay');
+            // Dynamic, compliant PDF stream fallback (Guaranteed to open cleanly in Adobe Reader / browsers)
+            $pdfContent = \App\Services\LegalPdfGenerator::forDocument($document);
+            return response($pdfContent, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => "attachment; filename=\"{$document->filename}\"",
+                'Content-Length' => strlen($pdfContent),
+            ]);
+        })->name('documents.download');
 
-    // Client Trust Retainer Deposit
-    Route::post('/clients/{client}/trust-deposit', function (Request $request, Client $client) {
-        $request->validate(['amount' => 'required|numeric|min:50']);
-        $client->trust_balance += (float) $request->amount;
-        $client->save();
-        return back()->with('success', "IOLTA escrow deposit of $" . number_format($request->amount, 2) . " credited to {$client->name}.");
-    })->name('clients.trust-deposit');
+        // Chambers Calendar & Court Docket
+        Route::get('/calendar', function () {
+            $firmId = Auth::user()->firm_id;
+            $events = Event::where('firm_id', $firmId)->with('matter')->orderBy('start_time')->get();
+            $appointments = \App\Models\Appointment::where('firm_id', $firmId)->with(['matter', 'client', 'attorney'])->orderBy('scheduled_at')->get();
+            $matters = Matter::where('firm_id', $firmId)->get();
+            return view('calendar.index', compact('events', 'appointments', 'matters'));
+        })->name('calendar.index');
 
-    // Tasks & Productivity Hub
-    Route::get('/tasks', function () {
-        $tasks = Task::with(['assignee', 'matter'])->latest()->get();
-        $attorneys = User::whereIn('role', ['partner', 'associate', 'paralegal'])->get();
-        $matters = Matter::all();
-        return view('tasks.index', compact('tasks', 'attorneys', 'matters'));
-    })->name('tasks.index');
+        Route::post('/calendar', function (Request $request) {
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'event_type' => 'required|string',
+                'start_time' => 'required|date',
+                'matter_id' => 'nullable|exists:matters,id',
+                'location' => 'nullable|string',
+                'is_statutory_deadline' => 'nullable',
+            ]);
 
-    Route::post('/tasks', function (Request $request) {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'priority' => 'required|in:urgent,high,normal,low',
-            'due_date' => 'required|date',
-            'matter_id' => 'nullable|exists:matters,id',
-            'assigned_to' => 'nullable|exists:users,id',
-        ]);
+            Event::create([
+                'firm_id' => Auth::user()->firm_id ?? 1,
+                'matter_id' => $validated['matter_id'] ?? null,
+                'user_id' => Auth::id(),
+                'title' => $validated['title'],
+                'event_type' => $validated['event_type'],
+                'start_time' => $validated['start_time'],
+                'location' => $validated['location'],
+                'is_statutory_deadline' => $request->has('is_statutory_deadline'),
+            ]);
 
-        Task::create([
-            'firm_id' => Auth::user()->firm_id ?? 1,
-            'matter_id' => $validated['matter_id'] ?? null,
-            'assigned_to' => $validated['assigned_to'] ?? Auth::id(),
-            'created_by' => Auth::id() ?? 1,
-            'title' => $validated['title'],
-            'priority' => $validated['priority'],
-            'due_date' => $validated['due_date'],
-            'status' => 'todo',
-        ]);
+            return back()->with('success', 'Docket event registered on chambers calendar.');
+        })->name('calendar.store');
 
-        return back()->with('success', 'Litigation task successfully logged.');
-    })->name('tasks.store');
+        // Billing, Invoicing, Expenses & Chambers Ledger (PDF Pages 16-20)
+        Route::get('/billing', [\App\Http\Controllers\BillingController::class, 'index'])->name('billing.index');
+        Route::post('/billing/time-entries', [\App\Http\Controllers\BillingController::class, 'storeTimeEntry'])->name('billing.time-entries.store');
+        Route::post('/billing/expenses', [\App\Http\Controllers\BillingController::class, 'storeExpense'])->name('billing.expenses.store');
+        Route::post('/billing/invoices/generate', [\App\Http\Controllers\BillingController::class, 'generateInvoice'])->name('billing.invoices.generate');
+        Route::post('/billing/invoices/{invoice}/settle', [\App\Http\Controllers\BillingController::class, 'settleInvoice'])->name('billing.invoices.settle');
+        Route::post('/billing/transactions', [\App\Http\Controllers\BillingController::class, 'storeTransaction'])->name('billing.transactions.store');
 
-    // Global Search Engine
-    Route::get('/search', function (Request $request) {
-        $q = trim($request->input('q', ''));
-        if (empty($q)) {
-            return redirect()->route('matters.index');
-        }
+        // Operational Legal Reports & Cause Lists
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\ReportController::class, 'index'])->name('index');
+            Route::get('/cases', [\App\Http\Controllers\ReportController::class, 'caseReports'])->name('cases');
+            Route::get('/hearings', [\App\Http\Controllers\ReportController::class, 'hearingSchedule'])->name('hearings');
+            Route::get('/clients', [\App\Http\Controllers\ReportController::class, 'clientActivity'])->name('clients');
+            Route::get('/workload', [\App\Http\Controllers\ReportController::class, 'workload'])->name('workload');
+            Route::get('/bank-activity', [\App\Http\Controllers\ReportController::class, 'bankActivity'])->name('bank-activity');
+        });
 
-        $matters = Matter::where('title', 'like', "%{$q}%")
-            ->orWhere('case_number', 'like', "%{$q}%")
-            ->orWhere('court_name', 'like', "%{$q}%")
-            ->with('client')->get();
 
-        $clients = Client::where('name', 'like', "%{$q}%")
-            ->orWhere('email', 'like', "%{$q}%")->get();
+        // Toggle Task status
+        Route::post('/tasks/{task}/toggle', function (Task $task) {
+            $task->status = ($task->status === 'completed') ? 'todo' : 'completed';
+            $task->save();
+            return back()->with('success', "Task status updated.");
+        })->name('tasks.toggle');
 
-        $documents = Document::where('title', 'like', "%{$q}%")
-            ->orWhere('filename', 'like', "%{$q}%")
-            ->with('matter')->get();
+        // Send Matter Privileged Message
+        Route::post('/messages', function (Request $request) {
+            $request->validate([
+                'matter_id' => 'required|exists:matters,id',
+                'body' => 'required|string|max:1000',
+            ]);
 
-        $tasks = Task::where('title', 'like', "%{$q}%")->with(['assignee', 'matter'])->get();
+            Message::create([
+                'firm_id' => Auth::user()->firm_id ?? 1,
+                'matter_id' => $request->matter_id,
+                'sender_id' => Auth::id(),
+                'body' => $request->body,
+                'is_privileged' => true,
+            ]);
 
-        return view('search', compact('q', 'matters', 'clients', 'documents', 'tasks'));
-    })->name('search');
+            return back()->with('success', 'Privileged attorney-client communication dispatched.');
+        })->name('messages.store');
 
-    // Firm & Team Settings
-    Route::get('/settings', function () {
-        $firm = Auth::user()->firm ?? \App\Models\Firm::first();
-        $users = User::where('firm_id', $firm->id)->get();
-        return view('settings.index', compact('firm', 'users'));
-    })->name('settings.index');
+        // Document Requests from Counsel to Client (F-07)
+        Route::post('/document-requests', function (Request $request) {
+            $firmId = Auth::user()->firm_id ?? 1;
 
-    Route::post('/settings/team', function (Request $request) {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'role' => 'required|in:partner,associate,paralegal',
-            'hourly_rate' => 'required|numeric|min:50',
-        ]);
+            $validated = $request->validate([
+                'matter_id' => 'required|exists:matters,id',
+                'client_id' => 'required|exists:clients,id',
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string|max:1000',
+                'category' => 'nullable|string|max:100',
+                'priority' => 'nullable|in:low,normal,high,urgent',
+                'due_date' => 'nullable|date',
+            ]);
 
-        $user = User::create([
-            'firm_id' => Auth::user()->firm_id ?? 1,
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
-            'role' => $validated['role'],
-            'title' => ucfirst($validated['role']),
-            'hourly_rate' => $validated['hourly_rate'],
-            'is_active' => true,
-        ]);
+            $matter = Matter::where('id', $validated['matter_id'])->where('firm_id', $firmId)->firstOrFail();
+            $client = Client::where('id', $validated['client_id'])->where('firm_id', $firmId)->firstOrFail();
 
-        return back()->with('success', "Team member {$user->name} added with billing rate \${$user->hourly_rate}/hr.");
-    })->name('settings.team');
+            $docRequest = DocumentRequest::create([
+                'firm_id' => $firmId,
+                'matter_id' => $matter->id,
+                'client_id' => $client->id,
+                'requested_by' => Auth::id(),
+                'title' => $validated['title'],
+                'description' => $validated['description'] ?? null,
+                'category' => $validated['category'] ?? 'Financial Statements',
+                'priority' => $validated['priority'] ?? 'normal',
+                'due_date' => $validated['due_date'] ?? now()->addDays(7),
+                'status' => 'pending',
+            ]);
 
-    // Daily Broadsheet Executive Intelligence
-    Route::get('/briefing', function () {
-        $matters = Matter::with(['client', 'leadAttorney'])->get();
-        $events = Event::with('matter')->orderBy('start_time')->get();
-        $tasks = Task::with(['assignee', 'matter'])->get();
-        return view('briefing', compact('matters', 'events', 'tasks'));
-    })->name('briefing');
+            if (!empty($client->email)) {
+                try {
+                    Mail::to($client->email)->send(new DocumentRequestedMail($docRequest));
+                } catch (\Throwable $e) {
+                    Log::warning("Could not dispatch document request email: " . $e->getMessage());
+                }
+            }
+
+            return back()->with('success', "Document request '{$docRequest->title}' dispatched to {$client->name}.");
+        })->name('document-requests.store');
+
+        Route::post('/document-requests/{request}/review', function (Request $httpRequest, DocumentRequest $request) {
+            $firmId = Auth::user()->firm_id ?? 1;
+            if ($request->firm_id !== $firmId) {
+                abort(403, 'Unauthorized document request review.');
+            }
+
+            $validated = $httpRequest->validate([
+                'status' => 'required|in:under_review,completed,rejected',
+                'review_notes' => 'nullable|string|max:1000',
+            ]);
+
+            $request->update([
+                'status' => $validated['status'],
+                'review_notes' => $validated['review_notes'] ?? null,
+            ]);
+
+            return back()->with('success', "Document submission marked as " . ucfirst($validated['status']) . ".");
+        })->name('document-requests.review');
+
+
+        // Tasks & Productivity Hub
+        Route::get('/tasks', function () {
+            $firmId = Auth::user()->firm_id ?? 1;
+            $tasks = Task::where('firm_id', $firmId)->with(['assignee', 'matter'])->latest()->get();
+            $attorneys = User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate', 'paralegal'])->get();
+            $matters = Matter::where('firm_id', $firmId)->get();
+            return view('tasks.index', compact('tasks', 'attorneys', 'matters'));
+        })->name('tasks.index');
+
+        Route::post('/tasks', function (Request $request) {
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'priority' => 'required|in:urgent,high,normal,low',
+                'due_date' => 'required|date',
+                'matter_id' => 'nullable|exists:matters,id',
+                'assigned_to' => 'nullable|exists:users,id',
+            ]);
+
+            Task::create([
+                'firm_id' => Auth::user()->firm_id ?? 1,
+                'matter_id' => $validated['matter_id'] ?? null,
+                'assigned_to' => $validated['assigned_to'] ?? Auth::id(),
+                'created_by' => Auth::id() ?? 1,
+                'title' => $validated['title'],
+                'priority' => $validated['priority'],
+                'due_date' => $validated['due_date'],
+                'status' => 'todo',
+            ]);
+
+            return back()->with('success', 'Litigation task successfully logged.');
+        })->name('tasks.store');
+
+        // Global Search Engine
+        Route::get('/search', function (Request $request) {
+            $firmId = Auth::user()->firm_id ?? 1;
+            $q = trim($request->input('q', ''));
+            if (empty($q)) {
+                return redirect()->route('matters.index');
+            }
+
+            $matters = Matter::where('firm_id', $firmId)
+                ->where(function ($sub) use ($q) {
+                    $sub->where('title', 'like', "%{$q}%")
+                        ->orWhere('case_number', 'like', "%{$q}%")
+                        ->orWhere('court_name', 'like', "%{$q}%");
+                })
+                ->with('client')->get();
+
+            $clients = Client::where('firm_id', $firmId)
+                ->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', "%{$q}%")
+                        ->orWhere('email', 'like', "%{$q}%");
+                })->get();
+
+            $documents = Document::where('firm_id', $firmId)
+                ->where(function ($sub) use ($q) {
+                    $sub->where('title', 'like', "%{$q}%")
+                        ->orWhere('filename', 'like', "%{$q}%");
+                })
+                ->with('matter')->get();
+
+            $tasks = Task::where('firm_id', $firmId)
+                ->where('title', 'like', "%{$q}%")
+                ->with(['assignee', 'matter'])->get();
+
+            return view('search', compact('q', 'matters', 'clients', 'documents', 'tasks'));
+        })->name('search');
+
+        // Dynamic Practice Settings Configuration Hub
+        Route::get('/settings', [\App\Http\Controllers\SettingsController::class, 'index'])->name('settings.index');
+        Route::put('/settings/firm', [\App\Http\Controllers\SettingsController::class, 'updateFirm'])->name('settings.firm.update');
+        Route::post('/settings/practice-areas', [\App\Http\Controllers\SettingsController::class, 'storePracticeArea'])->name('settings.practice-areas.store');
+        Route::post('/settings/practice-areas/{practiceArea}/toggle', [\App\Http\Controllers\SettingsController::class, 'togglePracticeArea'])->name('settings.practice-areas.toggle');
+        Route::post('/settings/holidays', [\App\Http\Controllers\SettingsController::class, 'storeHoliday'])->name('settings.holidays.store');
+        Route::delete('/settings/holidays/{holiday}', [\App\Http\Controllers\SettingsController::class, 'destroyHoliday'])->name('settings.holidays.destroy');
+        Route::post('/settings/letters', [\App\Http\Controllers\SettingsController::class, 'storeLetterTemplate'])->name('settings.letters.store');
+        Route::put('/settings/letters/{letterTemplate}', [\App\Http\Controllers\SettingsController::class, 'updateLetterTemplate'])->name('settings.letters.update');
+        Route::put('/settings/emails/{emailTemplate}', [\App\Http\Controllers\SettingsController::class, 'updateEmailTemplate'])->name('settings.emails.update');
+        Route::put('/settings/id-types/{idType}', [\App\Http\Controllers\SettingsController::class, 'updateIdType'])->name('settings.id-types.update');
+
+
+        // Daily Broadsheet Executive Intelligence
+        Route::get('/briefing', function () {
+            $firmId = Auth::user()->firm_id ?? 1;
+            $matters = Matter::where('firm_id', $firmId)->with(['client', 'leadAttorney'])->get();
+            $events = Event::where('firm_id', $firmId)->with('matter')->orderBy('start_time')->get();
+            $tasks = Task::where('firm_id', $firmId)->with(['assignee', 'matter'])->get();
+            return view('briefing', compact('matters', 'events', 'tasks'));
+        })->name('briefing');
 
     }); // End of Firm Workspace Routes Group
 
     // Client Portal Suite (F-08 & F-07)
     Route::middleware(['portal.client'])->prefix('portal')->name('portal.')->group(function () {
-        
+
+        $getClient = function () {
+            $user = Auth::user();
+            $client = Client::where('user_id', $user->id)->first()
+                ?? Client::where('email', $user->email)->first();
+
+            if (!$client) {
+                abort(403, 'No client representation record is linked to this user account.');
+            }
+            return $client;
+        };
+
         Route::get('/', function () {
             return redirect()->route('portal.dashboard');
         })->name('index');
 
         // Portal Dashboard Overview
-        Route::get('/dashboard', function () {
-            $user = Auth::user();
-            $client = Client::where('user_id', $user->id)->first() 
-                ?? Client::where('email', $user->email)->first() 
-                ?? Client::first();
+        Route::get('/dashboard', function () use ($getClient) {
+            $client = $getClient();
 
             $matters = Matter::where('client_id', $client->id)->with(['documents', 'leadAttorney', 'documentRequests'])->get();
             $documentRequests = DocumentRequest::where('client_id', $client->id)->with('matter')->latest()->get();
             $invoices = Invoice::where('client_id', $client->id)->latest()->get();
             $events = Event::whereIn('matter_id', $matters->pluck('id'))->orderBy('start_time')->get();
+            $documentsCount = Document::whereIn('matter_id', $matters->pluck('id'))->where('is_client_visible', true)->count();
 
-            return view('portal.dashboard', compact('client', 'matters', 'documentRequests', 'invoices', 'events'));
+            return view('portal.dashboard', compact('client', 'matters', 'documentRequests', 'invoices', 'events', 'documentsCount'));
         })->name('dashboard');
 
         // My Cases / Matters
-        Route::get('/matters', function () {
-            $user = Auth::user();
-            $client = Client::where('user_id', $user->id)->first() 
-                ?? Client::where('email', $user->email)->first() 
-                ?? Client::first();
+        Route::get('/matters', function () use ($getClient) {
+            $client = $getClient();
 
             $matters = Matter::where('client_id', $client->id)->with(['documents', 'leadAttorney', 'documentRequests'])->latest()->get();
             return view('portal.matters.index', compact('client', 'matters'));
         })->name('matters.index');
 
-        Route::get('/matters/{matter}', function (Matter $matter) {
-            $user = Auth::user();
-            $client = Client::where('user_id', $user->id)->first() 
-                ?? Client::where('email', $user->email)->first() 
-                ?? Client::first();
+        Route::get('/matters/{matter}', function (Matter $matter) use ($getClient) {
+            $client = $getClient();
 
             if ($matter->client_id !== $client->id) {
                 abort(403, 'Unauthorized case dossier.');
             }
 
-            $matter->load(['documents', 'leadAttorney', 'documentRequests', 'events', 'messages.sender']);
+            $matter->load([
+                'documents' => fn($q) => $q->where('is_client_visible', true),
+                'leadAttorney',
+                'documentRequests',
+                'events',
+                'messages.sender'
+            ]);
             return view('portal.matters.show', compact('client', 'matter'));
         })->name('matters.show');
 
         // Document Requests Workflow (F-07)
-        Route::get('/requests', function () {
-            $user = Auth::user();
-            $client = Client::where('user_id', $user->id)->first() 
-                ?? Client::where('email', $user->email)->first() 
-                ?? Client::first();
+        Route::get('/requests', function () use ($getClient) {
+            $client = $getClient();
 
             $requests = DocumentRequest::where('client_id', $client->id)->with(['matter', 'requestedBy'])->latest()->get();
             return view('portal.requests.index', compact('client', 'requests'));
         })->name('requests.index');
 
-        Route::post('/requests/{request}/upload', function (Request $httpRequest, DocumentRequest $request) {
+        Route::post('/requests/{request}/upload', function (Request $httpRequest, DocumentRequest $request) use ($getClient) {
             $user = Auth::user();
-            $client = Client::where('user_id', $user->id)->first() 
-                ?? Client::where('email', $user->email)->first() 
-                ?? Client::first();
+            $client = $getClient();
 
             if ($request->client_id !== $client->id) {
                 abort(403, 'Unauthorized document request.');
@@ -537,7 +741,8 @@ Route::middleware('auth')->group(function () {
 
             $file = $httpRequest->file('file');
             $sha256 = hash_file('sha256', $file->getRealPath());
-            $path = $file->store('documents/client_uploads', 'local');
+            $disk = config('filesystems.default', 'local');
+            $path = $file->store('documents/client_uploads', $disk);
 
             $doc = Document::create([
                 'firm_id' => $request->firm_id,
@@ -547,10 +752,11 @@ Route::middleware('auth')->group(function () {
                 'filename' => $file->getClientOriginalName(),
                 'file_path' => $path,
                 'file_size' => $file->getSize(),
-                'mime_type' => $file->getClientMimeType(),
+                'mime_type' => $file->getClientMimeType() ?: 'application/pdf',
                 'sha256' => $sha256,
                 'category' => 'Client Submissions',
                 'privilege' => 'Confidential',
+                'is_client_visible' => true,
                 'version' => 1,
             ]);
 
@@ -565,24 +771,32 @@ Route::middleware('auth')->group(function () {
         })->name('requests.upload');
 
         // Case Documents Repository
-        Route::get('/documents', function () {
-            $user = Auth::user();
-            $client = Client::where('user_id', $user->id)->first() 
-                ?? Client::where('email', $user->email)->first() 
-                ?? Client::first();
+        Route::get('/documents', function () use ($getClient) {
+            $client = $getClient();
 
             $matterIds = Matter::where('client_id', $client->id)->pluck('id');
-            $documents = Document::whereIn('matter_id', $matterIds)->with('matter')->latest()->get();
+            $documents = Document::whereIn('matter_id', $matterIds)
+                ->where('is_client_visible', true)
+                ->with('matter')->latest()->get();
             $matters = Matter::where('client_id', $client->id)->get();
 
             return view('portal.documents.index', compact('client', 'documents', 'matters'));
         })->name('documents.index');
 
-        Route::post('/documents/upload', function (Request $request) {
+        Route::post('/documents/upload', function (Request $request) use ($getClient) {
             $user = Auth::user();
-            $client = Client::where('user_id', $user->id)->first() 
-                ?? Client::where('email', $user->email)->first() 
-                ?? Client::first();
+            $client = $getClient();
+
+            // Detect PHP-level upload errors before Laravel validation
+            if ($request->hasFile('file') && !$request->file('file')->isValid()) {
+                $errorCode = $request->file('file')->getError();
+                $maxUpload = ini_get('upload_max_filesize');
+                $msg = match ($errorCode) {
+                    UPLOAD_ERR_INI_SIZE => "Uploaded file exceeds server limit ({$maxUpload}). Please select a file smaller than {$maxUpload}.",
+                    default => "File upload failed with error code {$errorCode}."
+                };
+                return back()->withInput()->with('error', $msg);
+            }
 
             $request->validate([
                 'matter_id' => 'required|exists:matters,id',
@@ -595,7 +809,8 @@ Route::middleware('auth')->group(function () {
 
             $file = $request->file('file');
             $sha256 = hash_file('sha256', $file->getRealPath());
-            $path = $file->store('documents/client_uploads', 'local');
+            $disk = config('filesystems.default', 'local');
+            $path = $file->store('documents/client_uploads', $disk);
 
             Document::create([
                 'firm_id' => $matter->firm_id,
@@ -605,22 +820,60 @@ Route::middleware('auth')->group(function () {
                 'filename' => $file->getClientOriginalName(),
                 'file_path' => $path,
                 'file_size' => $file->getSize(),
-                'mime_type' => $file->getClientMimeType(),
+                'mime_type' => $file->getClientMimeType() ?: 'application/pdf',
                 'sha256' => $sha256,
                 'category' => $request->category ?? 'Client Submissions',
                 'privilege' => 'Confidential',
+                'is_client_visible' => true,
                 'version' => 1,
             ]);
 
             return back()->with('success', 'Document uploaded to case file.');
         })->name('documents.upload');
 
+        Route::get('/documents/{document}/download', function (Document $document) use ($getClient) {
+            $client = $getClient();
+
+            // STRICT DATA ISOLATION: The document must belong to a matter owned by this client
+            $matter = Matter::where('id', $document->matter_id)->where('client_id', $client->id)->first();
+            if (!$matter) {
+                abort(403, 'Unauthorized document access: This filing does not belong to your case dossiers.');
+            }
+
+            // Document must be designated client-visible
+            if ($document->is_client_visible === false) {
+                abort(403, 'Unauthorized: This filing is restricted to internal chambers work product.');
+            }
+
+            $defaultDisk = config('filesystems.default', 'local');
+            if ($document->file_path && Storage::disk($defaultDisk)->exists($document->file_path)) {
+                return Storage::disk($defaultDisk)->download($document->file_path, $document->filename, [
+                    'Content-Type' => $document->mime_type ?: 'application/pdf',
+                ]);
+            }
+            if ($document->file_path && Storage::disk('local')->exists($document->file_path)) {
+                return Storage::disk('local')->download($document->file_path, $document->filename, [
+                    'Content-Type' => $document->mime_type ?: 'application/pdf',
+                ]);
+            }
+            if ($document->file_path && Storage::disk('s3')->exists($document->file_path)) {
+                return Storage::disk('s3')->download($document->file_path, $document->filename, [
+                    'Content-Type' => $document->mime_type ?: 'application/pdf',
+                ]);
+            }
+
+            // Dynamic, compliant PDF stream fallback (Guaranteed to open cleanly in Adobe Reader / browsers)
+            $pdfContent = \App\Services\LegalPdfGenerator::forDocument($document);
+            return response($pdfContent, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => "attachment; filename=\"{$document->filename}\"",
+                'Content-Length' => strlen($pdfContent),
+            ]);
+        })->name('documents.download');
+
         // Counsel Communications / Messages
-        Route::get('/messages', function (Request $request) {
-            $user = Auth::user();
-            $client = Client::where('user_id', $user->id)->first() 
-                ?? Client::where('email', $user->email)->first() 
-                ?? Client::first();
+        Route::get('/messages', function (Request $request) use ($getClient) {
+            $client = $getClient();
 
             $matters = Matter::where('client_id', $client->id)->with(['leadAttorney', 'messages.sender'])->get();
             $selectedMatterId = $request->input('matter_id', $matters->first()->id ?? null);
@@ -629,11 +882,9 @@ Route::middleware('auth')->group(function () {
             return view('portal.messages.index', compact('client', 'matters', 'selectedMatter'));
         })->name('messages.index');
 
-        Route::post('/messages', function (Request $request) {
+        Route::post('/messages', function (Request $request) use ($getClient) {
             $user = Auth::user();
-            $client = Client::where('user_id', $user->id)->first() 
-                ?? Client::where('email', $user->email)->first() 
-                ?? Client::first();
+            $client = $getClient();
 
             $request->validate([
                 'matter_id' => 'required|exists:matters,id',
@@ -653,22 +904,26 @@ Route::middleware('auth')->group(function () {
             return back()->with('success', 'Message dispatched to legal counsel.');
         })->name('messages.store');
 
-        // Invoices & Retainer Ledger
-        Route::get('/invoices', function () {
-            $user = Auth::user();
-            $client = Client::where('user_id', $user->id)->first() 
-                ?? Client::where('email', $user->email)->first() 
-                ?? Client::first();
+        // Hearings & Calendar
+        Route::get('/calendar', function () use ($getClient) {
+            $client = $getClient();
+
+            $matterIds = Matter::where('client_id', $client->id)->pluck('id');
+            $events = Event::whereIn('matter_id', $matterIds)->with('matter')->orderBy('start_time')->get();
+
+            return view('portal.calendar.index', compact('client', 'events'));
+        })->name('calendar.index');
+
+        // Client Invoices & Retainer Ledger
+        Route::get('/invoices', function () use ($getClient) {
+            $client = $getClient();
 
             $invoices = Invoice::where('client_id', $client->id)->with('matter')->latest()->get();
             return view('portal.invoices.index', compact('client', 'invoices'));
         })->name('invoices.index');
 
-        Route::post('/invoices/{invoice}/pay', function (Request $request, Invoice $invoice) {
-            $user = Auth::user();
-            $client = Client::where('user_id', $user->id)->first() 
-                ?? Client::where('email', $user->email)->first() 
-                ?? Client::first();
+        Route::post('/invoices/{invoice}/pay', function (Request $request, Invoice $invoice) use ($getClient) {
+            $client = $getClient();
 
             if ($invoice->client_id !== $client->id) {
                 abort(403, 'Unauthorized invoice.');
@@ -683,21 +938,8 @@ Route::middleware('auth')->group(function () {
                 'amount_paid' => $invoice->total_amount,
             ]);
 
-            return back()->with('success', "Invoice {$invoice->invoice_number} settled in full.");
+            return back()->with('success', "Fee Bill {$invoice->invoice_number} settled successfully.");
         })->name('invoices.pay');
-
-        // Hearings & Calendar
-        Route::get('/calendar', function () {
-            $user = Auth::user();
-            $client = Client::where('user_id', $user->id)->first() 
-                ?? Client::where('email', $user->email)->first() 
-                ?? Client::first();
-
-            $matterIds = Matter::where('client_id', $client->id)->pluck('id');
-            $events = Event::whereIn('matter_id', $matterIds)->with('matter')->orderBy('start_time')->get();
-
-            return view('portal.calendar.index', compact('client', 'events'));
-        })->name('calendar.index');
     });
 });
 
@@ -719,6 +961,20 @@ Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(funct
         }
     })->name('dashboard');
 
+    // Law Firm Tenant Management
+    Route::resource('firms', \App\Http\Controllers\Admin\FirmManagementController::class);
+    Route::post('/firms/{firm}/toggle-status', [\App\Http\Controllers\Admin\FirmManagementController::class, 'toggleStatus'])->name('firms.toggle-status');
+
+    // SaaS Subscription & Plan Governance (PDF Pages 3, 20, 21)
+    Route::get('/plans', [\App\Http\Controllers\Admin\PlanManagementController::class, 'index'])->name('plans.index');
+    Route::post('/plans', [\App\Http\Controllers\Admin\PlanManagementController::class, 'store'])->name('plans.store');
+    Route::put('/plans/{plan}', [\App\Http\Controllers\Admin\PlanManagementController::class, 'update'])->name('plans.update');
+    Route::post('/plans/firms/{firm}/assign', [\App\Http\Controllers\Admin\PlanManagementController::class, 'assignPlan'])->name('plans.assign');
+
+    // Automated Test Management System
+    Route::get('/tests', [\App\Http\Controllers\Admin\TestManagementController::class, 'index'])->name('tests.index');
+    Route::post('/tests/run', [\App\Http\Controllers\Admin\TestManagementController::class, 'runAll'])->name('tests.run');
+
     Route::get('/settings/environment', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'index'])->name('settings.environment');
     Route::post('/settings/environment', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'update'])->name('settings.environment.update');
     Route::post('/settings/environment/test-db', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testDatabase'])->name('settings.environment.test-db');
@@ -727,4 +983,6 @@ Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(funct
     Route::post('/settings/environment/run-migrations', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'runMigrations'])->name('settings.environment.run-migrations');
     Route::post('/settings/environment/seed-db', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'seedDatabase'])->name('settings.environment.seed-db');
     Route::post('/settings/environment/restore-backup', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'restoreBackup'])->name('settings.environment.restore-backup');
+    Route::post('/settings/environment/clean-data', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'cleanData'])->name('settings.environment.clean-data');
+
 });

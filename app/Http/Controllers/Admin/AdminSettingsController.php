@@ -139,19 +139,68 @@ class AdminSettingsController extends Controller
         return response()->json($result);
     }
 
-    public function restoreBackup(Request $request, EnvironmentManager $envManager): RedirectResponse
+    public function restoreBackup(Request $request, EnvironmentManager $envManager)
     {
         $request->validate(['filename' => 'required|string']);
         $filename = $request->input('filename');
 
         $restored = $envManager->restoreBackup($filename);
 
+        if ($request->expectsJson() || $request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => $restored,
+                'message' => $restored
+                    ? "Environment successfully restored from backup: {$filename}"
+                    : "Failed to restore backup: file not found or permission denied.",
+            ]);
+        }
+
         if ($restored) {
-            return redirect()->route('admin.settings.environment')
+            return redirect()->route('admin.settings.environment', ['tab' => 'backups'])
                 ->with('success', "Environment restored successfully from backup: {$filename}");
         }
 
-        return redirect()->route('admin.settings.environment')
+        return redirect()->route('admin.settings.environment', ['tab' => 'backups'])
             ->with('error', "Failed to restore backup: {$filename}");
+    }
+
+    public function cleanData(Request $request): JsonResponse|RedirectResponse
+    {
+        $phrase = trim((string) $request->input('confirm_phrase'));
+        if (strtoupper($phrase) !== 'RESET') {
+            if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please enter "RESET" to confirm data purge.',
+                ], 422);
+            }
+            return redirect()->route('admin.settings.environment', ['tab' => 'database'])
+                ->with('error', 'Confirmation keyword incorrect. You must type "RESET" to purge sample data.');
+        }
+
+        try {
+            \Illuminate\Support\Facades\Artisan::call('legal:clean-data', ['--force' => true]);
+            $output = \Illuminate\Support\Facades\Artisan::output();
+
+            if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Sample matters, documents, and client records successfully purged. Chambers is in a clean fresh state.',
+                    'output' => $output,
+                ]);
+            }
+
+            return redirect()->route('admin.settings.environment', ['tab' => 'database'])
+                ->with('success', 'Sample matters, documents, and client records successfully purged. Chambers is in a clean fresh state.');
+        } catch (\Throwable $e) {
+            if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Purge failed: ' . $e->getMessage(),
+                ], 500);
+            }
+            return redirect()->route('admin.settings.environment', ['tab' => 'database'])
+                ->with('error', 'Failed to clean data: ' . $e->getMessage());
+        }
     }
 }

@@ -240,7 +240,7 @@ class DatabaseSeeder extends Seeder
         $matterApex->users()->attach([$priya->id, $amit->id]);
 
         // 5. Documents & Court Filings
-        Document::create([
+        $doc1 = Document::create([
             'firm_id' => $firm->id,
             'matter_id' => $matterMalhotra->id,
             'user_id' => $rajesh->id,
@@ -254,8 +254,11 @@ class DatabaseSeeder extends Seeder
             'privilege' => 'Advocate-Client Privileged',
             'version' => 1,
         ]);
+        $pdfBytes1 = \App\Services\LegalPdfGenerator::forDocument($doc1);
+        \Illuminate\Support\Facades\Storage::disk('local')->put($doc1->file_path, $pdfBytes1);
+        $doc1->update(['file_size' => strlen($pdfBytes1), 'sha256' => hash('sha256', $pdfBytes1)]);
 
-        Document::create([
+        $doc2 = Document::create([
             'firm_id' => $firm->id,
             'matter_id' => $matterMalhotra->id,
             'user_id' => $priya->id,
@@ -269,8 +272,11 @@ class DatabaseSeeder extends Seeder
             'privilege' => 'Confidential',
             'version' => 1,
         ]);
+        $pdfBytes2 = \App\Services\LegalPdfGenerator::forDocument($doc2);
+        \Illuminate\Support\Facades\Storage::disk('local')->put($doc2->file_path, $pdfBytes2);
+        $doc2->update(['file_size' => strlen($pdfBytes2), 'sha256' => hash('sha256', $pdfBytes2)]);
 
-        Document::create([
+        $doc3 = Document::create([
             'firm_id' => $firm->id,
             'matter_id' => $matterDelta->id,
             'user_id' => $priya->id,
@@ -284,6 +290,9 @@ class DatabaseSeeder extends Seeder
             'privilege' => 'Advocate-Client Privileged',
             'version' => 1,
         ]);
+        $pdfBytes3 = \App\Services\LegalPdfGenerator::forDocument($doc3);
+        \Illuminate\Support\Facades\Storage::disk('local')->put($doc3->file_path, $pdfBytes3);
+        $doc3->update(['file_size' => strlen($pdfBytes3), 'sha256' => hash('sha256', $pdfBytes3)]);
 
         // 6. Time Entries & Professional Fee Register
         TimeEntry::create([

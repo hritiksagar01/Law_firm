@@ -198,7 +198,7 @@
                                     {{ \Carbon\Carbon::parse($doc->created_at)->format('d M Y') }}
                                 </td>
                                 <td class="py-3 text-right">
-                                    <a href="{{ route('documents.download', $doc->id) }}" class="inline-flex items-center gap-1 text-xs text-[#9F8349] hover:underline font-medium">
+                                    <a href="{{ route('portal.documents.download', $doc->id) }}" class="inline-flex items-center gap-1 text-xs text-[#9F8349] hover:underline font-medium">
                                         <span class="material-symbols-outlined text-sm">download</span>
                                         <span>Download</span>
                                     </a>

@@ -15,7 +15,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-[#FAF8F5] font-sans text-[#222222] antialiased min-h-screen" x-data="{
-    activeTab: 'storage',
+    activeTab: '{{ request('tab', 'storage') }}',
     testingDb: false,
     dbResult: null,
     testingS3: false,
@@ -25,7 +25,15 @@
     runningMigrations: false,
     seedingDb: false,
     migrationResult: null,
-    showMigrationModal: false
+    showMigrationModal: false,
+    showRestoreModal: false,
+    restoreTargetFile: '',
+    restoringBackup: false,
+    restoreFeedback: null,
+    showCleanModal: false,
+    cleaningData: false,
+    cleanConfirmPhrase: '',
+    cleanResult: null
 }">
     
     <!-- Top Executive Navigation Bar -->
@@ -120,35 +128,35 @@
 
         <!-- Navigation Tabs -->
         <div class="flex flex-wrap items-center gap-2 p-1.5 bg-[#F4EFEA] rounded-xl mb-6 border border-[#e2e1dd]">
-            <button @click="activeTab = 'storage'" 
+            <button @click="activeTab = 'storage'; history.replaceState(null, null, '?tab=storage')" 
                 :class="activeTab === 'storage' ? 'bg-white text-[#222222] shadow-sm font-semibold' : 'text-[#766A5E] hover:text-[#222222] font-medium'"
                 class="py-2.5 px-4 rounded-lg text-xs flex items-center gap-2 transition-all">
                 <span class="material-symbols-outlined text-base text-amber-600">cloud_upload</span>
                 <span>Cloud Storage (AWS S3 / R2)</span>
             </button>
 
-            <button @click="activeTab = 'database'" 
+            <button @click="activeTab = 'database'; history.replaceState(null, null, '?tab=database')" 
                 :class="activeTab === 'database' ? 'bg-white text-[#222222] shadow-sm font-semibold' : 'text-[#766A5E] hover:text-[#222222] font-medium'"
                 class="py-2.5 px-4 rounded-lg text-xs flex items-center gap-2 transition-all">
                 <span class="material-symbols-outlined text-base text-blue-600">database</span>
                 <span>Database Engine</span>
             </button>
 
-            <button @click="activeTab = 'mail'" 
+            <button @click="activeTab = 'mail'; history.replaceState(null, null, '?tab=mail')" 
                 :class="activeTab === 'mail' ? 'bg-white text-[#222222] shadow-sm font-semibold' : 'text-[#766A5E] hover:text-[#222222] font-medium'"
                 class="py-2.5 px-4 rounded-lg text-xs flex items-center gap-2 transition-all">
                 <span class="material-symbols-outlined text-base text-purple-600">mail</span>
                 <span>Email &amp; SMTP Relay</span>
             </button>
 
-            <button @click="activeTab = 'app'" 
+            <button @click="activeTab = 'app'; history.replaceState(null, null, '?tab=app')" 
                 :class="activeTab === 'app' ? 'bg-white text-[#222222] shadow-sm font-semibold' : 'text-[#766A5E] hover:text-[#222222] font-medium'"
                 class="py-2.5 px-4 rounded-lg text-xs flex items-center gap-2 transition-all">
                 <span class="material-symbols-outlined text-base text-[#9F8349]">settings_applications</span>
                 <span>App &amp; Indian Localization</span>
             </button>
 
-            <button @click="activeTab = 'backups'" 
+            <button @click="activeTab = 'backups'; history.replaceState(null, null, '?tab=backups')" 
                 :class="activeTab === 'backups' ? 'bg-white text-[#222222] shadow-sm font-semibold' : 'text-[#766A5E] hover:text-[#222222] font-medium'"
                 class="py-2.5 px-4 rounded-lg text-xs flex items-center gap-2 transition-all">
                 <span class="material-symbols-outlined text-base text-[#554D45]">history</span>
@@ -322,6 +330,13 @@
                         <span x-show="seedingDb" class="material-symbols-outlined text-sm animate-spin">refresh</span>
                         <span x-text="seedingDb ? 'Seeding Practice Data...' : 'Seed Practice Data &amp; Users'"></span>
                     </button>
+
+                    <button type="button" 
+                        @click="showCleanModal = true; cleanConfirmPhrase = ''; cleanResult = null;"
+                        class="px-3.5 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs">
+                        <span class="material-symbols-outlined text-sm text-red-600">delete_sweep</span>
+                        <span>Wipe Sample Data (Fresh Slate)</span>
+                    </button>
                 </div>
             </div>
 
@@ -369,14 +384,18 @@
                     <p class="text-[#554D45] leading-relaxed font-medium">
                         Always use the <strong>Supabase Connection Pooler (IPv4)</strong> in your configuration:
                     </p>
-                    <ul class="list-disc list-inside text-[11px] font-mono text-[#766A5E] space-y-0.5 mt-1 bg-white p-2.5 rounded-lg border border-[#EFECE6]">
-                        <li>Host: <span class="text-[#9F8349] font-bold">aws-0-[region].pooler.supabase.com</span> (e.g. <span class="text-[#9F8349]">aws-0-ap-south-1.pooler.supabase.com</span>)</li>
-                        <li>Port: <span class="text-[#9F8349] font-bold">5432</span> (Session Mode for Laravel)</li>
+                    <ul class="list-disc list-inside text-[11px] font-mono text-[#766A5E] space-y-1 mt-1 bg-white p-2.5 rounded-lg border border-[#EFECE6]">
+                        <li>Host: <span class="text-[#9F8349] font-bold">aws-0-[region].pooler.supabase.com</span> (e.g. <span class="text-[#9F8349]">aws-0-ap-northeast-1.pooler.supabase.com</span>)</li>
+                        <li>Port: <span class="text-emerald-700 font-bold">6543</span> <span class="text-xs font-sans text-emerald-800 font-semibold">(Transaction Mode — Super Fast &amp; High Scalability with Emulated Prepares)</span> or <span class="text-[#9F8349] font-bold">5432</span> (Session Mode)</li>
                         <li>Username: <span class="text-[#9F8349] font-bold">postgres.[project-ref]</span> (Must include <span class="text-[#9F8349]">.[project-ref]</span>)</li>
                         <li>Database: <span class="text-[#9F8349] font-bold">postgres</span></li>
                     </ul>
+                    <div class="p-2 bg-emerald-50 border border-emerald-200 rounded text-[11px] text-emerald-900 mt-2">
+                        <strong>Performance Optimization Note:</strong> Port <code class="font-bold">6543</code> (Transaction Pooler) connects to warm PgBouncer pools on Supabase without spawning heavy backend processes. Combined with local file sessions (<code class="font-mono">SESSION_DRIVER=file</code>), this eliminates network roundtrips and makes Supabase lightning fast!
+                    </div>
                 </div>
             </div>
+
 
             <!-- Quick 1-Click Database Presets -->
             <div class="mb-5 flex flex-wrap items-center justify-between gap-3 p-3.5 bg-[#FAF8F5] rounded-xl border border-[#EAE4DC]">
@@ -491,7 +510,7 @@
                         <span class="material-symbols-outlined text-purple-600">mail</span>
                         <span>Outbound SMTP Email Gateway (Brevo / SES / Mailgun)</span>
                     </h2>
-                    <p class="text-xs text-[#766A5E] mt-1">Configure transactional email delivery for client invitation links, retainer reminders, hearing alerts, and invoice billing.</p>
+                    <p class="text-xs text-[#766A5E] mt-1">Configure transactional email delivery for client invitation links, consultation confirmations, hearing alerts, and document requests.</p>
                 </div>
 
                 <div class="flex items-center gap-2">
@@ -610,7 +629,7 @@
                 </div>
 
                 <div class="mt-8 pt-5 border-t border-[#F4EFEA] flex items-center justify-between">
-                    <span class="text-xs text-[#766A5E]">Applies to all client email notifications and billing dispatches.</span>
+                    <span class="text-xs text-[#766A5E]">Applies to all client email notifications and case dispatches.</span>
                     <button type="submit" class="px-5 py-2.5 rounded-lg bg-[#9F8349] hover:bg-[#856C36] text-white text-xs font-semibold shadow-sm flex items-center gap-2">
                         <span class="material-symbols-outlined text-base text-[#B88B56]">save</span>
                         <span>Save Email Settings</span>
@@ -752,14 +771,10 @@
                                     {{ $backup['size'] }}
                                 </td>
                                 <td class="py-3 px-4 text-right">
-                                    <form action="{{ route('admin.settings.environment.restore-backup') }}" method="POST" onsubmit="return confirm('Revert .env to this snapshot? Current file will be backed up.');" class="inline">
-                                        @csrf
-                                        <input type="hidden" name="filename" value="{{ $backup['filename'] }}"/>
-                                        <button type="submit" class="px-2.5 py-1 rounded bg-[#FAF8F5] hover:bg-amber-100 text-amber-900 border border-amber-300 font-semibold transition-all inline-flex items-center gap-1">
-                                            <span class="material-symbols-outlined text-sm">settings_backup_restore</span>
-                                            <span>Restore Snapshot</span>
-                                        </button>
-                                    </form>
+                                    <button type="button" @click="confirmRestore('{{ $backup['filename'] }}')" class="px-2.5 py-1 rounded bg-[#FAF8F5] hover:bg-amber-100 text-amber-900 border border-amber-300 font-semibold transition-all inline-flex items-center gap-1 shadow-sm">
+                                        <span class="material-symbols-outlined text-sm text-[#9F8349]">settings_backup_restore</span>
+                                        <span>Restore Snapshot</span>
+                                    </button>
                                 </td>
                             </tr>
                             @endforeach
@@ -809,6 +824,114 @@
                 </div>
             </div>
 
+        </div>
+
+        <!-- Restore Snapshot Confirmation Modal -->
+        <div x-show="showRestoreModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+            <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="if(!restoringBackup) showRestoreModal = false"></div>
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-[#E8DAC8]" @click.away="if(!restoringBackup) showRestoreModal = false">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-2xl text-[#9F8349]">settings_backup_restore</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-base font-serif font-bold text-[#222222]">Restore Environment Snapshot</h3>
+                            <p class="text-xs text-[#766A5E] mt-1">
+                                Are you sure you want to revert your active <code class="font-mono bg-[#FAF8F5] px-1.5 py-0.5 rounded border border-[#E8DAC8] text-[#222222]">.env</code> to:
+                            </p>
+                            <div class="mt-2.5 p-2.5 rounded-lg bg-[#FAF8F5] border border-[#E8DAC8] font-mono text-xs font-semibold text-[#222222] flex items-center justify-between">
+                                <span x-text="restoreTargetFile"></span>
+                                <span class="text-[10px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300 font-sans font-medium">Snapshot</span>
+                            </div>
+                            <div class="mt-3 p-3 rounded-lg bg-amber-50/70 border border-amber-200/80 text-[11px] text-amber-900 leading-relaxed">
+                                <strong class="font-semibold">Safety Assurance:</strong> An automated pre-restore backup of your current <code class="font-mono">.env</code> will be created instantly before restoring, and application configuration caches will be reloaded.
+                            </div>
+
+                            <!-- Inline Feedback Message -->
+                            <template x-if="restoreFeedback">
+                                <div class="mt-3 p-3 rounded-lg text-xs font-medium" :class="restoreFeedback.success ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-red-50 text-red-800 border border-red-200'">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-base" x-text="restoreFeedback.success ? 'check_circle' : 'error'"></span>
+                                        <span x-text="restoreFeedback.message"></span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-[#F4EFEA]">
+                        <button type="button" @click="showRestoreModal = false" :disabled="restoringBackup" class="px-4 py-2 rounded-lg text-xs font-medium text-[#766A5E] hover:bg-[#FAF8F5] border border-[#E8DAC8] transition-all">
+                            Cancel
+                        </button>
+                        <button type="button" @click="executeRestore()" :disabled="restoringBackup" class="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#9F8349] hover:bg-[#8A713E] shadow-sm flex items-center gap-2 transition-all">
+                            <span x-show="restoringBackup" class="inline-block w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                            <span class="material-symbols-outlined text-sm" x-show="!restoringBackup">check</span>
+                            <span x-text="restoringBackup ? 'Restoring Snapshot...' : 'Confirm Restore'"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clean Slate / Sample Data Wipe Modal -->
+        <div x-show="showCleanModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+            <div class="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity" @click="if(!cleaningData) showCleanModal = false"></div>
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-lg border border-[#EAE4DC]">
+                    <div class="p-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
+                                <span class="material-symbols-outlined text-xl">delete_sweep</span>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-[#222222]">Wipe Sample &amp; Seeded Practice Data</h3>
+                                <p class="text-xs text-[#766A5E]">Start fresh with a clean chambers slate</p>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-xs text-red-950 space-y-2 mb-4 leading-relaxed">
+                            <p class="font-semibold text-red-950">This action will permanently purge:</p>
+                            <ul class="list-disc list-inside space-y-1 text-red-900 font-mono text-[11px]">
+                                <li>All sample client profiles &amp; portal logins</li>
+                                <li>All matters, case dossiers, and court filings</li>
+                                <li>All physical document files from storage</li>
+                                <li>All billing invoices, time logs, tasks, and hearings</li>
+                            </ul>
+                            <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded text-emerald-900 text-[11px] font-medium mt-2">
+                                <strong>Protected:</strong> Your Law Firm tenant structure, subscription tier, and advocate/admin staff login credentials are completely preserved so you can immediately begin live casework.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-semibold text-[#222222] mb-1">
+                                Type <span class="font-mono text-red-600 font-bold">RESET</span> to confirm:
+                            </label>
+                            <input type="text" x-model="cleanConfirmPhrase" placeholder="RESET" 
+                                class="w-full text-xs rounded-lg border border-[#EAE4DC] p-2.5 bg-[#FAF8F5] font-mono focus:bg-white focus:ring-1 focus:ring-red-500 focus:border-red-500 uppercase"/>
+                        </div>
+
+                        <template x-if="cleanResult">
+                            <div class="mb-4 p-3 rounded-lg text-xs" :class="cleanResult.success ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-red-50 text-red-900 border border-red-200'">
+                                <span x-text="cleanResult.message"></span>
+                            </div>
+                        </template>
+
+                        <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#EAE4DC]">
+                            <button type="button" @click="showCleanModal = false" :disabled="cleaningData" 
+                                class="px-4 py-2 text-xs font-semibold rounded-lg bg-[#FAF8F5] text-[#554D45] hover:bg-[#F4EFEA] border border-[#EAE4DC] transition-colors">
+                                Cancel
+                            </button>
+                            <button type="button" @click="executeCleanData()" :disabled="cleaningData || cleanConfirmPhrase.trim().toUpperCase() !== 'RESET'" 
+                                class="px-4 py-2 text-xs font-semibold rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-sm transition-all">
+                                <span x-show="!cleaningData" class="material-symbols-outlined text-sm">delete_forever</span>
+                                <span x-show="cleaningData" class="material-symbols-outlined text-sm animate-spin">refresh</span>
+                                <span x-text="cleaningData ? 'Purging Sample Data...' : 'Confirm Purge (Clean Slate)'"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </main>
@@ -995,6 +1118,76 @@
                 document.getElementById('db_password').value = '';
                 alert('Local SQLite (Safe Failsafe) preset applied! Click "Test DB Connection" or "Save Database Settings".');
             }
+        }
+
+        function confirmRestore(filename) {
+            const alpine = Alpine.$data(document.body);
+            alpine.restoreTargetFile = filename;
+            alpine.restoreFeedback = null;
+            alpine.restoringBackup = false;
+            alpine.showRestoreModal = true;
+        }
+
+        function executeRestore() {
+            const alpine = Alpine.$data(document.body);
+            if (!alpine.restoreTargetFile) return;
+
+            alpine.restoringBackup = true;
+            alpine.restoreFeedback = null;
+
+            fetch('{{ route('admin.settings.environment.restore-backup') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ filename: alpine.restoreTargetFile })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alpine.restoringBackup = false;
+                alpine.restoreFeedback = data;
+                if (data.success) {
+                    setTimeout(() => {
+                        window.location.href = '{{ route('admin.settings.environment') }}?tab=backups';
+                    }, 800);
+                }
+            })
+            .catch(err => {
+                alpine.restoringBackup = false;
+                alpine.restoreFeedback = { success: false, message: 'Restore request error: ' + err.message };
+            });
+        }
+
+        function executeCleanData() {
+            const alpine = Alpine.$data(document.body);
+            alpine.cleaningData = true;
+            alpine.cleanResult = null;
+
+            fetch('{{ route('admin.settings.environment.clean-data') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ confirm_phrase: alpine.cleanConfirmPhrase })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alpine.cleaningData = false;
+                alpine.cleanResult = data;
+                if (data.success) {
+                    setTimeout(() => {
+                        window.location.href = '{{ route('admin.settings.environment') }}?tab=database';
+                    }, 1200);
+                }
+            })
+            .catch(err => {
+                alpine.cleaningData = false;
+                alpine.cleanResult = { success: false, message: 'Purge error: ' + err.message };
+            });
         }
     </script>
 </body>

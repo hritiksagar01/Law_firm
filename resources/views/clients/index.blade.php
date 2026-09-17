@@ -41,6 +41,11 @@
                         <span>{{ $client->phone }}</span>
                     </div>
                     @endif
+
+                    <div class="mt-2 text-[11px] text-[#554D45] flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-sm text-[#9F8349]">gavel</span>
+                        <span>Counsel: <strong>{{ $client->primaryAttorney->name ?? 'Managing Chambers' }}</strong></span>
+                    </div>
                 </div>
 
                 <div class="mt-4 pt-3 border-t border-[#F4EFEA] flex items-center justify-between text-xs">
@@ -48,10 +53,26 @@
                         <span class="text-[10px] text-[#766A5E] block uppercase font-mono">Matters &amp; Dossiers</span>
                         <span class="font-mono font-semibold text-[#222222]">{{ $client->matters->count() }} active</span>
                     </div>
-                    <a href="{{ route('matters.index') }}" class="py-1 px-2.5 text-center text-[11px] font-medium text-[#9F8349] bg-[#F8F4EE] hover:bg-[#F4ECE1]/50 rounded transition-colors flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">folder_open</span>
-                        <span>View Cases</span>
-                    </a>
+                    <div class="flex items-center gap-2">
+                        @if($client->user_id)
+                            <span class="inline-flex items-center gap-1 text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                <span class="material-symbols-outlined text-xs">verified_user</span>
+                                <span>Portal Active</span>
+                            </span>
+                        @else
+                            <form action="{{ route('clients.invite', $client->id) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="py-1 px-2 text-[10px] font-medium text-white bg-[#9F8349] hover:bg-[#856C36] rounded transition-colors flex items-center gap-0.5">
+                                    <span class="material-symbols-outlined text-xs">send</span>
+                                    <span>Invite Portal</span>
+                                </button>
+                            </form>
+                        @endif
+                        <a href="{{ route('matters.index') }}" class="py-1 px-2.5 text-center text-[11px] font-medium text-[#9F8349] bg-[#F8F4EE] hover:bg-[#F4ECE1]/50 rounded transition-colors flex items-center gap-1">
+                            <span class="material-symbols-outlined text-xs">folder_open</span>
+                            <span>Cases</span>
+                        </a>
+                    </div>
                 </div>
             </div>
             @endforeach
@@ -106,6 +127,25 @@
                             <label class="font-medium text-[#222222]">GSTIN / PAN</label>
                             <input name="tax_id" type="text" placeholder="07AAACM1234F1Z5" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
                         </div>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <label class="font-medium text-[#222222]">Lead Consulting Counsel</label>
+                        <select name="primary_attorney_id" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]">
+                            @foreach($attorneys as $attorney)
+                                <option value="{{ $attorney->id }}" {{ Auth::id() === $attorney->id ? 'selected' : '' }}>
+                                    {{ $attorney->name }} ({{ ucfirst($attorney->role) }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="p-3 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] flex items-start gap-2.5">
+                        <input type="checkbox" name="invite_portal" id="invite_portal" value="1" checked class="mt-0.5 rounded border-[#EAE4DC] text-[#9F8349] focus:ring-[#9F8349]"/>
+                        <label for="invite_portal" class="text-xs text-[#222222] font-medium flex flex-col cursor-pointer">
+                            <span class="font-semibold text-[#222222]">Provision Client Portal User Account</span>
+                            <span class="text-[11px] text-[#766A5E] font-normal">Creates a client login associated with this legal counsel. Default password: Client@1234</span>
+                        </label>
                     </div>
 
                     <input type="hidden" name="trust_balance" value="0"/>

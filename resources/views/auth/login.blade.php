@@ -119,13 +119,13 @@
                 <template x-if="tab === 'firm'">
                     <div>
                         <h2 class="text-base font-serif font-bold text-[#222222]">Advocate &amp; Chambers Sign In</h2>
-                        <p class="text-xs text-[#766A5E] mt-0.5">Access litigation dockets, time entries, and matter billing.</p>
+                        <p class="text-xs text-[#766A5E] mt-0.5">Access litigation dockets, filings, and legal opinions.</p>
                     </div>
                 </template>
                 <template x-if="tab === 'client'">
                     <div>
                         <h2 class="text-base font-serif font-bold text-[#222222]">Client Portal Sign In</h2>
-                        <p class="text-xs text-[#766A5E] mt-0.5">Track case milestones, fulfill document requests, and review billing.</p>
+                        <p class="text-xs text-[#766A5E] mt-0.5">Track case milestones, fulfill document requests, and view court listings.</p>
                     </div>
                 </template>
             </div>

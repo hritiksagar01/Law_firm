@@ -97,11 +97,14 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
-            'connect_timeout' => env('DB_CONNECT_TIMEOUT', 3),
+            'connect_timeout' => env('DB_CONNECT_TIMEOUT', 5),
             'options' => [
-                \PDO::ATTR_TIMEOUT => 3,
+                \PDO::ATTR_TIMEOUT => 5,
+                \PDO::ATTR_EMULATE_PREPARES => true, // Essential for Supabase PgBouncer Transaction Pooler (Port 6543)
+                \PDO::ATTR_PERSISTENT => env('DB_PERSISTENT', false),
             ],
         ],
+
 
         'sqlsrv' => [
             'driver' => 'sqlsrv',

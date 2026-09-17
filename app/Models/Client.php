@@ -27,6 +27,11 @@ class Client extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function primaryAttorney(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'primary_attorney_id');
+    }
+
     public function matters(): HasMany
     {
         return $this->hasMany(Matter::class);

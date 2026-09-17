@@ -114,7 +114,7 @@ class AuthController extends Controller
         try {
             $user = User::where('email', $request->email)->first();
 
-            if (! $user) {
+            if (!$user) {
                 return back()->withErrors(['email' => 'Demo user not found.']);
             }
 
@@ -161,8 +161,8 @@ class AuthController extends Controller
     public function showRegisterForm()
     {
         if (Auth::check()) {
-            return Auth::user()->isClient() 
-                ? redirect()->route('portal.dashboard') 
+            return Auth::user()->isClient()
+                ? redirect()->route('portal.dashboard')
                 : redirect()->route('dashboard');
         }
 

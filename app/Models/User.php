@@ -64,19 +64,106 @@ class User extends Authenticatable
         return $this->hasMany(Event::class);
     }
 
+    public function roleRelation(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function groups(): BelongsToMany
+    {
+        return $this->belongsToMany(UserGroup::class, 'group_user');
+    }
+
+    public function hasRole(string|array $roles): bool
+    {
+        $roleList = is_array($roles) ? $roles : [$roles];
+        
+        if (in_array($this->role, $roleList)) {
+            return true;
+        }
+
+        if ($this->roleRelation && in_array($this->roleRelation->slug, $roleList)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function hasPermission(string $permissionSlug): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        // Check via assigned Role model
+        if ($this->relationLoaded('roleRelation')) {
+            if ($this->roleRelation && $this->roleRelation->hasPermission($permissionSlug)) {
+                return true;
+            }
+        } elseif ($this->role_id) {
+            $role = $this->roleRelation()->with('permissions')->first();
+            if ($role && $role->permissions->contains('slug', $permissionSlug)) {
+                return true;
+            }
+        }
+
+        // Check via User Groups
+        foreach ($this->groups()->with('permissions')->get() as $group) {
+            if ($group->permissions->contains('slug', $permissionSlug)) {
+                return true;
+            }
+        }
+
+        // Fallback default permissions based on role string
+        $defaultMatrix = [
+            'admin' => ['*'],
+            'partner' => ['*'],
+            'lawyer' => ['matters.view', 'matters.create', 'matters.edit', 'clients.view', 'clients.create', 'clients.edit', 'documents.view', 'documents.upload', 'tasks.view', 'tasks.create', 'tasks.edit', 'tasks.assign', 'opinions.view', 'opinions.create', 'opinions.review', 'calendar.view', 'hearings.manage', 'appointments.manage', 'reports.view'],
+            'associate' => ['matters.view', 'matters.create', 'matters.edit', 'clients.view', 'clients.create', 'clients.edit', 'documents.view', 'documents.upload', 'tasks.view', 'tasks.create', 'tasks.edit', 'tasks.assign', 'opinions.view', 'opinions.create', 'opinions.review', 'calendar.view', 'hearings.manage', 'appointments.manage', 'reports.view'],
+            'paralegal' => ['matters.view', 'clients.view', 'documents.view', 'documents.upload', 'tasks.view', 'tasks.edit', 'calendar.view', 'hearings.manage', 'appointments.manage'],
+            'support_staff' => ['clients.view', 'calendar.view', 'appointments.manage', 'tasks.view'],
+            'client' => ['portal.access'],
+        ];
+
+        $currentRole = $this->roleRelation ? $this->roleRelation->slug : $this->role;
+        $allowed = $defaultMatrix[$currentRole] ?? [];
+
+        return in_array('*', $allowed) || in_array($permissionSlug, $allowed);
+    }
+
     public function isPartner(): bool
     {
-        return in_array($this->role, ['partner', 'senior_partner']);
+        return in_array($this->role, ['partner', 'senior_partner', 'admin']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['admin', 'partner']));
+    }
+
+    public function isAdmin(): bool
+    {
+        return in_array($this->role, ['admin', 'partner', 'superadmin']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['admin', 'partner']));
     }
 
     public function isAttorney(): bool
     {
-        return in_array($this->role, ['partner', 'senior_partner', 'associate']);
+        return in_array($this->role, ['partner', 'senior_partner', 'associate', 'lawyer', 'admin']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['admin', 'partner', 'lawyer']));
+    }
+
+    public function isLawyer(): bool
+    {
+        return $this->isAttorney();
+    }
+
+    public function isParalegal(): bool
+    {
+        return $this->role === 'paralegal' || ($this->roleRelation && $this->roleRelation->slug === 'paralegal');
+    }
+
+    public function isSupportStaff(): bool
+    {
+        return in_array($this->role, ['support_staff', 'support', 'finance']) || ($this->roleRelation && $this->roleRelation->slug === 'support_staff');
     }
 
     public function isClient(): bool
     {
-        return $this->role === 'client';
+        return $this->role === 'client' || ($this->roleRelation && $this->roleRelation->slug === 'client');
     }
 
     public function isSuperAdmin(): bool
@@ -84,3 +171,5 @@ class User extends Authenticatable
         return $this->role === 'superadmin';
     }
 }
+
+

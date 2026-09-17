@@ -32,6 +32,10 @@
                 <span class="material-symbols-outlined text-sm">hub</span>
                 <span>Tenant Telemetry</span>
             </a>
+            <a href="{{ route('admin.firms.index') }}" class="px-3 py-1.5 rounded-md text-[#D4C4B5] hover:text-white hover:bg-[#3A322B] transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">corporate_fare</span>
+                <span>Law Firms</span>
+            </a>
             <a href="{{ route('admin.settings.environment') }}" class="px-3 py-1.5 rounded-md text-[#D4C4B5] hover:text-white hover:bg-[#3A322B] transition-all flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-sm">tune</span>
                 <span>Environment &amp; Cloud</span>
@@ -56,10 +60,10 @@
                     <span class="material-symbols-outlined text-base text-[#9F8349]">tune</span>
                     <span>Environment &amp; Cloud Settings</span>
                 </a>
-                <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm">
+                <a href="{{ route('admin.firms.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm transition-all">
                     <span class="material-symbols-outlined text-base">domain_add</span>
                     <span>Provision New Law Firm</span>
-                </button>
+                </a>
             </div>
         </div>
 
@@ -93,8 +97,14 @@
         <!-- Law Firm Tenant Directory -->
         <div class="bg-white rounded-2xl border border-[#EFECE6] shadow-xs overflow-hidden">
             <div class="p-4 border-b border-[#EFECE6] flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-[#222222]">Registered Law Firm Tenants</h3>
-                <span class="font-mono text-xs text-[#766A5E]">{{ $firms->count() }} Tenant Accounts</span>
+                <div>
+                    <h3 class="text-sm font-semibold text-[#222222]">Registered Law Firm Tenants</h3>
+                    <span class="font-mono text-xs text-[#766A5E]">{{ $firms->count() }} Tenant Accounts</span>
+                </div>
+                <a href="{{ route('admin.firms.index') }}" class="text-xs text-[#9F8349] font-semibold hover:underline flex items-center gap-1">
+                    <span>Manage All Law Firms</span>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
             </div>
 
             <table class="w-full text-left border-collapse">
@@ -105,14 +115,16 @@
                         <th class="py-3 px-4 text-center">Attorneys &amp; Staff</th>
                         <th class="py-3 px-4 text-center">Active Matters</th>
                         <th class="py-3 px-4 text-center">Vault Files</th>
-                        <th class="py-3 px-4 text-center">Action</th>
+                        <th class="py-3 px-4 text-right">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#EFECE6] text-sm">
                     @foreach($firms as $firm)
                     <tr class="hover:bg-[#FAF8F5] transition-colors">
                         <td class="py-3.5 px-4 font-semibold text-[#222222]">
-                            {{ $firm->name }}
+                            <a href="{{ route('admin.firms.show', $firm) }}" class="hover:text-[#9F8349] hover:underline">
+                                {{ $firm->name }}
+                            </a>
                         </td>
                         <td class="py-3.5 px-4 font-mono text-xs text-[#766A5E]">
                             {{ $firm->slug }}.lexiscore.app
@@ -126,10 +138,15 @@
                         <td class="py-3.5 px-4 text-center font-mono text-xs text-[#222222]">
                             {{ $firm->documents_count }}
                         </td>
-                        <td class="py-3.5 px-4 text-center">
-                            <a href="{{ route('dashboard') }}" class="px-3 py-1 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-2xs">
-                                Impersonate Chambers
-                            </a>
+                        <td class="py-3.5 px-4 text-right">
+                            <div class="inline-flex items-center gap-2">
+                                <a href="{{ route('admin.firms.show', $firm) }}" class="px-2.5 py-1 rounded-lg border border-[#EAE4DC] text-xs font-semibold text-[#222222] hover:bg-white shadow-2xs">
+                                    Overview
+                                </a>
+                                <a href="{{ route('dashboard') }}" class="px-2.5 py-1 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-2xs">
+                                    Workspace
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     @endforeach

@@ -23,16 +23,16 @@
         <!-- Stage Filters -->
         <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
             <a href="{{ route('matters.index') }}" class="px-3 py-1.5 rounded-lg text-xs font-medium {{ !request('stage') || request('stage') == 'all' ? 'bg-[#9F8349] text-white' : 'bg-white border border-[#EAE4DC] text-[#554D45] hover:bg-[#F4EFEA]' }}">
-                All ({{ \App\Models\Matter::count() }})
+                All ({{ $totalCount ?? $matters->count() }})
             </a>
             <a href="{{ route('matters.index', ['stage' => 'Discovery']) }}" class="px-3 py-1.5 rounded-lg text-xs font-medium {{ request('stage') == 'Discovery' ? 'bg-[#9F8349] text-white' : 'bg-white border border-[#EAE4DC] text-[#554D45] hover:bg-[#F4EFEA]' }}">
-                Discovery ({{ \App\Models\Matter::where('stage', 'Discovery')->count() }})
+                Discovery ({{ $discoveryCount ?? $matters->where('stage', 'Discovery')->count() }})
             </a>
             <a href="{{ route('matters.index', ['stage' => 'Pleadings']) }}" class="px-3 py-1.5 rounded-lg text-xs font-medium {{ request('stage') == 'Pleadings' ? 'bg-[#9F8349] text-white' : 'bg-white border border-[#EAE4DC] text-[#554D45] hover:bg-[#F4EFEA]' }}">
-                Pleadings ({{ \App\Models\Matter::where('stage', 'Pleadings')->count() }})
+                Pleadings ({{ $pleadingsCount ?? $matters->where('stage', 'Pleadings')->count() }})
             </a>
             <a href="{{ route('matters.index', ['stage' => 'Pre-Trial']) }}" class="px-3 py-1.5 rounded-lg text-xs font-medium {{ request('stage') == 'Pre-Trial' ? 'bg-[#9F8349] text-white' : 'bg-white border border-[#EAE4DC] text-[#554D45] hover:bg-[#F4EFEA]' }}">
-                Pre-Trial ({{ \App\Models\Matter::where('stage', 'Pre-Trial')->count() }})
+                Pre-Trial ({{ $preTrialCount ?? $matters->where('stage', 'Pre-Trial')->count() }})
             </a>
         </div>
 

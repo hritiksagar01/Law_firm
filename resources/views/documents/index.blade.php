@@ -1,7 +1,13 @@
 <x-app-layout>
     <x-slot name="title">Document &amp; Evidence Vault — Quire Legal</x-slot>
 
-    <div x-data="{ openUploadModal: false, categoryFilter: 'all' }">
+    <div x-data="{
+        openUploadModal: {{ ($errors->any() || session('error')) ? 'true' : 'false' }},
+        categoryFilter: 'all',
+        selectedFileName: '',
+        selectedFileSizeText: '',
+        fileSizeError: ''
+    }">
         <!-- Header & Action Ribbon -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#EFECE6] mb-6">
             <div>
@@ -52,6 +58,7 @@
                         <th class="py-3 px-4">Matter Dossier</th>
                         <th class="py-3 px-4">Category</th>
                         <th class="py-3 px-4">Privilege Assertion</th>
+                        <th class="py-3 px-4">Portal Visibility</th>
                         <th class="py-3 px-4">Size</th>
                         <th class="py-3 px-4">SHA-256 Checksum</th>
                         <th class="py-3 px-4 text-center">Download</th>
@@ -70,7 +77,7 @@
                             </div>
                         </td>
                         <td class="py-3.5 px-4 text-xs font-medium text-[#554D45]">
-                            {{ $doc->matter->case_number }}
+                            {{ $doc->matter->case_number ?? 'General' }}
                         </td>
                         <td class="py-3.5 px-4">
                             <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-[#F4EFEA] text-[#554D45]">
@@ -81,6 +88,19 @@
                             <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-[#B88B56]/60 text-[#9F8349] font-semibold">
                                 {{ $doc->privilege }}
                             </span>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            @if($doc->is_client_visible)
+                                <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span class="material-symbols-outlined text-xs">visibility</span>
+                                    <span>Client Visible</span>
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+                                    <span class="material-symbols-outlined text-xs">lock</span>
+                                    <span>Chambers Only</span>
+                                </span>
+                            @endif
                         </td>
                         <td class="py-3.5 px-4 font-mono text-xs text-[#766A5E]">
                             {{ $doc->formattedSize() }}
@@ -111,6 +131,25 @@
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
+
+                @if($errors->any())
+                <div class="mb-3 p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-800">
+                    <div class="flex items-center gap-1.5 font-semibold mb-1">
+                        <span class="material-symbols-outlined text-sm">error</span>
+                        <span>Upload Issue:</span>
+                    </div>
+                    <ul class="list-disc list-inside text-[11px] space-y-0.5">
+                        @foreach($errors->all() as $err)
+                        <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @elseif(session('error'))
+                <div class="mb-3 p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-800 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">error</span>
+                    <span>{{ session('error') }}</span>
+                </div>
+                @endif
 
                 <form action="{{ route('documents.upload') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-3.5 text-xs">
                     @csrf
@@ -151,9 +190,55 @@
                         </div>
                     </div>
 
+                    <div class="p-3 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] flex items-start gap-2.5">
+                        <input type="checkbox" name="is_client_visible" id="is_client_visible" value="1" checked class="mt-0.5 rounded border-[#EAE4DC] text-[#9F8349] focus:ring-[#9F8349]"/>
+                        <label for="is_client_visible" class="text-xs text-[#222222] font-medium flex flex-col cursor-pointer">
+                            <span class="font-semibold text-[#222222]">Share with Client in Portal</span>
+                            <span class="text-[11px] text-[#766A5E] font-normal">When checked, the client associated with this case can view and download this filing. Uncheck for internal chambers work product or confidential strategy memos.</span>
+                        </label>
+                    </div>
+
                     <div class="flex flex-col gap-1">
-                        <label class="font-medium text-[#222222]">Document File (PDF, DOCX, TXT)</label>
-                        <input name="file" required type="file" class="w-full p-2 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-medium file:bg-[#9F8349] file:text-white hover:file:bg-[#856C36] cursor-pointer"/>
+                        <div class="flex items-center justify-between">
+                            <label class="font-medium text-[#222222]">Document File (PDF, DOCX, TXT, Images)</label>
+                            <span class="text-[10px] text-[#766A5E] font-mono">Max 50 MB</span>
+                        </div>
+                        <input name="file" required type="file" 
+                            accept=".pdf,.docx,.doc,.txt,.tiff,.png,.jpg,.jpeg"
+                            @change="
+                                const f = $event.target.files[0];
+                                if (f) {
+                                    selectedFileName = f.name;
+                                    const mb = (f.size / (1024 * 1024)).toFixed(2);
+                                    selectedFileSizeText = mb + ' MB';
+                                    if (f.size > 52428800) {
+                                        fileSizeError = 'File size (' + mb + ' MB) exceeds the maximum allowed 50 MB limit.';
+                                    } else {
+                                        fileSizeError = '';
+                                    }
+                                } else {
+                                    selectedFileName = '';
+                                    selectedFileSizeText = '';
+                                    fileSizeError = '';
+                                }
+                            "
+                            class="w-full p-2 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-medium file:bg-[#9F8349] file:text-white hover:file:bg-[#856C36] cursor-pointer"/>
+                        
+                        <template x-if="selectedFileName">
+                            <div class="flex items-center justify-between text-[11px] p-2 mt-1 rounded bg-[#FAF8F5] border border-[#EAE4DC]">
+                                <div class="flex items-center gap-1.5 truncate">
+                                    <span class="material-symbols-outlined text-sm text-[#9F8349]">attach_file</span>
+                                    <span class="font-mono truncate" x-text="selectedFileName"></span>
+                                </div>
+                                <span class="font-mono text-[#766A5E] shrink-0 ml-2" x-text="selectedFileSizeText"></span>
+                            </div>
+                        </template>
+                        <template x-if="fileSizeError">
+                            <div class="text-[11px] text-red-600 flex items-center gap-1 font-medium mt-1">
+                                <span class="material-symbols-outlined text-sm">warning</span>
+                                <span x-text="fileSizeError"></span>
+                            </div>
+                        </template>
                     </div>
 
                     <div class="p-2.5 rounded bg-[#F8F4EE] text-[#9F8349] text-[11px] flex items-center gap-1.5">
@@ -163,7 +248,7 @@
 
                     <div class="pt-3 border-t border-[#F4EFEA] flex items-center justify-end gap-2">
                         <button type="button" @click="openUploadModal = false" class="px-4 py-2 rounded-lg border border-[#EAE4DC] text-[#554D45] hover:bg-[#FAF8F5]">Cancel</button>
-                        <button type="submit" class="px-4 py-2 rounded-lg bg-[#9F8349] text-white font-semibold hover:bg-[#856C36]">Authenticate &amp; Upload</button>
+                        <button type="submit" :disabled="fileSizeError !== ''" class="px-4 py-2 rounded-lg bg-[#9F8349] text-white font-semibold hover:bg-[#856C36] disabled:opacity-50 disabled:cursor-not-allowed transition-all">Authenticate &amp; Upload</button>
                     </div>
                 </form>
             </div>
