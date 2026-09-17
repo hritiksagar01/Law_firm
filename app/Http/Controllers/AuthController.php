@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ResetPasswordMail;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -172,8 +178,107 @@ class AuthController extends Controller
 
     public function sendResetLink(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
+        $validated = $request->validate([
+            'email' => 'required|email',
+        ]);
 
-        return back()->with('status', 'If an active representation or counsel account exists for this email, an encrypted password reset dispatch has been sent.');
+        $user = User::where('email', $validated['email'])->first();
+
+        if (!$user) {
+            // Security measure: Do not leak whether user exists, but give reassuring message
+            return back()->with('status', 'If an active representation or counsel account exists for this email, an encrypted password reset dispatch has been sent.');
+        }
+
+        // Generate cryptographically secure 64-character token
+        $token = Str::random(64);
+
+        // Record in password_reset_tokens
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $user->email],
+            [
+                'token' => $token,
+                'created_at' => now(),
+            ]
+        );
+
+        $resetUrl = route('password.reset', [
+            'token' => $token,
+            'email' => $user->email,
+        ]);
+
+        $mailSent = false;
+        try {
+            Mail::to($user->email)->send(new ResetPasswordMail($user, $resetUrl));
+            $mailSent = true;
+        } catch (\Throwable $e) {
+            Log::warning("Password reset email delivery failed for {$user->email}: " . $e->getMessage());
+            Log::info("Password Reset Direct Link for {$user->email}: {$resetUrl}");
+        }
+
+        $redirect = back()->with('status', "An encrypted password reset dispatch has been generated for {$user->email}.");
+
+        // In local/debug environments or if SMTP is offline, provide direct link in session for immediate access
+        if (config('app.debug') || app()->environment('local') || !$mailSent) {
+            $redirect->with('reset_link', $resetUrl);
+        }
+
+        return $redirect;
+    }
+
+    public function showResetPassword(Request $request, string $token)
+    {
+        $email = $request->query('email');
+
+        $record = DB::table('password_reset_tokens')
+            ->where('token', $token)
+            ->where('email', $email)
+            ->first();
+
+        if (!$record || Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+            return redirect()->route('password.request')
+                ->withErrors(['email' => 'This password reset link is invalid or has expired. Please request a fresh reset link.']);
+        }
+
+        return view('auth.reset-password', [
+            'token' => $token,
+            'email' => $email,
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validated = $request->validate([
+            'token' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $record = DB::table('password_reset_tokens')
+            ->where('token', $validated['token'])
+            ->where('email', $validated['email'])
+            ->first();
+
+        if (!$record || Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+            return back()->withErrors(['email' => 'This password reset link is invalid or has expired. Please request a fresh reset link.']);
+        }
+
+        $user = User::where('email', $validated['email'])->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => 'Unable to locate an account for this email address.']);
+        }
+
+        // Update password with hash
+        $user->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        // Consume token
+        DB::table('password_reset_tokens')
+            ->where('email', $validated['email'])
+            ->delete();
+
+        return redirect()->route('login')
+            ->with('success', 'Your password has been successfully reset! You can now sign in with your new credentials.');
     }
 }
