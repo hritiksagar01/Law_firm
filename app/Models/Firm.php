@@ -91,5 +91,33 @@ class Firm extends Model
     {
         return $this->hasMany(BankAccount::class);
     }
+
+    /**
+     * Derive "Valid Upto" from the firm's latest active subscription.
+     * Returns Carbon date or null if no subscription exists.
+     */
+    public function getValidUptoAttribute(): ?\Carbon\Carbon
+    {
+        $sub = $this->relationLoaded('currentSubscription')
+            ? $this->currentSubscription
+            : $this->currentSubscription()->first();
+        return $sub?->ends_at;
+    }
+
+    /**
+     * Return display_name if set, otherwise fall back to name.
+     */
+    public function getDisplayTitleAttribute(): string
+    {
+        return $this->display_name ?: $this->name;
+    }
+
+    /**
+     * Get the firm's primary admin user (first partner user).
+     */
+    public function primaryAdmin(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(User::class)->where('role', 'partner')->oldestOfMany();
+    }
 }
 

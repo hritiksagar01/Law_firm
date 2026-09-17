@@ -31,7 +31,7 @@ class PlanManagementController extends Controller
             'slug' => 'required|string|max:100|unique:plans,slug',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'interval' => 'required|in:monthly,yearly',
+            'interval' => 'required|in:monthly,biannual,yearly',
             'max_users' => 'required|integer|min:1',
             'max_matters' => 'required|integer|min:1',
             'max_storage_gb' => 'required|integer|min:1',
@@ -104,5 +104,33 @@ class PlanManagementController extends Controller
 
         return redirect()->route('admin.plans.index')
             ->with('success', "Firm '{$firm->name}' upgraded to {$plan->name} valid through {$endsAt->format('d M Y')}.");
+    }
+
+    /**
+     * DELETE /admin/plans/{plan}
+     * Only allow deletion if no active subscriptions reference this plan.
+     */
+    public function destroy(Plan $plan)
+    {
+        if ($plan->subscriptions()->where('status', 'active')->exists()) {
+            return back()->with('error', "Cannot delete '{$plan->name}' — it has active subscriptions.");
+        }
+
+        $name = $plan->name;
+        $plan->delete();
+
+        return redirect()->route('admin.plans.index')
+            ->with('success', "Plan '{$name}' deleted.");
+    }
+
+    /**
+     * POST /admin/plans/{plan}/toggle-active
+     * Flip the is_active flag.
+     */
+    public function toggleActive(Plan $plan)
+    {
+        $plan->update(['is_active' => !$plan->is_active]);
+        $status = $plan->is_active ? 'activated' : 'deactivated';
+        return back()->with('success', "Plan '{$plan->name}' {$status}.");
     }
 }

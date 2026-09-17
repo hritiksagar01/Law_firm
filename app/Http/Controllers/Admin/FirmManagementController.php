@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
+use App\Models\Plan;
+use App\Models\Subscription;
+
 class FirmManagementController extends Controller
 {
     /**
@@ -19,12 +22,14 @@ class FirmManagementController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Firm::withCount(['users', 'matters', 'documents', 'clients']);
+        $query = Firm::withCount(['users', 'matters', 'documents', 'clients'])
+            ->with(['currentSubscription.plan', 'primaryAdmin']);
 
         if ($request->filled('q')) {
             $search = $request->q;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('display_name', 'like', "%{$search}%")
                   ->orWhere('slug', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
                   ->orWhere('city', 'like', "%{$search}%");
@@ -36,6 +41,7 @@ class FirmManagementController extends Controller
         }
 
         $firms = $query->latest()->paginate(15)->withQueryString();
+        $plans = Plan::where('is_active', true)->get();
 
         $stats = [
             'total' => Firm::count(),
@@ -44,7 +50,7 @@ class FirmManagementController extends Controller
             'total_users' => User::whereNotNull('firm_id')->count(),
         ];
 
-        return view('admin.firms.index', compact('firms', 'stats'));
+        return view('admin.firms.index', compact('firms', 'stats', 'plans'));
     }
 
     /**
@@ -75,6 +81,8 @@ class FirmManagementController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'display_name' => 'nullable|string|max:255',
+            'contact_name' => 'nullable|string|max:255',
             'slug' => 'nullable|string|max:100|unique:firms,slug',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
@@ -109,6 +117,8 @@ class FirmManagementController extends Controller
         DB::transaction(function () use ($validated, $slug, $request) {
             $firm = Firm::create([
                 'name' => $validated['name'],
+                'display_name' => $validated['display_name'] ?? null,
+                'contact_name' => $validated['contact_name'] ?? null,
                 'slug' => $slug,
                 'email' => $validated['email'] ?? null,
                 'phone' => $validated['phone'] ?? null,
@@ -183,6 +193,8 @@ class FirmManagementController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'display_name' => 'nullable|string|max:255',
+            'contact_name' => 'nullable|string|max:255',
             'slug' => "required|string|max:100|unique:firms,slug,{$firm->id}",
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
@@ -200,6 +212,8 @@ class FirmManagementController extends Controller
 
         $firm->update([
             'name' => $validated['name'],
+            'display_name' => $validated['display_name'] ?? null,
+            'contact_name' => $validated['contact_name'] ?? null,
             'slug' => Str::slug($validated['slug']),
             'email' => $validated['email'] ?? null,
             'phone' => $validated['phone'] ?? null,
@@ -229,6 +243,65 @@ class FirmManagementController extends Controller
 
         $statusLabel = ucfirst($newStatus);
         return back()->with('success', "Law firm '{$firm->name}' is now marked as {$statusLabel}.");
+    }
+
+    /**
+     * Reset the password for a firm's primary admin/managing partner.
+     * POST /admin/firms/{firm}/change-password
+     */
+    public function changePassword(Request $request, Firm $firm): RedirectResponse
+    {
+        $validated = $request->validate([
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $admin = $firm->users()->where('role', 'partner')->oldest()->first();
+
+        if (!$admin) {
+            $admin = $firm->users()->oldest()->first();
+        }
+
+        if (!$admin) {
+            return back()->with('error', "No user accounts found for '{$firm->name}'. Cannot change password.");
+        }
+
+        $admin->update(['password' => Hash::make($validated['new_password'])]);
+
+        return back()->with('success', "Password for '{$admin->name}' ({$admin->email}) at '{$firm->name}' has been reset successfully.");
+    }
+
+    /**
+     * Upgrade, downgrade, or renew a firm's subscription plan.
+     * POST /admin/firms/{firm}/change-subscription
+     */
+    public function changeSubscription(Request $request, Firm $firm): RedirectResponse
+    {
+        $validated = $request->validate([
+            'plan_id' => 'required|exists:plans,id',
+            'duration_months' => 'required|integer|min:1|max:36',
+        ]);
+
+        $plan = Plan::findOrFail($validated['plan_id']);
+
+        $currentSub = $firm->currentSubscription;
+        $startsAt = ($currentSub && $currentSub->ends_at && $currentSub->ends_at->isFuture())
+            ? $currentSub->ends_at
+            : now();
+        $endsAt = $startsAt->copy()->addMonths((int) $validated['duration_months']);
+
+        $firm->subscriptions()
+            ->where('status', 'active')
+            ->update(['status' => 'upgraded']);
+
+        Subscription::create([
+            'firm_id' => $firm->id,
+            'plan_id' => $plan->id,
+            'status' => 'active',
+            'starts_at' => $startsAt,
+            'ends_at' => $endsAt,
+        ]);
+
+        return back()->with('success', "'{$firm->name}' subscription updated to {$plan->name}, valid through {$endsAt->format('d M Y')}.");
     }
 
     /**

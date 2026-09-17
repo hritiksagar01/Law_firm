@@ -31,7 +31,33 @@ class User extends Authenticatable
             'two_factor_confirmed_at' => 'datetime',
             'password' => 'hashed',
             'hourly_rate' => 'decimal:2',
+            'id_expiration' => 'date',
         ];
+    }
+
+    /**
+     * Get full display name. Uses first_name + surname if set, else falls back to name.
+     */
+    public function getFullDisplayNameAttribute(): string
+    {
+        if ($this->first_name || $this->surname) {
+            return trim(($this->first_name ?? '') . ' ' . ($this->surname ?? ''));
+        }
+        return $this->name;
+    }
+
+    /**
+     * Get resolved avatar — returns avatar_url, or uploaded file URL, or null for fallback.
+     */
+    public function getResolvedAvatarAttribute(): ?string
+    {
+        if ($this->avatar_url) {
+            if (str_starts_with($this->avatar_url, 'http://') || str_starts_with($this->avatar_url, 'https://')) {
+                return $this->avatar_url;
+            }
+            return asset('storage/' . $this->avatar_url);
+        }
+        return null;
     }
 
     public function firm(): BelongsTo

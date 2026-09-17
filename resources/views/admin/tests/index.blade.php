@@ -1,4 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.admin')
+
+@section('title', 'Automated Test Management')
+@section('header_title', 'Platform Audit Tests')
 
 @section('content')
 <div class="max-w-7xl mx-auto space-y-6">

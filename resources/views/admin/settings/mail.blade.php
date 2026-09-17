@@ -1,6 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Platform Mail & SMTP Gateway — Super Admin Console')
+@section('title', 'Platform Mail & SMTP Gateway')
+@section('header_title', 'Mail & Communications Gateway')
 
 @section('content')
 <div class="space-y-6 max-w-6xl mx-auto py-6" x-data="{

@@ -978,22 +978,36 @@ Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(funct
         return view('admin.dashboard', compact('firms'));
     })->name('dashboard');
 
-    // Law Firm Tenant Management
+    // ── Law Firm Tenant Management ──────────────────────────
     Route::resource('firms', \App\Http\Controllers\Admin\FirmManagementController::class);
     Route::post('/firms/{firm}/toggle-status', [\App\Http\Controllers\Admin\FirmManagementController::class, 'toggleStatus'])->name('firms.toggle-status');
+    Route::post('/firms/{firm}/change-password', [\App\Http\Controllers\Admin\FirmManagementController::class, 'changePassword'])->name('firms.change-password');
+    Route::post('/firms/{firm}/change-subscription', [\App\Http\Controllers\Admin\FirmManagementController::class, 'changeSubscription'])->name('firms.change-subscription');
 
-    // SaaS Subscription & Plan Governance (PDF Pages 3, 20, 21)
+    // ── SaaS Subscription Plans ─────────────────────────────
     Route::get('/plans', [\App\Http\Controllers\Admin\PlanManagementController::class, 'index'])->name('plans.index');
     Route::post('/plans', [\App\Http\Controllers\Admin\PlanManagementController::class, 'store'])->name('plans.store');
     Route::put('/plans/{plan}', [\App\Http\Controllers\Admin\PlanManagementController::class, 'update'])->name('plans.update');
+    Route::delete('/plans/{plan}', [\App\Http\Controllers\Admin\PlanManagementController::class, 'destroy'])->name('plans.destroy');
+    Route::post('/plans/{plan}/toggle-active', [\App\Http\Controllers\Admin\PlanManagementController::class, 'toggleActive'])->name('plans.toggle-active');
     Route::post('/plans/firms/{firm}/assign', [\App\Http\Controllers\Admin\PlanManagementController::class, 'assignPlan'])->name('plans.assign');
 
-    // Automated Test Management System
-    Route::get('/tests', [\App\Http\Controllers\Admin\TestManagementController::class, 'index'])->name('tests.index');
-    Route::post('/tests/run', [\App\Http\Controllers\Admin\TestManagementController::class, 'runAll'])->name('tests.run');
+    // ── Subscription Governance & Renewals (PDF Pages 20, 21) ──
+    Route::get('/subscriptions', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'index'])->name('subscriptions.index');
+    Route::post('/subscriptions/{subscription}/renew', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'renew'])->name('subscriptions.renew');
 
-    // Platform Mail & Communications Gateway
+    // ── Super Admin Profile & Account (PDF Pages 4, 5) ──────
+    Route::get('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/change-password', [\App\Http\Controllers\Admin\AdminProfileController::class, 'changePassword'])->name('profile.change-password');
+    Route::post('/profile/change-avatar', [\App\Http\Controllers\Admin\AdminProfileController::class, 'changeAvatar'])->name('profile.change-avatar');
+
+    // ── Platform Mail & Communications Gateway ──────────────
     Route::get('/settings/mail', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'mailSettings'])->name('settings.mail');
     Route::post('/settings/mail', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'updateMailSettings'])->name('settings.mail.update');
     Route::post('/settings/mail/test', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testMail'])->name('settings.mail.test');
+
+    // ── Automated Test Management ───────────────────────────
+    Route::get('/tests', [\App\Http\Controllers\Admin\TestManagementController::class, 'index'])->name('tests.index');
+    Route::post('/tests/run', [\App\Http\Controllers\Admin\TestManagementController::class, 'runAll'])->name('tests.run');
 });
