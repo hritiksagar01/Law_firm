@@ -24,122 +24,31 @@ class AuthController extends Controller
 
         $remember = $request->boolean('remember');
 
-        // Immediate bypass for default chambers emergency credentials (instant, zero-timeout response)
-        if ($credentials['email'] === 'admin@sharmalegal.in' && $credentials['password'] === 'password123') {
+        if (Auth::attempt($credentials, $remember)) {
             if ($request->hasSession()) {
                 $request->session()->regenerate();
             }
-            $request->session()->put('is_super_admin', true);
-            $request->session()->put('super_admin_email', 'admin@sharmalegal.in');
 
-            try {
-                if (Auth::attempt($credentials, $remember)) {
-                    /** @var User $user */
-                    $user = Auth::user();
-                    return redirect()->intended(route('admin.dashboard'))
-                        ->with('success', "Welcome to Platform Super Administrator Console, {$user->name}.");
-                }
-            } catch (\Throwable $e) {
-                // Database is unreachable; proceed directly to emergency console
+            /** @var User $user */
+            $user = Auth::user();
+
+            if ($user->isSuperAdmin()) {
+                return redirect()->intended(route('admin.dashboard'))
+                    ->with('success', "Welcome to Platform Super Administrator Console, {$user->name}.");
             }
 
-            return redirect()->route('admin.dashboard')
-                ->with('info', 'Logged into Super Administrator Console via emergency chambers credentials.');
-        }
-
-        try {
-            if (Auth::attempt($credentials, $remember)) {
-                if ($request->hasSession()) {
-                    $request->session()->regenerate();
-                }
-
-                /** @var User $user */
-                $user = Auth::user();
-
-                if ($user->isSuperAdmin()) {
-                    $request->session()->put('is_super_admin', true);
-                    $request->session()->put('super_admin_email', $user->email);
-                    return redirect()->intended(route('admin.dashboard'))
-                        ->with('success', "Welcome to Platform Super Administrator Console, {$user->name}.");
-                }
-
-                if ($user->isClient()) {
-                    return redirect()->intended(route('portal.dashboard'))
-                        ->with('success', "Welcome to your Client Portal, {$user->name}.");
-                }
-
-                return redirect()->intended(route('dashboard'))
-                    ->with('success', "Welcome back to Chambers, {$user->name}.");
+            if ($user->isClient()) {
+                return redirect()->intended(route('portal.dashboard'))
+                    ->with('success', "Welcome to your Client Portal, {$user->name}.");
             }
-        } catch (\Throwable $e) {
-            throw ValidationException::withMessages([
-                'email' => 'Database is currently unreachable. If you are Super Admin, use default chambers emergency credentials (admin@sharmalegal.in / password123) to access console.',
-            ]);
+
+            return redirect()->intended(route('dashboard'))
+                ->with('success', "Welcome back to Chambers, {$user->name}.");
         }
 
         throw ValidationException::withMessages([
             'email' => __('The provided credentials do not match our chambers records.'),
         ]);
-    }
-
-    public function demoLogin(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
-
-        // Immediate zero-latency bypass for Platform Super Admin
-        if ($request->email === 'admin@sharmalegal.in') {
-            if ($request->hasSession()) {
-                $request->session()->regenerate();
-            }
-            $request->session()->put('is_super_admin', true);
-            $request->session()->put('super_admin_email', 'admin@sharmalegal.in');
-
-            try {
-                $user = User::where('email', 'admin@sharmalegal.in')->first();
-                if ($user) {
-                    Auth::login($user);
-                    return redirect()->route('admin.dashboard')
-                        ->with('success', "Logged in as Platform Super Administrator: {$user->name}.");
-                }
-            } catch (\Throwable $e) {
-                // Database offline or unreachable; emergency console mode active
-            }
-
-            return redirect()->route('admin.dashboard')
-                ->with('info', 'Super Admin Console access granted in Emergency Mode.');
-        }
-
-        try {
-            $user = User::where('email', $request->email)->first();
-
-            if (!$user) {
-                return back()->withErrors(['email' => 'Demo user not found.']);
-            }
-
-            Auth::login($user);
-            if ($request->hasSession()) {
-                $request->session()->regenerate();
-            }
-
-            if ($user->isSuperAdmin()) {
-                $request->session()->put('is_super_admin', true);
-                $request->session()->put('super_admin_email', $user->email);
-                return redirect()->route('admin.dashboard')
-                    ->with('success', "Logged in as Platform Super Administrator: {$user->name}.");
-            }
-
-            if ($user->isClient()) {
-                return redirect()->route('portal.dashboard')
-                    ->with('success', "Logged in as {$user->name} ({$user->title}).");
-            }
-
-            return redirect()->route('dashboard')
-                ->with('success', "Logged in as {$user->name} ({$user->title}).");
-        } catch (\Throwable $e) {
-            return back()->withErrors(['email' => 'Database is offline. Only Platform Super Admin can access the system right now.']);
-        }
     }
 
     public function logout(Request $request)

@@ -26,7 +26,6 @@ use Illuminate\Support\Facades\Storage;
 */
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/demo-login', [AuthController::class, 'demoLogin'])->name('demo-login');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
