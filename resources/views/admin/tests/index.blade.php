@@ -21,9 +21,9 @@
                     <span>Re-Run All {{ $results['total_suites'] ?? 23 }} Test Suites</span>
                 </button>
             </form>
-            <a href="{{ route('admin.settings.environment') }}" class="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg bg-white border border-[#EFECE6] text-xs font-medium text-[#554D45] hover:bg-[#FAF8F5] transition-all shadow-xs">
-                <span class="material-symbols-outlined text-sm">dns</span>
-                <span>Cloud &amp; DB Console</span>
+            <a href="{{ route('admin.settings.mail') }}" class="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg bg-white border border-[#EFECE6] text-xs font-medium text-[#554D45] hover:bg-[#FAF8F5] transition-all shadow-xs">
+                <span class="material-symbols-outlined text-sm">mail</span>
+                <span>Mail Gateway</span>
             </a>
         </div>
     </div>

@@ -3,204 +3,79 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\EnvironmentManager;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class AdminSettingsController extends Controller
 {
-    public function index(EnvironmentManager $envManager): View
+    /**
+     * Display Platform Mail & Communications Settings.
+     * In this production-hardened environment, database and storage keys are immutable
+     * server configuration managed strictly via CI/CD and server environment variables.
+     */
+    public function mailSettings(): View
     {
-        $settings = $envManager->getCategorizedSettings();
-        $backups = $envManager->listBackups();
-        $rawEnv = file_exists(base_path('.env')) ? file_get_contents(base_path('.env')) : '';
-
-        return view('admin.settings.environment', compact('settings', 'backups', 'rawEnv'));
-    }
-
-    public function update(Request $request, EnvironmentManager $envManager): RedirectResponse
-    {
-        if ($request->has('raw_env_content')) {
-            $rawContent = $request->input('raw_env_content');
-            $envManager->createBackup();
-            file_put_contents(base_path('.env'), $rawContent, LOCK_EX);
-            $envManager->clearCaches();
-
-            return redirect()->route('admin.settings.environment')
-                ->with('success', 'Environment file updated from raw editor and caches refreshed.');
-        }
-
-        $allowedKeys = [
-            // Storage / S3
-            'FILESYSTEM_DISK',
-            'AWS_ACCESS_KEY_ID',
-            'AWS_SECRET_ACCESS_KEY',
-            'AWS_DEFAULT_REGION',
-            'AWS_BUCKET',
-            'AWS_ENDPOINT',
-            'AWS_USE_PATH_STYLE_ENDPOINT',
-            // Database
-            'DB_CONNECTION',
-            'DB_HOST',
-            'DB_PORT',
-            'DB_DATABASE',
-            'DB_USERNAME',
-            'DB_PASSWORD',
-            // Email
-            'MAIL_MAILER',
-            'MAIL_HOST',
-            'MAIL_PORT',
-            'MAIL_USERNAME',
-            'MAIL_PASSWORD',
-            'MAIL_ENCRYPTION',
-            'MAIL_FROM_ADDRESS',
-            'MAIL_FROM_NAME',
-            // App
-            'APP_NAME',
-            'APP_ENV',
-            'APP_DEBUG',
-            'APP_URL',
-            'LEGAL_APP_NAME',
-            'LEGAL_CURRENCY_SYMBOL',
-            'LEGAL_CURRENCY_CODE',
+        $mailConfig = [
+            'mailer' => config('mail.default', 'log'),
+            'host' => config('mail.mailers.smtp.host', '127.0.0.1'),
+            'port' => config('mail.mailers.smtp.port', 587),
+            'username' => config('mail.mailers.smtp.username', ''),
+            'encryption' => config('mail.mailers.smtp.encryption', 'tls'),
+            'from_address' => config('mail.from.address', 'contact@vennamraj.com'),
+            'from_name' => config('mail.from.name', config('app.name')),
+            'has_password' => !empty(config('mail.mailers.smtp.password')),
         ];
 
-        $payload = [];
-        foreach ($allowedKeys as $key) {
-            if ($request->has($key)) {
-                $payload[$key] = $request->input($key);
-            }
-        }
+        return view('admin.settings.mail', compact('mailConfig'));
+    }
 
-        // Handle checkboxes if not present in request
-        if ($request->has('_form_section') && $request->input('_form_section') === 'app') {
-            $payload['APP_DEBUG'] = $request->has('APP_DEBUG') ? 'true' : 'false';
-        }
+    /**
+     * Test SMTP Delivery by dispatching a verified test email.
+     */
+    public function testMail(Request $request): JsonResponse
+    {
+        $request->validate([
+            'test_email' => 'required|email',
+        ]);
 
-        // Proactive Safety Shield: Verify database connection BEFORE saving to .env
-        if ($request->input('_form_section') === 'database' && ! $request->boolean('force_save')) {
-            $testResult = $envManager->testDatabase([
-                'driver' => $request->input('DB_CONNECTION', 'sqlite'),
-                'host' => $request->input('DB_HOST', ''),
-                'port' => $request->input('DB_PORT', ''),
-                'database' => $request->input('DB_DATABASE', ''),
-                'username' => $request->input('DB_USERNAME', ''),
-                'password' => $request->input('DB_PASSWORD', ''),
-            ]);
-
-            if (! $testResult['success']) {
-                return redirect()->route('admin.settings.environment')
-                    ->withInput()
-                    ->with('error', "Database Connection Test Failed! Active configuration was NOT changed to protect site availability. Details: " . $testResult['message']);
-            }
-        }
+        $recipient = $request->input('test_email');
+        $host = config('mail.mailers.smtp.host', 'smtp.brevo.com');
+        $port = config('mail.mailers.smtp.port', 587);
 
         try {
-            $envManager->update($payload);
-        } catch (\Throwable $e) {
-            return redirect()->route('admin.settings.environment')
-                ->withInput()
-                ->with('error', "Failed to update .env: " . $e->getMessage());
-        }
-
-        return redirect()->route('admin.settings.environment')
-            ->with('success', 'Environment variables updated and configuration caches cleared successfully.');
-    }
-
-    public function testDatabase(Request $request, EnvironmentManager $envManager): JsonResponse
-    {
-        $result = $envManager->testDatabase($request->all());
-        return response()->json($result);
-    }
-
-    public function testS3(Request $request, EnvironmentManager $envManager): JsonResponse
-    {
-        $result = $envManager->testS3($request->all());
-        return response()->json($result);
-    }
-
-    public function testMail(Request $request, EnvironmentManager $envManager): JsonResponse
-    {
-        $result = $envManager->testMail($request->all());
-        return response()->json($result);
-    }
-
-    public function runMigrations(EnvironmentManager $envManager): JsonResponse
-    {
-        $result = $envManager->runMigrations();
-        return response()->json($result);
-    }
-
-    public function seedDatabase(EnvironmentManager $envManager): JsonResponse
-    {
-        $result = $envManager->seedDatabase();
-        return response()->json($result);
-    }
-
-    public function restoreBackup(Request $request, EnvironmentManager $envManager)
-    {
-        $request->validate(['filename' => 'required|string']);
-        $filename = $request->input('filename');
-
-        $restored = $envManager->restoreBackup($filename);
-
-        if ($request->expectsJson() || $request->wantsJson() || $request->ajax()) {
-            return response()->json([
-                'success' => $restored,
-                'message' => $restored
-                    ? "Environment successfully restored from backup: {$filename}"
-                    : "Failed to restore backup: file not found or permission denied.",
-            ]);
-        }
-
-        if ($restored) {
-            return redirect()->route('admin.settings.environment', ['tab' => 'backups'])
-                ->with('success', "Environment restored successfully from backup: {$filename}");
-        }
-
-        return redirect()->route('admin.settings.environment', ['tab' => 'backups'])
-            ->with('error', "Failed to restore backup: {$filename}");
-    }
-
-    public function cleanData(Request $request): JsonResponse|RedirectResponse
-    {
-        $phrase = trim((string) $request->input('confirm_phrase'));
-        if (strtoupper($phrase) !== 'RESET') {
-            if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
+            // 1. First probe TCP socket connectivity
+            $errno = 0;
+            $errstr = '';
+            $fp = @fsockopen($host, (int) $port, $errno, $errstr, 5);
+            if (! $fp) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Please enter "RESET" to confirm data purge.',
+                    'message' => "Socket probe failed to {$host}:{$port}. Error: {$errstr} ({$errno}).",
                 ], 422);
             }
-            return redirect()->route('admin.settings.environment', ['tab' => 'database'])
-                ->with('error', 'Confirmation keyword incorrect. You must type "RESET" to purge sample data.');
-        }
+            fclose($fp);
 
-        try {
-            \Illuminate\Support\Facades\Artisan::call('legal:clean-data', ['--force' => true]);
-            $output = \Illuminate\Support\Facades\Artisan::output();
+            // 2. Dispatch a verification email
+            Mail::raw(
+                "This is a verified test email from " . config('app.name') . ".\n\nYour SMTP gateway is operating properly.\nTimestamp: " . now()->toIso8601String(),
+                function ($message) use ($recipient) {
+                    $message->to($recipient)
+                        ->subject('Platform SMTP Gateway Test Verification — ' . config('app.name'));
+                }
+            );
 
-            if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Sample matters, documents, and client records successfully purged. Chambers is in a clean fresh state.',
-                    'output' => $output,
-                ]);
-            }
-
-            return redirect()->route('admin.settings.environment', ['tab' => 'database'])
-                ->with('success', 'Sample matters, documents, and client records successfully purged. Chambers is in a clean fresh state.');
+            return response()->json([
+                'success' => true,
+                'message' => "Test email successfully dispatched to {$recipient} via {$host}:{$port}!",
+            ]);
         } catch (\Throwable $e) {
-            if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Purge failed: ' . $e->getMessage(),
-                ], 500);
-            }
-            return redirect()->route('admin.settings.environment', ['tab' => 'database'])
-                ->with('error', 'Failed to clean data: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => "SMTP Delivery Failed: " . $e->getMessage(),
+            ], 500);
         }
     }
 }

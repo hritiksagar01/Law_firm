@@ -36,9 +36,17 @@
                 <span class="material-symbols-outlined text-sm">corporate_fare</span>
                 <span>Law Firms</span>
             </a>
-            <a href="{{ route('admin.settings.environment') }}" class="px-3 py-1.5 rounded-md text-[#D4C4B5] hover:text-white hover:bg-[#3A322B] transition-all flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm">tune</span>
-                <span>Environment &amp; Cloud</span>
+            <a href="{{ route('admin.plans.index') }}" class="px-3 py-1.5 rounded-md text-[#D4C4B5] hover:text-white hover:bg-[#3A322B] transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">subscriptions</span>
+                <span>Plans</span>
+            </a>
+            <a href="{{ route('admin.tests.index') }}" class="px-3 py-1.5 rounded-md text-[#D4C4B5] hover:text-white hover:bg-[#3A322B] transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">verified_user</span>
+                <span>Audit Tests</span>
+            </a>
+            <a href="{{ route('admin.settings.mail') }}" class="px-3 py-1.5 rounded-md text-[#D4C4B5] hover:text-white hover:bg-[#3A322B] transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">mail</span>
+                <span>Mail Gateway</span>
             </a>
         </nav>
 
@@ -56,9 +64,9 @@
                 <p class="text-sm text-[#766A5E] mt-1">Multi-firm resource isolation, database latency, and AWS S3 / Cloudflare R2 storage consumption</p>
             </div>
             <div class="flex items-center gap-2.5">
-                <a href="{{ route('admin.settings.environment') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white border border-[#EAE4DC] text-[#222222] text-xs font-semibold hover:bg-[#FAF8F5] shadow-xs">
-                    <span class="material-symbols-outlined text-base text-[#9F8349]">tune</span>
-                    <span>Environment &amp; Cloud Settings</span>
+                <a href="{{ route('admin.settings.mail') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white border border-[#EAE4DC] text-[#222222] text-xs font-semibold hover:bg-[#FAF8F5] shadow-xs">
+                    <span class="material-symbols-outlined text-base text-[#9F8349]">mail</span>
+                    <span>Mail Gateway &amp; SMTP</span>
                 </a>
                 <a href="{{ route('admin.firms.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm transition-all">
                     <span class="material-symbols-outlined text-base">domain_add</span>

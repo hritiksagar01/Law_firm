@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - clean-production
   workflow_dispatch: # Allows manual trigger from GitHub Actions dashboard
 
 jobs:
@@ -29,10 +30,11 @@ jobs:
             echo "Connected to EC2 server successfully."
             cd /var/www/lawfirm
 
-            # Fetch and update to latest main commit
-            git fetch origin main
-            git reset --hard origin/main
+            # Fetch and update to latest commit on active branch
+            git fetch origin ${{ github.ref_name }}
+            git checkout ${{ github.ref_name }} || git checkout -b ${{ github.ref_name }} origin/${{ github.ref_name }}
+            git reset --hard origin/${{ github.ref_name }}
 
-            # Make deploy script executable and run full deployment
+            # Make deploy script executable and run deployment
             chmod +x deploy/deploy.sh
             ./deploy/deploy.sh

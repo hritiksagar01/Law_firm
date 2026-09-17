@@ -197,9 +197,9 @@
                             <span class="material-symbols-outlined text-sm text-[#9F8349]">admin_panel_settings</span>
                             <span>Super Admin Platform Console</span>
                         </a>
-                        <a href="{{ route('admin.settings.environment') }}" class="px-4 py-2 hover:bg-[#F8F4EE] text-[#9F8349] flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm text-[#B88B56]">tune</span>
-                            <span>Cloud &amp; Env Variables</span>
+                        <a href="{{ route('admin.settings.mail') }}" class="px-4 py-2 hover:bg-[#F8F4EE] text-[#9F8349] flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm text-[#B88B56]">mail</span>
+                            <span>Mail &amp; SMTP Gateway</span>
                         </a>
                         <div class="h-px bg-[#EFECE6] my-1"></div>
                         @endif

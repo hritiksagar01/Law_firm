@@ -43,7 +43,7 @@ class AuthController extends Controller
                 // Database is unreachable; proceed directly to emergency console
             }
 
-            return redirect()->route('admin.settings.environment')
+            return redirect()->route('admin.dashboard')
                 ->with('info', 'Logged into Super Administrator Console via emergency chambers credentials.');
         }
 
@@ -107,8 +107,8 @@ class AuthController extends Controller
                 // Database offline or unreachable; emergency console mode active
             }
 
-            return redirect()->route('admin.settings.environment')
-                ->with('info', 'Super Admin Console access granted in Emergency Mode. Configure credentials or restore a backup below.');
+            return redirect()->route('admin.dashboard')
+                ->with('info', 'Super Admin Console access granted in Emergency Mode.');
         }
 
         try {

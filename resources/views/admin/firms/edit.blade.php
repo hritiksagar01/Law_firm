@@ -36,9 +36,17 @@
                 <span class="material-symbols-outlined text-sm">corporate_fare</span>
                 <span>Law Firms</span>
             </a>
-            <a href="{{ route('admin.settings.environment') }}" class="px-3 py-1.5 rounded-md text-[#8C7F72] hover:text-white hover:bg-[#3A322B] transition-all flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm">tune</span>
-                <span>Environment &amp; Cloud</span>
+            <a href="{{ route('admin.plans.index') }}" class="px-3 py-1.5 rounded-md text-[#8C7F72] hover:text-white hover:bg-[#3A322B] transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">subscriptions</span>
+                <span>Plans</span>
+            </a>
+            <a href="{{ route('admin.tests.index') }}" class="px-3 py-1.5 rounded-md text-[#8C7F72] hover:text-white hover:bg-[#3A322B] transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">verified_user</span>
+                <span>Audit Tests</span>
+            </a>
+            <a href="{{ route('admin.settings.mail') }}" class="px-3 py-1.5 rounded-md text-[#8C7F72] hover:text-white hover:bg-[#3A322B] transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">mail</span>
+                <span>Mail Gateway</span>
             </a>
         </nav>
 
