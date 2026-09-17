@@ -1,0 +1,30 @@
+• 
+Remember Me: Select this option to stay logged in on the device for quicker 
+access in the future. 
+• 
+Forgot Password: Easily reset the password by clicking the "Forgot Password" 
+link to receive instructions via email. 
+This login system ensures that only authorized personnel can access sensitive firm data, 
+offering secure and efficient entry to the software. 
+ 
+ 
+ 
+ 
+Dashboard  
+ 
+The Dashboard provides a customizable and user-friendly interface that displays 
+important information at a glance. Key features include: 
+• 
+Customized User Dashboard Fields: Personalize the dashboard to show 
+relevant metrics, tasks, or notifications tailored to individual user preferences and 
+roles. 
+• 
+Dashboard Items: Display key widgets such as case status, upcoming 
+deadlines, recent activities, or financial summaries to keep users informed. 
+• 
+Client Contact & List of Matters: Easily access client contact details and view a 
+list of active matters or cases, helping users stay organized and focused on their 
+responsibilities. 
+The Dashboard streamlines workflow by presenting critical information in one 
+convenient, easy-to-navigate space. 
+ 

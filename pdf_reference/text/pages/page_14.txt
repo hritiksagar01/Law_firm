@@ -1,0 +1,31 @@
+ 
+ 
+Events  
+ 
+The Events feature helps track and manage important activities and milestones within a 
+case or firm operations. Key features include: 
+• 
+Court Hearings  
+: Track court hearings, trials, and legal proceedings to ensure 
+no critical dates are missed. 
+• 
+Client Meetings  
+: Schedule and manage meetings with clients, witnesses, and 
+stakeholders for smooth coordination. 
+• 
+Deadlines  
+: Monitor critical deadlines like filing dates and responses to avoid 
+missed opportunities. 
+• 
+Internal Team Activities  
+ 
+: Manage team meetings and internal reviews to 
+keep everyone aligned. 
+• 
+Notifications  
+: Get automatic reminders to ensure all key events are timely 
+executed. 
+The Events feature improves organization, ensures efficient planning, and guarantees 
+the timely execution of both client-facing and internal activities. 
+ 
+ 

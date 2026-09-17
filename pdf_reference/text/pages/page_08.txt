@@ -1,0 +1,20 @@
+ 
+Role permission: Role Permission  
+ allows administrators to assign specific access 
+rights and responsibilities to different users based on their role within the organization. 
+This ensures that each user can only access the features and data relevant to their job, 
+maintaining security and organization within the system. 
+ 
+ 
+Roles  
+ 
+ 
+The Roles feature in our case management software allows administrators to define 
+specific user positions within the system, assigning the appropriate permissions based on 
+their responsibilities within the firm. Each role ensures that users only have access to the 
+relevant information and tools they need to perform their tasks efficiently and securely. 
+Key roles include: 
+1. Admin  
+ 
+o 
+Full access to all system features and settings. 

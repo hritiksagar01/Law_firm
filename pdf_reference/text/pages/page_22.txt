@@ -1,0 +1,30 @@
+ 
+ 
+Report Module  
+ 
+The Report Module in the software provides detailed and customizable reports that help 
+law firms track case progress, financial activities, and client interactions efficiently. This 
+module enables legal teams to monitor key metrics, ensure compliance, and make 
+informed decisions. Below are key features of the Report Module: 
+Bank Activity Report  
+ 
+The Bank Activity Report feature provides an in-depth overview of all financial 
+transactions related to cases and clients, ensuring transparency and accuracy in financial 
+management. Key functionalities include: 
+• 
+Transaction Tracking  
+: Monitor all financial transactions, such as payments, 
+deposits, and case-related expenses, providing insights into the movement of 
+funds within each case. 
+• 
+Bank Reconciliation  
+: Reconcile firm bank account transactions with case 
+records to ensure consistency and accuracy in financial reporting. 
+• 
+Income & Expenditure Report  
+: Generate detailed reports summarizing 
+income and expenses for specific cases, giving a clear view of each case’s 
+financial status. 
+This feature helps keep financial records organized, supports accurate reporting, and 
+promotes transparency in case-related financial activities. 
+ 

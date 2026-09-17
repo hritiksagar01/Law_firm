@@ -1,0 +1,19 @@
+ 
+Administration  
+ 
+The Administration section allows firm administrators to manage user access and roles 
+with ease. Key features include: 
+• 
+Add Users to Predefined Groups: Assign users to specific predefined groups 
+based on their roles and responsibilities, ensuring they have the appropriate 
+access to resources and features. 
+• 
+Create Groups: Set up custom user groups tailored to the firm’s structure, 
+making it easier to manage permissions and streamline workflows. 
+This functionality ensures efficient user management and maintains security within the 
+firm’s operations. 
+User: A user  
+ is an individual who interacts with the case management software, 
+managing tasks, accessing case information, and collaborating with team members to 
+ensure efficient legal operations. 
+ 
