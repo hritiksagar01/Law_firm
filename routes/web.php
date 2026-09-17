@@ -995,5 +995,6 @@ Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(funct
 
     // Platform Mail & Communications Gateway
     Route::get('/settings/mail', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'mailSettings'])->name('settings.mail');
+    Route::post('/settings/mail', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'updateMailSettings'])->name('settings.mail.update');
     Route::post('/settings/mail/test', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testMail'])->name('settings.mail.test');
 });

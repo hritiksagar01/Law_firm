@@ -44,7 +44,7 @@ sudo chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/databa
 
 if [ -f "$APP_DIR/.env" ]; then
     sudo chown ubuntu:www-data "$APP_DIR/.env"
-    sudo chmod 640 "$APP_DIR/.env"
+    sudo chmod 660 "$APP_DIR/.env"
 fi
 
 echo "=== [6/6] Bringing Application Back Up & Reloading PHP-FPM ==="
