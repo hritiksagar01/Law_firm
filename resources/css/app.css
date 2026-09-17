@@ -5,9 +5,9 @@
 @source '../views/**/*.blade.php';
 
 @theme {
-    /* Juris Prestige Typography */
-    --font-sans: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-serif: 'EB Garamond', Garamond, Georgia, serif;
+    /* Industry Standard Readable Typography: Inter & Plus Jakarta Sans */
+    --font-sans: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-serif: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 
     /* Juris Prestige Color Palette */
@@ -68,6 +68,7 @@
         font-family: var(--font-sans);
         color: #222222;
         background-color: #FAF8F5;
+        letter-spacing: -0.011em;
     }
 
     body {
@@ -76,10 +77,12 @@
         color: #222222;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
     }
 
-    h1, h2, h3, .font-serif {
+    h1, h2, h3, h4, h5, h6, .font-serif {
         font-family: var(--font-serif);
+        letter-spacing: -0.02em;
     }
 }
 

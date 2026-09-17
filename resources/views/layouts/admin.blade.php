@@ -7,10 +7,10 @@
     <title>@yield('title', 'Super Admin Platform Console') — Multi-Tenant Legal Cloud</title>
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}"/>
     
-    <!-- Juris Prestige Typography: EB Garamond & Manrope -->
+    <!-- Industry Standard Readable Typography: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -85,12 +85,6 @@
                     <span>Mail Gateway</span>
                 </a>
 
-                <!-- Platform Audit Tests -->
-                <a href="{{ route('admin.tests.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.tests.*') ? 'bg-[#9F8349] text-white shadow-xs font-semibold' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
-                    <span class="material-symbols-outlined text-xl">verified_user</span>
-                    <span>Platform Tests</span>
-                </a>
 
                 <!-- Super Admin Profile -->
                 <a href="{{ route('admin.profile.index') }}" 

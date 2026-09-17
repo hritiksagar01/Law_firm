@@ -6,10 +6,10 @@
     <title>{{ $title ?? (config('legal.app_name', 'Vennamraj Associates') . ' — Legal Practice Platform') }}</title>
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}"/>
     
-    <!-- Juris Prestige Typography: EB Garamond (Headline) & Manrope (Body/Label) -->
+    <!-- Industry Standard Readable Typography: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 
     <!-- Vite Assets -->
