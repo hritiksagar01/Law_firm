@@ -24,23 +24,11 @@
     </div>
 
     <!-- Infrastructure Health Telemetry -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="p-5 rounded-2xl bg-white border border-[#EFECE6] shadow-xs">
             <span class="font-mono text-[10px] uppercase tracking-wider text-[#766A5E]">Tenants Active</span>
             <span class="text-2xl font-serif font-bold text-[#222222] mt-1 block">{{ $firms->count() }} Firm(s)</span>
             <span class="text-xs text-[#9F8349] mt-2 block font-mono font-semibold">100% Operational</span>
-        </div>
-
-        <div class="p-5 rounded-2xl bg-white border border-[#EFECE6] shadow-xs">
-            <span class="font-mono text-[10px] uppercase tracking-wider text-[#766A5E]">Dual Database Mode</span>
-            <span class="text-xl font-mono font-bold text-[#9F8349] mt-1 block">{{ ucfirst(config('database.default', 'sqlite')) }}</span>
-            <span class="text-xs text-[#766A5E] mt-2 block font-mono">Connection Active &amp; Pooled</span>
-        </div>
-
-        <div class="p-5 rounded-2xl bg-white border border-[#EFECE6] shadow-xs">
-            <span class="font-mono text-[10px] uppercase tracking-wider text-[#766A5E]">Cloud Storage Driver</span>
-            <span class="text-xl font-mono font-bold text-[#222222] mt-1 block">{{ ucfirst(config('filesystems.default', 'local')) }}</span>
-            <span class="text-xs text-[#9F8349] mt-2 block font-mono font-semibold">AWS S3 &bull; Cloudflare R2 Ready</span>
         </div>
 
         <div class="p-5 rounded-2xl bg-white border border-[#EFECE6] shadow-xs">

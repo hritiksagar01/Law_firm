@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -25,7 +26,11 @@ class ResetPasswordMail extends Mailable
     public function envelope(): Envelope
     {
         $appName = config('legal.app_name', config('app.name', 'Chambers Platform'));
+        $fromAddress = config('mail.from.address', 'contact@vennamraj.com');
+        $fromName = config('mail.from.name', $appName);
+
         return new Envelope(
+            from: new Address($fromAddress, $fromName),
             subject: "Reset Your Password — {$appName}",
         );
     }

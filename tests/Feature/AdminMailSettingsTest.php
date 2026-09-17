@@ -8,11 +8,24 @@ use Tests\TestCase;
 
 class AdminMailSettingsTest extends TestCase
 {
+    protected ?string $envBackup = null;
+
     protected function setUp(): void
     {
         parent::setUp();
+        if (file_exists(base_path('.env'))) {
+            $this->envBackup = file_get_contents(base_path('.env'));
+        }
         $this->artisan('migrate');
         $this->seed(DatabaseSeeder::class);
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->envBackup !== null) {
+            file_put_contents(base_path('.env'), $this->envBackup);
+        }
+        parent::tearDown();
     }
 
     /**
