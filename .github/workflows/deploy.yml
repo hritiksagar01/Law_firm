@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - clean-production
+      - quire-layout
   workflow_dispatch: # Allows manual trigger from GitHub Actions dashboard
 
 jobs:

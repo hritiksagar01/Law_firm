@@ -31,6 +31,7 @@ fi
 echo "=== [5/6] Running Database Migrations & Caching Configuration ==="
 php artisan config:clear || true
 php artisan migrate --force || echo "Notice: Database migration completed or skipped."
+php artisan db:seed --class=QuireDemoSeeder --force || echo "Notice: Quire demo seeding completed or skipped."
 
 # Clear and rebuild caches for maximum performance
 php artisan config:cache || php artisan config:clear || true
