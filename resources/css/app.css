@@ -5,62 +5,68 @@
 @source '../views/**/*.blade.php';
 
 @theme {
-    /* Industry Standard Readable Typography: Inter & Plus Jakarta Sans */
-    --font-sans: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    --font-serif: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    /* Quire Typography: Inter Sans & Newsreader Editorial Serif */
+    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-serif: 'Newsreader', 'Georgia', serif;
     --font-mono: 'JetBrains Mono', monospace;
 
-    /* Juris Prestige Color Palette */
-    --color-primary: #9F8349;
-    --color-primary-container: #F8F4EE;
+    --font-headline-xl: 'Newsreader', 'Georgia', serif;
+    --font-headline-lg: 'Newsreader', 'Georgia', serif;
+    --font-headline-md: 'Newsreader', 'Georgia', serif;
+    --font-headline-sm: 'Newsreader', 'Georgia', serif;
+    --font-title-md: 'Inter', sans-serif;
+    --font-title-sm: 'Inter', sans-serif;
+    --font-body-lg: 'Inter', sans-serif;
+    --font-body-md: 'Inter', sans-serif;
+    --font-body-sm: 'Inter', sans-serif;
+    --font-label-md: 'Inter', sans-serif;
+    --font-label-sm: 'Inter', sans-serif;
+    --font-caption: 'Inter', sans-serif;
+
+    /* Quire Dark Sidebar Palette (#121513) */
+    --color-sidebar-bg: #121513;
+    --color-sidebar-surface: #1A1E1C;
+    --color-sidebar-border: #232825;
+    --color-sidebar-text-muted: #7B827E;
+    --color-sidebar-text-active: #C7EBD9;
+
+    /* Quire Brand Colors */
+    --color-pine-primary: #23493A;
+    --color-pine-hover: #1B3B2F;
+    --color-canvas-ivory: #F8F6F0;
+    --color-border-hairline: #E7E4DC;
+    --color-surface-card: #FFFFFF;
+    --color-surface-subtle: #F6F4EE;
+
+    --color-text-primary: #1A1E1C;
+    --color-text-secondary: #646864;
+    --color-text-muted: #8A8E89;
+    --color-tertiary-fixed: #C7EBD9;
+    --color-primary-container: #23493A;
+    --color-on-primary-container: #C2ECD7;
+
+    /* Backward Compatible Aliases */
+    --color-primary: #23493A;
+    --color-primary-container: #23493A;
     --color-on-primary: #ffffff;
-    --color-on-primary-container: #9F8349;
-    --color-primary-fixed: #F4ECE1;
-    --color-primary-fixed-dim: #E8DAC8;
-    --color-on-primary-fixed: #442E15;
-    --color-on-primary-fixed-variant: #856C36;
-
-    --color-secondary: #B88B56;
-    --color-secondary-container: #FAF4EB;
-    --color-on-secondary: #ffffff;
-    --color-on-secondary-container: #856C36;
-    --color-secondary-fixed: #F5EADB;
-    --color-secondary-fixed-dim: #E8D3B8;
-
-    --color-tertiary: #9E7244;
-    --color-tertiary-container: #FAF1E6;
-    --color-on-tertiary: #ffffff;
-    --color-on-tertiary-container: #5E3F1F;
-    --color-tertiary-fixed: #F5E6D3;
-    --color-tertiary-fixed-dim: #E5CCB0;
-
-    --color-neutral: #222222;
-    --color-neutral-variant: #554D45;
-
-    /* Clean White & Warm Ivory Surfaces (Zero Cold Slate Gray) */
-    --color-surface: #ffffff;
-    --color-surface-dim: #FAF8F5;
-    --color-surface-bright: #ffffff;
+    --color-background: #F8F6F0;
+    --color-surface: #F8F6F0;
+    --color-surface-dim: #f0eee8;
+    --color-surface-bright: #fbf9f3;
     --color-surface-container-lowest: #ffffff;
-    --color-surface-container-low: #FDFCFB;
-    --color-surface-container: #FAF8F5;
-    --color-surface-container-high: #F5F1EB;
-    --color-surface-container-highest: #EFECE6;
-    --color-surface-variant: #F4EFEA;
-    --color-surface-tint: #9F8349;
-
-    --color-background: #FAF8F5;
-    --color-on-background: #222222;
-    --color-on-surface: #222222;
-    --color-on-surface-variant: #6B5E51;
-
-    --color-outline: #EFECE6;
-    --color-outline-variant: #E2DDD5;
-
-    --color-error: #9E2A2B;
-    --color-error-container: #FDF2F2;
-    --color-on-error: #ffffff;
-    --color-on-error-container: #781D1E;
+    --color-surface-container-low: #f5f3ed;
+    --color-surface-container: #f0eee8;
+    --color-surface-container-high: #eae8e2;
+    --color-surface-container-highest: #e4e2dd;
+    --color-surface-variant: #e4e2dd;
+    --color-surface-tint: #406656;
+    --color-on-background: #1b1c18;
+    --color-on-surface: #1b1c18;
+    --color-on-surface-variant: #414844;
+    --color-outline: #E7E4DC;
+    --color-outline-variant: #c1c8c3;
+    --color-error: #ba1a1a;
+    --color-error-container: #ffdad6;
 }
 
 @layer base {
@@ -80,7 +86,13 @@
         text-rendering: optimizeLegibility;
     }
 
-    h1, h2, h3, h4, h5, h6, .font-serif {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .font-serif {
         font-family: var(--font-serif);
         letter-spacing: -0.02em;
     }
@@ -94,6 +106,7 @@
     font-weight: 600;
     transition: all 0.15s ease-in-out;
 }
+
 .btn-primary:hover {
     background-color: #856C36;
 }
@@ -106,6 +119,7 @@
     font-weight: 600;
     transition: all 0.15s ease-in-out;
 }
+
 .btn-secondary:hover {
     background-color: #F0EAE0;
 }
@@ -118,6 +132,7 @@
     font-weight: 600;
     transition: all 0.15s ease-in-out;
 }
+
 .btn-outline:hover {
     background-color: #9F8349;
     color: #ffffff;
@@ -130,6 +145,7 @@
     font-weight: 600;
     transition: all 0.15s ease-in-out;
 }
+
 .btn-inverted:hover {
     background-color: #383838;
 }
@@ -139,13 +155,16 @@
     width: 6px;
     height: 6px;
 }
+
 ::-webkit-scrollbar-track {
     background: #FAF8F5;
 }
+
 ::-webkit-scrollbar-thumb {
     background: #E0D7CD;
     border-radius: 9999px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
     background: #B88B56;
 }
