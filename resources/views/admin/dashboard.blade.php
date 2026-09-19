@@ -15,41 +15,45 @@
         <p class="text-[13px] text-[#646864] mt-1 font-sans">All firms · times in UTC</p>
     </div>
 
-    <!-- Yellow / Amber Warning Banner -->
+    <!-- Yellow / Amber Warning Banner (Dynamic 2FA Status) -->
+    @if(isset($adminsWithout2fa) && $adminsWithout2fa->isNotEmpty())
     <div class="bg-[#fbf3db] border border-[#f0dfaa] rounded-md px-4 py-3 text-[13px] text-[#634812] mb-6 leading-relaxed flex items-center justify-between shadow-xs">
         <div>
-            <span>4 administrators haven't set up two-step sign-in. Anjali Mehta (Meridian Law Chambers), Thomas Greer (Bellweather Legal Group), Margaret Hartwell (Hartwell &amp; Okafor LLP), Rowan Blake (Platform admin).</span>
-            <a href="{{ route('admin.firms.index') }}" class="underline font-medium hover:text-[#382606] ml-1">Review administrators</a>
+            <span>{{ $adminsWithout2fa->count() }} {{ \Illuminate\Support\Str::plural('administrator', $adminsWithout2fa->count()) }} haven't set up two-step sign-in: 
+                {{ $adminsWithout2fa->map(fn($a) => $a->name . ' (' . ($a->firm ? $a->firm->name : 'Platform admin') . ')')->implode(', ') }}.
+            </span>
+            <a href="{{ route('admin.users.index') }}" class="underline font-medium hover:text-[#382606] ml-1">Review administrators</a>
         </div>
     </div>
+    @endif
 
     <!-- Top 4 Connected Metric Ribbon -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border border-[#e5e3dc] bg-white rounded-md divide-y sm:divide-y-0 sm:divide-x divide-[#e5e3dc] shadow-xs mb-8">
         <!-- Active firms -->
         <a href="{{ route('admin.firms.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
             <div class="text-[12.5px] text-[#646864]">Active firms</div>
-            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ $activeFirmsCount ?? 2 }}</div>
-            <div class="text-[12px] text-[#8a8a8a] mt-1">of {{ $totalFirmsCount ?? 3 }} on the platform</div>
+            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ $activeFirmsCount ?? 0 }}</div>
+            <div class="text-[12px] text-[#8a8a8a] mt-1">of {{ $totalFirmsCount ?? 0 }} on the platform</div>
         </a>
 
         <!-- Users -->
-        <a href="{{ route('admin.firms.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
+        <a href="{{ route('admin.users.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
             <div class="text-[12.5px] text-[#646864]">Users</div>
-            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ $totalUsersCount ?? 14 }}</div>
-            <div class="text-[12px] text-[#8a8a8a] mt-1">{{ $staffCount ?? 8 }} staff · {{ $clientCount ?? 5 }} clients · {{ $adminCount ?? 1 }} platform</div>
+            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ $totalUsersCount ?? 0 }}</div>
+            <div class="text-[12px] text-[#8a8a8a] mt-1">{{ $staffCount ?? 0 }} staff · {{ $clientCount ?? 0 }} clients · {{ $adminCount ?? 0 }} platform</div>
         </a>
 
         <!-- Open matters -->
-        <a href="{{ route('admin.firms.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
+        <a href="{{ route('admin.matters.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
             <div class="text-[12.5px] text-[#646864]">Open matters</div>
-            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ $openMattersCount ?? 5 }}</div>
+            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ $openMattersCount ?? 0 }}</div>
             <div class="text-[12px] text-[#8a8a8a] mt-1">Not closed, all firms</div>
         </a>
 
         <!-- Seats in use -->
         <a href="{{ route('admin.firms.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
             <div class="text-[12.5px] text-[#646864]">Seats in use</div>
-            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ $seatsInUse ?? 7 }} of {{ $totalSeats ?? 20 }}</div>
+            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ $seatsInUse ?? 0 }} of {{ $totalSeats ?? 20 }}</div>
             <div class="text-[12px] text-[#8a8a8a] mt-1">Across active firms</div>
         </a>
     </div>
@@ -69,52 +73,41 @@
 
                 <div class="mt-4 pt-3 flex items-center justify-between text-[12px] border-b border-[#f0eee8] pb-3">
                     <span class="font-medium text-[#1a1a1a]">US Dollar (USD)</span>
-                    <span class="text-[#646864] tabular-nums font-mono">$13,552.50 in six months · $2,000.00 in the last 30 days</span>
+                    <span class="text-[#646864] tabular-nums font-mono">
+                        ${{ number_format($totalSixMonthsPayments ?? 0, 2) }} in six months · ${{ number_format($last30DaysPayments ?? 0, 2) }} in the last 30 days
+                    </span>
                 </div>
 
-                <!-- Bar Chart -->
+                <!-- Dynamic Bar Chart -->
                 <div class="mt-6 pt-4">
                     <div class="h-44 flex items-end justify-between px-4 sm:px-8 border-b border-[#e5e3dc] relative">
-                        <!-- Month Apr -->
-                        <div class="flex flex-col items-center justify-end h-full w-12 pb-1">
-                            <span class="text-[11px] text-[#8a8a8a] tabular-nums font-mono">0</span>
-                        </div>
-
-                        <!-- Month May -->
-                        <div class="flex flex-col items-center justify-end h-full w-12 pb-1">
-                            <span class="text-[11px] text-[#8a8a8a] tabular-nums font-mono">0</span>
-                        </div>
-
-                        <!-- Month Jun -->
-                        <div class="flex flex-col items-center justify-end h-full w-12 pb-1">
-                            <span class="text-[11px] text-[#8a8a8a] tabular-nums font-mono">0</span>
-                        </div>
-
-                        <!-- Month Jul -->
-                        <div class="flex flex-col items-center justify-end h-full w-12 pb-1">
-                            <span class="text-[11px] text-[#8a8a8a] tabular-nums font-mono">0</span>
-                        </div>
-
-                        <!-- Month Aug (Active Deep Pine Bar with $13.6K) -->
-                        <div class="flex flex-col items-center justify-end h-full w-12">
-                            <span class="text-[11.5px] font-medium text-[#1a1a1a] tabular-nums font-mono mb-1.5">$13.6K</span>
-                            <div class="w-10 sm:w-12 h-28 bg-[#23493a] rounded-t-[2px]"></div>
-                        </div>
-
-                        <!-- Month Sep -->
-                        <div class="flex flex-col items-center justify-end h-full w-12 pb-1">
-                            <span class="text-[11px] text-[#8a8a8a] tabular-nums font-mono">0</span>
-                        </div>
+                        @if(!empty($sixMonthsData))
+                            @foreach($sixMonthsData as $monthItem)
+                            <div class="flex flex-col items-center justify-end h-full w-12 {{ $monthItem['amount'] > 0 ? '' : 'pb-1' }}">
+                                @if($monthItem['amount'] > 0)
+                                    <span class="text-[11.5px] font-medium text-[#1a1a1a] tabular-nums font-mono mb-1.5">{{ $monthItem['formatted'] }}</span>
+                                    <div class="w-10 sm:w-12 bg-[#23493a] rounded-t-[2px] transition-all" style="height: {{ max(16, $monthItem['height_percentage']) }}%;"></div>
+                                @else
+                                    <span class="text-[11px] text-[#8a8a8a] tabular-nums font-mono">0</span>
+                                @endif
+                            </div>
+                            @endforeach
+                        @else
+                            <div class="w-full h-full flex items-center justify-center text-xs text-[#8a8a8a]">
+                                No payment telemetry available for trailing 6 months.
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Month Labels -->
                     <div class="flex items-center justify-between px-4 sm:px-8 pt-2.5 text-[12px] text-[#8a8a8a] font-sans">
-                        <span class="w-12 text-center">Apr</span>
-                        <span class="w-12 text-center">May</span>
-                        <span class="w-12 text-center">Jun</span>
-                        <span class="w-12 text-center">Jul</span>
-                        <span class="w-12 text-center font-medium text-[#1a1a1a]">Aug</span>
-                        <span class="w-12 text-center">Sep</span>
+                        @if(!empty($sixMonthsData))
+                            @foreach($sixMonthsData as $monthItem)
+                                <span class="w-12 text-center {{ $monthItem['amount'] > 0 ? 'font-medium text-[#1a1a1a]' : '' }}">
+                                    {{ $monthItem['month'] }}
+                                </span>
+                            @endforeach
+                        @endif
                     </div>
                 </div>
             </div>
@@ -134,32 +127,41 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#f0eee8]">
+                            @forelse($attentionFirms ?? [] as $firmItem)
                             <tr>
                                 <td class="py-3.5 pr-4 align-top">
-                                    <a href="{{ route('admin.firms.index') }}" class="font-medium text-[#1a1a1a] hover:text-[#23493a] hover:underline">
-                                        Bellweather Legal Group
+                                    <a href="{{ route('admin.firms.show', $firmItem) }}" class="font-medium text-[#1a1a1a] hover:text-[#23493a] hover:underline">
+                                        {{ $firmItem->name }}
                                     </a>
                                 </td>
                                 <td class="py-3.5 align-top">
-                                    <div class="text-[#1a1a1a]">Suspended · Payment past due</div>
-                                    <div class="text-[12px] text-[#8a8a8a] mt-0.5 font-mono">Renewal date Sep 1, 2026</div>
+                                    <div class="text-[#1a1a1a]">
+                                        @if($firmItem->status === 'suspended')
+                                            Suspended · Requires administrator review
+                                        @elseif($firmItem->status === 'inactive')
+                                            Inactive · Pending activation
+                                        @elseif($firmItem->currentSubscription && $firmItem->currentSubscription->status === 'past_due')
+                                            Suspended · Payment past due
+                                        @else
+                                            Requires administrative review
+                                        @endif
+                                    </div>
+                                    <div class="text-[12px] text-[#8a8a8a] mt-0.5 font-mono">
+                                        @if($firmItem->currentSubscription && $firmItem->currentSubscription->ends_at)
+                                            Renewal date {{ $firmItem->currentSubscription->ends_at->format('M j, Y') }}
+                                        @else
+                                            Tenant identifier: {{ $firmItem->slug }}
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
-                            @foreach($firms as $firmItem)
-                                @if($firmItem->status === 'suspended' && $firmItem->name !== 'Bellweather Legal Group')
-                                <tr>
-                                    <td class="py-3.5 pr-4 align-top">
-                                        <a href="{{ route('admin.firms.show', $firmItem) }}" class="font-medium text-[#1a1a1a] hover:text-[#23493a] hover:underline">
-                                            {{ $firmItem->name }}
-                                        </a>
-                                    </td>
-                                    <td class="py-3.5 align-top">
-                                        <div class="text-[#1a1a1a]">Suspended · Requires administrator review</div>
-                                        <div class="text-[12px] text-[#8a8a8a] mt-0.5 font-mono">Domain: {{ $firmItem->slug }}.quirelegal.com</div>
-                                    </td>
-                                </tr>
-                                @endif
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="2" class="py-6 text-center text-xs text-[#717974]">
+                                    All law firms are in good standing with active accounts.
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -174,9 +176,9 @@
             <div class="border border-[#e5e3dc] bg-white rounded-md p-5 sm:p-6 shadow-xs">
                 <div class="flex items-center justify-between">
                     <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Sign-ins, last 7 days</h2>
-                    <a href="{{ route('admin.profile.index') }}" class="text-[12px] text-[#23493a] hover:underline font-medium">History</a>
+                    <a href="{{ route('admin.sign-ins.index') }}" class="text-[12px] text-[#23493a] hover:underline font-medium">History</a>
                 </div>
-                <p class="text-[12px] text-[#8a8a8a] mt-0.5 font-sans">0 failed in the last 24 hours</p>
+                <p class="text-[12px] text-[#8a8a8a] mt-0.5 font-sans">{{ $failedIn24Hours ?? 0 }} failed in the last 24 hours</p>
 
                 <div class="mt-4">
                     <table class="w-full text-[12.5px]">
@@ -188,41 +190,21 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#f0eee8] font-mono tabular-nums text-[#1a1a1a]">
+                            @forelse($signInsLast7Days ?? [] as $dayItem)
                             <tr>
-                                <td class="py-2 text-left font-sans text-[12.5px]">Sat, Sep 19</td>
-                                <td class="py-2 text-right">3</td>
-                                <td class="py-2 text-right text-[#8a8a8a]">0</td>
+                                <td class="py-2 text-left font-sans text-[12.5px]">{{ $dayItem['date_label'] }}</td>
+                                <td class="py-2 text-right">{{ $dayItem['successful'] }}</td>
+                                <td class="py-2 text-right {{ $dayItem['failed'] > 0 ? 'text-red-600 font-semibold' : 'text-[#8a8a8a]' }}">
+                                    {{ $dayItem['failed'] }}
+                                </td>
                             </tr>
+                            @empty
                             <tr>
-                                <td class="py-2 text-left font-sans text-[12.5px]">Fri, Sep 18</td>
-                                <td class="py-2 text-right">1</td>
-                                <td class="py-2 text-right text-[#8a8a8a]">0</td>
+                                <td colspan="3" class="py-4 text-center text-xs text-[#8a8a8a]">
+                                    No sign-in records for the past 7 days.
+                                </td>
                             </tr>
-                            <tr>
-                                <td class="py-2 text-left font-sans text-[12.5px]">Thu, Sep 17</td>
-                                <td class="py-2 text-right">1</td>
-                                <td class="py-2 text-right text-[#8a8a8a]">0</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2 text-left font-sans text-[12.5px]">Wed, Sep 16</td>
-                                <td class="py-2 text-right">1</td>
-                                <td class="py-2 text-right text-[#8a8a8a]">0</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2 text-left font-sans text-[12.5px]">Tue, Sep 15</td>
-                                <td class="py-2 text-right">0</td>
-                                <td class="py-2 text-right text-[#8a8a8a]">0</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2 text-left font-sans text-[12.5px]">Mon, Sep 14</td>
-                                <td class="py-2 text-right">4</td>
-                                <td class="py-2 text-right text-[#8a8a8a]">0</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2 text-left font-sans text-[12.5px]">Sun, Sep 13</td>
-                                <td class="py-2 text-right">18</td>
-                                <td class="py-2 text-right text-red-600 font-semibold">1</td>
-                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -232,82 +214,30 @@
             <div class="border border-[#e5e3dc] bg-white rounded-md p-5 sm:p-6 shadow-xs">
                 <div class="flex items-center justify-between">
                     <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Recent activity</h2>
-                    <a href="{{ route('admin.subscriptions.index') }}" class="text-[12px] text-[#23493a] hover:underline font-medium">Audit log</a>
+                    <a href="{{ route('admin.audit.index') }}" class="text-[12px] text-[#23493a] hover:underline font-medium">Audit log</a>
                 </div>
                 <p class="text-[12px] text-[#8a8a8a] mt-0.5 font-sans">Operational events first; repeated actions are combined</p>
 
                 <div class="mt-4 divide-y divide-[#f0eee8]">
-                    <!-- Event 1 -->
-                    <div class="py-2.5 first:pt-0">
+                    @forelse($recentActivities ?? [] as $activity)
+                    <div class="py-2.5 first:pt-0 last:pb-0">
                         <div class="flex items-center justify-between text-[13px]">
-                            <span class="font-medium text-[#1a1a1a]">Signed in 2 times</span>
-                            <span class="text-[11.5px] text-[#8a8a8a]">just now</span>
+                            <span class="font-medium text-[#1a1a1a]">
+                                {{ $activity->action_label ?? ucfirst(str_replace('.', ' ', $activity->action)) }}
+                            </span>
+                            <span class="text-[11.5px] text-[#8a8a8a]">
+                                {{ $activity->created_at ? $activity->created_at->diffForHumans(null, true) : 'just now' }}
+                            </span>
                         </div>
-                        <p class="text-[12px] text-[#646864] mt-0.5">Rowan Blake · Platform · User account</p>
+                        <p class="text-[12px] text-[#646864] mt-0.5">
+                            {{ $activity->actor_name ?? 'User' }} · {{ $activity->firm ? $activity->firm->name : 'Platform' }} · {{ $activity->record_type ?? 'Audit' }}
+                        </p>
                     </div>
-
-                    <!-- Event 2 -->
-                    <div class="py-2.5">
-                        <div class="flex items-center justify-between text-[13px]">
-                            <span class="font-medium text-[#1a1a1a]">Signed in 2 times</span>
-                            <span class="text-[11.5px] text-[#8a8a8a]">4 hr ago</span>
-                        </div>
-                        <p class="text-[12px] text-[#646864] mt-0.5">Margaret Hartwell · Hartwell &amp; Okafor LLP · User account</p>
+                    @empty
+                    <div class="py-6 text-center text-xs text-[#717974]">
+                        No platform activity recorded recently.
                     </div>
-
-                    <!-- Event 3 -->
-                    <div class="py-2.5">
-                        <div class="flex items-center justify-between text-[13px]">
-                            <span class="font-medium text-[#1a1a1a]">Signed in</span>
-                            <span class="text-[11.5px] text-[#8a8a8a]">2 days ago</span>
-                        </div>
-                        <p class="text-[12px] text-[#646864] mt-0.5">Rowan Blake · Platform · User account</p>
-                    </div>
-
-                    <!-- Event 4 -->
-                    <div class="py-2.5">
-                        <div class="flex items-center justify-between text-[13px]">
-                            <span class="font-medium text-[#1a1a1a]">Signed in 3 times</span>
-                            <span class="text-[11.5px] text-[#8a8a8a]">3 days ago</span>
-                        </div>
-                        <p class="text-[12px] text-[#646864] mt-0.5">Margaret Hartwell · Hartwell &amp; Okafor LLP · User account</p>
-                    </div>
-
-                    <!-- Event 5 -->
-                    <div class="py-2.5">
-                        <div class="flex items-center justify-between text-[13px]">
-                            <span class="font-medium text-[#1a1a1a]">Signed in 3 times</span>
-                            <span class="text-[11.5px] text-[#8a8a8a]">5 days ago</span>
-                        </div>
-                        <p class="text-[12px] text-[#646864] mt-0.5">Rowan Blake · Platform · User account</p>
-                    </div>
-
-                    <!-- Event 6 -->
-                    <div class="py-2.5">
-                        <div class="flex items-center justify-between text-[13px]">
-                            <span class="font-medium text-[#1a1a1a]">Signed in</span>
-                            <span class="text-[11.5px] text-[#8a8a8a]">6 days ago</span>
-                        </div>
-                        <p class="text-[12px] text-[#646864] mt-0.5">Client portal user · Hartwell &amp; Okafor LLP · User account</p>
-                    </div>
-
-                    <!-- Event 7 -->
-                    <div class="py-2.5">
-                        <div class="flex items-center justify-between text-[13px]">
-                            <span class="font-medium text-[#1a1a1a]">Signed in 2 times</span>
-                            <span class="text-[11.5px] text-[#8a8a8a]">6 days ago</span>
-                        </div>
-                        <p class="text-[12px] text-[#646864] mt-0.5">Margaret Hartwell · Hartwell &amp; Okafor LLP · User account</p>
-                    </div>
-
-                    <!-- Event 8 -->
-                    <div class="py-2.5 last:pb-0">
-                        <div class="flex items-center justify-between text-[13px]">
-                            <span class="font-medium text-[#1a1a1a]">Signed in</span>
-                            <span class="text-[11.5px] text-[#8a8a8a]">6 days ago</span>
-                        </div>
-                        <p class="text-[12px] text-[#646864] mt-0.5">Client portal user · Hartwell &amp; Okafor LLP · User account</p>
-                    </div>
+                    @endforelse
                 </div>
             </div>
 

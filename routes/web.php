@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\AuditManagementController;
@@ -31,7 +32,6 @@ use App\Models\Firm;
 use App\Models\Invoice;
 use App\Models\Matter;
 use App\Models\Message;
-use App\Models\Plan;
 use App\Models\Task;
 use App\Models\User;
 use App\Services\LegalPdfGenerator;
@@ -1022,39 +1022,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', fn () => redirect()->route('admin.dashboard'));
 
-    Route::get('/dashboard', function () {
-        $firms = Firm::withCount(['users', 'matters', 'documents'])->get();
-        $totalFirmsCount = Firm::count();
-        $activeFirmsCount = Firm::where('status', 'active')->count() ?: $totalFirmsCount;
-        $totalUsersCount = User::count();
-        $staffCount = User::whereIn('role', ['partner', 'associate', 'paralegal', 'staff'])->count();
-        $clientCount = User::where('role', 'client')->count();
-        $adminCount = User::where('role', 'superadmin')->count();
-        $openMattersCount = Matter::where('status', '!=', 'closed')->count();
-        $totalSeats = 20;
-        try {
-            $planSeats = (int) Plan::sum('max_users');
-            if ($planSeats > 0) {
-                $totalSeats = max(20, $planSeats);
-            }
-        } catch (Throwable) {
-            $totalSeats = 20;
-        }
-        $seatsInUse = $staffCount ?: 7;
-
-        return view('admin.dashboard', compact(
-            'firms',
-            'totalFirmsCount',
-            'activeFirmsCount',
-            'totalUsersCount',
-            'staffCount',
-            'clientCount',
-            'adminCount',
-            'openMattersCount',
-            'totalSeats',
-            'seatsInUse'
-        ));
-    })->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     // ── Law Firm Tenant Management ──────────────────────────
     Route::resource('firms', FirmManagementController::class);

@@ -35,7 +35,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <!-- Card 1: Channels -->
-        <div class="bg-white border border-[#e5e3dc] rounded-sm p-4 flex flex-col justify-between">
+        <div class="bg-white border border-[#e5e3dc] rounded-sm p-4 flex flex-col justify-between shadow-xs">
             <div>
                 <h2 class="text-sm font-semibold text-[#1b1c18]">Channels</h2>
                 <p class="text-xs text-[#717974] mt-0.5 mb-4">A channel switched off here is off for every firm.</p>
@@ -76,7 +76,7 @@
         </div>
 
         <!-- Card 2: Providers -->
-        <div class="bg-white border border-[#e5e3dc] rounded-sm p-4 flex flex-col justify-between">
+        <div class="bg-white border border-[#e5e3dc] rounded-sm p-4 flex flex-col justify-between shadow-xs">
             <div>
                 <h2 class="text-sm font-semibold text-[#1b1c18] mb-3">Providers</h2>
 
@@ -85,18 +85,22 @@
                     <div class="border-b border-[#f0eee8] pb-2.5">
                         <div class="flex items-center justify-between">
                             <span class="font-medium text-[#1b1c18]">Email</span>
-                            <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-[#f0eee8] text-[#5e625e]">Logged only</span>
+                            <span class="px-2 py-0.5 rounded text-[11px] font-medium {{ ($mailConfig['mailer'] ?? '') === 'smtp' ? 'bg-[#d7f0e5] text-[#0d5236]' : 'bg-[#f0eee8] text-[#5e625e]' }}">
+                                {{ ($mailConfig['mailer'] ?? '') === 'smtp' ? 'SMTP Active' : 'Logged only' }}
+                            </span>
                         </div>
-                        <span class="font-mono text-[11px] text-[#717974] block mt-0.5">RESEND_API_KEY</span>
+                        <span class="font-mono text-[11px] text-[#717974] block mt-0.5">
+                            {{ ($mailConfig['mailer'] ?? '') === 'smtp' ? ($mailConfig['host'] ?? '127.0.0.1') : 'MAIL_MAILER=log' }}
+                        </span>
                     </div>
 
                     <!-- From Address -->
                     <div class="border-b border-[#f0eee8] pb-2.5">
                         <div class="flex items-center justify-between">
                             <span class="font-medium text-[#1b1c18]">From address</span>
-                            <span class="font-mono text-[11px] text-[#414844] truncate max-w-[150px]">{{ config('mail.from.name', 'Platform') }} &lt;{{ config('mail.from.address', 'notices@sharmalegal.in') }}&gt;</span>
+                            <span class="font-mono text-[11px] text-[#414844] truncate max-w-[150px]">{{ $mailConfig['from_name'] ?? config('mail.from.name', 'Platform') }} &lt;{{ $mailConfig['from_address'] ?? config('mail.from.address', 'notices@sharmalegal.in') }}&gt;</span>
                         </div>
-                        <span class="font-mono text-[11px] text-[#717974] block mt-0.5">EMAIL_FROM</span>
+                        <span class="font-mono text-[11px] text-[#717974] block mt-0.5">MAIL_FROM_ADDRESS</span>
                     </div>
 
                     <!-- SMS Provider -->
@@ -111,12 +115,12 @@
             </div>
 
             <p class="text-[11.5px] text-[#717974] mt-4 leading-relaxed">
-                Without provider credentials, messages are recorded below as “Logged only” instead of being sent.
+                Configure your SMTP server below to dispatch live outbound messages to all platform tenants.
             </p>
         </div>
 
         <!-- Card 3: Send a test -->
-        <div class="bg-white border border-[#e5e3dc] rounded-sm p-4">
+        <div class="bg-white border border-[#e5e3dc] rounded-sm p-4 shadow-xs">
             <h2 class="text-sm font-semibold text-[#1b1c18] mb-3">Send a test</h2>
 
             <!-- Test Email Form -->
@@ -155,6 +159,89 @@
             </form>
         </div>
 
+    </div>
+
+    <!-- Prominent Platform Mail & SMTP Gateway Configuration Card -->
+    <div class="bg-white border border-[#e5e3dc] rounded-sm p-5 shadow-xs">
+        <div class="flex items-center justify-between border-b border-[#f0eee8] pb-3.5 mb-4">
+            <div>
+                <h2 class="text-sm font-semibold text-[#1b1c18] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px] text-[#23493a]">mail</span>
+                    <span>Platform Mail &amp; SMTP Gateway</span>
+                </h2>
+                <p class="text-xs text-[#717974] mt-0.5">
+                    Configure outbound mail delivery credentials, server host, and default sender identity
+                </p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center px-2.5 py-1 rounded text-[11px] font-medium {{ ($mailConfig['mailer'] ?? '') === 'smtp' ? 'bg-[#d7f0e5] text-[#0d5236] border border-[#bbf0d8]' : 'bg-[#f0eee8] text-[#5e625e]' }}">
+                    Active driver: {{ strtoupper($mailConfig['mailer'] ?? 'LOG') }}
+                </span>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ route('admin.settings.mail.update') }}" id="smtp-settings-form" class="space-y-4">
+            @csrf
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                <div>
+                    <label class="block font-medium text-[#5e625e] mb-1">Mailer Driver</label>
+                    <select name="mail_mailer" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]">
+                        <option value="smtp" {{ ($mailConfig['mailer'] ?? '') === 'smtp' ? 'selected' : '' }}>SMTP Server</option>
+                        <option value="log" {{ ($mailConfig['mailer'] ?? '') === 'log' ? 'selected' : '' }}>Log (Testing)</option>
+                        <option value="sendmail" {{ ($mailConfig['mailer'] ?? '') === 'sendmail' ? 'selected' : '' }}>Sendmail</option>
+                        <option value="array" {{ ($mailConfig['mailer'] ?? '') === 'array' ? 'selected' : '' }}>Array</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-[#5e625e] mb-1">SMTP Host</label>
+                    <input type="text" name="mail_host" value="{{ $mailConfig['host'] ?? '127.0.0.1' }}" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]">
+                </div>
+
+                <div>
+                    <label class="block font-medium text-[#5e625e] mb-1">Port</label>
+                    <input type="number" name="mail_port" value="{{ $mailConfig['port'] ?? 587 }}" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]">
+                </div>
+
+                <div>
+                    <label class="block font-medium text-[#5e625e] mb-1">Encryption</label>
+                    <select name="mail_encryption" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]">
+                        <option value="tls" {{ ($mailConfig['encryption'] ?? '') === 'tls' ? 'selected' : '' }}>TLS</option>
+                        <option value="ssl" {{ ($mailConfig['encryption'] ?? '') === 'ssl' ? 'selected' : '' }}>SSL</option>
+                        <option value="none" {{ ($mailConfig['encryption'] ?? '') === 'none' ? 'selected' : '' }}>None</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-[#5e625e] mb-1">Username</label>
+                    <input type="text" name="mail_username" value="{{ $mailConfig['username'] ?? '' }}" placeholder="e.g. apikey or user@domain.com" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]">
+                </div>
+
+                <div>
+                    <label class="block font-medium text-[#5e625e] mb-1">Password / API Key</label>
+                    <input type="password" name="mail_password" placeholder="{{ ($mailConfig['has_password'] ?? false) ? '•••••••• (Stored)' : 'Enter SMTP password' }}" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]">
+                </div>
+
+                <div>
+                    <label class="block font-medium text-[#5e625e] mb-1">From Address</label>
+                    <input type="email" name="mail_from_address" value="{{ $mailConfig['from_address'] ?? config('mail.from.address', 'contact@vennamraj.com') }}" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]">
+                </div>
+
+                <div>
+                    <label class="block font-medium text-[#5e625e] mb-1">From Name</label>
+                    <input type="text" name="mail_from_name" value="{{ $mailConfig['from_name'] ?? config('legal.app_name', 'Vennamraj Associates') }}" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-[#f0eee8]">
+                <button type="submit" class="h-8 px-4 rounded bg-[#23493a] text-white text-xs font-medium hover:bg-[#1b382d] transition-colors shadow-xs">
+                    Save Mail Configuration
+                </button>
+                <button type="button" onclick="document.querySelectorAll('#smtp-settings-form input[type=text], #smtp-settings-form input[type=password]').forEach(el => el.value = '')" class="text-xs text-[#717974] hover:text-[#ba1a1a]">
+                    Clear All Fields
+                </button>
+            </div>
+        </form>
     </div>
 
     <!-- Delivery Log Card -->
@@ -285,82 +372,6 @@
         </div>
         @endif
     </div>
-
-    <!-- Advanced Platform SMTP Gateway Configuration (Collapsible Accordion) -->
-    <details class="group bg-white border border-[#e5e3dc] rounded-sm shadow-none p-4">
-        <summary class="cursor-pointer font-medium text-xs text-[#5e625e] group-hover:text-[#1b1c18] transition-colors flex items-center justify-between">
-            <span class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-[16px]">tune</span>
-                <span>Advanced SMTP &amp; Gateway Driver Settings (Platform Mail &amp; SMTP Gateway)</span>
-            </span>
-            <span class="text-[11px] text-[#717974]">Expand for low-level mailers</span>
-        </summary>
-
-        <div class="pt-4 mt-3 border-t border-[#f0eee8] text-xs">
-            <form method="POST" action="{{ route('admin.settings.mail.update') }}" class="space-y-4">
-                @csrf
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-[#5e625e] mb-1">Mailer Driver</label>
-                        <select name="mail_mailer" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs">
-                            <option value="log" {{ ($mailConfig['mailer'] ?? '') === 'log' ? 'selected' : '' }}>Log (Testing)</option>
-                            <option value="smtp" {{ ($mailConfig['mailer'] ?? '') === 'smtp' ? 'selected' : '' }}>SMTP Server</option>
-                            <option value="sendmail" {{ ($mailConfig['mailer'] ?? '') === 'sendmail' ? 'selected' : '' }}>Sendmail</option>
-                            <option value="array" {{ ($mailConfig['mailer'] ?? '') === 'array' ? 'selected' : '' }}>Array</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-medium text-[#5e625e] mb-1">SMTP Host</label>
-                        <input type="text" name="mail_host" value="{{ $mailConfig['host'] ?? '127.0.0.1' }}" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-medium text-[#5e625e] mb-1">Port</label>
-                        <input type="number" name="mail_port" value="{{ $mailConfig['port'] ?? 587 }}" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-medium text-[#5e625e] mb-1">Encryption</label>
-                        <select name="mail_encryption" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs">
-                            <option value="tls" {{ ($mailConfig['encryption'] ?? '') === 'tls' ? 'selected' : '' }}>TLS</option>
-                            <option value="ssl" {{ ($mailConfig['encryption'] ?? '') === 'ssl' ? 'selected' : '' }}>SSL</option>
-                            <option value="none" {{ ($mailConfig['encryption'] ?? '') === 'none' ? 'selected' : '' }}>None</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-medium text-[#5e625e] mb-1">Username</label>
-                        <input type="text" name="mail_username" value="{{ $mailConfig['username'] ?? '' }}" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-medium text-[#5e625e] mb-1">Password</label>
-                        <input type="password" name="mail_password" placeholder="••••••••" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-medium text-[#5e625e] mb-1">From Address</label>
-                        <input type="email" name="mail_from_address" value="{{ $mailConfig['from_address'] ?? config('mail.from.address', 'notices@sharmalegal.in') }}" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-medium text-[#5e625e] mb-1">From Name</label>
-                        <input type="text" name="mail_from_name" value="{{ $mailConfig['from_name'] ?? config('legal.app_name', 'Vennamraj Associates') }}" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs">
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between pt-2">
-                    <button type="submit" class="h-8 px-4 rounded bg-[#23493a] text-white text-xs font-medium hover:bg-[#1b382d] transition-colors">
-                        Save Mail Configuration
-                    </button>
-                    <button type="button" onclick="document.querySelectorAll('details input[type=text], details input[type=password]').forEach(el => el.value = '')" class="text-xs text-[#717974] hover:text-[#ba1a1a]">
-                        Clear All Fields
-                    </button>
-                </div>
-            </form>
-        </div>
-    </details>
 
 </div>
 @endsection
