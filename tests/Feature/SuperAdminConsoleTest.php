@@ -247,4 +247,59 @@ class SuperAdminConsoleTest extends TestCase
         $response->assertStatus(200);
         $response->assertDontSee('Payment gateways');
     }
+
+    public function test_superadmin_can_view_email_and_sms_and_delivery_log(): void
+    {
+        $this->seed(QuireDemoSeeder::class);
+
+        $response = $this->actingAs($this->superadmin)->get(route('admin.settings.mail'));
+        $response->assertStatus(200);
+        $response->assertSee('Email &amp; SMS', false);
+        $response->assertSee('Outbound notification delivery for every firm');
+        $response->assertSee('Channels');
+        $response->assertSee('Send email notifications');
+        $response->assertSee('Send SMS notifications');
+        $response->assertSee('Providers');
+        $response->assertSee('Send a test');
+        $response->assertSee('Delivery log');
+        $response->assertSee('Logged only');
+
+        // Test sending test email
+        $postEmail = $this->actingAs($this->superadmin)->post(route('admin.settings.mail.test-email'), [
+            'test_email' => 'test-ops@firm.example',
+        ]);
+        $postEmail->assertRedirect(route('admin.settings.mail'));
+        $this->assertDatabaseHas('delivery_logs', ['recipient' => 'test-ops@firm.example']);
+    }
+
+    public function test_superadmin_can_view_audit_log_and_export_csv(): void
+    {
+        $this->seed(QuireDemoSeeder::class);
+
+        $response = $this->actingAs($this->superadmin)->get(route('admin.audit.index'));
+        $response->assertStatus(200);
+        $response->assertSee('Audit log');
+        $response->assertSee('Append-only record of sign-ins, changes, document access and payments · UTC');
+        $response->assertSee('Export CSV');
+        $response->assertSee('Signed in');
+        $response->assertSee('auth.login');
+
+        // Test CSV export
+        $exportResponse = $this->actingAs($this->superadmin)->get(route('admin.audit.export'));
+        $exportResponse->assertStatus(200);
+        $this->assertStringContainsString('text/csv', $exportResponse->headers->get('content-type'));
+    }
+
+    public function test_superadmin_can_view_sign_in_history(): void
+    {
+        $this->seed(QuireDemoSeeder::class);
+
+        $response = $this->actingAs($this->superadmin)->get(route('admin.sign-ins.index'));
+        $response->assertStatus(200);
+        $response->assertSee('Sign-in history');
+        $response->assertSee('Every attempt, successful or not · UTC');
+        $response->assertSee('Failed sign-ins by IP, last 24 hours');
+        $response->assertSee('Sign-in attempts');
+        $response->assertSee('Signed in');
+    }
 }

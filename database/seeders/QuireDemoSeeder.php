@@ -2,11 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Models\AuditLog;
 use App\Models\Client;
+use App\Models\DeliveryLog;
 use App\Models\Document;
 use App\Models\Firm;
 use App\Models\Matter;
 use App\Models\Message;
+use App\Models\SignInHistory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -339,6 +342,69 @@ class QuireDemoSeeder extends Seeder
                     'body' => 'Docket Notice '.($j + 1).': Status update regarding matter '.$matterModel->case_number,
                     'is_privileged' => true,
                 ]);
+            }
+        }
+
+        // 7. Notification Delivery Logs
+        if (DeliveryLog::count() === 0) {
+            $deliveries = [
+                ['channel' => 'email', 'firm_id' => $firm->id, 'recipient' => 'e•••@example.com', 'notification' => 'Appointment reminder', 'provider' => 'None', 'status' => 'logged_only', 'created_at' => '2026-09-19 13:57:00'],
+                ['channel' => 'sms', 'firm_id' => $firm->id, 'recipient' => '+1 ••• ••• 0133', 'notification' => 'Appointment reminder', 'provider' => 'None', 'status' => 'logged_only', 'created_at' => '2026-09-19 13:57:00'],
+                ['channel' => 'email', 'firm_id' => $firm->id, 'recipient' => 'd•••@hartwellokafor.example', 'notification' => 'A deadline or hearing is approaching', 'provider' => 'None', 'status' => 'logged_only', 'created_at' => '2026-09-19 13:57:00'],
+                ['channel' => 'email', 'firm_id' => $firm->id, 'recipient' => 'p•••@hartwellokafor.example', 'notification' => 'A deadline or hearing is approaching', 'provider' => 'None', 'status' => 'logged_only', 'created_at' => '2026-09-19 13:57:00'],
+                ['channel' => 'email', 'firm_id' => $firm->id, 'recipient' => 'l•••@hartwellokafor.example', 'notification' => 'A deadline or hearing is approaching', 'provider' => 'None', 'status' => 'logged_only', 'created_at' => '2026-09-19 13:57:00'],
+                ['channel' => 'email', 'firm_id' => $firm->id, 'recipient' => 's•••@northgatefreight.example', 'notification' => 'A deadline or hearing is approaching', 'provider' => 'None', 'status' => 'logged_only', 'created_at' => '2026-09-19 13:57:00'],
+                ['channel' => 'email', 'firm_id' => $firm->id, 'recipient' => 'l•••@hartwellokafor.example', 'notification' => 'A task is assigned', 'provider' => 'None', 'status' => 'logged_only', 'created_at' => '2026-09-17 13:57:00'],
+                ['channel' => 'email', 'firm_id' => $firm->id, 'recipient' => 'm•••@hartwellokafor.example', 'notification' => 'A task is assigned', 'provider' => 'None', 'status' => 'logged_only', 'created_at' => '2026-09-15 13:57:00'],
+                ['channel' => 'email', 'firm_id' => $firm->id, 'recipient' => 'd•••@hartwellokafor.example', 'notification' => 'A client sends a message', 'provider' => 'None', 'status' => 'logged_only', 'created_at' => '2026-09-13 04:59:00'],
+                ['channel' => 'sms', 'firm_id' => $firm->id, 'recipient' => '+1 ••• ••• 0133', 'notification' => 'A document is requested from a client', 'provider' => 'None', 'status' => 'logged_only', 'created_at' => '2026-09-12 13:00:00'],
+                ['channel' => 'email', 'firm_id' => $firm->id, 'recipient' => 'e•••@example.com', 'notification' => 'A document is requested from a client', 'provider' => 'None', 'status' => 'logged_only', 'created_at' => '2026-09-12 13:00:00'],
+                ['channel' => 'email', 'firm_id' => $firm->id, 'recipient' => 'h•••@hartwellokafor.example', 'notification' => 'Portal invitation', 'provider' => 'None', 'status' => 'logged_only', 'created_at' => '2026-09-11 14:00:00'],
+            ];
+            foreach ($deliveries as $d) {
+                DeliveryLog::create($d);
+            }
+        }
+
+        // 8. Audit Logs
+        if (AuditLog::count() === 0) {
+            $audits = [
+                ['action' => 'auth.login', 'action_label' => 'Signed in', 'actor_name' => 'Rowan Blake', 'actor_email' => 'admin@quire.example', 'firm_id' => null, 'record_type' => 'User account', 'ip_address' => '49.43.114.131', 'created_at' => '2026-09-19 17:38:00'],
+                ['action' => 'auth.login', 'action_label' => 'Signed in', 'actor_name' => 'Margaret Hartwell', 'actor_email' => 'mhartwell@hartwellokafor.example', 'firm_id' => $firm->id, 'record_type' => 'User account', 'ip_address' => '122.161.172.219', 'created_at' => '2026-09-19 13:25:00'],
+                ['action' => 'document.downloaded', 'action_label' => 'Downloaded document', 'actor_name' => 'Client portal user', 'actor_email' => 'elena.marsh@marshholdings.com', 'firm_id' => $firm->id, 'record_type' => 'Document · matter 2026-0118', 'ip_address' => '144.6.61.46', 'created_at' => '2026-09-13 07:03:00'],
+                ['action' => 'document.viewed', 'action_label' => 'Previewed document', 'actor_name' => 'Margaret Hartwell', 'actor_email' => 'mhartwell@hartwellokafor.example', 'firm_id' => $firm->id, 'record_type' => 'Document · matter 2026-0118', 'ip_address' => '144.6.61.46', 'created_at' => '2026-09-13 07:03:00'],
+                ['action' => 'document.uploaded', 'action_label' => 'Uploaded document', 'actor_name' => 'Client portal user', 'actor_email' => null, 'firm_id' => $firm->id, 'record_type' => 'Document · matter 2026-0118', 'ip_address' => null, 'created_at' => '2026-09-13 01:00:00'],
+                ['action' => 'message.sent', 'action_label' => 'Sent message', 'actor_name' => 'Priya Raman', 'actor_email' => 'praman@hartwellokafor.example', 'firm_id' => $firm->id, 'record_type' => 'Message thread · matter 2026-0118', 'ip_address' => null, 'created_at' => '2026-09-12 13:40:00'],
+                ['action' => 'thread.created', 'action_label' => 'Started thread', 'actor_name' => 'Client portal user', 'actor_email' => null, 'firm_id' => $firm->id, 'record_type' => 'Message thread · matter 2026-0118', 'ip_address' => null, 'created_at' => '2026-09-11 22:12:00'],
+                ['action' => 'user.invited', 'action_label' => 'Invited user', 'actor_name' => 'Margaret Hartwell', 'actor_email' => 'mhartwell@hartwellokafor.example', 'firm_id' => $firm->id, 'record_type' => 'User account', 'ip_address' => null, 'created_at' => '2026-09-11 14:00:00'],
+                ['action' => 'matter.update_posted', 'action_label' => 'Posted case update', 'actor_name' => 'Daniel Okafor', 'actor_email' => 'dokafor@hartwellokafor.example', 'firm_id' => $firm->id, 'record_type' => 'Matter · matter 2026-0118', 'ip_address' => null, 'created_at' => '2026-09-10 14:00:00'],
+                ['action' => 'payment.recorded', 'action_label' => 'Recorded payment', 'actor_name' => 'Luis Ortega', 'actor_email' => 'lortega@hartwellokafor.example', 'firm_id' => $firm->id, 'record_type' => 'Invoice · matter 2026-0124', 'ip_address' => null, 'created_at' => '2026-08-29 15:00:00'],
+                ['action' => 'request.accepted', 'action_label' => 'Accepted submission', 'actor_name' => 'Luis Ortega', 'actor_email' => 'lortega@hartwellokafor.example', 'firm_id' => $firm->id, 'record_type' => 'Document request · matter 2026-0118', 'ip_address' => null, 'created_at' => '2026-08-29 14:00:00'],
+                ['action' => 'invoice.sent', 'action_label' => 'Sent invoice', 'actor_name' => 'Margaret Hartwell', 'actor_email' => 'mhartwell@hartwellokafor.example', 'firm_id' => $firm->id, 'record_type' => 'Invoice · matter 2026-0124', 'ip_address' => null, 'created_at' => '2026-08-19 14:00:00'],
+                ['action' => 'payment.succeeded', 'action_label' => 'Payment received', 'actor_name' => 'Client portal user', 'actor_email' => null, 'firm_id' => $firm->id, 'record_type' => 'Invoice · matter 2026-0118', 'ip_address' => null, 'created_at' => '2026-08-04 12:14:00'],
+                ['action' => 'matter.created', 'action_label' => 'Opened matter', 'actor_name' => 'Anjali Mehta', 'actor_email' => 'anjali@meridianlaw.example', 'firm_id' => $meridianFirm->id, 'record_type' => 'Matter · matter MLC/2026/017', 'ip_address' => null, 'created_at' => '2026-07-17 14:00:00'],
+            ];
+            foreach ($audits as $a) {
+                AuditLog::create($a);
+            }
+        }
+
+        // 9. Sign-in History
+        if (SignInHistory::count() === 0) {
+            $signIns = [
+                ['email' => 'admin@quire.example', 'is_client' => false, 'result' => 'signed_in', 'failure_reason' => null, 'ip_address' => '49.43.114.131', 'device' => 'Chrome on Windows', 'firm_id' => null, 'created_at' => '2026-09-19 17:38:00'],
+                ['email' => 'mhartwell@hartwellokafor.example', 'is_client' => false, 'result' => 'signed_in', 'failure_reason' => null, 'ip_address' => '122.161.172.219', 'device' => 'Chrome on Windows', 'firm_id' => $firm->id, 'created_at' => '2026-09-19 13:25:00'],
+                ['email' => 'admin@quire.example', 'is_client' => false, 'result' => 'signed_in', 'failure_reason' => null, 'ip_address' => '106.216.80.207', 'device' => 'Chrome on macOS', 'firm_id' => null, 'created_at' => '2026-09-14 05:27:00'],
+                ['email' => 'e•••@example.com', 'is_client' => true, 'result' => 'signed_in', 'failure_reason' => null, 'ip_address' => '49.43.114.131', 'device' => 'Chrome on Windows', 'firm_id' => $firm->id, 'created_at' => '2026-09-13 20:11:00'],
+                ['email' => 'abc@gmail.com', 'is_client' => false, 'result' => 'failed', 'failure_reason' => 'No such account', 'ip_address' => '49.43.114.131', 'device' => 'Chrome on Windows', 'firm_id' => null, 'created_at' => '2026-09-13 16:05:00'],
+                ['email' => 'mhartwell@hartwellokafor.example', 'is_client' => false, 'result' => 'signed_in', 'failure_reason' => null, 'ip_address' => '157.50.101.205', 'device' => 'Safari on iOS', 'firm_id' => $firm->id, 'created_at' => '2026-09-13 15:45:00'],
+                ['email' => 'k•••@example.in', 'is_client' => true, 'result' => 'signed_in', 'failure_reason' => null, 'ip_address' => '49.204.212.107', 'device' => 'Chrome on Windows', 'firm_id' => $meridianFirm->id, 'created_at' => '2026-09-13 10:58:00'],
+                ['email' => 'e•••@example.com', 'is_client' => true, 'result' => 'failed', 'failure_reason' => 'Wrong password', 'ip_address' => '198.51.100.23', 'device' => 'iOS', 'firm_id' => $firm->id, 'created_at' => '2026-09-12 23:03:00'],
+                ['email' => 'admin@hartwellokafor.example', 'is_client' => false, 'result' => 'failed', 'failure_reason' => 'No such account', 'ip_address' => '185.220.101.9', 'device' => 'python-requests', 'firm_id' => null, 'created_at' => '2026-09-09 07:11:00'],
+                ['email' => 'k•••@example.in', 'is_client' => true, 'result' => 'signed_in', 'failure_reason' => null, 'ip_address' => '49.36.12.8', 'device' => 'Android', 'firm_id' => $meridianFirm->id, 'created_at' => '2026-09-09 01:00:00'],
+            ];
+            foreach ($signIns as $s) {
+                SignInHistory::create($s);
             }
         }
     }

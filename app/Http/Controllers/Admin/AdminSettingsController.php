@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\DeliveryLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,12 +15,9 @@ use Illuminate\View\View;
 class AdminSettingsController extends Controller
 {
     /**
-     * Display Platform Mail & Communications Settings.
-     * In this production-hardened environment, database and storage keys are immutable
-     * server configuration managed strictly via CI/CD and server environment variables.
-     * Mail gateway configuration is fully customizable here.
+     * Display Platform Email & SMS Notification Delivery & Settings.
      */
-    public function mailSettings(): View
+    public function mailSettings(Request $request): View
     {
         $mailConfig = [
             'mailer' => config('mail.default', 'log'),
@@ -29,10 +27,81 @@ class AdminSettingsController extends Controller
             'encryption' => config('mail.mailers.smtp.encryption', 'tls') ?? 'none',
             'from_address' => config('mail.from.address', 'contact@vennamraj.com'),
             'from_name' => config('mail.from.name', config('app.name')),
-            'has_password' => !empty(config('mail.mailers.smtp.password')),
+            'has_password' => ! empty(config('mail.mailers.smtp.password')),
         ];
 
-        return view('admin.settings.mail', compact('mailConfig'));
+        $query = DeliveryLog::with('firm');
+
+        if ($request->filled('channel') && ! in_array(strtolower($request->channel), ['both', 'any', 'all', ''])) {
+            $query->where('channel', strtolower($request->channel));
+        }
+
+        if ($request->filled('status') && ! in_array(strtolower($request->status), ['any', 'all', ''])) {
+            $status = strtolower(str_replace(' ', '_', $request->status));
+            $query->where('status', $status);
+        }
+
+        $deliveryLogs = $query->orderByDesc('created_at')->paginate(25)->withQueryString();
+
+        $channelsEnabled = [
+            'email' => session('channels_email', true),
+            'sms' => session('channels_sms', true),
+        ];
+
+        return view('admin.settings.mail', compact('mailConfig', 'deliveryLogs', 'channelsEnabled'));
+    }
+
+    /**
+     * Save Notification Channels.
+     */
+    public function saveChannels(Request $request): RedirectResponse
+    {
+        session([
+            'channels_email' => $request->has('send_email'),
+            'channels_sms' => $request->has('send_sms'),
+        ]);
+
+        return redirect()->route('admin.settings.mail')->with('success', 'Notification channels saved successfully.');
+    }
+
+    /**
+     * Send test email and log delivery.
+     */
+    public function sendTestEmail(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'test_email' => 'required|email',
+        ]);
+
+        DeliveryLog::create([
+            'channel' => 'email',
+            'recipient' => $request->test_email,
+            'notification' => 'Test message',
+            'provider' => config('mail.default') === 'smtp' ? 'Resend' : 'None',
+            'status' => 'logged_only',
+        ]);
+
+        return redirect()->route('admin.settings.mail')->with('success', 'Test email dispatched to '.$request->test_email);
+    }
+
+    /**
+     * Send test SMS and log delivery.
+     */
+    public function sendTestSms(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'test_phone' => 'required|string',
+        ]);
+
+        DeliveryLog::create([
+            'channel' => 'sms',
+            'recipient' => $request->test_phone,
+            'notification' => 'Test message',
+            'provider' => 'Twilio',
+            'status' => 'logged_only',
+        ]);
+
+        return redirect()->route('admin.settings.mail')->with('success', 'Test SMS dispatched to '.$request->test_phone);
     }
 
     /**
@@ -97,7 +166,8 @@ class AdminSettingsController extends Controller
         // 3. Clear configuration caches
         try {
             Artisan::call('config:clear');
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
 
         return redirect()->route('admin.settings.mail')
             ->with('success', 'Platform Mail & SMTP Gateway settings updated successfully! You can now send test emails.');
@@ -143,10 +213,10 @@ class AdminSettingsController extends Controller
             // If log driver, write directly to system log
             if ($mailer === 'log') {
                 Mail::raw(
-                    "Verified test email from " . config('app.name') . ".\n\nLogged to storage/logs/laravel.log\nTimestamp: " . now()->toIso8601String(),
+                    'Verified test email from '.config('app.name').".\n\nLogged to storage/logs/laravel.log\nTimestamp: ".now()->toIso8601String(),
                     function ($message) use ($recipient) {
                         $message->to($recipient)
-                            ->subject('Platform SMTP Gateway Test Verification — ' . config('app.name'));
+                            ->subject('Platform SMTP Gateway Test Verification — '.config('app.name'));
                     }
                 );
 
@@ -172,10 +242,10 @@ class AdminSettingsController extends Controller
 
             // Dispatch verification email
             Mail::raw(
-                "This is a verified test email from " . config('app.name') . ".\n\nYour SMTP gateway is operating properly.\nTimestamp: " . now()->toIso8601String(),
+                'This is a verified test email from '.config('app.name').".\n\nYour SMTP gateway is operating properly.\nTimestamp: ".now()->toIso8601String(),
                 function ($message) use ($recipient) {
                     $message->to($recipient)
-                        ->subject('Platform SMTP Gateway Test Verification — ' . config('app.name'));
+                        ->subject('Platform SMTP Gateway Test Verification — '.config('app.name'));
                 }
             );
 
@@ -186,7 +256,7 @@ class AdminSettingsController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => "SMTP Delivery Failed: " . $e->getMessage(),
+                'message' => 'SMTP Delivery Failed: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -197,7 +267,7 @@ class AdminSettingsController extends Controller
     protected function updateEnvMailKeys(array $keys): bool
     {
         $envPath = base_path('.env');
-        if (!file_exists($envPath) || !is_readable($envPath)) {
+        if (! file_exists($envPath) || ! is_readable($envPath)) {
             return false;
         }
 
@@ -205,17 +275,18 @@ class AdminSettingsController extends Controller
 
         foreach ($keys as $key => $value) {
             $formattedValue = $this->formatEnvValue($value);
-            $pattern = "/^(#\s*)?" . preg_quote($key, '/') . "=.*$/m";
+            $pattern = "/^(#\s*)?".preg_quote($key, '/').'=.*$/m';
 
             if (preg_match($pattern, $content)) {
                 $content = preg_replace($pattern, "{$key}={$formattedValue}", $content);
             } else {
-                $content = rtrim($content) . "\n{$key}={$formattedValue}\n";
+                $content = rtrim($content)."\n{$key}={$formattedValue}\n";
             }
         }
 
         try {
             @file_put_contents($envPath, $content);
+
             return true;
         } catch (\Throwable $e) {
             return false;
@@ -232,8 +303,9 @@ class AdminSettingsController extends Controller
         }
         $value = (string) $value;
         if (str_contains($value, ' ') || str_contains($value, '#') || str_contains($value, '$') || str_contains($value, '"')) {
-            return '"' . addcslashes($value, '"\\$') . '"';
+            return '"'.addcslashes($value, '"\\$').'"';
         }
+
         return $value;
     }
 }

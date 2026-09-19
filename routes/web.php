@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\AdminSettingsController;
+use App\Http\Controllers\Admin\AuditManagementController;
 use App\Http\Controllers\Admin\FirmManagementController;
 use App\Http\Controllers\Admin\MatterManagementController;
 use App\Http\Controllers\Admin\PlanManagementController;
+use App\Http\Controllers\Admin\SignInHistoryController;
 use App\Http\Controllers\Admin\SubscriptionManagementController;
 use App\Http\Controllers\Admin\TestManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
@@ -1092,6 +1094,18 @@ Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(funct
     Route::get('/settings/mail', [AdminSettingsController::class, 'mailSettings'])->name('settings.mail');
     Route::post('/settings/mail', [AdminSettingsController::class, 'updateMailSettings'])->name('settings.mail.update');
     Route::post('/settings/mail/test', [AdminSettingsController::class, 'testMail'])->name('settings.mail.test');
+    Route::post('/settings/mail/channels', [AdminSettingsController::class, 'saveChannels'])->name('settings.mail.channels');
+    Route::post('/settings/mail/test-email', [AdminSettingsController::class, 'sendTestEmail'])->name('settings.mail.test-email');
+    Route::post('/settings/mail/test-sms', [AdminSettingsController::class, 'sendTestSms'])->name('settings.mail.test-sms');
+    Route::get('/notifications', fn () => redirect()->route('admin.settings.mail'));
+
+    // ── Platform Audit Log & Export ──────────────────────────
+    Route::get('/audit', [AuditManagementController::class, 'index'])->name('audit.index');
+    Route::get('/audit/export', [AuditManagementController::class, 'export'])->name('audit.export');
+
+    // ── Platform Sign-in History ─────────────────────────────
+    Route::get('/sign-ins', [SignInHistoryController::class, 'index'])->name('sign-ins.index');
+    Route::get('/logins', fn () => redirect()->route('admin.sign-ins.index'));
 
     // ── Automated Test Management ───────────────────────────
     Route::get('/tests', [TestManagementController::class, 'index'])->name('tests.index');
