@@ -24,23 +24,24 @@ jobs:
           SSH_HOST: ${{ secrets.EC2_HOST }}
           SSH_USER: ${{ secrets.EC2_USERNAME }}
           SSH_PORT: ${{ secrets.EC2_PORT || 22 }}
-          TARGET_BRANCH: ${{ github.ref_name }}
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -p $SSH_PORT $SSH_USER@$SSH_HOST "bash -s" << EOF
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -p $SSH_PORT $SSH_USER@$SSH_HOST << 'REMOTE_SCRIPT'
+            export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
             set -ex
             echo "Connected to EC2 server successfully."
             cd /var/www/lawfirm
             git config --global --add safe.directory /var/www/lawfirm || true
 
-            # Pull and switch to target branch
-            git fetch origin
-            git checkout -B $TARGET_BRANCH origin/$TARGET_BRANCH
-            git reset --hard origin/$TARGET_BRANCH
+            echo "=== Fetching target branch ==="
+            git fetch origin ${{ github.ref_name }}
+            git checkout -B ${{ github.ref_name }} FETCH_HEAD
+            git reset --hard FETCH_HEAD
 
+            echo "=== Executing deployment script ==="
             chmod +x deploy/deploy.sh
-            ./deploy/deploy.sh
-          EOF
+            bash deploy/deploy.sh
+          REMOTE_SCRIPT

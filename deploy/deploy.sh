@@ -4,6 +4,7 @@
 # ==============================================================================
 
 set -e
+export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
 
 APP_DIR="/var/www/lawfirm"
 
@@ -16,8 +17,9 @@ php artisan down --render="errors::503" --retry=15 || true
 
 # Determine active git branch
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
-git fetch origin || true
-git reset --hard "origin/$CURRENT_BRANCH" || git reset --hard HEAD
+echo "=== [3/6] Pulling Latest Changes from Git ($CURRENT_BRANCH) ==="
+git fetch origin "$CURRENT_BRANCH" || git fetch origin || true
+git reset --hard "origin/$CURRENT_BRANCH" || git reset --hard HEAD || true
 
 echo "=== [4/6] Installing Dependencies & Compiling Production Assets ==="
 composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
@@ -38,13 +40,13 @@ php artisan route:cache || php artisan route:clear || true
 php artisan view:cache || php artisan view:clear || true
 php artisan event:cache || php artisan event:clear || true
 
-# Ensure proper ownership and secure permissions (no world-writable permissions)
-sudo chown -R ubuntu:www-data "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/database"
-sudo chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/database"
+# Ensure proper ownership and secure permissions
+sudo chown -R ubuntu:www-data "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/database" || true
+sudo chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/database" || true
 
 if [ -f "$APP_DIR/.env" ]; then
-    sudo chown ubuntu:www-data "$APP_DIR/.env"
-    sudo chmod 660 "$APP_DIR/.env"
+    sudo chown ubuntu:www-data "$APP_DIR/.env" || true
+    sudo chmod 660 "$APP_DIR/.env" || true
 fi
 
 echo "=== [6/6] Bringing Application Back Up & Reloading PHP-FPM ==="
