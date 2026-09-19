@@ -30,10 +30,11 @@ jobs:
           script: |
             echo "Connected to EC2 server successfully."
             cd /var/www/lawfirm
+            git config --global --add safe.directory /var/www/lawfirm || true
 
-            # Fetch and update to latest commit on active branch
-            git fetch origin ${{ github.ref_name }}
-            git checkout ${{ github.ref_name }} || git checkout -b ${{ github.ref_name }} origin/${{ github.ref_name }}
+            # Fetch all remote refs and switch to active branch cleanly
+            git fetch origin +refs/heads/*:refs/remotes/origin/* --prune
+            git checkout -B ${{ github.ref_name }} origin/${{ github.ref_name }}
             git reset --hard origin/${{ github.ref_name }}
 
             # Make deploy script executable and run deployment

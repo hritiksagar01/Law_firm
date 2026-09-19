@@ -17,7 +17,7 @@ php artisan down --render="errors::503" --retry=15 || true
 # Determine active git branch
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
 echo "=== [3/6] Pulling Latest Changes from Git ($CURRENT_BRANCH) ==="
-git fetch origin "$CURRENT_BRANCH" || git fetch origin
+git fetch origin +refs/heads/*:refs/remotes/origin/* --prune || git fetch origin || true
 git reset --hard "origin/$CURRENT_BRANCH" || git reset --hard HEAD
 
 echo "=== [4/6] Installing Dependencies & Compiling Production Assets ==="
