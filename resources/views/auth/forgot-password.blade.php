@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Recover Vault Password — Quire Legal</title>
 
+    <!-- Industry Standard Readable Typography: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -27,9 +28,30 @@
         </div>
 
         @if(session('status'))
-        <div class="w-full mb-4 p-3 rounded-lg bg-[#F8F4EE] border border-[#E8DAC8] text-xs text-[#856C36] flex items-center gap-2">
-            <span class="material-symbols-outlined text-base">mark_email_read</span>
-            <span>{{ session('status') }}</span>
+        <div class="w-full mb-4 p-3.5 rounded-xl bg-[#F8F4EE] border border-[#E8DAC8] text-xs text-[#856C36] flex flex-col gap-2">
+            <div class="flex items-center gap-2 font-medium">
+                <span class="material-symbols-outlined text-base text-[#9F8349]">mark_email_read</span>
+                <span>{{ session('status') }}</span>
+            </div>
+            @if(session('reset_link'))
+            <div class="mt-1 p-2.5 bg-white rounded-lg border border-[#EAE4DC] flex items-center justify-between gap-2">
+                <span class="text-[11px] text-[#554D45] truncate">Direct Password Reset:</span>
+                <a href="{{ session('reset_link') }}" class="px-3 py-1 bg-[#9F8349] text-white rounded-md text-[11px] font-semibold hover:bg-[#856C36] shrink-0">
+                    Open Reset Form &rarr;
+                </a>
+            </div>
+            @endif
+        </div>
+        @endif
+
+        @if($errors->any())
+        <div class="w-full mb-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 flex flex-col gap-1">
+            @foreach($errors->all() as $error)
+            <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm shrink-0">error</span>
+                <span>{{ $error }}</span>
+            </div>
+            @endforeach
         </div>
         @endif
 

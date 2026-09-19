@@ -1,0 +1,25 @@
+ 
+Calendar  
+ 
+The Calendar feature in our case management software helps legal teams stay 
+organized and ensures deadlines and appointments are met. Key features include: 
+• 
+Scheduling Court Dates  
+: Easily schedule and track court hearings, 
+depositions, and legal events to avoid missing critical dates. 
+• 
+Appointment Management  
+: Schedule client meetings and internal team 
+discussions with automated reminders. 
+• 
+Deadline Tracking  
+: Monitor important case deadlines, such as filing dates 
+and document submissions, to ensure timely actions. 
+• 
+Syncing & Integration  
+: Sync your calendar across devices or systems to 
+stay updated on the go. 
+The Calendar feature boosts efficiency, helps manage case-related events, and reduces 
+the risk of missed deadlines. 
+ 
+ 

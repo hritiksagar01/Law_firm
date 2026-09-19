@@ -1,0 +1,24 @@
+ 
+ 
+Clients  
+ 
+The Clients feature enables law firms to provide a secure, transparent, and collaborative 
+environment for clients. Key features include: 
+• 
+View Case Progress  
+: Clients can track case status, milestones, and updates 
+in real-time. 
+• 
+Secure Communication  
+: A safe platform for clients to send messages, ask 
+questions, and share documents with their legal team. 
+• 
+Review Documents  
+: Clients can access, approve, or comment on case-
+related documents such as contracts and legal filings. 
+• 
+Manage Appointments  
+: Clients can track upcoming meetings, court dates, 
+and important deadlines related to their case. 
+This feature ensures seamless communication, transparency, and active client 
+involvement throughout the legal process. 

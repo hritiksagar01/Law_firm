@@ -3,18 +3,18 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>@yield('title', 'Client Portal') — {{ config('legal.app_name', 'Vennamraj Associates') }}</title>
+    <title>@yield('title', 'Client Portal') — {{ config('legal.app_name', 'Sharma Legal Chambers') }}</title>
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}"/>
 
-    <!-- Juris Prestige Typography: EB Garamond & Manrope -->
+    <!-- Google Fonts: Newsreader & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#FAF8F5] text-[#222222] font-sans antialiased min-h-screen" x-data="{ mobileMenuOpen: false }">
+<body class="bg-canvas-ivory font-body-md text-body-md text-on-surface flex min-h-screen antialiased">
 <style>[x-cloak] { display: none !important; }</style>
 
     @php
@@ -24,238 +24,181 @@
             ?? \App\Models\Client::first();
         $pendingRequestsCount = \App\Models\DocumentRequest::where('client_id', $portalClient->id ?? 0)->where('status', 'pending')->count();
         $mattersCount = \App\Models\Matter::where('client_id', $portalClient->id ?? 0)->count();
+        
+        $uName = $portalUser->name ?? 'Client';
+        $words = explode(' ', trim($uName));
+        $initials = count($words) >= 2 ? strtoupper(substr($words[0], 0, 1) . substr($words[count($words)-1], 0, 1)) : strtoupper(substr($uName, 0, 2));
     @endphp
 
-    <!-- Left Sidebar Navigation Shell (Juris Prestige Crisp White & Brown Accent) -->
-    <aside class="fixed left-0 top-0 h-screen w-[260px] bg-white text-[#222222] z-50 flex flex-col justify-between border-r border-[#EFECE6] shadow-[1px_0_12px_rgba(159,131,73,0.04)] hidden md:flex">
-        <div class="flex flex-col">
-            <!-- Brand & Client Portal Header -->
-            <div class="p-4 border-b border-[#EFECE6]">
-                <div class="flex items-center justify-center mb-3">
-                    <a href="{{ route('portal.dashboard') }}" class="block">
-                        <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-11 w-auto object-contain rounded-md shadow-xs"/>
-                    </a>
-                </div>
-
-                @if($portalClient)
-                <div class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-[#FAF8F5] border border-[#EFECE6]">
-                    <div class="flex flex-col min-w-0">
-                        <span class="text-xs text-[#222222] truncate font-semibold">{{ $portalClient->name }}</span>
-                        <span class="font-mono text-[10px] text-[#766A5E] truncate">Retained Client</span>
-                    </div>
-                    <span class="material-symbols-outlined text-[#9F8349] text-base">verified</span>
-                </div>
-                @endif
+    <!-- Persistent Dark Left Sidebar (#121513) -->
+    <aside class="fixed inset-y-0 left-0 w-64 bg-sidebar-bg text-[#cfd3ce] flex flex-col z-50 border-r border-[#202521] select-none">
+        <!-- Sidebar Brand Header -->
+        <div class="h-20 px-6 flex flex-col justify-center border-b border-[#202521]">
+            <div class="flex items-center gap-2">
+                <span class="font-headline-md text-[18px] font-serif tracking-tight text-white truncate">
+                    {{ $portalClient->firm->name ?? config('legal.app_name', 'Sharma Legal Chambers') }}
+                </span>
             </div>
-
-            <!-- Client Portal Navigation Links (On The Left) -->
-            <div class="px-2 py-3 flex flex-col gap-0.5">
-                <span class="px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-[#9F8349] font-semibold">Client Services</span>
-                
-                <!-- Overview -->
-                <a href="{{ route('portal.dashboard') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('portal.dashboard') ? 'bg-[#9F8349] text-white font-semibold shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
-                    <div class="flex items-center gap-2.5">
-                        <span class="material-symbols-outlined text-lg {{ request()->routeIs('portal.dashboard') ? 'text-white' : 'text-[#9F8349]' }}">dashboard</span>
-                        <span>Overview</span>
-                    </div>
-                </a>
-
-                <!-- My Cases -->
-                <a href="{{ route('portal.matters.index') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('portal.matters.*') ? 'bg-[#9F8349] text-white font-semibold shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
-                    <div class="flex items-center gap-2.5">
-                        <span class="material-symbols-outlined text-lg {{ request()->routeIs('portal.matters.*') ? 'text-white' : 'text-[#9F8349]' }}">gavel</span>
-                        <span>My Cases</span>
-                    </div>
-                    <span class="font-mono text-[11px] px-1.5 py-0.5 rounded-full {{ request()->routeIs('portal.matters.*') ? 'bg-white/20 text-white' : 'bg-[#F8F4EE] text-[#9F8349]' }}">{{ $mattersCount }}</span>
-                </a>
-
-                <!-- Document Requests -->
-                <a href="{{ route('portal.requests.index') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('portal.requests.*') ? 'bg-[#9F8349] text-white font-semibold shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
-                    <div class="flex items-center gap-2.5">
-                        <span class="material-symbols-outlined text-lg {{ request()->routeIs('portal.requests.*') ? 'text-white' : 'text-[#9F8349]' }}">drive_folder_upload</span>
-                        <span>Document Requests</span>
-                    </div>
-                    @if($pendingRequestsCount > 0)
-                    <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#B88B56] text-white">{{ $pendingRequestsCount }}</span>
-                    @endif
-                </a>
-
-                <!-- Documents Vault -->
-                <a href="{{ route('portal.documents.index') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('portal.documents.*') ? 'bg-[#9F8349] text-white font-semibold shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
-                    <div class="flex items-center gap-2.5">
-                        <span class="material-symbols-outlined text-lg {{ request()->routeIs('portal.documents.*') ? 'text-white' : 'text-[#9F8349]' }}">description</span>
-                        <span>Documents Vault</span>
-                    </div>
-                </a>
-
-                <!-- Counsel Messages -->
-                <a href="{{ route('portal.messages.index') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('portal.messages.*') ? 'bg-[#9F8349] text-white font-semibold shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
-                    <div class="flex items-center gap-2.5">
-                        <span class="material-symbols-outlined text-lg {{ request()->routeIs('portal.messages.*') ? 'text-white' : 'text-[#9F8349]' }}">chat</span>
-                        <span>Counsel Messages</span>
-                    </div>
-                </a>
-
-                <!-- Court Hearings -->
-                <a href="{{ route('portal.calendar.index') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('portal.calendar.*') ? 'bg-[#9F8349] text-white font-semibold shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
-                    <div class="flex items-center gap-2.5">
-                        <span class="material-symbols-outlined text-lg {{ request()->routeIs('portal.calendar.*') ? 'text-white' : 'text-[#9F8349]' }}">calendar_month</span>
-                        <span>Court Hearings</span>
-                    </div>
-                </a>
-
-                <!-- Invoices & Retainer Ledger -->
-                <a href="{{ route('portal.invoices.index') }}" class="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('portal.invoices.*') ? 'bg-[#9F8349] text-white font-semibold shadow-sm' : 'text-[#554D45] hover:bg-[#F8F4EE] hover:text-[#9F8349]' }}">
-                    <div class="flex items-center gap-2.5">
-                        <span class="material-symbols-outlined text-lg {{ request()->routeIs('portal.invoices.*') ? 'text-white' : 'text-[#9F8349]' }}">receipt_long</span>
-                        <span>Fee Bills &amp; Ledger</span>
-                    </div>
-                </a>
-            </div>
+            <span class="font-caption text-[11px] text-[#7d857f] tracking-wide mt-0.5">
+                Client Portal · Ref #{{ $portalClient->id ?? 'CL-01' }}
+            </span>
         </div>
 
-        <!-- User Profile Footer -->
-        <div class="p-3 border-t border-[#EFECE6] bg-[#FAF8F5]">
-            <div class="flex items-center justify-between p-2 rounded-lg bg-white border border-[#EFECE6] shadow-xs">
-                <div class="flex items-center gap-2.5 min-w-0">
-                    <div class="relative shrink-0">
-                        <img alt="{{ auth()->user()->name ?? 'Client' }}" class="w-8 h-8 rounded-full object-cover ring-1 ring-[#9F8349]/30" src="{{ auth()->user()->avatar_url ?? 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80' }}"/>
-                        <span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-[#9F8349] ring-2 ring-white"></span>
-                    </div>
-                    <div class="flex flex-col min-w-0">
-                        <span class="text-xs text-[#222222] font-semibold truncate">{{ auth()->user()->name ?? 'Client' }}</span>
-                        <span class="text-[10px] text-[#766A5E] truncate">{{ $portalClient->name ?? 'Corporate Client' }}</span>
-                    </div>
+        <!-- Sidebar Navigation Links -->
+        <nav class="flex-1 py-4 px-3 flex flex-col gap-1 overflow-y-auto">
+            <!-- Overview -->
+            <a href="{{ route('portal.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded font-title-sm text-[13px] transition-colors {{ request()->routeIs('portal.dashboard') ? 'bg-pine-primary text-white shadow-sm font-medium' : 'text-[#9da39e] hover:text-white hover:bg-[#1d221e]' }}">
+                <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('portal.dashboard') ? 'text-[#8fb7a4]' : '' }}">dashboard</span>
+                <span>Overview</span>
+            </a>
+
+            <!-- Matters & Dockets -->
+            <a href="{{ route('portal.matters.index') }}" class="flex items-center justify-between px-3 py-2 rounded font-title-sm text-[13px] transition-colors {{ request()->routeIs('portal.matters.*') ? 'bg-pine-primary text-white shadow-sm font-medium' : 'text-[#9da39e] hover:text-white hover:bg-[#1d221e]' }}">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('portal.matters.*') ? 'text-[#8fb7a4]' : '' }}">folder_open</span>
+                    <span>Matters &amp; Dockets</span>
                 </div>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" title="Sign Out of Portal" class="p-1.5 text-[#766A5E] hover:text-[#9F8349] hover:bg-[#F8F4EE] transition-colors rounded">
-                        <span class="material-symbols-outlined text-lg">logout</span>
-                    </button>
-                </form>
+                <span class="font-caption text-[11px] px-1.5 py-0.2 rounded-full {{ request()->routeIs('portal.matters.*') ? 'bg-white/20 text-white' : 'bg-[#1d221e] text-[#9da39e]' }}">{{ $mattersCount }}</span>
+            </a>
+
+            <!-- Document Requests -->
+            <a href="{{ route('portal.requests.index') }}" class="flex items-center justify-between px-3 py-2 rounded font-title-sm text-[13px] transition-colors {{ request()->routeIs('portal.requests.*') ? 'bg-pine-primary text-white shadow-sm font-medium' : 'text-[#9da39e] hover:text-white hover:bg-[#1d221e]' }}">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('portal.requests.*') ? 'text-[#8fb7a4]' : '' }}">drive_folder_upload</span>
+                    <span>Document Requests</span>
+                </div>
+                @if($pendingRequestsCount > 0)
+                <span class="px-1.5 py-0.2 rounded-full bg-[#ba1a1a] text-[10px] text-white font-semibold">{{ $pendingRequestsCount }}</span>
+                @endif
+            </a>
+
+            <!-- Documents Vault -->
+            <a href="{{ route('portal.documents.index') }}" class="flex items-center gap-3 px-3 py-2 rounded font-title-sm text-[13px] transition-colors {{ request()->routeIs('portal.documents.*') ? 'bg-pine-primary text-white shadow-sm font-medium' : 'text-[#9da39e] hover:text-white hover:bg-[#1d221e]' }}">
+                <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('portal.documents.*') ? 'text-[#8fb7a4]' : '' }}">description</span>
+                <span>Documents</span>
+            </a>
+
+            <!-- Messages -->
+            <a href="{{ route('portal.messages.index') }}" class="flex items-center justify-between px-3 py-2 rounded font-title-sm text-[13px] transition-colors {{ request()->routeIs('portal.messages.*') ? 'bg-pine-primary text-white shadow-sm font-medium' : 'text-[#9da39e] hover:text-white hover:bg-[#1d221e]' }}">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('portal.messages.*') ? 'text-[#8fb7a4]' : '' }}">forum</span>
+                    <span>Messages</span>
+                </div>
+                <span class="px-1.5 py-0.2 rounded-full bg-pine-primary text-[10px] text-[#c2ecd7] font-semibold">3</span>
+            </a>
+
+            <!-- Litigation Calendar -->
+            <a href="{{ route('portal.calendar.index') }}" class="flex items-center gap-3 px-3 py-2 rounded font-title-sm text-[13px] transition-colors {{ request()->routeIs('portal.calendar.*') ? 'bg-pine-primary text-white shadow-sm font-medium' : 'text-[#9da39e] hover:text-white hover:bg-[#1d221e]' }}">
+                <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('portal.calendar.*') ? 'text-[#8fb7a4]' : '' }}">calendar_month</span>
+                <span>Litigation Calendar</span>
+            </a>
+
+            <!-- Billing & Invoices -->
+            <a href="{{ route('portal.invoices.index') }}" class="flex items-center gap-3 px-3 py-2 rounded font-title-sm text-[13px] transition-colors {{ request()->routeIs('portal.invoices.*') ? 'bg-pine-primary text-white shadow-sm font-medium' : 'text-[#9da39e] hover:text-white hover:bg-[#1d221e]' }}">
+                <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('portal.invoices.*') ? 'text-[#8fb7a4]' : '' }}">receipt_long</span>
+                <span>Invoices &amp; Billing</span>
+            </a>
+        </nav>
+
+        <!-- Sidebar Footer: Client Profile -->
+        <div class="p-4 border-t border-[#202521] bg-[#101210] flex items-center justify-between">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-full bg-pine-primary text-[#c2ecd7] font-title-sm text-[12px] flex items-center justify-center shrink-0 font-semibold">
+                    {{ $initials }}
+                </div>
+                <div class="flex flex-col min-w-0">
+                    <span class="font-title-sm text-[13px] text-white truncate">{{ $portalUser->name }}</span>
+                    <span class="font-caption text-[11px] text-[#7d857f] truncate">{{ $portalClient->name ?? 'Retained Client' }}</span>
+                </div>
             </div>
+            <form action="{{ route('logout') }}" method="POST" class="inline">
+                @csrf
+                <button class="text-[#7d857f] hover:text-white transition-colors ml-2 cursor-pointer" title="Sign out" type="submit">
+                    <span class="material-symbols-outlined text-[18px]">logout</span>
+                </button>
+            </form>
         </div>
     </aside>
 
-    <!-- Mobile Drawer for Left Navigation -->
-    <div x-show="mobileMenuOpen" x-cloak class="fixed inset-0 z-50 md:hidden flex">
-        <div @click="mobileMenuOpen = false" class="fixed inset-0 bg-black/40 backdrop-blur-xs"></div>
-        <aside class="relative w-[270px] max-w-[80%] bg-white text-[#222222] h-full flex flex-col justify-between p-4 shadow-2xl z-10 border-r border-[#EFECE6]">
-            <!-- Mobile Sidebar Content -->
-            <div class="flex flex-col gap-4">
-                <div class="flex items-center justify-between pb-3 border-b border-[#EFECE6]">
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-lg bg-[#9F8349] flex items-center justify-center text-white">
-                            <span class="material-symbols-outlined text-xl">balance</span>
-                        </div>
-                        <span class="font-serif text-base text-[#222222] font-bold">Client Portal</span>
-                    </div>
-                    <button @click="mobileMenuOpen = false" class="text-[#766A5E] hover:text-[#222222]">
-                        <span class="material-symbols-outlined">close</span>
-                    </button>
-                </div>
-
-                <div class="flex flex-col gap-1">
-                    <a href="{{ route('portal.dashboard') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('portal.dashboard') ? 'bg-[#9F8349] text-white font-bold' : 'text-[#554D45]' }}">
-                        <span class="material-symbols-outlined text-lg">dashboard</span>
-                        <span>Overview</span>
-                    </a>
-                    <a href="{{ route('portal.matters.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('portal.matters.*') ? 'bg-[#9F8349] text-white font-bold' : 'text-[#554D45]' }}">
-                        <span class="material-symbols-outlined text-lg">gavel</span>
-                        <span>My Cases ({{ $mattersCount }})</span>
-                    </a>
-                    <a href="{{ route('portal.requests.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('portal.requests.*') ? 'bg-[#9F8349] text-white font-bold' : 'text-[#554D45]' }}">
-                        <span class="material-symbols-outlined text-lg">drive_folder_upload</span>
-                        <span>Document Requests ({{ $pendingRequestsCount }})</span>
-                    </a>
-                    <a href="{{ route('portal.documents.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('portal.documents.*') ? 'bg-[#9F8349] text-white font-bold' : 'text-[#554D45]' }}">
-                        <span class="material-symbols-outlined text-lg">description</span>
-                        <span>Documents Vault</span>
-                    </a>
-                    <a href="{{ route('portal.messages.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('portal.messages.*') ? 'bg-[#9F8349] text-white font-bold' : 'text-[#554D45]' }}">
-                        <span class="material-symbols-outlined text-lg">chat</span>
-                        <span>Counsel Messages</span>
-                    </a>
-                    <a href="{{ route('portal.invoices.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('portal.invoices.*') ? 'bg-[#9F8349] text-white font-bold' : 'text-[#554D45]' }}">
-                        <span class="material-symbols-outlined text-lg">account_balance_wallet</span>
-                        <span>Invoices &amp; Retainer</span>
-                    </a>
-                    <a href="{{ route('portal.calendar.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('portal.calendar.*') ? 'bg-[#9F8349] text-white font-bold' : 'text-[#554D45]' }}">
-                        <span class="material-symbols-outlined text-lg">calendar_month</span>
-                        <span>Court Hearings</span>
-                    </a>
-                </div>
+    <!-- Main Wrapper with Left Sidebar Offset -->
+    <div class="pl-64 flex-1 flex flex-col min-h-screen">
+        <!-- Top Bar -->
+        <header class="h-16 bg-surface border-b border-border-hairline sticky top-0 z-40 px-6 lg:px-8 flex items-center justify-between gap-4">
+            <!-- Clean Search Bar -->
+            <div class="flex items-center gap-2 bg-surface-card border border-border-hairline rounded px-3 py-1.5 w-full max-w-md text-text-muted focus-within:border-pine-primary focus-within:text-text-primary transition-colors">
+                <span class="material-symbols-outlined text-[18px] text-text-muted">search</span>
+                <input class="bg-transparent border-0 p-0 text-[13px] text-text-primary placeholder:text-text-muted focus:ring-0 w-full outline-none" placeholder="Search matters, documents, invoices..." type="text"/>
+                <kbd class="px-1.5 py-0.5 rounded bg-surface-subtle border border-border-hairline font-caption text-[11px] text-text-secondary">⌘K</kbd>
             </div>
 
-            <form action="{{ route('logout') }}" method="POST" class="pt-4 border-t border-[#EFECE6]">
-                @csrf
-                <button type="submit" class="w-full flex items-center justify-center gap-2 py-2 bg-red-50 text-red-700 border border-red-200 rounded-lg text-xs font-semibold">
-                    <span class="material-symbols-outlined text-sm">logout</span>
-                    <span>Sign Out</span>
-                </button>
-            </form>
-        </aside>
-    </div>
-
-    <!-- Main Content Area (Offset for Left Sidebar) -->
-    <div class="md:pl-[260px] flex flex-col min-h-screen">
-        
-        <!-- Global Top Header Bar -->
-        <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#EFECE6] h-16 px-4 sm:px-8 flex items-center justify-between shadow-[0_1px_4px_rgba(159,131,73,0.02)]">
-            <!-- Left Header: Mobile Toggle & Chambers Context -->
-            <div class="flex items-center gap-3">
-                <button @click="mobileMenuOpen = true" class="md:hidden p-1.5 rounded-lg text-[#222222] hover:bg-[#FAF8F5]">
-                    <span class="material-symbols-outlined text-2xl">menu</span>
-                </button>
-                <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                    <span class="text-xs font-semibold text-[#222222]">{{ $portalClient->firm->name ?? 'Vennamraj Associates' }}</span>
-                    <span class="hidden sm:inline text-xs text-[#8C7F72]">/</span>
-                    <span class="text-[11px] font-mono text-[#766A5E]">Confidential Client Portal</span>
+            <!-- Right Header Utilities -->
+            <div class="flex items-center gap-4 shrink-0">
+                <!-- Subtle demo environment pill -->
+                <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-subtle border border-border-hairline text-text-secondary font-caption text-[11px]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-pine-primary animate-pulse"></span>
+                    <span>Secure Chambers Environment</span>
                 </div>
-            </div>
 
-            <!-- Right Header: Fast Logout -->
-            <div class="flex items-center gap-3">
+                <!-- Notification Bell with Counter -->
+                <button class="relative w-8 h-8 flex items-center justify-center rounded border border-border-hairline bg-surface-card text-on-surface-variant hover:text-on-surface hover:bg-surface-subtle transition-colors" title="Chambers Notifications" type="button">
+                    <span class="material-symbols-outlined text-[18px]">notifications</span>
+                    <span class="absolute -top-1 -right-1 w-4 h-4 bg-error text-white font-caption text-[9px] font-bold rounded-full flex items-center justify-center">2</span>
+                </button>
 
-                <form action="{{ route('logout') }}" method="POST" class="inline">
-                    @csrf
-                    <button type="submit" class="inline-flex items-center gap-1 px-3 h-8.5 rounded-lg bg-white hover:bg-red-50 text-[#766A5E] hover:text-red-700 text-xs font-medium border border-[#EAE4DC] hover:border-red-200 transition-colors shadow-2xs" title="Sign Out">
-                        <span class="material-symbols-outlined text-base">logout</span>
-                        <span class="hidden sm:inline">Sign Out</span>
-                    </button>
-                </form>
+                <!-- Client Dossier Context Pill -->
+                <div class="hidden md:flex items-center gap-2 pl-3 border-l border-border-hairline text-left">
+                    <span class="font-caption text-caption text-text-muted uppercase tracking-wider">Client Context:</span>
+                    <span class="font-label-sm text-label-sm text-text-primary font-medium truncate max-w-[140px]">{{ $portalClient->name ?? 'Retained Client' }}</span>
+                </div>
             </div>
         </header>
 
-        <!-- Main Page View Content -->
-        <main class="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto">
-            <!-- Flash Alerts -->
-            @if(session('success'))
-            <div class="mb-6 p-4 rounded-xl bg-[#F8F4EE] border border-[#E8DAC8] text-[#856C36] text-xs flex items-center gap-3 shadow-xs">
-                <span class="material-symbols-outlined text-lg text-[#9F8349]">check_circle</span>
-                <span class="font-medium">{{ session('success') }}</span>
-            </div>
-            @endif
+        <!-- Main Content Canvas -->
+        <main class="flex-1 w-full bg-canvas-ivory">
+            <div class="max-w-[1400px] mx-auto px-6 lg:px-8 py-6">
+                @if(session('success'))
+                <div class="mb-6 p-3.5 rounded-lg bg-[#eef5f1] border border-[#c4ded0] text-xs text-[#1e4636] flex items-center justify-between shadow-xs">
+                    <div class="flex items-center gap-2.5">
+                        <span class="material-symbols-outlined text-lg text-pine-primary">check_circle</span>
+                        <span class="font-medium">{{ session('success') }}</span>
+                    </div>
+                    <span class="text-[10px] font-mono uppercase text-pine-primary font-bold">Confirmed</span>
+                </div>
+                @endif
 
-            @if(isset($errors) && $errors->any())
-            <div class="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-900 text-xs flex items-center gap-3 shadow-xs">
-                <span class="material-symbols-outlined text-lg text-red-700">error</span>
-                <span class="font-medium">{{ $errors->first() }}</span>
-            </div>
-            @endif
+                @if(session('error') || (isset($errors) && $errors->any()))
+                <div class="mb-6 p-3.5 rounded-lg bg-red-50 border border-red-200 text-xs text-red-900 flex items-center justify-between shadow-xs">
+                    <div class="flex items-center gap-2.5">
+                        <span class="material-symbols-outlined text-lg text-error">error</span>
+                        <span class="font-medium">{{ session('error') ?? ($errors->first() ?? '') }}</span>
+                    </div>
+                    <span class="text-[10px] font-mono uppercase text-error font-bold">Alert</span>
+                </div>
+                @endif
 
-            @yield('content')
+                @yield('content')
+            </div>
         </main>
 
-        <!-- Footer -->
-        <footer class="bg-white border-t border-[#EFECE6] py-4 px-6 text-xs text-[#766A5E]">
-            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
-                <span>&copy; {{ date('Y') }} {{ config('legal.app_name', 'Vennamraj Associates') }}. Client Portal.</span>
-                <span class="text-[11px] font-mono text-[#9F8349] font-semibold">Legal Communications Strictly Privileged</span>
+        <!-- Sticky Compact Footer -->
+        <footer class="w-full bg-surface-card border-t border-border-hairline py-3 px-6 lg:px-8 mt-auto">
+            <div class="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-2 font-caption text-caption text-text-secondary">
+                <div class="flex items-center gap-space-sm">
+                    <span class="material-symbols-outlined text-[16px] text-pine-primary">shield_locked</span>
+                    <span>Archival grade encryption</span>
+                    <span class="inline-block w-1 h-1 rounded-full bg-outline-variant"></span>
+                    <span>Two-step sign-in active</span>
+                    <span class="inline-block w-1 h-1 rounded-full bg-outline-variant"></span>
+                    <span>Audit trail enabled</span>
+                </div>
+                <div class="flex items-center gap-space-lg text-text-muted">
+                    <span class="font-mono text-[11px]">DOCKET-SYNC v4.12.0</span>
+                    <span class="text-[11px]">Chambers Seal #SL-8821</span>
+                </div>
             </div>
         </footer>
-
     </div>
 
+    @livewireScripts
 </body>
 </html>

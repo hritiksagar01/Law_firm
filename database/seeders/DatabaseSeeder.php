@@ -13,8 +13,10 @@ use App\Models\Message;
 use App\Models\Task;
 use App\Models\TimeEntry;
 use App\Models\User;
+use App\Services\LegalPdfGenerator;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class DatabaseSeeder extends Seeder
 {
@@ -254,8 +256,8 @@ class DatabaseSeeder extends Seeder
             'privilege' => 'Advocate-Client Privileged',
             'version' => 1,
         ]);
-        $pdfBytes1 = \App\Services\LegalPdfGenerator::forDocument($doc1);
-        \Illuminate\Support\Facades\Storage::disk('local')->put($doc1->file_path, $pdfBytes1);
+        $pdfBytes1 = LegalPdfGenerator::forDocument($doc1);
+        Storage::disk('local')->put($doc1->file_path, $pdfBytes1);
         $doc1->update(['file_size' => strlen($pdfBytes1), 'sha256' => hash('sha256', $pdfBytes1)]);
 
         $doc2 = Document::create([
@@ -272,8 +274,8 @@ class DatabaseSeeder extends Seeder
             'privilege' => 'Confidential',
             'version' => 1,
         ]);
-        $pdfBytes2 = \App\Services\LegalPdfGenerator::forDocument($doc2);
-        \Illuminate\Support\Facades\Storage::disk('local')->put($doc2->file_path, $pdfBytes2);
+        $pdfBytes2 = LegalPdfGenerator::forDocument($doc2);
+        Storage::disk('local')->put($doc2->file_path, $pdfBytes2);
         $doc2->update(['file_size' => strlen($pdfBytes2), 'sha256' => hash('sha256', $pdfBytes2)]);
 
         $doc3 = Document::create([
@@ -290,8 +292,8 @@ class DatabaseSeeder extends Seeder
             'privilege' => 'Advocate-Client Privileged',
             'version' => 1,
         ]);
-        $pdfBytes3 = \App\Services\LegalPdfGenerator::forDocument($doc3);
-        \Illuminate\Support\Facades\Storage::disk('local')->put($doc3->file_path, $pdfBytes3);
+        $pdfBytes3 = LegalPdfGenerator::forDocument($doc3);
+        Storage::disk('local')->put($doc3->file_path, $pdfBytes3);
         $doc3->update(['file_size' => strlen($pdfBytes3), 'sha256' => hash('sha256', $pdfBytes3)]);
 
         // 6. Time Entries & Professional Fee Register
@@ -531,5 +533,8 @@ class DatabaseSeeder extends Seeder
             'amount_paid' => 59000.00,
             'status' => 'paid',
         ]);
+
+        // 14. Quire Legal Demo Persona & Accounts
+        $this->call(QuireDemoSeeder::class);
     }
 }

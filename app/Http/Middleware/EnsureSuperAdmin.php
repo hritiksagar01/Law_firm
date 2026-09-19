@@ -9,31 +9,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureSuperAdmin
 {
+    /**
+     * Handle an incoming request.
+     * Enforce strict authentication: User must be actively logged in with role 'superadmin'.
+     */
     public function handle(Request $request, Closure $next): Response
     {
-        // 1. If session already verified this client as Super Admin, grant access without querying DB
-        if ($request->session()->get('is_super_admin') === true) {
+        if (Auth::check() && Auth::user()->isSuperAdmin()) {
             return $next($request);
         }
 
-        try {
-            if (Auth::check() && Auth::user()->isSuperAdmin()) {
-                $request->session()->put('is_super_admin', true);
-                $request->session()->put('super_admin_email', Auth::user()->email);
-                return $next($request);
-            }
-        } catch (\Throwable $e) {
-            // Database is unreachable/offline, but if session was previously authenticated, allow management
-            if ($request->session()->get('is_super_admin') === true) {
-                return $next($request);
-            }
-        }
-
         if ($request->expectsJson()) {
-            return response()->json(['error' => 'Unauthorized: Super Administrator access required.'], 403);
+            return response()->json(['error' => 'Unauthorized: Super Administrator authentication required.'], 403);
         }
 
         return redirect()->route('login')
-            ->with('error', 'Super Administrator access required.');
+            ->with('error', 'Super Administrator authentication required. Please sign in with your credentials.');
     }
 }

@@ -26,13 +26,14 @@ use Illuminate\Support\Facades\Storage;
 */
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/demo-login', [AuthController::class, 'demoLogin'])->name('demo-login');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
     Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 });
 
 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
@@ -395,32 +396,45 @@ Route::middleware('auth')->group(function () {
                 abort(403, 'Unauthorized document access across firms.');
             }
 
-            // Lawyer-level isolation: non-partners must be assigned to this matter
+            // Lawyer-level isolation: non-partners must be assigned to this matter or be the author/requester
             if (!in_array($user->role, ['superadmin', 'partner'])) {
-                $assigned = $document->matter && (
+                $isCreatorOrRequester = ($document->user_id === $user->id) ||
+                    \App\Models\DocumentRequest::where('document_id', $document->id)->where('requested_by', $user->id)->exists();
+
+                $assigned = $isCreatorOrRequester || ($document->matter && (
                     $document->matter->lead_attorney_id === $user->id ||
                     $document->matter->users()->where('users.id', $user->id)->exists()
-                );
+                ));
                 if (!$assigned) {
                     abort(403, 'Unauthorized: You are not assigned to this case dossier.');
                 }
             }
 
             $defaultDisk = config('filesystems.default', 'local');
-            if ($document->file_path && Storage::disk($defaultDisk)->exists($document->file_path)) {
-                return Storage::disk($defaultDisk)->download($document->file_path, $document->filename, [
-                    'Content-Type' => $document->mime_type ?: 'application/pdf',
-                ]);
-            }
-            if ($document->file_path && Storage::disk('local')->exists($document->file_path)) {
-                return Storage::disk('local')->download($document->file_path, $document->filename, [
-                    'Content-Type' => $document->mime_type ?: 'application/pdf',
-                ]);
-            }
-            if ($document->file_path && Storage::disk('s3')->exists($document->file_path)) {
-                return Storage::disk('s3')->download($document->file_path, $document->filename, [
-                    'Content-Type' => $document->mime_type ?: 'application/pdf',
-                ]);
+            if ($document->file_path) {
+                try {
+                    if (Storage::disk($defaultDisk)->exists($document->file_path)) {
+                        return Storage::disk($defaultDisk)->download($document->file_path, $document->filename, [
+                            'Content-Type' => $document->mime_type ?: 'application/pdf',
+                        ]);
+                    }
+                } catch (\Throwable $e) {}
+
+                try {
+                    if ($defaultDisk !== 'local' && Storage::disk('local')->exists($document->file_path)) {
+                        return Storage::disk('local')->download($document->file_path, $document->filename, [
+                            'Content-Type' => $document->mime_type ?: 'application/pdf',
+                        ]);
+                    }
+                } catch (\Throwable $e) {}
+
+                try {
+                    if ($defaultDisk !== 's3' && class_exists(\League\Flysystem\AwsS3V3\AwsS3V3Adapter::class) && Storage::disk('s3')->exists($document->file_path)) {
+                        return Storage::disk('s3')->download($document->file_path, $document->filename, [
+                            'Content-Type' => $document->mime_type ?: 'application/pdf',
+                        ]);
+                    }
+                } catch (\Throwable $e) {}
             }
 
             // Dynamic, compliant PDF stream fallback (Guaranteed to open cleanly in Adobe Reader / browsers)
@@ -846,20 +860,30 @@ Route::middleware('auth')->group(function () {
             }
 
             $defaultDisk = config('filesystems.default', 'local');
-            if ($document->file_path && Storage::disk($defaultDisk)->exists($document->file_path)) {
-                return Storage::disk($defaultDisk)->download($document->file_path, $document->filename, [
-                    'Content-Type' => $document->mime_type ?: 'application/pdf',
-                ]);
-            }
-            if ($document->file_path && Storage::disk('local')->exists($document->file_path)) {
-                return Storage::disk('local')->download($document->file_path, $document->filename, [
-                    'Content-Type' => $document->mime_type ?: 'application/pdf',
-                ]);
-            }
-            if ($document->file_path && Storage::disk('s3')->exists($document->file_path)) {
-                return Storage::disk('s3')->download($document->file_path, $document->filename, [
-                    'Content-Type' => $document->mime_type ?: 'application/pdf',
-                ]);
+            if ($document->file_path) {
+                try {
+                    if (Storage::disk($defaultDisk)->exists($document->file_path)) {
+                        return Storage::disk($defaultDisk)->download($document->file_path, $document->filename, [
+                            'Content-Type' => $document->mime_type ?: 'application/pdf',
+                        ]);
+                    }
+                } catch (\Throwable $e) {}
+
+                try {
+                    if ($defaultDisk !== 'local' && Storage::disk('local')->exists($document->file_path)) {
+                        return Storage::disk('local')->download($document->file_path, $document->filename, [
+                            'Content-Type' => $document->mime_type ?: 'application/pdf',
+                        ]);
+                    }
+                } catch (\Throwable $e) {}
+
+                try {
+                    if ($defaultDisk !== 's3' && class_exists(\League\Flysystem\AwsS3V3\AwsS3V3Adapter::class) && Storage::disk('s3')->exists($document->file_path)) {
+                        return Storage::disk('s3')->download($document->file_path, $document->filename, [
+                            'Content-Type' => $document->mime_type ?: 'application/pdf',
+                        ]);
+                    }
+                } catch (\Throwable $e) {}
             }
 
             // Dynamic, compliant PDF stream fallback (Guaranteed to open cleanly in Adobe Reader / browsers)
@@ -952,37 +976,40 @@ Route::middleware('auth')->group(function () {
 */
 Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
-        try {
-            $firms = \App\Models\Firm::withCount(['users', 'matters', 'documents'])->get();
-            return view('admin.dashboard', compact('firms'));
-        } catch (\Throwable $e) {
-            return redirect()->route('admin.settings.environment')
-                ->with('error', 'Active Database is offline or unreachable. Redirected to Environment & Cloud Console.');
-        }
+        $firms = \App\Models\Firm::withCount(['users', 'matters', 'documents'])->get();
+        return view('admin.dashboard', compact('firms'));
     })->name('dashboard');
 
-    // Law Firm Tenant Management
+    // ── Law Firm Tenant Management ──────────────────────────
     Route::resource('firms', \App\Http\Controllers\Admin\FirmManagementController::class);
     Route::post('/firms/{firm}/toggle-status', [\App\Http\Controllers\Admin\FirmManagementController::class, 'toggleStatus'])->name('firms.toggle-status');
+    Route::post('/firms/{firm}/change-password', [\App\Http\Controllers\Admin\FirmManagementController::class, 'changePassword'])->name('firms.change-password');
+    Route::post('/firms/{firm}/change-subscription', [\App\Http\Controllers\Admin\FirmManagementController::class, 'changeSubscription'])->name('firms.change-subscription');
 
-    // SaaS Subscription & Plan Governance (PDF Pages 3, 20, 21)
+    // ── SaaS Subscription Plans ─────────────────────────────
     Route::get('/plans', [\App\Http\Controllers\Admin\PlanManagementController::class, 'index'])->name('plans.index');
     Route::post('/plans', [\App\Http\Controllers\Admin\PlanManagementController::class, 'store'])->name('plans.store');
     Route::put('/plans/{plan}', [\App\Http\Controllers\Admin\PlanManagementController::class, 'update'])->name('plans.update');
+    Route::delete('/plans/{plan}', [\App\Http\Controllers\Admin\PlanManagementController::class, 'destroy'])->name('plans.destroy');
+    Route::post('/plans/{plan}/toggle-active', [\App\Http\Controllers\Admin\PlanManagementController::class, 'toggleActive'])->name('plans.toggle-active');
     Route::post('/plans/firms/{firm}/assign', [\App\Http\Controllers\Admin\PlanManagementController::class, 'assignPlan'])->name('plans.assign');
 
-    // Automated Test Management System
+    // ── Subscription Governance & Renewals (PDF Pages 20, 21) ──
+    Route::get('/subscriptions', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'index'])->name('subscriptions.index');
+    Route::post('/subscriptions/{subscription}/renew', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'renew'])->name('subscriptions.renew');
+
+    // ── Super Admin Profile & Account (PDF Pages 4, 5) ──────
+    Route::get('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/change-password', [\App\Http\Controllers\Admin\AdminProfileController::class, 'changePassword'])->name('profile.change-password');
+    Route::post('/profile/change-avatar', [\App\Http\Controllers\Admin\AdminProfileController::class, 'changeAvatar'])->name('profile.change-avatar');
+
+    // ── Platform Mail & Communications Gateway ──────────────
+    Route::get('/settings/mail', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'mailSettings'])->name('settings.mail');
+    Route::post('/settings/mail', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'updateMailSettings'])->name('settings.mail.update');
+    Route::post('/settings/mail/test', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testMail'])->name('settings.mail.test');
+
+    // ── Automated Test Management ───────────────────────────
     Route::get('/tests', [\App\Http\Controllers\Admin\TestManagementController::class, 'index'])->name('tests.index');
     Route::post('/tests/run', [\App\Http\Controllers\Admin\TestManagementController::class, 'runAll'])->name('tests.run');
-
-    Route::get('/settings/environment', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'index'])->name('settings.environment');
-    Route::post('/settings/environment', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'update'])->name('settings.environment.update');
-    Route::post('/settings/environment/test-db', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testDatabase'])->name('settings.environment.test-db');
-    Route::post('/settings/environment/test-s3', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testS3'])->name('settings.environment.test-s3');
-    Route::post('/settings/environment/test-mail', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testMail'])->name('settings.environment.test-mail');
-    Route::post('/settings/environment/run-migrations', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'runMigrations'])->name('settings.environment.run-migrations');
-    Route::post('/settings/environment/seed-db', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'seedDatabase'])->name('settings.environment.seed-db');
-    Route::post('/settings/environment/restore-backup', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'restoreBackup'])->name('settings.environment.restore-backup');
-    Route::post('/settings/environment/clean-data', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'cleanData'])->name('settings.environment.clean-data');
-
 });

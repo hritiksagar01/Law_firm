@@ -1,0 +1,45 @@
+o 
+Ability to manage users, assign roles, and configure software settings. 
+o 
+Oversee all activities and ensure proper system functioning. 
+2. Lawyer  
+ 
+o 
+Manage and track cases, communicate with clients, and access 
+documents. 
+o 
+Ability to make legal decisions, update case statuses, and manage legal 
+documents. 
+o 
+Limited access to administrative functions, focused on case-related 
+activities. 
+3. Paralegal  
+ 
+o 
+Assist in case management, legal research, and document preparation. 
+o 
+Collaborate with lawyers on case details, but no access to sensitive client 
+communication. 
+o 
+Can update case information and manage document repositories. 
+4. Client  
+ 
+o 
+Access only to their own case information and documents. 
+o 
+Can communicate securely with the legal team and review case updates. 
+o 
+No access to internal firm operations or other client cases. 
+5. Support Staff  
+ 
+o 
+Manage administrative tasks like scheduling, case documentation updates, 
+and basic client communication. 
+o 
+Limited access to case details and no ability to make legal decisions. 
+o 
+Provides essential support to the legal team without accessing sensitive 
+legal documents. 
+These Roles enhance security by ensuring that each user has the appropriate level of 
+access to the software, improving workflow efficiency and safeguarding confidential 
+information. 

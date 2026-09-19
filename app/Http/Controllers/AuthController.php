@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ResetPasswordMail;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -24,122 +30,31 @@ class AuthController extends Controller
 
         $remember = $request->boolean('remember');
 
-        // Immediate bypass for default chambers emergency credentials (instant, zero-timeout response)
-        if ($credentials['email'] === 'admin@sharmalegal.in' && $credentials['password'] === 'password123') {
+        if (Auth::attempt($credentials, $remember)) {
             if ($request->hasSession()) {
                 $request->session()->regenerate();
             }
-            $request->session()->put('is_super_admin', true);
-            $request->session()->put('super_admin_email', 'admin@sharmalegal.in');
 
-            try {
-                if (Auth::attempt($credentials, $remember)) {
-                    /** @var User $user */
-                    $user = Auth::user();
-                    return redirect()->intended(route('admin.dashboard'))
-                        ->with('success', "Welcome to Platform Super Administrator Console, {$user->name}.");
-                }
-            } catch (\Throwable $e) {
-                // Database is unreachable; proceed directly to emergency console
+            /** @var User $user */
+            $user = Auth::user();
+
+            if ($user->isSuperAdmin()) {
+                return redirect()->intended(route('admin.dashboard'))
+                    ->with('success', "Welcome to Platform Super Administrator Console, {$user->name}.");
             }
 
-            return redirect()->route('admin.settings.environment')
-                ->with('info', 'Logged into Super Administrator Console via emergency chambers credentials.');
-        }
-
-        try {
-            if (Auth::attempt($credentials, $remember)) {
-                if ($request->hasSession()) {
-                    $request->session()->regenerate();
-                }
-
-                /** @var User $user */
-                $user = Auth::user();
-
-                if ($user->isSuperAdmin()) {
-                    $request->session()->put('is_super_admin', true);
-                    $request->session()->put('super_admin_email', $user->email);
-                    return redirect()->intended(route('admin.dashboard'))
-                        ->with('success', "Welcome to Platform Super Administrator Console, {$user->name}.");
-                }
-
-                if ($user->isClient()) {
-                    return redirect()->intended(route('portal.dashboard'))
-                        ->with('success', "Welcome to your Client Portal, {$user->name}.");
-                }
-
-                return redirect()->intended(route('dashboard'))
-                    ->with('success', "Welcome back to Chambers, {$user->name}.");
+            if ($user->isClient()) {
+                return redirect()->intended(route('portal.dashboard'))
+                    ->with('success', "Welcome to your Client Portal, {$user->name}.");
             }
-        } catch (\Throwable $e) {
-            throw ValidationException::withMessages([
-                'email' => 'Database is currently unreachable. If you are Super Admin, use default chambers emergency credentials (admin@sharmalegal.in / password123) to access console.',
-            ]);
+
+            return redirect()->intended(route('dashboard'))
+                ->with('success', "Welcome back to Chambers, {$user->name}.");
         }
 
         throw ValidationException::withMessages([
             'email' => __('The provided credentials do not match our chambers records.'),
         ]);
-    }
-
-    public function demoLogin(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
-
-        // Immediate zero-latency bypass for Platform Super Admin
-        if ($request->email === 'admin@sharmalegal.in') {
-            if ($request->hasSession()) {
-                $request->session()->regenerate();
-            }
-            $request->session()->put('is_super_admin', true);
-            $request->session()->put('super_admin_email', 'admin@sharmalegal.in');
-
-            try {
-                $user = User::where('email', 'admin@sharmalegal.in')->first();
-                if ($user) {
-                    Auth::login($user);
-                    return redirect()->route('admin.dashboard')
-                        ->with('success', "Logged in as Platform Super Administrator: {$user->name}.");
-                }
-            } catch (\Throwable $e) {
-                // Database offline or unreachable; emergency console mode active
-            }
-
-            return redirect()->route('admin.settings.environment')
-                ->with('info', 'Super Admin Console access granted in Emergency Mode. Configure credentials or restore a backup below.');
-        }
-
-        try {
-            $user = User::where('email', $request->email)->first();
-
-            if (!$user) {
-                return back()->withErrors(['email' => 'Demo user not found.']);
-            }
-
-            Auth::login($user);
-            if ($request->hasSession()) {
-                $request->session()->regenerate();
-            }
-
-            if ($user->isSuperAdmin()) {
-                $request->session()->put('is_super_admin', true);
-                $request->session()->put('super_admin_email', $user->email);
-                return redirect()->route('admin.dashboard')
-                    ->with('success', "Logged in as Platform Super Administrator: {$user->name}.");
-            }
-
-            if ($user->isClient()) {
-                return redirect()->route('portal.dashboard')
-                    ->with('success', "Logged in as {$user->name} ({$user->title}).");
-            }
-
-            return redirect()->route('dashboard')
-                ->with('success', "Logged in as {$user->name} ({$user->title}).");
-        } catch (\Throwable $e) {
-            return back()->withErrors(['email' => 'Database is offline. Only Platform Super Admin can access the system right now.']);
-        }
     }
 
     public function logout(Request $request)
@@ -263,8 +178,107 @@ class AuthController extends Controller
 
     public function sendResetLink(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
+        $validated = $request->validate([
+            'email' => 'required|email',
+        ]);
 
-        return back()->with('status', 'If an active representation or counsel account exists for this email, an encrypted password reset dispatch has been sent.');
+        $user = User::where('email', $validated['email'])->first();
+
+        if (!$user) {
+            // Security measure: Do not leak whether user exists, but give reassuring message
+            return back()->with('status', 'If an active representation or counsel account exists for this email, an encrypted password reset dispatch has been sent.');
+        }
+
+        // Generate cryptographically secure 64-character token
+        $token = Str::random(64);
+
+        // Record in password_reset_tokens
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $user->email],
+            [
+                'token' => $token,
+                'created_at' => now(),
+            ]
+        );
+
+        $resetUrl = route('password.reset', [
+            'token' => $token,
+            'email' => $user->email,
+        ]);
+
+        $mailSent = false;
+        try {
+            Mail::to($user->email)->send(new ResetPasswordMail($user, $resetUrl));
+            $mailSent = true;
+        } catch (\Throwable $e) {
+            Log::warning("Password reset email delivery failed for {$user->email}: " . $e->getMessage());
+            Log::info("Password Reset Direct Link for {$user->email}: {$resetUrl}");
+        }
+
+        $redirect = back()->with('status', "An encrypted password reset dispatch has been generated for {$user->email}.");
+
+        // In local/debug environments or if SMTP is offline, provide direct link in session for immediate access
+        if (config('app.debug') || app()->environment('local') || !$mailSent) {
+            $redirect->with('reset_link', $resetUrl);
+        }
+
+        return $redirect;
+    }
+
+    public function showResetPassword(Request $request, string $token)
+    {
+        $email = $request->query('email');
+
+        $record = DB::table('password_reset_tokens')
+            ->where('token', $token)
+            ->where('email', $email)
+            ->first();
+
+        if (!$record || Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+            return redirect()->route('password.request')
+                ->withErrors(['email' => 'This password reset link is invalid or has expired. Please request a fresh reset link.']);
+        }
+
+        return view('auth.reset-password', [
+            'token' => $token,
+            'email' => $email,
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validated = $request->validate([
+            'token' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $record = DB::table('password_reset_tokens')
+            ->where('token', $validated['token'])
+            ->where('email', $validated['email'])
+            ->first();
+
+        if (!$record || Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+            return back()->withErrors(['email' => 'This password reset link is invalid or has expired. Please request a fresh reset link.']);
+        }
+
+        $user = User::where('email', $validated['email'])->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => 'Unable to locate an account for this email address.']);
+        }
+
+        // Update password with hash
+        $user->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        // Consume token
+        DB::table('password_reset_tokens')
+            ->where('email', $validated['email'])
+            ->delete();
+
+        return redirect()->route('login')
+            ->with('success', 'Your password has been successfully reset! You can now sign in with your new credentials.');
     }
 }

@@ -1,0 +1,37 @@
+ 
+Billing & Invoice  
+ 
+ 
+The Billing & Invoice feature simplifies invoicing and payment management, ensuring 
+accuracy and efficiency. Key functionalities include: 
+• 
+Customizable Invoices  
+: Tailor invoices to your firm's billing structure, 
+including services, billable hours, and expenses. 
+• 
+Automatic Billable Hours Tracking  
+: Automatically track billable hours for 
+accurate invoicing. 
+• 
+Expense Integration  
+: Add case-related expenses directly to client invoices 
+for accurate billing. 
+• 
+Multiple Payment Methods  
+: Offer clients various payment options, such as 
+credit cards, bank transfers, and online systems. 
+• 
+Recurring Billing  
+: Set up recurring billing for retainer agreements or ongoing 
+services. 
+• 
+Detailed Reporting  
+: Generate reports to track outstanding invoices, payment 
+statuses, and overall billing performance. 
+• 
+Payment Reminders  
+: Automatically send reminders for unpaid invoices, 
+ensuring timely payments. 
+This feature streamlines the billing process, improves cash flow, and ensures accurate, 
+timely invoicing for law firms. 
+ 

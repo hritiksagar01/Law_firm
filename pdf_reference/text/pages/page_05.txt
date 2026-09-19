@@ -1,0 +1,21 @@
+ 
+Account Management: 
+• 
+Change Password: Securely update your password to enhance account security 
+and maintain privacy. 
+• 
+Change Profile Picture: Personalize your account by uploading or updating your 
+profile picture. 
+• 
+Logout: Sign out of your account to protect your data and ensure privacy when 
+you’re finished. 
+ 
+Login as a Firm  
+ 
+The Login as a Firm feature allows firm administrators or authorized users to securely 
+access the software with the following options: 
+• 
+User Name or Email: Enter the firm’s registered username or email address for 
+login. 
+• 
+Password: Securely enter the password associated with the firm’s account. 

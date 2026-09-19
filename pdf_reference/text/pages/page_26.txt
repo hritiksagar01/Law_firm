@@ -1,0 +1,6 @@
+ 
+• 
+Invoice: Customize invoice templates and billing preferences. 
+ 
+• 
+Currency: Choose the currency for transactions and financial reporting. 

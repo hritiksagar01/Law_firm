@@ -1,0 +1,7 @@
+ 
+• 
+Practice Area Task: Create and assign tasks specific to various practice areas. 
+ 
+• 
+ID Types: Configure different ID types for clients, cases, or internal use for 
+better organization. 

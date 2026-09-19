@@ -1,0 +1,39 @@
+ 
+ 
+Subscription 
+ 
+Transaction  
+ 
+The Transaction feature enables precise tracking and management of all financial 
+exchanges within your law firm. Key functionalities include: 
+• 
+Payment Tracking  
+: Record and monitor client payments, ensuring accurate 
+financial records for full and partial payments. 
+• 
+Expense Logging  
+: Capture and associate case-related expenses, such as 
+travel, court fees, and billable costs, with specific cases or clients. 
+• 
+Receipts & Invoices  
+: Generate receipts for payments and invoices for 
+services, keeping all financial documents organized. 
+• 
+Transaction History  
+: Maintain a log of past transactions, making it easy to 
+access payment, expense, and adjustment records. 
+• 
+Refund Management  
+: Manage and document refunds or adjustments, 
+ensuring client satisfaction. 
+• 
+Payment Methods  
+: Track payments from credit cards, checks, or bank 
+transfers, offering flexibility in payment options. 
+• 
+Real-Time Updates  
+: Get instant updates on payment and expense statuses, 
+ensuring current financial records. 
+This feature enhances financial accuracy, transparency, and management, making it 
+easier for your firm to track and process all financial transactions. 
+ 

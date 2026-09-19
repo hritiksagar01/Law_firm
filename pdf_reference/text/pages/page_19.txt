@@ -1,0 +1,36 @@
+ 
+Ledger  
+ 
+The Ledger feature helps law firms track all financial transactions accurately, ensuring 
+transparency and efficiency. Key functionalities include: 
+• 
+Transaction History  
+: Keep a comprehensive log of client payments, invoices, 
+expenses, and reimbursements. 
+• 
+Case-Specific Ledger  
+: Track financials for individual cases, ensuring 
+accurate attribution of billable hours, expenses, and payments. 
+• 
+Categorized Entries  
+: Organize transactions by categories like billable hours, 
+administrative costs, and client payments. 
+• 
+Real-Time Updates  
+: Stay updated on the status of accounts and transactions 
+for better financial management. 
+• 
+Balance Tracking  
+: Monitor outstanding balances, payments, and refunds for 
+clients and firm accounts. 
+• 
+Audit Trail  
+: Maintain a secure, transparent record of all financial activities for 
+auditing or compliance purposes. 
+• 
+Customizable Reports  
+: Generate reports to analyze cash flow, outstanding 
+payments, and case-specific finances. 
+This feature ensures organized financial tracking, transparency, and compliance, making 
+financial management easier for law firms. 
+ 

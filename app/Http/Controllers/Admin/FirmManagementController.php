@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
+use App\Models\Plan;
+use App\Models\Subscription;
+
 class FirmManagementController extends Controller
 {
     /**
@@ -19,12 +24,14 @@ class FirmManagementController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Firm::withCount(['users', 'matters', 'documents', 'clients']);
+        $query = Firm::withCount(['users', 'matters', 'documents', 'clients'])
+            ->with(['currentSubscription.plan', 'primaryAdmin']);
 
         if ($request->filled('q')) {
             $search = $request->q;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('display_name', 'like', "%{$search}%")
                   ->orWhere('slug', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
                   ->orWhere('city', 'like', "%{$search}%");
@@ -36,6 +43,7 @@ class FirmManagementController extends Controller
         }
 
         $firms = $query->latest()->paginate(15)->withQueryString();
+        $plans = Plan::where('is_active', true)->get();
 
         $stats = [
             'total' => Firm::count(),
@@ -44,7 +52,7 @@ class FirmManagementController extends Controller
             'total_users' => User::whereNotNull('firm_id')->count(),
         ];
 
-        return view('admin.firms.index', compact('firms', 'stats'));
+        return view('admin.firms.index', compact('firms', 'stats', 'plans'));
     }
 
     /**
@@ -75,6 +83,8 @@ class FirmManagementController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'display_name' => 'nullable|string|max:255',
+            'contact_name' => 'nullable|string|max:255',
             'slug' => 'nullable|string|max:100|unique:firms,slug',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
@@ -109,6 +119,8 @@ class FirmManagementController extends Controller
         DB::transaction(function () use ($validated, $slug, $request) {
             $firm = Firm::create([
                 'name' => $validated['name'],
+                'display_name' => $validated['display_name'] ?? null,
+                'contact_name' => $validated['contact_name'] ?? null,
                 'slug' => $slug,
                 'email' => $validated['email'] ?? null,
                 'phone' => $validated['phone'] ?? null,
@@ -183,6 +195,8 @@ class FirmManagementController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'display_name' => 'nullable|string|max:255',
+            'contact_name' => 'nullable|string|max:255',
             'slug' => "required|string|max:100|unique:firms,slug,{$firm->id}",
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
@@ -200,6 +214,8 @@ class FirmManagementController extends Controller
 
         $firm->update([
             'name' => $validated['name'],
+            'display_name' => $validated['display_name'] ?? null,
+            'contact_name' => $validated['contact_name'] ?? null,
             'slug' => Str::slug($validated['slug']),
             'email' => $validated['email'] ?? null,
             'phone' => $validated['phone'] ?? null,
@@ -232,18 +248,119 @@ class FirmManagementController extends Controller
     }
 
     /**
-     * Delete firm if safe.
+     * Reset the password for a firm's primary admin/managing partner.
+     * POST /admin/firms/{firm}/change-password
      */
-    public function destroy(Firm $firm): RedirectResponse
+    public function changePassword(Request $request, Firm $firm): RedirectResponse
     {
-        if ($firm->matters()->count() > 0) {
-            return back()->with('error', "Cannot delete '{$firm->name}' because it has active legal matters. Mark it as Inactive instead.");
+        $validated = $request->validate([
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $admin = $firm->users()->where('role', 'partner')->oldest()->first();
+
+        if (!$admin) {
+            $admin = $firm->users()->oldest()->first();
         }
 
+        if (!$admin) {
+            return back()->with('error', "No user accounts found for '{$firm->name}'. Cannot change password.");
+        }
+
+        $admin->update(['password' => Hash::make($validated['new_password'])]);
+
+        return back()->with('success', "Password for '{$admin->name}' ({$admin->email}) at '{$firm->name}' has been reset successfully.");
+    }
+
+    /**
+     * Upgrade, downgrade, or renew a firm's subscription plan.
+     * POST /admin/firms/{firm}/change-subscription
+     */
+    public function changeSubscription(Request $request, Firm $firm): RedirectResponse
+    {
+        $validated = $request->validate([
+            'plan_id' => 'required|exists:plans,id',
+            'duration_months' => 'required|integer|min:1|max:36',
+        ]);
+
+        $plan = Plan::findOrFail($validated['plan_id']);
+
+        $currentSub = $firm->currentSubscription;
+        $startsAt = ($currentSub && $currentSub->ends_at && $currentSub->ends_at->isFuture())
+            ? $currentSub->ends_at
+            : now();
+        $endsAt = $startsAt->copy()->addMonths((int) $validated['duration_months']);
+
+        $firm->subscriptions()
+            ->where('status', 'active')
+            ->update(['status' => 'upgraded']);
+
+        Subscription::create([
+            'firm_id' => $firm->id,
+            'plan_id' => $plan->id,
+            'status' => 'active',
+            'starts_at' => $startsAt,
+            'ends_at' => $endsAt,
+        ]);
+
+        return back()->with('success', "'{$firm->name}' subscription updated to {$plan->name}, valid through {$endsAt->format('d M Y')}.");
+    }
+
+    /**
+     * Delete or permanently purge a law firm and its associated tenant data.
+     */
+    public function destroy(Request $request, Firm $firm): RedirectResponse
+    {
         $name = $firm->name;
-        $firm->delete();
+
+        DB::transaction(function () use ($firm) {
+            // 1. Clean up physical documents from storage
+            if (class_exists(\App\Models\Document::class)) {
+                $documents = \App\Models\Document::where('firm_id', $firm->id)->get();
+                foreach ($documents as $doc) {
+                    if (!empty($doc->file_path)) {
+                        try {
+                            Storage::disk('public')->delete($doc->file_path);
+                            Storage::delete($doc->file_path);
+                        } catch (\Throwable $e) {}
+                    }
+                }
+            }
+
+            // 2. Remove all related tenant data across all child tables to prevent foreign key errors
+            $childTables = [
+                'matter_user', 'time_entries', 'documents', 'document_requests',
+                'events', 'tasks', 'messages', 'opinions', 'appointments',
+                'case_notes', 'note_categories', 'invoices', 'expenses',
+                'transactions', 'bank_accounts', 'matters', 'clients',
+                'practice_area_tasks', 'practice_areas', 'holidays',
+                'email_templates', 'letter_templates', 'notification_templates',
+                'activity_categories', 'id_types', 'user_groups', 'roles',
+                'subscriptions'
+            ];
+
+            foreach ($childTables as $table) {
+                if (Schema::hasTable($table)) {
+                    if (Schema::hasColumn($table, 'firm_id')) {
+                        DB::table($table)->where('firm_id', $firm->id)->delete();
+                    }
+                }
+            }
+
+            // 3. Remove tenant-specific user accounts (preserving any superadmin)
+            User::where('firm_id', $firm->id)
+                ->where('role', '!=', 'superadmin')
+                ->delete();
+
+            User::where('firm_id', $firm->id)
+                ->where('role', 'superadmin')
+                ->update(['firm_id' => null]);
+
+            // 4. Delete the firm itself
+            $firm->delete();
+        });
 
         return redirect()->route('admin.firms.index')
-            ->with('success', "Law firm '{$name}' was deleted.");
+            ->with('success', "Law firm '{$name}' and all associated tenant records were permanently deleted.");
     }
 }

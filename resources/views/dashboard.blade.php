@@ -1,248 +1,496 @@
 <x-app-layout>
-    <x-slot name="title">{{ config('legal.app_name', 'Vennamraj Associates') }} — Chambers Dashboard</x-slot>
+    <x-slot name="title">{{ config('legal.app_name', 'Sharma Legal Chambers') }} — Litigation Briefs &amp; Chambers Docket</x-slot>
 
-    <!-- Top Greeting & Header Actions -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 mb-2">
-        <div class="flex flex-col">
-            <div class="flex items-center gap-2 mb-1">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F4EFEA] font-mono text-[11px] text-[#554D45] border border-[#EAE4DC]">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#B88B56]"></span>
-                    ACTIVE ADVOCATE SESSION · {{ strtoupper(auth()->user()->name ?? 'Counsel') }}
-                </span>
-                <span class="text-[#766A5E] text-xs">/</span>
-                <span class="text-xs font-semibold text-[#554D45] uppercase tracking-wider">{{ auth()->user()->title ?? 'Senior Advocate & Managing Partner' }}</span>
-            </div>
-            <h1 class="text-3xl font-serif text-[#222222] font-bold tracking-tight">Good afternoon, {{ auth()->user()->name ?? 'Counsel' }}</h1>
-            <p class="text-sm text-[#766A5E]">{{ now()->format('l, F j, Y') }} <span class="mx-1.5">·</span> {{ auth()->user()->firm->name ?? 'Vennamraj Associates, Advocates' }} <span class="mx-1.5">·</span> Chambers</p>
-        </div>
-
-        <!-- Quick Action Toolbar -->
-        <div class="flex items-center gap-2 shrink-0">
-            <a href="{{ route('matters.create') }}" class="inline-flex items-center gap-1.5 px-3.5 h-10 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm transition-colors">
-                <span class="material-symbols-outlined text-base">add_box</span>
-                <span>New Case Dossier</span>
-            </a>
-        </div>
-    </div>
-
-    <!-- Row 1: Executive Practice Metrics Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        <!-- Card 1: Active Matters -->
-        <div class="p-5 bg-white rounded-xl border border-[#EFECE6] shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex flex-col justify-between relative overflow-hidden group hover:border-[#8C7F72] transition-all">
-            <div class="flex items-start justify-between">
-                <div>
-                    <span class="font-mono text-[11px] uppercase tracking-wider text-[#766A5E]">Active Case Dossiers</span>
-                    <div class="text-3xl font-serif font-bold text-[#222222] mt-1">{{ $mattersCount ?? \App\Models\Matter::where('firm_id', auth()->user()->firm_id ?? 1)->count() }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-lg bg-[#F4EFEA] flex items-center justify-center text-[#9F8349]">
-                    <span class="material-symbols-outlined text-xl">gavel</span>
-                </div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-[#F4EFEA] flex items-center justify-between text-xs">
-                <span class="text-[#9F8349] font-medium flex items-center gap-1">
-                    <span class="material-symbols-outlined text-sm">trending_up</span> Active Litigation
-                </span>
-                <span class="font-mono text-[11px] text-[#766A5E]">High Court &amp; Tribunals</span>
-            </div>
-        </div>
-
-        <!-- Card 2: Court Filings & Hearings -->
-        <div class="p-5 bg-white rounded-xl border border-[#EFECE6] shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex flex-col justify-between relative overflow-hidden group hover:border-[#8C7F72] transition-all">
-            <div class="flex items-start justify-between">
-                <div>
-                    <span class="font-mono text-[11px] uppercase tracking-wider text-[#766A5E]">Filings &amp; Hearings</span>
-                    <div class="text-3xl font-serif font-bold text-[#222222] mt-1">{{ $eventsCount ?? \App\Models\Event::where('firm_id', auth()->user()->firm_id ?? 1)->count() }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-lg bg-[#F4EFEA] flex items-center justify-center text-[#9F8349]">
-                    <span class="material-symbols-outlined text-xl">calendar_month</span>
-                </div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-[#F4EFEA] flex items-center justify-between text-xs">
-                <span class="text-[#9F8349] font-medium flex items-center gap-1">
-                    <span class="material-symbols-outlined text-sm">event_available</span> Active Schedule
-                </span>
-                <span class="font-mono text-[11px] text-[#766A5E]">Indian Judicial Forums</span>
-            </div>
-        </div>
-
-        <!-- Card 3: Priority Action Tasks -->
-        <div class="p-5 bg-white rounded-xl border border-[#EFECE6] shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex flex-col justify-between relative overflow-hidden group hover:border-[#8C7F72] transition-all">
-            <div class="flex items-start justify-between">
-                <div>
-                    <span class="font-mono text-[11px] uppercase tracking-wider text-[#766A5E]">Priority Action Items</span>
-                    <div class="text-3xl font-serif font-bold text-[#222222] mt-1">{{ $tasksCount ?? \App\Models\Task::where('firm_id', auth()->user()->firm_id ?? 1)->count() }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-lg bg-[#F4EFEA] flex items-center justify-center text-[#9F8349]">
-                    <span class="material-symbols-outlined text-xl">task_alt</span>
-                </div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-[#F4EFEA] flex items-center justify-between text-xs">
-                <span class="text-[#9F8349] font-medium flex items-center gap-1">
-                    <span class="material-symbols-outlined text-sm">checklist</span> Docket Deadlines
-                </span>
-                <span class="font-mono text-[11px] text-[#766A5E]">Assigned Counsel</span>
-            </div>
-        </div>
-
-        <!-- Card 4: Retained Clients -->
-        <div class="p-5 bg-white rounded-xl border border-[#EFECE6] shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex flex-col justify-between relative overflow-hidden group hover:border-[#8C7F72] transition-all">
-            <div class="flex items-start justify-between">
-                <div>
-                    <span class="font-mono text-[11px] uppercase tracking-wider text-[#766A5E]">Retained Clients &amp; Entities</span>
-                    <div class="text-3xl font-serif font-bold text-[#222222] mt-1">{{ $clientsCount ?? \App\Models\Client::where('firm_id', auth()->user()->firm_id ?? 1)->count() }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-lg bg-[#F4EFEA] flex items-center justify-center text-[#9F8349]">
-                    <span class="material-symbols-outlined text-xl">corporate_fare</span>
-                </div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-[#F4EFEA] flex items-center justify-between text-xs">
-                <span class="text-[#9F8349] font-medium flex items-center gap-1">
-                    <span class="material-symbols-outlined text-sm">verified_user</span> Confidential
-                </span>
-                <span class="font-mono text-[11px] text-[#766A5E]">Client Directory</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Two-Column Workflow Canvas -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div class="flex flex-col w-full gap-space-lg text-text-primary">
         
-        <!-- Left 2-Column Section: Active Matters & Recent Time Ledger -->
-        <div class="xl:col-span-2 flex flex-col gap-6">
-            
-            <!-- Active Matters Dossier Table -->
-            <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
-                <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#9F8349] text-xl">cases</span>
-                        <h2 class="text-base font-semibold text-[#222222]">Active Litigation &amp; Transaction Matters</h2>
+        <!-- Top Executive Overview Bar with Editorial Layout -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md pb-space-sm border-b border-border-hairline/60">
+            <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-space-xs text-text-muted font-label-sm text-label-sm uppercase tracking-wider">
+                    <span>Chambers of {{ auth()->user()->firm->name ?? 'Sharma Legal' }}</span>
+                    <span>·</span>
+                    <span>Executive Practice Roster</span>
+                    <span>·</span>
+                    <span class="text-pine-primary font-medium">Session Term Q2</span>
+                </div>
+                <h1 class="font-headline-xl text-headline-xl text-primary font-serif font-medium tracking-tight">
+                    Litigation Briefs &amp; Chambers Docket
+                </h1>
+                <p class="font-body-md text-body-md text-text-secondary">
+                    Chambers causelist, priority dockets, and high court appearance roster.
+                </p>
+            </div>
+            <div class="flex items-center gap-space-sm">
+                <div class="hidden sm:flex items-center gap-space-xs px-space-sm py-1.5 rounded bg-surface-card border border-border-hairline shadow-sm text-text-secondary font-label-sm text-label-sm">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                    <span>High Court Cause List Live</span>
+                </div>
+                <a href="{{ route('matters.create') }}" class="btn-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                    <span>File New Matter</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Key Metrics Ledger Panel (Tone-on-Tone Stack) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
+            <!-- Stat 1: Active Case Dossiers -->
+            <div class="bg-surface-card border border-border-hairline rounded-lg p-space-md shadow-sm flex flex-col justify-between relative overflow-hidden group">
+                <div class="flex items-start justify-between">
+                    <span class="font-label-sm text-label-sm text-text-muted uppercase tracking-wider">Active Case Dossiers</span>
+                    <span class="p-1 rounded bg-surface-subtle text-pine-primary material-symbols-outlined text-[20px]">gavel</span>
+                </div>
+                <div class="mt-space-sm">
+                    <div class="flex items-baseline gap-2">
+                        <span class="font-headline-lg text-headline-lg text-primary font-serif font-normal tabular-nums">{{ $mattersCount ?? $matters->count() }}</span>
+                        <span class="text-pine-primary font-label-sm text-label-sm font-medium">+4 this month</span>
                     </div>
-                    <a href="{{ route('matters.index') }}" class="text-xs font-medium text-[#9F8349] hover:underline flex items-center gap-1">
-                        <span>View All Matters</span>
-                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    <p class="font-body-sm text-body-sm text-text-secondary mt-1">High Court, NCLT &amp; District Tribunals</p>
+                </div>
+                <div class="mt-space-sm pt-2 bg-surface-subtle border-t border-border-hairline -mx-space-md -mb-space-md px-space-md py-2 flex items-center justify-between text-text-muted font-caption text-caption">
+                    <span>31 High Court · 17 Tribunals</span>
+                    <a href="{{ route('matters.index') }}" class="text-pine-primary font-medium hover:underline cursor-pointer group flex items-center gap-0.5">
+                        <span>View registry</span>
+                        <span class="group-hover:translate-x-0.5 transition-transform">→</span>
                     </a>
                 </div>
+            </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-[#FAF8F5] border-b border-[#EFECE6] text-[11px] font-mono text-[#766A5E] uppercase tracking-wider">
-                                <th class="py-3 px-4">Docket / Matter</th>
-                                <th class="py-3 px-4">Client</th>
-                                <th class="py-3 px-4">Stage</th>
-                                <th class="py-3 px-4">Lead Counsel</th>
-                                <th class="py-3 px-4 text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-[#F4EFEA] text-sm">
-                            @foreach($matters as $matter)
-                            <tr class="hover:bg-[#FAF8F5] transition-colors group">
-                                <td class="py-3 px-4">
-                                    <div class="flex flex-col">
-                                        <a href="{{ route('matters.show', $matter->id) }}" class="font-medium text-[#222222] group-hover:text-[#9F8349] transition-colors">
-                                            {{ $matter->title }}
-                                        </a>
-                                        <span class="font-mono text-xs text-[#766A5E]">{{ $matter->case_number }} <span class="mx-1">·</span> {{ $matter->practice_area }}</span>
-                                    </div>
-                                </td>
-                                <td class="py-3 px-4 text-[#554D45]">
-                                    {{ $matter->client->name }}
-                                </td>
-                                <td class="py-3 px-4">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#F8F4EE] text-[#9F8349] border border-[#E8DAC8] font-semibold">
-                                        {{ $matter->stage }}
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4">
-                                    <div class="flex items-center gap-2">
-                                        <img alt="{{ $matter->leadAttorney?->name }}" class="w-6 h-6 rounded-full object-cover ring-1 ring-[#EAE4DC]" src="{{ $matter->leadAttorney?->avatar_url }}"/>
-                                        <span class="text-xs text-[#554D45]">{{ $matter->leadAttorney?->name }}</span>
-                                    </div>
-                                </td>
-                                <td class="py-3 px-4 text-center">
-                                    <a href="{{ route('matters.show', $matter->id) }}" class="p-1.5 text-[#766A5E] hover:text-[#9F8349] hover:bg-[#F4EFEA] rounded inline-flex" title="Open Dossier">
-                                        <span class="material-symbols-outlined text-lg">folder_open</span>
-                                    </a>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+            <!-- Stat 2: Upcoming Hearings -->
+            <div class="bg-surface-card border border-border-hairline rounded-lg p-space-md shadow-sm flex flex-col justify-between group">
+                <div class="flex items-start justify-between">
+                    <span class="font-label-sm text-label-sm text-text-muted uppercase tracking-wider">Upcoming Hearings</span>
+                    <span class="p-1 rounded bg-surface-subtle text-pine-primary material-symbols-outlined text-[20px]">event_upcoming</span>
+                </div>
+                <div class="mt-space-sm">
+                    <div class="flex items-baseline gap-2">
+                        <span class="font-headline-lg text-headline-lg text-primary font-serif font-normal tabular-nums">{{ $eventsCount ?? $events->count() }}</span>
+                        <span class="px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-800 font-label-sm text-label-sm font-medium">2 Priority Arguments</span>
+                    </div>
+                    <p class="font-body-sm text-body-sm text-text-secondary mt-1">Scheduled next 5 days across benches</p>
+                </div>
+                <div class="mt-space-sm pt-2 bg-surface-subtle border-t border-border-hairline -mx-space-md -mb-space-md px-space-md py-2 flex items-center justify-between text-text-muted font-caption text-caption">
+                    <span>Earliest: Today 10:30 AM</span>
+                    <a href="{{ route('calendar.index') }}" class="text-pine-primary font-medium hover:underline cursor-pointer group flex items-center gap-0.5">
+                        <span>Cause list</span>
+                        <span class="group-hover:translate-x-0.5 transition-transform">→</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stat 3: Pending Filings -->
+            <div class="bg-surface-card border border-border-hairline rounded-lg p-space-md shadow-sm flex flex-col justify-between group">
+                <div class="flex items-start justify-between">
+                    <span class="font-label-sm text-label-sm text-text-muted uppercase tracking-wider">Pending Filings</span>
+                    <span class="p-1 rounded bg-surface-subtle text-pine-primary material-symbols-outlined text-[20px]">assignment_late</span>
+                </div>
+                <div class="mt-space-sm">
+                    <div class="flex items-baseline gap-2">
+                        <span class="font-headline-lg text-headline-lg text-primary font-serif font-normal tabular-nums">{{ $tasksCount ?? $tasks->count() }}</span>
+                        <span class="px-2 py-0.5 rounded bg-red-50 text-red-800 border border-red-200 font-label-sm text-label-sm font-medium">Due ≤ 5 Days</span>
+                    </div>
+                    <p class="font-body-sm text-body-sm text-text-secondary mt-1">Caveats, Rejoinders &amp; Submissions</p>
+                </div>
+                <div class="mt-space-sm pt-2 bg-surface-subtle border-t border-border-hairline -mx-space-md -mb-space-md px-space-md py-2 flex items-center justify-between text-text-muted font-caption text-caption">
+                    <span>3 awaiting Senior Counsel clearance</span>
+                    <a href="{{ route('tasks.index') }}" class="text-pine-primary font-medium hover:underline cursor-pointer group flex items-center gap-0.5">
+                        <span>Review queue</span>
+                        <span class="group-hover:translate-x-0.5 transition-transform">→</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stat 4: Realized Billings -->
+            <div class="bg-surface-card border border-border-hairline rounded-lg p-space-md shadow-sm flex flex-col justify-between group">
+                <div class="flex items-start justify-between">
+                    <span class="font-label-sm text-label-sm text-text-muted uppercase tracking-wider">Realized Billings</span>
+                    <span class="p-1 rounded bg-surface-subtle text-pine-primary material-symbols-outlined text-[20px]">account_balance_wallet</span>
+                </div>
+                <div class="mt-space-sm">
+                    <div class="flex items-baseline justify-between">
+                        <div class="flex items-baseline gap-1">
+                            <span class="font-headline-lg text-headline-lg text-primary font-serif font-normal tabular-nums">₹42.8L</span>
+                            <span class="font-label-sm text-label-sm text-text-muted tabular-nums">/ ₹58.0L</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-title-sm text-title-sm tabular-nums">82%</span>
+                    </div>
+                    <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
+                        <div class="bg-pine-primary h-full rounded-full" style="width: 82%;"></div>
+                    </div>
+                </div>
+                <div class="mt-space-sm pt-2 bg-surface-subtle border-t border-border-hairline -mx-space-md -mb-space-md px-space-md py-2 flex items-center justify-between text-text-muted font-caption text-caption">
+                    <span>₹15.2L uncollected across clients</span>
+                    <a href="{{ route('billing.index') }}" class="text-pine-primary font-medium hover:underline cursor-pointer group flex items-center gap-0.5">
+                        <span>Chambers ledger</span>
+                        <span class="group-hover:translate-x-0.5 transition-transform">→</span>
+                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- Right 1-Column Section: Court Docket Calendar & Tasks -->
-        <div class="flex flex-col gap-6">
+        <!-- Primary Asymmetric Workspace: 70% Litigation Engine & 30% Daily Operations -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
             
-            <!-- Court Docket Ribbon -->
-            <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
-                <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#ba1a1a] text-xl">event_upcoming</span>
-                        <h2 class="text-base font-semibold text-[#222222]">Chambers Docket</h2>
+            <!-- LEFT COLUMN (70% - Col Span 8) -->
+            <div class="lg:col-span-8 flex flex-col gap-space-lg">
+                
+                <!-- Critical Litigation Dockets & Upcoming Hearings Table Card -->
+                <div class="bg-surface-card border border-border-hairline rounded-lg shadow-sm overflow-hidden">
+                    <!-- Card Header with Subtle Tone Shift -->
+                    <div class="px-space-lg py-space-md bg-surface-subtle border-b border-border-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+                        <div>
+                            <div class="flex items-center gap-space-xs">
+                                <span class="font-caption text-caption uppercase tracking-wider text-pine-primary font-semibold">Priority Docket Matrix</span>
+                                <span class="text-text-muted">·</span>
+                                <span class="font-caption text-caption text-text-muted">Updated real-time</span>
+                            </div>
+                            <h2 class="font-headline-md text-headline-md text-primary font-serif font-medium">Critical Litigation Dockets &amp; Upcoming Hearings</h2>
+                        </div>
+                        <div class="flex items-center gap-space-xs">
+                            <a href="{{ route('matters.index') }}" class="btn-secondary h-8 px-2.5 text-xs">
+                                All Matters ({{ $matters->count() }})
+                            </a>
+                            <span class="px-2.5 py-1 rounded bg-pine-primary text-white text-xs font-semibold">
+                                Active Hearings
+                            </span>
+                        </div>
                     </div>
-                    <span class="font-mono text-xs text-[#766A5E]">Indian Standard Time (IST)</span>
+
+                    <!-- Docket Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-surface-container-low border-b border-border-hairline text-text-muted font-caption text-caption uppercase tracking-wider">
+                                    <th class="py-space-sm px-space-md">Case Title &amp; Registry ID</th>
+                                    <th class="py-space-sm px-space-md">Forum / Bench</th>
+                                    <th class="py-space-sm px-space-md">Hearing &amp; Status</th>
+                                    <th class="py-space-sm px-space-md">Bench &amp; Counsel</th>
+                                    <th class="py-space-sm px-space-md text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border-hairline font-body-sm text-body-sm">
+                                @forelse($matters as $matter)
+                                <tr class="hover:bg-canvas-ivory transition-colors group">
+                                    <td class="py-space-md px-space-md align-top">
+                                        <div class="flex flex-col">
+                                            <a href="{{ route('matters.show', $matter->id) }}" class="font-title-sm text-title-sm text-text-primary group-hover:text-pine-primary transition-colors font-semibold">
+                                                {{ $matter->title }}
+                                            </a>
+                                            <span class="font-caption text-caption text-text-muted font-mono mt-0.5">
+                                                {{ $matter->case_number }} · {{ $matter->practice_area }}
+                                            </span>
+                                            @if($matter->client)
+                                            <span class="inline-flex items-center gap-1 mt-1 text-text-secondary font-caption text-caption">
+                                                <span class="material-symbols-outlined text-[14px] text-text-muted">business</span>
+                                                {{ $matter->client->name }}
+                                            </span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="py-space-md px-space-md align-top">
+                                        <div class="flex flex-col">
+                                            <span class="font-label-md text-label-md text-text-primary font-medium">{{ $matter->court_name ?? 'High Court of Delhi' }}</span>
+                                            <span class="text-text-muted font-caption text-caption">Courtroom 14 · Commercial Bench</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-space-md px-space-md align-top">
+                                        <div class="flex flex-col gap-1 items-start">
+                                            <span class="font-label-sm text-label-sm text-text-primary">Scheduled Term Q2</span>
+                                            <span class="px-2 py-0.5 rounded bg-pine-primary/10 text-pine-primary border border-pine-primary/20 font-label-sm text-label-sm inline-flex items-center gap-1.5 font-medium">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-pine-primary"></span>
+                                                <span>{{ $matter->stage }}</span>
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="py-space-md px-space-md align-top">
+                                        <div class="flex flex-col">
+                                            <span class="text-text-primary font-medium">{{ $matter->judge_name ?? "Hon'ble Presiding Bench" }}</span>
+                                            <span class="text-pine-primary font-label-sm text-label-sm">{{ $matter->leadAttorney?->name ?? 'Adv. A. Sharma (Lead)' }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-space-md px-space-md align-top text-right whitespace-nowrap">
+                                        <a href="{{ route('matters.show', $matter->id) }}" class="inline-flex items-center gap-1 font-title-sm text-title-sm text-pine-primary hover:text-pine-hover group">
+                                            <span>Open Brief</span>
+                                            <span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="5" class="py-8 text-center text-text-muted text-xs">
+                                        No active litigation dockets currently listed for this practice term.
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Table Footer Context -->
+                    <div class="px-space-md py-space-sm bg-surface-subtle border-t border-border-hairline flex items-center justify-between font-caption text-caption text-text-muted">
+                        <span>Showing {{ $matters->count() }} active matters requiring direct chamber representation</span>
+                        <a href="{{ route('matters.index') }}" class="text-pine-primary font-title-sm text-title-sm hover:underline flex items-center gap-1">
+                            <span>View Full Chamber Cause Register</span>
+                            <span class="material-symbols-outlined text-[16px]">navigate_next</span>
+                        </a>
+                    </div>
                 </div>
 
-                <div class="p-4 flex flex-col gap-3">
-                    @foreach($events as $event)
-                    <div class="p-3.5 rounded-lg border {{ $event->is_statutory_deadline ? 'border-red-200 bg-red-50/50' : 'border-[#EFECE6] bg-[#FAF8F5]' }} flex flex-col gap-1.5">
-                        <div class="flex items-center justify-between">
-                            <span class="font-mono text-xs font-semibold {{ $event->is_statutory_deadline ? 'text-red-700' : 'text-[#9F8349]' }}">
-                                {{ $event->start_time->format('D, M d · g:i A') }}
-                            </span>
-                            @if($event->is_statutory_deadline)
-                            <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-800 font-bold uppercase tracking-wider">Statutory Due</span>
-                            @else
-                            <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-[#F4EFEA] text-[#554D45]">{{ $event->event_type }}</span>
-                            @endif
+                <!-- Quick Drafts & Filings Tracker (Drafting & Approval Ledger) -->
+                <div class="bg-surface-card border border-border-hairline rounded-lg shadow-sm p-space-lg flex flex-col gap-space-md">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <span class="font-caption text-caption uppercase tracking-wider text-pine-primary font-semibold">Chamber Drafting Desk</span>
+                            <h3 class="font-headline-sm text-headline-sm text-primary font-serif font-medium">Quick Drafts &amp; Filings Tracker</h3>
                         </div>
-                        <h4 class="text-sm font-semibold text-[#222222]">{{ $event->title }}</h4>
-                        @if($event->matter)
-                        <span class="text-xs text-[#766A5E] font-medium">{{ $event->matter->case_number }} — {{ $event->matter->title }}</span>
-                        @endif
-                        @if($event->location)
-                        <div class="flex items-center gap-1.5 text-xs text-[#554D45] mt-1">
-                            <span class="material-symbols-outlined text-sm text-[#766A5E]">pin_drop</span>
-                            <span>{{ $event->location }}</span>
+                        <div class="flex items-center gap-space-sm">
+                            <span class="font-caption text-caption text-text-muted">{{ $tasks->count() }} Active items in queue</span>
+                            <a href="{{ route('tasks.index') }}" class="btn-secondary h-8 px-2.5 text-xs">
+                                + New Pleading Draft
+                            </a>
                         </div>
-                        @endif
                     </div>
-                    @endforeach
+
+                    <!-- Drafts Itemized Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md pt-space-xs">
+                        <!-- Item 1 -->
+                        <div class="p-space-md rounded border border-border-hairline bg-surface-subtle flex flex-col justify-between gap-space-sm relative">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="px-1.5 py-0.5 rounded bg-surface-card border border-border-hairline text-pine-primary font-caption text-caption font-semibold">AFFIDAVIT</span>
+                                    <span class="text-text-muted font-caption text-caption">Due 4:00 PM</span>
+                                </div>
+                                <h4 class="font-title-sm text-title-sm text-text-primary mt-1 font-semibold">Affidavit in Reply to Contempt Notice</h4>
+                                <p class="font-caption text-caption text-text-secondary">Ready for client deponent attestation &amp; notary stamp.</p>
+                            </div>
+                            <div class="flex flex-col gap-2 pt-2">
+                                <div class="flex items-center justify-between text-text-muted font-caption text-caption">
+                                    <span>Drafted by Chambers Team</span>
+                                    <span class="text-pine-primary font-medium tabular-nums">90% Complete</span>
+                                </div>
+                                <div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+                                    <div class="bg-pine-primary h-full rounded-full" style="width: 90%;"></div>
+                                </div>
+                                <div class="flex items-center justify-between pt-1">
+                                    <label class="flex items-center gap-2 text-text-secondary font-label-sm text-label-sm cursor-pointer">
+                                        <input checked type="checkbox" class="accent-pine-primary rounded"/>
+                                        <span>Advocate Approved</span>
+                                    </label>
+                                    <span class="text-pine-primary font-title-sm text-title-sm text-[12px] group hover:underline cursor-pointer">Sign brief →</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div class="p-space-md rounded border border-border-hairline bg-surface-subtle flex flex-col justify-between gap-space-sm relative">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="px-1.5 py-0.5 rounded bg-surface-card border border-border-hairline text-pine-primary font-caption text-caption font-semibold">CAVEAT PETITION</span>
+                                    <span class="text-red-700 font-caption text-caption font-medium">Urgent Today</span>
+                                </div>
+                                <h4 class="font-title-sm text-title-sm text-text-primary mt-1 font-semibold">Caveat u/S 148A CPC (NCLT Bench II)</h4>
+                                <p class="font-caption text-caption text-text-secondary">Prevents ex-parte interim injunction against debt rollover.</p>
+                            </div>
+                            <div class="flex flex-col gap-2 pt-2">
+                                <div class="flex items-center justify-between text-text-muted font-caption text-caption">
+                                    <span>Drafted by Lead Associate</span>
+                                    <span class="text-amber-700 font-medium">Requires Vakalatnama</span>
+                                </div>
+                                <div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+                                    <div class="bg-amber-600 h-full rounded-full" style="width: 60%;"></div>
+                                </div>
+                                <div class="flex items-center justify-between pt-1">
+                                    <label class="flex items-center gap-2 text-text-secondary font-label-sm text-label-sm cursor-pointer">
+                                        <input type="checkbox" class="accent-pine-primary rounded"/>
+                                        <span>Vakalatnama Stamped</span>
+                                    </label>
+                                    <span class="text-pine-primary font-title-sm text-title-sm text-[12px] group hover:underline cursor-pointer">E-File →</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 3 -->
+                        <div class="p-space-md rounded border border-border-hairline bg-surface-subtle flex flex-col justify-between gap-space-sm relative">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="px-1.5 py-0.5 rounded bg-surface-card border border-border-hairline text-pine-primary font-caption text-caption font-semibold">REJOINDER</span>
+                                    <span class="text-text-muted font-caption text-caption">Due Friday</span>
+                                </div>
+                                <h4 class="font-title-sm text-title-sm text-text-primary mt-1 font-semibold">Rejoinder to Written Statement</h4>
+                                <p class="font-caption text-caption text-text-secondary">Citing Hon'ble SC precedent on holographic codicil validity.</p>
+                            </div>
+                            <div class="flex flex-col gap-2 pt-2">
+                                <div class="flex items-center justify-between text-text-muted font-caption text-caption">
+                                    <span>Under Senior Review</span>
+                                    <span class="text-pine-primary font-medium">Final Proofing</span>
+                                </div>
+                                <div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+                                    <div class="bg-pine-primary h-full rounded-full" style="width: 80%;"></div>
+                                </div>
+                                <div class="flex items-center justify-between pt-1">
+                                    <label class="flex items-center gap-2 text-text-secondary font-label-sm text-label-sm cursor-pointer">
+                                        <input checked type="checkbox" class="accent-pine-primary rounded"/>
+                                        <span>Citation Verified</span>
+                                    </label>
+                                    <span class="text-pine-primary font-title-sm text-title-sm text-[12px] group hover:underline cursor-pointer">Print docket →</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
             </div>
 
-            <!-- Priority Litigation Tasks -->
-            <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
-                <div class="p-4 border-b border-[#F4EFEA] flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#9F8349] text-xl">check_box</span>
-                        <h2 class="text-base font-semibold text-[#222222]">Priority Action Items</h2>
+            <!-- RIGHT COLUMN (30% - Col Span 4) -->
+            <div class="lg:col-span-4 flex flex-col gap-space-lg">
+                
+                <!-- Chambers Quick Actions (Deep Pine Accents) -->
+                <div class="bg-surface-card border border-border-hairline rounded-lg shadow-sm p-space-lg flex flex-col gap-space-md">
+                    <div class="flex items-center justify-between">
+                        <span class="font-caption text-caption uppercase tracking-wider text-pine-primary font-semibold">Advocate Desk</span>
+                        <span class="material-symbols-outlined text-[18px] text-text-muted">bolt</span>
                     </div>
-                    <span class="font-mono text-xs text-[#766A5E]">2 Pending</span>
+                    <h3 class="font-headline-sm text-headline-sm text-primary font-serif font-medium">Chambers Quick Actions</h3>
+                    <div class="grid grid-cols-1 gap-2.5">
+                        <a href="{{ route('matters.create') }}" class="btn-primary w-full flex items-center justify-between text-left">
+                            <span class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">post_add</span>
+                                <span>+ File New Matter</span>
+                            </span>
+                            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                        </a>
+
+                        <a href="{{ route('calendar.index') }}" class="w-full py-2.5 px-space-md rounded bg-surface-subtle border border-border-hairline text-text-primary font-title-sm text-title-sm flex items-center justify-between hover:bg-surface-container-high transition-colors text-left">
+                            <span class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px] text-pine-primary">timer</span>
+                                <span>Log Hearing Appearance</span>
+                            </span>
+                            <span class="text-caption font-caption text-text-muted">Hourly / Daily</span>
+                        </a>
+
+                        <a href="{{ route('billing.index') }}" class="w-full py-2.5 px-space-md rounded bg-surface-subtle border border-border-hairline text-text-primary font-title-sm text-title-sm flex items-center justify-between hover:bg-surface-container-high transition-colors text-left">
+                            <span class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px] text-pine-primary">receipt_long</span>
+                                <span>Generate Retainer Note</span>
+                            </span>
+                            <span class="text-caption font-caption text-text-muted">Pro-forma Bill</span>
+                        </a>
+
+                        <a href="{{ route('opinions.create') }}" class="w-full py-2.5 px-space-md rounded bg-surface-subtle border border-border-hairline text-text-primary font-title-sm text-title-sm flex items-center justify-between hover:bg-surface-container-high transition-colors text-left">
+                            <span class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px] text-pine-primary">draw</span>
+                                <span>Record Case Opinion</span>
+                            </span>
+                            <span class="text-caption font-caption text-text-muted">Confidential Memo</span>
+                        </a>
+                    </div>
                 </div>
 
-                <div class="p-4 flex flex-col gap-2.5">
-                    @foreach($tasks as $task)
-                    <div class="p-3 rounded-lg border border-[#EFECE6] hover:border-[#EAE4DC] transition-colors flex items-start gap-3">
-                        <input type="checkbox" class="w-4 h-4 rounded text-[#9F8349] accent-[#9F8349] mt-0.5 cursor-pointer"/>
-                        <div class="flex flex-col min-w-0 flex-1">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-semibold text-[#222222] truncate">{{ $task->title }}</span>
-                                <span class="font-mono text-[10px] px-1.5 py-0.2 rounded font-bold uppercase {{ $task->priority === 'urgent' ? 'bg-red-100 text-red-700' : 'bg-[#B88B56]/60 text-[#9F8349]' }}">
-                                    {{ $task->priority }}
-                                </span>
+                <!-- Court Calendar Today & Tomorrow (Chronological Timetable) -->
+                <div class="bg-surface-card border border-border-hairline rounded-lg shadow-sm p-space-lg flex flex-col gap-space-md">
+                    <div class="flex items-center justify-between">
+                        <div class="flex flex-col">
+                            <span class="font-caption text-caption uppercase tracking-wider text-pine-primary font-semibold">Real-Time Registry</span>
+                            <h3 class="font-headline-sm text-headline-sm text-primary font-serif font-medium">Court Schedule</h3>
+                        </div>
+                        <span class="px-2 py-0.5 rounded bg-surface-subtle border border-border-hairline text-text-muted font-caption text-caption">IST (UTC+5:30)</span>
+                    </div>
+
+                    <div class="flex flex-col gap-space-md relative">
+                        @forelse($events->take(3) as $event)
+                        <div class="flex gap-space-sm items-start relative">
+                            <div class="flex flex-col items-center">
+                                <span class="w-2.5 h-2.5 rounded-full {{ $event->is_statutory_deadline ? 'bg-red-600' : 'bg-pine-primary' }} ring-4 ring-emerald-100 mt-1"></span>
+                                <span class="w-0.5 h-16 bg-surface-container-high mt-1"></span>
                             </div>
-                            <p class="text-[11px] text-[#554D45] mt-0.5 line-clamp-2">{{ $task->description }}</p>
-                            <div class="flex items-center justify-between mt-2 text-[10px] text-[#766A5E]">
-                                <span>Assigned: {{ $task->assignee->name }}</span>
-                                <span class="font-mono text-red-700 font-medium">Due {{ $task->due_date?->format('M d') }}</span>
+                            <div class="flex-1 bg-surface-subtle border border-border-hairline rounded p-space-sm flex flex-col gap-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-title-sm text-title-sm text-text-primary tabular-nums font-semibold">{{ $event->start_time->format('g:i A') }}</span>
+                                    <span class="px-1.5 py-0.5 rounded {{ $event->is_statutory_deadline ? 'bg-red-50 text-red-800 border border-red-200' : 'bg-pine-primary/10 text-pine-primary border border-pine-primary/20' }} font-caption text-caption font-medium">
+                                        {{ $event->event_type }}
+                                    </span>
+                                </div>
+                                <p class="font-label-sm text-label-sm text-text-primary font-medium">{{ $event->title }}</p>
+                                <div class="flex items-center justify-between font-caption text-caption text-text-muted">
+                                    <span>{{ $event->location ?? 'Court hearing' }}</span>
+                                    <span class="text-pine-primary font-mono font-medium">{{ $event->matter?->case_number }}</span>
+                                </div>
                             </div>
                         </div>
+                        @empty
+                        <div class="text-center py-4 text-xs text-text-muted">No hearing items scheduled for today.</div>
+                        @endforelse
                     </div>
-                    @endforeach
                 </div>
+
+                <!-- Assigned Associates & Bench Status -->
+                <div class="bg-surface-card border border-border-hairline rounded-lg shadow-sm p-space-lg flex flex-col gap-space-md">
+                    <div class="flex items-center justify-between">
+                        <div class="flex flex-col">
+                            <span class="font-caption text-caption uppercase tracking-wider text-pine-primary font-semibold">Chambers Roster</span>
+                            <h3 class="font-headline-sm text-headline-sm text-primary font-serif font-medium">Assigned Associates</h3>
+                        </div>
+                        <span class="p-1 rounded bg-surface-subtle text-pine-primary material-symbols-outlined text-[18px]">group</span>
+                    </div>
+
+                    <div class="flex flex-col gap-space-sm">
+                        <!-- Associate 1 -->
+                        <div class="flex items-center justify-between p-space-sm rounded border border-border-hairline bg-surface-subtle">
+                            <div class="flex items-center gap-space-sm">
+                                <div class="w-8 h-8 rounded-full bg-pine-primary text-white flex items-center justify-center font-title-sm text-title-sm font-semibold shadow-xs">
+                                    AS
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="font-title-sm text-title-sm text-text-primary font-semibold">Adv. Ananya Sharma</span>
+                                    <span class="font-caption text-caption text-text-muted">Managing Counsel · High Court</span>
+                                </div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-pine-primary/10 text-pine-primary font-label-sm text-label-sm flex items-center gap-1.5 border border-pine-primary/20 font-medium">
+                                <span class="w-1.5 h-1.5 rounded-full bg-pine-primary"></span>
+                                <span>In Court 14</span>
+                            </span>
+                        </div>
+
+                        <!-- Associate 2 -->
+                        <div class="flex items-center justify-between p-space-sm rounded border border-border-hairline bg-surface-subtle">
+                            <div class="flex items-center gap-space-sm">
+                                <div class="w-8 h-8 rounded-full bg-surface-card border border-border-hairline text-pine-primary flex items-center justify-center font-title-sm text-title-sm font-semibold shadow-xs">
+                                    DO
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="font-title-sm text-title-sm text-text-primary font-semibold">Adv. Daniel Okafor</span>
+                                    <span class="font-caption text-caption text-text-muted">Senior Retained Counsel</span>
+                                </div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-800 font-label-sm text-label-sm flex items-center gap-1.5 border border-blue-200 font-medium">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                                <span>Briefing Session</span>
+                            </span>
+                        </div>
+
+                        <!-- Associate 3 -->
+                        <div class="flex items-center justify-between p-space-sm rounded border border-border-hairline bg-surface-subtle">
+                            <div class="flex items-center gap-space-sm">
+                                <div class="w-8 h-8 rounded-full bg-surface-card border border-border-hairline text-text-secondary flex items-center justify-center font-title-sm text-title-sm font-semibold shadow-xs">
+                                    LO
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="font-title-sm text-title-sm text-text-primary font-semibold">Luis Ortega</span>
+                                    <span class="font-caption text-caption text-text-muted">Senior Paralegal · Docket Registry</span>
+                                </div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-surface-card border border-border-hairline text-text-secondary font-label-sm text-label-sm font-medium">
+                                Chambers (Drafting)
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 flex items-center justify-between text-text-muted font-caption text-caption">
+                        <span>Chamber roster active</span>
+                        <a href="{{ route('users.index') }}" class="text-pine-primary hover:underline font-title-sm text-title-sm">Duty roster →</a>
+                    </div>
+                </div>
+
             </div>
 
         </div>
