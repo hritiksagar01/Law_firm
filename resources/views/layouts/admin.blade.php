@@ -65,24 +65,17 @@
                 </a>
 
                 <!-- Users -->
-                <a href="{{ route('admin.firms.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors text-[#9ca3af] hover:text-white hover:bg-white/[.05]">
-                    <span class="material-symbols-outlined text-[19px] text-[#9ca3af]">group</span>
+                <a href="{{ route('admin.users.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('admin.users.*') ? 'text-white' : 'text-[#9ca3af]' }}">group</span>
                     <span>Users</span>
                 </a>
 
                 <!-- Matters -->
-                <a href="{{ route('admin.firms.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors text-[#9ca3af] hover:text-white hover:bg-white/[.05]">
-                    <span class="material-symbols-outlined text-[19px] text-[#9ca3af]">folder</span>
+                <a href="{{ route('admin.matters.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('admin.matters.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('admin.matters.*') ? 'text-white' : 'text-[#9ca3af]' }}">folder</span>
                     <span>Matters</span>
-                </a>
-
-                <!-- Payment gateways -->
-                <a href="{{ route('admin.plans.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('admin.plans.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
-                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('admin.plans.*') ? 'text-white' : 'text-[#9ca3af]' }}">credit_card</span>
-                    <span>Payment gateways</span>
                 </a>
 
                 <!-- Email & SMS -->

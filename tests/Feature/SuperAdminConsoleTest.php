@@ -6,21 +6,24 @@ use App\Models\Firm;
 use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Database\Seeders\DatabaseSeeder;
+use Database\Seeders\QuireDemoSeeder;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class SuperAdminConsoleTest extends TestCase
 {
     private User $superadmin;
+
     private Firm $firm;
+
     private Plan $plan;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('migrate');
-        $this->seed(\Database\Seeders\DatabaseSeeder::class);
+        $this->seed(DatabaseSeeder::class);
 
         $this->superadmin = User::where('email', 'admin@sharmalegal.in')->firstOrFail();
 
@@ -199,7 +202,7 @@ class SuperAdminConsoleTest extends TestCase
     {
         $plan = Plan::create([
             'name' => 'Temp Plan',
-            'slug' => 'temp-plan-' . uniqid(),
+            'slug' => 'temp-plan-'.uniqid(),
             'price' => 1000,
             'interval' => 'monthly',
             'max_users' => 2,
@@ -217,5 +220,31 @@ class SuperAdminConsoleTest extends TestCase
         $deleteResponse = $this->actingAs($this->superadmin)->delete(route('admin.plans.destroy', $plan));
         $deleteResponse->assertRedirect(route('admin.plans.index'));
         $this->assertNull(Plan::find($plan->id));
+    }
+
+    public function test_superadmin_can_view_matters_directory_and_filter(): void
+    {
+        $this->seed(QuireDemoSeeder::class);
+
+        $response = $this->actingAs($this->superadmin)->get(route('admin.matters.index'));
+        $response->assertStatus(200);
+        $response->assertSee('Matters');
+        $response->assertSee('Volume and activity across firms, for support and capacity planning');
+        $response->assertSee('Platform staff see record types, counts, statuses and matter numbers');
+        $response->assertSee('2026-0139');
+        $response->assertSee('Hartwell &amp; Okafor LLP', false);
+
+        // Test filter by matter number
+        $filterResponse = $this->actingAs($this->superadmin)->get(route('admin.matters.index', ['q' => 'MLC/2026/017']));
+        $filterResponse->assertStatus(200);
+        $filterResponse->assertSee('MLC/2026/017');
+        $filterResponse->assertDontSee('2026-0139');
+    }
+
+    public function test_payment_gateways_is_removed_from_admin_navigation(): void
+    {
+        $response = $this->actingAs($this->superadmin)->get(route('admin.matters.index'));
+        $response->assertStatus(200);
+        $response->assertDontSee('Payment gateways');
     }
 }

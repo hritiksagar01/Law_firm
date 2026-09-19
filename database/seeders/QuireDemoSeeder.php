@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\Client;
+use App\Models\Document;
 use App\Models\Firm;
 use App\Models\Matter;
+use App\Models\Message;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -183,41 +185,161 @@ class QuireDemoSeeder extends Seeder
             ]
         );
 
-        // 6. Matters
-        Matter::updateOrCreate(
-            ['case_number' => 'NY-COMM-2026-0941'],
+        // 6. Matters & Meridian Law Chambers
+        $meridianFirm = Firm::firstOrCreate(
+            ['slug' => 'meridian-law-chambers'],
             [
-                'firm_id' => $firm->id,
-                'client_id' => $clientElena->id,
-                'lead_attorney_id' => $daniel->id,
-                'title' => 'Marsh v. Castellan Pharmaceuticals Inc.',
-                'practice_area' => 'Commercial Litigation',
-                'stage' => 'Interim Injunction',
+                'name' => 'Meridian Law Chambers',
+                'email' => 'admin@meridianlaw.example',
+                'phone' => '+1 (415) 555-0188',
+                'address' => '200 California Street, Suite 500, San Francisco, CA 94111',
+                'practice_areas' => ['Consumer & regulatory complaints', 'Commercial litigation'],
+                'currency' => 'USD',
                 'status' => 'active',
-                'court_name' => 'New York Supreme Court (Commercial Division)',
-                'judge_name' => 'Hon. Evelyn Keller',
-                'billing_type' => 'hourly',
-                'budget' => 350000.00,
-                'opened_at' => now()->subMonths(3),
             ]
         );
 
-        Matter::updateOrCreate(
-            ['case_number' => 'DEL-NCLT-2026-1048'],
+        $mattersData = [
             [
+                'case_number' => '2026-0139',
+                'firm_id' => $firm->id,
+                'client_id' => $clientElena->id,
+                'lead_attorney_id' => $daniel->id,
+                'title' => 'Estate Administration & Trust Execution',
+                'practice_area' => 'Estates & trusts',
+                'stage' => 'Intake',
+                'status' => 'intake',
+                'billing_type' => 'hourly',
+                'budget' => 75000.00,
+                'opened_at' => '2026-09-04',
+                'closed_at' => null,
+                'docs_count' => 1,
+                'msgs_count' => 0,
+                'updated_at' => '2026-09-06 14:30:00',
+            ],
+            [
+                'case_number' => '2026-0131',
+                'firm_id' => $firm->id,
+                'client_id' => $clientElena->id,
+                'lead_attorney_id' => $daniel->id,
+                'title' => 'Commercial Contract & Supply Chain Litigation',
+                'practice_area' => 'Commercial litigation',
+                'stage' => 'Discovery',
+                'status' => 'open',
+                'billing_type' => 'hourly',
+                'budget' => 250000.00,
+                'opened_at' => '2026-08-04',
+                'closed_at' => null,
+                'docs_count' => 3,
+                'msgs_count' => 2,
+                'updated_at' => '2026-09-09 16:45:00',
+            ],
+            [
+                'case_number' => 'MLC/2026/017',
+                'firm_id' => $meridianFirm->id,
+                'client_id' => $clientSam->id,
+                'lead_attorney_id' => $margaret->id,
+                'title' => 'State Regulatory Compliance & Consumer Defense',
+                'practice_area' => 'Consumer & regulatory complaints',
+                'stage' => 'Preliminary',
+                'status' => 'open',
+                'billing_type' => 'hourly',
+                'budget' => 120000.00,
+                'opened_at' => '2026-07-17',
+                'closed_at' => null,
+                'docs_count' => 1,
+                'msgs_count' => 0,
+                'updated_at' => '2026-09-07 10:20:00',
+            ],
+            [
+                'case_number' => '2026-0124',
                 'firm_id' => $firm->id,
                 'client_id' => $clientSam->id,
                 'lead_attorney_id' => $margaret->id,
-                'title' => 'Whitaker Technologies Refinancing & Debt Restructuring',
-                'practice_area' => 'Corporate Restructuring',
-                'stage' => 'Pleadings Filed',
-                'status' => 'active',
-                'court_name' => 'Delaware Court of Chancery',
-                'judge_name' => 'Chancellor Kathaleen McCormick',
+                'title' => 'Commercial Property Acquisition & Title Conveyance',
+                'practice_area' => 'Real estate',
+                'stage' => 'Pending Review',
+                'status' => 'pending',
                 'billing_type' => 'flat_fee',
-                'budget' => 220000.00,
-                'opened_at' => now()->subMonth(),
-            ]
-        );
+                'budget' => 95000.00,
+                'opened_at' => '2026-07-03',
+                'closed_at' => null,
+                'docs_count' => 1,
+                'msgs_count' => 2,
+                'updated_at' => '2026-09-10 17:00:00',
+            ],
+            [
+                'case_number' => '2026-0118',
+                'firm_id' => $firm->id,
+                'client_id' => $clientElena->id,
+                'lead_attorney_id' => $daniel->id,
+                'title' => 'Civil Partnership Dissolution & Asset Settlement',
+                'practice_area' => 'Civil litigation',
+                'stage' => 'Pleadings',
+                'status' => 'open',
+                'billing_type' => 'hourly',
+                'budget' => 180000.00,
+                'opened_at' => '2026-06-11',
+                'closed_at' => null,
+                'docs_count' => 9,
+                'msgs_count' => 8,
+                'updated_at' => '2026-09-13 15:10:00',
+            ],
+            [
+                'case_number' => '2026-0102',
+                'firm_id' => $firm->id,
+                'client_id' => $clientKiran->id,
+                'lead_attorney_id' => $daniel->id,
+                'title' => 'Executive Severance Arbitration & Non-Compete',
+                'practice_area' => 'Employment',
+                'stage' => 'Resolved',
+                'status' => 'closed',
+                'billing_type' => 'flat_fee',
+                'budget' => 85000.00,
+                'opened_at' => '2026-02-20',
+                'closed_at' => '2026-08-24',
+                'docs_count' => 0,
+                'msgs_count' => 0,
+                'updated_at' => '2026-08-24 16:00:00',
+            ],
+        ];
+
+        foreach ($mattersData as $m) {
+            $docsCount = $m['docs_count'];
+            $msgsCount = $m['msgs_count'];
+            unset($m['docs_count'], $m['msgs_count']);
+
+            $matterModel = Matter::updateOrCreate(
+                ['case_number' => $m['case_number']],
+                $m
+            );
+
+            // Seed placeholder docs if needed
+            $existingDocs = Document::where('matter_id', $matterModel->id)->count();
+            for ($i = $existingDocs; $i < $docsCount; $i++) {
+                Document::create([
+                    'firm_id' => $matterModel->firm_id,
+                    'matter_id' => $matterModel->id,
+                    'user_id' => $matterModel->lead_attorney_id,
+                    'title' => 'Document '.($i + 1).' - '.$matterModel->case_number,
+                    'filename' => 'document_'.($i + 1).'.pdf',
+                    'file_path' => 'documents/demo_'.$matterModel->id.'_'.$i.'.pdf',
+                    'mime_type' => 'application/pdf',
+                    'file_size' => 1024 * 250,
+                ]);
+            }
+
+            // Seed placeholder messages if needed
+            $existingMsgs = Message::where('matter_id', $matterModel->id)->count();
+            for ($j = $existingMsgs; $j < $msgsCount; $j++) {
+                Message::create([
+                    'firm_id' => $matterModel->firm_id,
+                    'matter_id' => $matterModel->id,
+                    'sender_id' => $matterModel->lead_attorney_id,
+                    'body' => 'Docket Notice '.($j + 1).': Status update regarding matter '.$matterModel->case_number,
+                    'is_privileged' => true,
+                ]);
+            }
+        }
     }
 }

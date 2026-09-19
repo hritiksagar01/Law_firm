@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\FirmManagementController;
+use App\Http\Controllers\Admin\MatterManagementController;
 use App\Http\Controllers\Admin\PlanManagementController;
 use App\Http\Controllers\Admin\SubscriptionManagementController;
 use App\Http\Controllers\Admin\TestManagementController;
@@ -1065,6 +1066,9 @@ Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(funct
     Route::post('/users/{user}/reset-password', [UserManagementController::class, 'sendPasswordReset'])->name('users.reset-password');
     Route::post('/users/{user}/sign-out-everywhere', [UserManagementController::class, 'signOutEverywhere'])->name('users.sign-out-everywhere');
     Route::post('/users/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])->name('users.toggle-status');
+
+    // ── Platform Matters Governance ──────────────────────────
+    Route::get('/matters', [MatterManagementController::class, 'index'])->name('matters.index');
 
     // ── SaaS Subscription Plans ─────────────────────────────
     Route::get('/plans', [PlanManagementController::class, 'index'])->name('plans.index');
