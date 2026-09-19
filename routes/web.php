@@ -25,6 +25,7 @@ use App\Models\Firm;
 use App\Models\Invoice;
 use App\Models\Matter;
 use App\Models\Message;
+use App\Models\Plan;
 use App\Models\Task;
 use App\Models\User;
 use App\Services\LegalPdfGenerator;
@@ -1024,7 +1025,15 @@ Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(funct
         $clientCount = User::where('role', 'client')->count();
         $adminCount = User::where('role', 'superadmin')->count();
         $openMattersCount = Matter::where('status', '!=', 'closed')->count();
-        $totalSeats = max(20, (int) Firm::sum('max_users') ?: 20);
+        $totalSeats = 20;
+        try {
+            $planSeats = (int) Plan::sum('max_users');
+            if ($planSeats > 0) {
+                $totalSeats = max(20, $planSeats);
+            }
+        } catch (Throwable) {
+            $totalSeats = 20;
+        }
         $seatsInUse = $staffCount ?: 7;
 
         return view('admin.dashboard', compact(
