@@ -43,6 +43,7 @@ php artisan event:cache || php artisan event:clear || true
 # Ensure proper ownership and secure permissions
 sudo chown -R ubuntu:www-data "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/database" || true
 sudo chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/database" || true
+sudo chmod -R 777 "$APP_DIR/storage/logs" || true
 
 if [ -f "$APP_DIR/.env" ]; then
     sudo chown ubuntu:www-data "$APP_DIR/.env" || true
