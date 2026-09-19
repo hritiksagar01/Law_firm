@@ -18,6 +18,26 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Verify SSH Secrets
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          SSH_HOST: ${{ secrets.EC2_HOST }}
+          SSH_USER: ${{ secrets.EC2_USERNAME }}
+        run: |
+          if [ -z "$SSH_HOST" ]; then
+            echo "::error::EC2_HOST secret is empty or not accessible on this branch!"
+            exit 1
+          fi
+          if [ -z "$SSH_USER" ]; then
+            echo "::error::EC2_USERNAME secret is empty or not accessible on this branch!"
+            exit 1
+          fi
+          if [ -z "$SSH_KEY" ]; then
+            echo "::error::EC2_SSH_KEY secret is empty or not accessible on this branch!"
+            exit 1
+          fi
+          echo "All SSH secrets are present and non-empty."
+
       - name: Deploy via SSH to EC2
         env:
           SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
