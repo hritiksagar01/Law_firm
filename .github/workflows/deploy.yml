@@ -49,6 +49,11 @@ jobs:
             sudo chown -R ubuntu:ubuntu "$APP_DIR" || true
             git config --global --add safe.directory "$APP_DIR" || true
 
+            echo "=== Discarding any server-local tracked file modifications ==="
+            git checkout -- . || true
+            git reset --hard HEAD || true
+            git clean -fd || true
+
             echo "=== Fetching target branch: $TARGET_BRANCH ==="
             git fetch origin "$TARGET_BRANCH" || git fetch origin
             git checkout -B "$TARGET_BRANCH" "origin/$TARGET_BRANCH" || git checkout -B "$TARGET_BRANCH" FETCH_HEAD
