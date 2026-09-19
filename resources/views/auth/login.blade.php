@@ -36,14 +36,12 @@
 
     <div class="w-full max-w-[440px] flex flex-col items-center my-6">
 
-        <!-- Brand Emblem & Practice Identity -->
+        <!-- Brand Emblem -->
         <div class="flex flex-col items-center text-center mb-6">
-            <div class="p-3 bg-white rounded-xl border border-[#E7E4DC] shadow-[0_4px_20px_-2px_rgba(26,30,28,0.06)] mb-3">
+            <div class="p-3 bg-white rounded-xl border border-[#E7E4DC] shadow-[0_4px_20px_-2px_rgba(26,30,28,0.06)]">
                 <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}"
                     class="h-12 w-auto object-contain" />
             </div>
-            <h1 class="font-headline text-2xl font-medium text-[#1A1E1C] tracking-tight">{{ config('legal.app_name', 'Vennamraj Associates') }}</h1>
-            <p class="text-xs text-[#646864] mt-1 font-sans">Practice Chambers · Litigation Docket · Client Advisory</p>
         </div>
 
         <!-- Flash Notifications -->
