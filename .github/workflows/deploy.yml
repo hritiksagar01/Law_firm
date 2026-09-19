@@ -6,7 +6,7 @@ on:
       - main
       - clean-production
       - quire-layout
-  workflow_dispatch: # Allows manual trigger from GitHub Actions dashboard
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -18,25 +18,29 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Execute Remote SSH Deployment on EC2
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: ${{ secrets.EC2_PORT || 22 }}
-          script_stop: true
-          command_timeout: '10m'
-          script: |
+      - name: Deploy via SSH to EC2
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          SSH_HOST: ${{ secrets.EC2_HOST }}
+          SSH_USER: ${{ secrets.EC2_USERNAME }}
+          SSH_PORT: ${{ secrets.EC2_PORT || 22 }}
+          TARGET_BRANCH: ${{ github.ref_name }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -p $SSH_PORT $SSH_USER@$SSH_HOST "bash -s" << EOF
+            set -ex
             echo "Connected to EC2 server successfully."
             cd /var/www/lawfirm
             git config --global --add safe.directory /var/www/lawfirm || true
 
-            # Fetch all remote refs and switch to active branch cleanly
-            git fetch origin +refs/heads/*:refs/remotes/origin/* --prune
-            git checkout -B ${{ github.ref_name }} origin/${{ github.ref_name }}
-            git reset --hard origin/${{ github.ref_name }}
+            # Pull and switch to target branch
+            git fetch origin
+            git checkout -B $TARGET_BRANCH origin/$TARGET_BRANCH
+            git reset --hard origin/$TARGET_BRANCH
 
-            # Make deploy script executable and run deployment
             chmod +x deploy/deploy.sh
             ./deploy/deploy.sh
+          EOF
