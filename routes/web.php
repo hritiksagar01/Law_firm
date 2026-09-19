@@ -6,8 +6,10 @@ use App\Http\Controllers\Admin\AuditManagementController;
 use App\Http\Controllers\Admin\FirmManagementController;
 use App\Http\Controllers\Admin\MatterManagementController;
 use App\Http\Controllers\Admin\PlanManagementController;
+use App\Http\Controllers\Admin\RolesCategoriesController;
 use App\Http\Controllers\Admin\SignInHistoryController;
 use App\Http\Controllers\Admin\SubscriptionManagementController;
+use App\Http\Controllers\Admin\SystemSettingsController;
 use App\Http\Controllers\Admin\TestManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AppointmentController;
@@ -1106,6 +1108,22 @@ Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(funct
     // ── Platform Sign-in History ─────────────────────────────
     Route::get('/sign-ins', [SignInHistoryController::class, 'index'])->name('sign-ins.index');
     Route::get('/logins', fn () => redirect()->route('admin.sign-ins.index'));
+
+    // ── Roles & Categories Starting Defaults ─────────────────
+    Route::get('/roles', [RolesCategoriesController::class, 'index'])->name('roles.index');
+    Route::post('/roles/permissions', [RolesCategoriesController::class, 'updatePermissions'])->name('roles.permissions');
+    Route::post('/roles/categories', [RolesCategoriesController::class, 'storeCategory'])->name('roles.categories.store');
+    Route::put('/roles/categories/{id}', [RolesCategoriesController::class, 'updateCategory'])->name('roles.categories.update');
+    Route::delete('/roles/categories/{id}', [RolesCategoriesController::class, 'destroyCategory'])->name('roles.categories.destroy');
+    Route::get('/defaults', fn () => redirect()->route('admin.roles.index'));
+    Route::get('/settings/roles', fn () => redirect()->route('admin.roles.index'));
+
+    // ── Platform System Settings ─────────────────────────────
+    Route::get('/system', [SystemSettingsController::class, 'index'])->name('system.index');
+    Route::post('/system', [SystemSettingsController::class, 'update'])->name('system.update');
+    Route::get('/settings/system', fn () => redirect()->route('admin.system.index'));
+    Route::get('/settings', fn () => redirect()->route('admin.system.index'));
+    Route::post('/settings/system', [SystemSettingsController::class, 'update']);
 
     // ── Automated Test Management ───────────────────────────
     Route::get('/tests', [TestManagementController::class, 'index'])->name('tests.index');

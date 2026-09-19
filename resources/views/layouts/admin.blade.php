@@ -100,16 +100,16 @@
                 </a>
 
                 <!-- Roles & categories -->
-                <a href="{{ route('admin.plans.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors text-[#9ca3af] hover:text-white hover:bg-white/[.05]">
-                    <span class="material-symbols-outlined text-[19px] text-[#9ca3af]">tune</span>
+                <a href="{{ route('admin.roles.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('admin.roles.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('admin.roles.*') ? 'text-white' : 'text-[#9ca3af]' }}">tune</span>
                     <span>Roles &amp; categories</span>
                 </a>
 
                 <!-- System settings -->
-                <a href="{{ route('admin.profile.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('admin.profile.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
-                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('admin.profile.*') ? 'text-white' : 'text-[#9ca3af]' }}">settings</span>
+                <a href="{{ route('admin.system.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('admin.system.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('admin.system.*') ? 'text-white' : 'text-[#9ca3af]' }}">settings</span>
                     <span>System settings</span>
                 </a>
             </nav>

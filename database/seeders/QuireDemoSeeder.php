@@ -4,11 +4,15 @@ namespace Database\Seeders;
 
 use App\Models\AuditLog;
 use App\Models\Client;
+use App\Models\DefaultDocumentCategory;
 use App\Models\DeliveryLog;
 use App\Models\Document;
 use App\Models\Firm;
 use App\Models\Matter;
 use App\Models\Message;
+use App\Models\Permission;
+use App\Models\PlatformSetting;
+use App\Models\Role;
 use App\Models\SignInHistory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -406,6 +410,102 @@ class QuireDemoSeeder extends Seeder
             foreach ($signIns as $s) {
                 SignInHistory::create($s);
             }
+        }
+
+        // 10. Default Document Categories
+        if (DefaultDocumentCategory::count() === 0) {
+            $categories = [
+                ['sort_order' => 0, 'name' => 'Engagement', 'description' => 'Engagement letters, fee agreements, conflict waivers'],
+                ['sort_order' => 1, 'name' => 'Pleadings', 'description' => 'Complaints, answers, motions and briefs'],
+                ['sort_order' => 2, 'name' => 'Court orders', 'description' => 'Orders, judgments and notices from the court'],
+                ['sort_order' => 3, 'name' => 'Correspondence', 'description' => 'Letters to and from opposing counsel and third parties'],
+                ['sort_order' => 4, 'name' => 'Work product', 'description' => 'Internal memos, research and strategy — never share with clients'],
+                ['sort_order' => 5, 'name' => 'Discovery', 'description' => 'Requests, responses, deposition transcripts'],
+                ['sort_order' => 6, 'name' => 'Evidence & exhibits', 'description' => 'Photos, records and exhibits'],
+                ['sort_order' => 7, 'name' => 'Contracts', 'description' => 'Agreements, leases, amendments'],
+                ['sort_order' => 8, 'name' => 'Client records', 'description' => 'Identification, financial and medical records from the client'],
+                ['sort_order' => 9, 'name' => 'Billing', 'description' => 'Statements and receipts'],
+            ];
+            foreach ($categories as $cat) {
+                DefaultDocumentCategory::create($cat);
+            }
+        }
+
+        // 11. Platform Settings
+        PlatformSetting::set('platform_name', 'Quire');
+        PlatformSetting::set('support_email', 'support@quire.example');
+        PlatformSetting::set('idle_timeout', 12);
+        if (PlatformSetting::get('maintenance_notice') === null) {
+            PlatformSetting::set('maintenance_notice', '');
+        }
+
+        // 12. Quire Standard Permissions Matrix
+        $quirePermissions = [
+            // Matters
+            ['module' => 'Matters', 'name' => 'See every matter, not only assigned ones', 'slug' => 'matters.view_all', 'attorney' => false, 'paralegal' => false],
+            ['module' => 'Matters', 'name' => 'Open new matters', 'slug' => 'matters.create', 'attorney' => true, 'paralegal' => false],
+            ['module' => 'Matters', 'name' => 'Edit matter details, team and status', 'slug' => 'matters.edit', 'attorney' => true, 'paralegal' => false],
+            // Clients
+            ['module' => 'Clients', 'name' => 'View client records', 'slug' => 'clients.view', 'attorney' => true, 'paralegal' => true],
+            ['module' => 'Clients', 'name' => 'Create and edit clients', 'slug' => 'clients.manage', 'attorney' => true, 'paralegal' => false],
+            ['module' => 'Clients', 'name' => 'Invite clients to the portal', 'slug' => 'clients.invite', 'attorney' => true, 'paralegal' => false],
+            // Documents
+            ['module' => 'Documents', 'name' => 'Upload documents and new versions', 'slug' => 'documents.upload', 'attorney' => true, 'paralegal' => true],
+            ['module' => 'Documents', 'name' => 'Share documents with clients', 'slug' => 'documents.share', 'attorney' => true, 'paralegal' => false],
+            ['module' => 'Documents', 'name' => 'Restrict documents to named people', 'slug' => 'documents.restrict', 'attorney' => true, 'paralegal' => false],
+            ['module' => 'Documents', 'name' => 'Archive documents', 'slug' => 'documents.archive', 'attorney' => true, 'paralegal' => false],
+            ['module' => 'Documents', 'name' => 'Request and review client documents', 'slug' => 'requests.manage', 'attorney' => true, 'paralegal' => true],
+            // Communication
+            ['module' => 'Communication', 'name' => 'Message clients', 'slug' => 'messages.client', 'attorney' => true, 'paralegal' => true],
+            ['module' => 'Communication', 'name' => 'Internal team threads', 'slug' => 'messages.internal', 'attorney' => true, 'paralegal' => true],
+            ['module' => 'Communication', 'name' => 'Write internal notes', 'slug' => 'notes.manage', 'attorney' => true, 'paralegal' => true],
+            ['module' => 'Communication', 'name' => 'Post case updates to clients', 'slug' => 'updates.post', 'attorney' => true, 'paralegal' => false],
+            // Work
+            ['module' => 'Work', 'name' => 'Create and assign tasks and dates', 'slug' => 'tasks.manage', 'attorney' => true, 'paralegal' => true],
+            ['module' => 'Work', 'name' => 'Build forms and send them to clients', 'slug' => 'forms.manage', 'attorney' => true, 'paralegal' => false],
+            // Billing
+            ['module' => 'Billing', 'name' => 'Record time', 'slug' => 'time.log', 'attorney' => true, 'paralegal' => true],
+            ['module' => 'Billing', 'name' => 'View invoices and payments', 'slug' => 'billing.view', 'attorney' => true, 'paralegal' => true],
+            ['module' => 'Billing', 'name' => 'Create, send and void invoices; record payments', 'slug' => 'billing.manage', 'attorney' => true, 'paralegal' => false],
+            ['module' => 'Billing', 'name' => 'Issue refunds', 'slug' => 'payments.refund', 'attorney' => false, 'paralegal' => false],
+            // Administration
+            ['module' => 'Administration', 'name' => 'Read the firm audit log', 'slug' => 'audit.view', 'attorney' => false, 'paralegal' => false],
+            ['module' => 'Administration', 'name' => 'Invite staff and change roles', 'slug' => 'team.manage', 'attorney' => false, 'paralegal' => false],
+            ['module' => 'Administration', 'name' => 'Firm settings, categories, payments, notifications', 'slug' => 'settings.manage', 'attorney' => false, 'paralegal' => false],
+        ];
+
+        $attorneyPermIds = [];
+        $paralegalPermIds = [];
+        $adminPermIds = [];
+
+        foreach ($quirePermissions as $qp) {
+            $perm = Permission::updateOrCreate(
+                ['slug' => $qp['slug']],
+                ['name' => $qp['name'], 'module' => $qp['module']]
+            );
+            $adminPermIds[] = $perm->id;
+            if ($qp['attorney']) {
+                $attorneyPermIds[] = $perm->id;
+            }
+            if ($qp['paralegal']) {
+                $paralegalPermIds[] = $perm->id;
+            }
+        }
+
+        // Attach default permissions to system roles if present
+        $adminRole = Role::where('slug', 'admin')->whereNull('firm_id')->first();
+        if ($adminRole) {
+            $adminRole->permissions()->sync($adminPermIds);
+        }
+
+        $lawyerRole = Role::whereIn('slug', ['lawyer', 'attorney'])->whereNull('firm_id')->first();
+        if ($lawyerRole) {
+            $lawyerRole->permissions()->sync($attorneyPermIds);
+        }
+
+        $paralegalRole = Role::where('slug', 'paralegal')->whereNull('firm_id')->first();
+        if ($paralegalRole) {
+            $paralegalRole->permissions()->sync($paralegalPermIds);
         }
     }
 }
