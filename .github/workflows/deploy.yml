@@ -18,61 +18,25 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Verify SSH Secrets
-        env:
-          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-          SSH_HOST: ${{ secrets.EC2_HOST }}
-          SSH_USER: ${{ secrets.EC2_USERNAME }}
-        run: |
-          if [ -z "$SSH_HOST" ]; then
-            echo "::error::EC2_HOST secret is empty or not accessible on this branch!"
-            exit 1
-          fi
-          if [ -z "$SSH_USER" ]; then
-            echo "::error::EC2_USERNAME secret is empty or not accessible on this branch!"
-            exit 1
-          fi
-          if [ -z "$SSH_KEY" ]; then
-            echo "::error::EC2_SSH_KEY secret is empty or not accessible on this branch!"
-            exit 1
-          fi
-          echo "All SSH secrets are present and non-empty."
-
-      - name: Deploy via SSH to EC2
-        env:
-          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-          SSH_HOST: ${{ secrets.EC2_HOST }}
-          SSH_USER: ${{ secrets.EC2_USERNAME }}
-          SSH_PORT: ${{ secrets.EC2_PORT || 22 }}
-        run: |
-          mkdir -p ~/.ssh
-          printf "%s\n" "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-          echo "" >> ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-          echo "Testing SSH connection to $SSH_USER@$SSH_HOST:$SSH_PORT..."
-          SSH_EXIT=0
-          ssh -v -o StrictHostKeyChecking=no -o ConnectTimeout=15 -p $SSH_PORT $SSH_USER@$SSH_HOST "echo 'SSH_OK' && hostname" > /tmp/ssh_test.log 2>&1 || SSH_EXIT=$?
-
-          if [ $SSH_EXIT -ne 0 ]; then
-            cat /tmp/ssh_test.log
-            ERR_SNIPPET=$(tail -n 8 /tmp/ssh_test.log | tr '\n' ' ' | tr -d '"')
-            echo "::error::SSH connection error ($SSH_EXIT): $ERR_SNIPPET"
-            exit $SSH_EXIT
-          fi
-          echo "SSH test succeeded!"
-
-          echo "Running remote deployment script..."
-          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -p $SSH_PORT $SSH_USER@$SSH_HOST "bash -s" << 'EOF'
-            set -ex
-            export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+      - name: Execute Remote SSH Deployment on EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_PORT || 22 }}
+          script_stop: true
+          command_timeout: '10m'
+          script: |
+            echo "Connected to EC2 server successfully."
             cd /var/www/lawfirm
             git config --global --add safe.directory /var/www/lawfirm || true
 
-            git fetch origin quire-layout
-            git checkout -B quire-layout FETCH_HEAD
+            echo "=== Fetching target commit from origin ==="
+            git fetch origin ${{ github.ref_name }}
+            git checkout -B ${{ github.ref_name }} FETCH_HEAD
             git reset --hard FETCH_HEAD
 
+            echo "=== Running deploy script ==="
             chmod +x deploy/deploy.sh
             bash deploy/deploy.sh
-          EOF
