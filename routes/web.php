@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\FirmManagementController;
 use App\Http\Controllers\Admin\PlanManagementController;
 use App\Http\Controllers\Admin\SubscriptionManagementController;
 use App\Http\Controllers\Admin\TestManagementController;
+use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BillingController;
@@ -1055,7 +1056,15 @@ Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(funct
     Route::post('/firms/{firm}/toggle-status', [FirmManagementController::class, 'toggleStatus'])->name('firms.toggle-status');
     Route::post('/firms/{firm}/change-password', [FirmManagementController::class, 'changePassword'])->name('firms.change-password');
     Route::post('/firms/{firm}/change-subscription', [FirmManagementController::class, 'changeSubscription'])->name('firms.change-subscription');
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+
+    // ── Platform User Management ─────────────────────────────
+    Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
+    Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}', [UserManagementController::class, 'show'])->name('users.show');
+    Route::post('/users/{user}/role', [UserManagementController::class, 'updateRole'])->name('users.update-role');
+    Route::post('/users/{user}/reset-password', [UserManagementController::class, 'sendPasswordReset'])->name('users.reset-password');
+    Route::post('/users/{user}/sign-out-everywhere', [UserManagementController::class, 'signOutEverywhere'])->name('users.sign-out-everywhere');
+    Route::post('/users/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])->name('users.toggle-status');
 
     // ── SaaS Subscription Plans ─────────────────────────────
     Route::get('/plans', [PlanManagementController::class, 'index'])->name('plans.index');
