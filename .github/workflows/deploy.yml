@@ -46,22 +46,24 @@ jobs:
           SSH_PORT: ${{ secrets.EC2_PORT || 22 }}
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          printf "%s\n" "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          echo "" >> ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -p $SSH_PORT $SSH_USER@$SSH_HOST << 'REMOTE_SCRIPT'
-            export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+          echo "Testing SSH connection to $SSH_USER@$SSH_HOST:$SSH_PORT..."
+          ssh -v -o StrictHostKeyChecking=no -o ConnectTimeout=15 -p $SSH_PORT $SSH_USER@$SSH_HOST "echo 'SSH connection verified on host:' && hostname"
+
+          echo "Running remote deployment script..."
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -p $SSH_PORT $SSH_USER@$SSH_HOST "bash -s" << 'EOF'
             set -ex
-            echo "Connected to EC2 server successfully."
+            export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
             cd /var/www/lawfirm
             git config --global --add safe.directory /var/www/lawfirm || true
 
-            echo "=== Fetching target branch ==="
-            git fetch origin ${{ github.ref_name }}
-            git checkout -B ${{ github.ref_name }} FETCH_HEAD
+            git fetch origin quire-layout
+            git checkout -B quire-layout FETCH_HEAD
             git reset --hard FETCH_HEAD
 
-            echo "=== Executing deployment script ==="
             chmod +x deploy/deploy.sh
             bash deploy/deploy.sh
-          REMOTE_SCRIPT
+          EOF
