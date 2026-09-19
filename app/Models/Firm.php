@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Firm extends Model
 {
@@ -15,6 +17,7 @@ class Firm extends Model
     protected $casts = [
         'practice_areas' => 'array',
         'default_hourly_rate' => 'decimal:2',
+        'allow_client_signup' => 'boolean',
     ];
 
     public function isActive(): bool
@@ -72,7 +75,7 @@ class Firm extends Model
         return $this->hasMany(Subscription::class);
     }
 
-    public function currentSubscription(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function currentSubscription(): HasOne
     {
         return $this->hasOne(Subscription::class)->latestOfMany();
     }
@@ -96,11 +99,12 @@ class Firm extends Model
      * Derive "Valid Upto" from the firm's latest active subscription.
      * Returns Carbon date or null if no subscription exists.
      */
-    public function getValidUptoAttribute(): ?\Carbon\Carbon
+    public function getValidUptoAttribute(): ?Carbon
     {
         $sub = $this->relationLoaded('currentSubscription')
             ? $this->currentSubscription
             : $this->currentSubscription()->first();
+
         return $sub?->ends_at;
     }
 
@@ -115,9 +119,8 @@ class Firm extends Model
     /**
      * Get the firm's primary admin user (first partner user).
      */
-    public function primaryAdmin(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function primaryAdmin(): HasOne
     {
         return $this->hasOne(User::class)->where('role', 'partner')->oldestOfMany();
     }
 }
-

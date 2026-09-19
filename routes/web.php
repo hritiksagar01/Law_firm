@@ -1055,6 +1055,7 @@ Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(funct
     Route::post('/firms/{firm}/toggle-status', [FirmManagementController::class, 'toggleStatus'])->name('firms.toggle-status');
     Route::post('/firms/{firm}/change-password', [FirmManagementController::class, 'changePassword'])->name('firms.change-password');
     Route::post('/firms/{firm}/change-subscription', [FirmManagementController::class, 'changeSubscription'])->name('firms.change-subscription');
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
 
     // ── SaaS Subscription Plans ─────────────────────────────
     Route::get('/plans', [PlanManagementController::class, 'index'])->name('plans.index');
