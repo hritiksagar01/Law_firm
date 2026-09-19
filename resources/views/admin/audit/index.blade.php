@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 
-@section('title', 'Audit log — Quire Legal Multi-Tenant Cloud')
+@section('title', 'Audit log — Platform Console')
 
 @section('content')
 <div class="space-y-6">
 
-    <!-- Page Header (Exact Quire styling with Export CSV) -->
+    <!-- Page Header with Export CSV -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
             <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Audit log</h1>

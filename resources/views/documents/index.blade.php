@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">Document &amp; Evidence Vault — Quire Legal</x-slot>
+    <x-slot name="title">Document &amp; Evidence Vault — {{ config('legal.app_name', 'Vennamraj Associates') }}</x-slot>
 
     <div x-data="{
         openUploadModal: {{ ($errors->any() || session('error')) ? 'true' : 'false' }},

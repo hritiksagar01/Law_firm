@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Email & SMS — Quire Legal Multi-Tenant Cloud')
+@section('title', 'Email & SMS — Platform Console')
 
 @section('content')
 <div class="space-y-6">
@@ -23,7 +23,7 @@
     </div>
     @endif
 
-    <!-- Page Header (Exact Quire styling) -->
+    <!-- Page Header -->
     <div>
         <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Email &amp; SMS</h1>
         <p class="text-xs text-[#5e625e] mt-1 font-sans">
@@ -94,7 +94,7 @@
                     <div class="border-b border-[#f0eee8] pb-2.5">
                         <div class="flex items-center justify-between">
                             <span class="font-medium text-[#1b1c18]">From address</span>
-                            <span class="font-mono text-[11px] text-[#414844] truncate max-w-[150px]">Quire &lt;notices@quire.example&gt;</span>
+                            <span class="font-mono text-[11px] text-[#414844] truncate max-w-[150px]">{{ config('mail.from.name', 'Platform') }} &lt;{{ config('mail.from.address', 'notices@sharmalegal.in') }}&gt;</span>
                         </div>
                         <span class="font-mono text-[11px] text-[#717974] block mt-0.5">EMAIL_FROM</span>
                     </div>
@@ -341,12 +341,12 @@
 
                     <div>
                         <label class="block text-xs font-medium text-[#5e625e] mb-1">From Address</label>
-                        <input type="email" name="mail_from_address" value="{{ $mailConfig['from_address'] ?? 'notices@quire.example' }}" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs">
+                        <input type="email" name="mail_from_address" value="{{ $mailConfig['from_address'] ?? config('mail.from.address', 'notices@sharmalegal.in') }}" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs">
                     </div>
 
                     <div>
                         <label class="block text-xs font-medium text-[#5e625e] mb-1">From Name</label>
-                        <input type="text" name="mail_from_name" value="{{ $mailConfig['from_name'] ?? 'Quire Legal' }}" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs">
+                        <input type="text" name="mail_from_name" value="{{ $mailConfig['from_name'] ?? config('legal.app_name', 'Vennamraj Associates') }}" class="w-full h-8 px-2.5 rounded border border-[#c1c8c3] text-xs">
                     </div>
                 </div>
 

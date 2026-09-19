@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
-    <title>@yield('title', 'Platform Governance Console') — Quire Legal Multi-Tenant Cloud</title>
+    <title>@yield('title', 'Platform Governance Console') — Multi-Tenant Legal Cloud</title>
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}"/>
     
     <!-- Google Fonts: Newsreader & Inter -->
@@ -17,7 +17,7 @@
     @livewireStyles
     <style>[x-cloak] { display: none !important; }</style>
 </head>
-<body class="bg-canvas-ivory font-body-md text-body-md text-text-primary antialiased min-h-screen"
+<body class="bg-[#fbf9f5] font-sans text-[#1b1c18] antialiased min-h-screen"
       x-data="{ 
           sidebarOpen: false, 
           userMenuOpen: false, 
@@ -29,19 +29,22 @@
     <div x-show="sidebarOpen" 
          x-cloak
          @click="sidebarOpen = false" 
-         class="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs lg:hidden transition-opacity">
+         class="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs lg:hidden transition-opacity">
     </div>
 
-    <!-- Left Sidebar Shell (Quire Platform Administration #161718) -->
+    <!-- Left Sidebar Shell (Platform Administration #161718) -->
     <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
            class="fixed left-0 top-0 h-screen w-64 bg-[#161718] text-[#d1d5db] z-50 flex flex-col justify-between border-r border-[#26282a] select-none transition-transform duration-300 ease-in-out">
         
         <div class="flex flex-col flex-1 overflow-y-auto">
             <!-- Brand & Platform Header -->
             <div class="px-6 py-5 border-b border-white/[.08] flex items-center justify-between">
-                <a href="{{ route('admin.dashboard') }}" class="block">
-                    <span class="font-serif text-[22px] tracking-tight text-white font-normal block leading-tight">Quire</span>
-                    <span class="text-[12px] text-[#8e8e8e] block mt-0.5 font-sans">Platform administration</span>
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
+                    <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-10 w-auto object-contain rounded"/>
+                    <div class="flex flex-col min-w-0">
+                        <span class="text-[13.5px] font-semibold text-white tracking-wide block leading-tight">Super Admin</span>
+                        <span class="text-[11px] text-[#8e8e8e] block mt-0.5 font-sans">Platform Console</span>
+                    </div>
                 </a>
                 <button @click="sidebarOpen = false" class="lg:hidden p-1.5 text-[#8e8e8e] hover:text-white rounded">
                     <span class="material-symbols-outlined text-xl">close</span>
@@ -120,7 +123,7 @@
             @php
                 $currentUser = Auth::user();
                 $displayName = $currentUser?->name ?? 'Rowan Blake';
-                $userEmail = $currentUser?->email ?? 'admin@quire.example';
+                $userEmail = $currentUser?->email ?? 'admin@sharmalegal.in';
                 $initials = 'RB';
                 if ($displayName) {
                     $parts = explode(' ', trim($displayName));
@@ -157,7 +160,10 @@
         
         <!-- Mobile Top Navigation Header -->
         <div class="lg:hidden h-14 bg-[#161718] border-b border-white/[.08] px-4 flex items-center justify-between sticky top-0 z-30">
-            <a href="{{ route('admin.dashboard') }}" class="font-serif text-[19px] text-white font-normal">Quire</a>
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5">
+                <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-8 w-auto object-contain rounded"/>
+                <span class="text-[13.5px] font-medium text-white">Super Admin</span>
+            </a>
             <button @click="sidebarOpen = true" class="p-2 text-white">
                 <span class="material-symbols-outlined text-2xl">menu</span>
             </button>
@@ -195,7 +201,7 @@
          x-cloak
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
         <div @click.outside="changePasswordModal = false"
-             class="bg-surface-card border border-border-hairline rounded-lg max-w-md w-full p-6 shadow-quire">
+             class="bg-surface-card border border-border-hairline rounded-lg max-w-md w-full p-6 shadow-xl">
             <div class="flex items-center justify-between pb-4 border-b border-border-hairline">
                 <h3 class="font-serif text-lg font-medium text-text-primary">Update Security Credentials</h3>
                 <button @click="changePasswordModal = false" class="text-text-muted hover:text-text-primary">
@@ -229,7 +235,7 @@
          x-cloak
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
         <div @click.outside="changeAvatarModal = false"
-             class="bg-surface-card border border-border-hairline rounded-lg max-w-md w-full p-6 shadow-quire">
+             class="bg-surface-card border border-border-hairline rounded-lg max-w-md w-full p-6 shadow-xl">
             <div class="flex items-center justify-between pb-4 border-b border-border-hairline">
                 <h3 class="font-serif text-lg font-medium text-text-primary">Update Avatar Portrait</h3>
                 <button @click="changeAvatarModal = false" class="text-text-muted hover:text-text-primary">

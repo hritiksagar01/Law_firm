@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Subscription Plans — Quire Legal Multi-Tenant Cloud')
+@section('title', 'Subscription Plans — Platform Console')
 
 @section('content')
 <div class="space-y-6" x-data="{ 

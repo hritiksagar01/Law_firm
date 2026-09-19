@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Recover Vault Password — Quire Legal</title>
+    <title>Recover Vault Password — {{ config('legal.app_name', 'Vennamraj Associates') }}</title>
 
     <!-- Industry Standard Readable Typography: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>

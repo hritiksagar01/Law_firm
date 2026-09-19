@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">Chambers Calendar &amp; Court Docket — Quire Legal</x-slot>
+    <x-slot name="title">Chambers Calendar &amp; Court Docket — {{ config('legal.app_name', 'Vennamraj Associates') }}</x-slot>
 
     @php
         $upcomingDeadline = $events->firstWhere('is_statutory_deadline', true) ?? $events->first();

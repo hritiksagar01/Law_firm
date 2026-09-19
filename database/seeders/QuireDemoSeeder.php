@@ -373,7 +373,7 @@ class QuireDemoSeeder extends Seeder
         // 8. Audit Logs
         if (AuditLog::count() === 0) {
             $audits = [
-                ['action' => 'auth.login', 'action_label' => 'Signed in', 'actor_name' => 'Rowan Blake', 'actor_email' => 'admin@quire.example', 'firm_id' => null, 'record_type' => 'User account', 'ip_address' => '49.43.114.131', 'created_at' => '2026-09-19 17:38:00'],
+                ['action' => 'auth.login', 'action_label' => 'Signed in', 'actor_name' => 'Rowan Blake', 'actor_email' => 'admin@sharmalegal.in', 'firm_id' => null, 'record_type' => 'User account', 'ip_address' => '49.43.114.131', 'created_at' => '2026-09-19 17:38:00'],
                 ['action' => 'auth.login', 'action_label' => 'Signed in', 'actor_name' => 'Margaret Hartwell', 'actor_email' => 'mhartwell@hartwellokafor.example', 'firm_id' => $firm->id, 'record_type' => 'User account', 'ip_address' => '122.161.172.219', 'created_at' => '2026-09-19 13:25:00'],
                 ['action' => 'document.downloaded', 'action_label' => 'Downloaded document', 'actor_name' => 'Client portal user', 'actor_email' => 'elena.marsh@marshholdings.com', 'firm_id' => $firm->id, 'record_type' => 'Document · matter 2026-0118', 'ip_address' => '144.6.61.46', 'created_at' => '2026-09-13 07:03:00'],
                 ['action' => 'document.viewed', 'action_label' => 'Previewed document', 'actor_name' => 'Margaret Hartwell', 'actor_email' => 'mhartwell@hartwellokafor.example', 'firm_id' => $firm->id, 'record_type' => 'Document · matter 2026-0118', 'ip_address' => '144.6.61.46', 'created_at' => '2026-09-13 07:03:00'],
@@ -396,9 +396,9 @@ class QuireDemoSeeder extends Seeder
         // 9. Sign-in History
         if (SignInHistory::count() === 0) {
             $signIns = [
-                ['email' => 'admin@quire.example', 'is_client' => false, 'result' => 'signed_in', 'failure_reason' => null, 'ip_address' => '49.43.114.131', 'device' => 'Chrome on Windows', 'firm_id' => null, 'created_at' => '2026-09-19 17:38:00'],
+                ['email' => 'admin@sharmalegal.in', 'is_client' => false, 'result' => 'signed_in', 'failure_reason' => null, 'ip_address' => '49.43.114.131', 'device' => 'Chrome on Windows', 'firm_id' => null, 'created_at' => '2026-09-19 17:38:00'],
                 ['email' => 'mhartwell@hartwellokafor.example', 'is_client' => false, 'result' => 'signed_in', 'failure_reason' => null, 'ip_address' => '122.161.172.219', 'device' => 'Chrome on Windows', 'firm_id' => $firm->id, 'created_at' => '2026-09-19 13:25:00'],
-                ['email' => 'admin@quire.example', 'is_client' => false, 'result' => 'signed_in', 'failure_reason' => null, 'ip_address' => '106.216.80.207', 'device' => 'Chrome on macOS', 'firm_id' => null, 'created_at' => '2026-09-14 05:27:00'],
+                ['email' => 'admin@sharmalegal.in', 'is_client' => false, 'result' => 'signed_in', 'failure_reason' => null, 'ip_address' => '106.216.80.207', 'device' => 'Chrome on macOS', 'firm_id' => null, 'created_at' => '2026-09-14 05:27:00'],
                 ['email' => 'e•••@example.com', 'is_client' => true, 'result' => 'signed_in', 'failure_reason' => null, 'ip_address' => '49.43.114.131', 'device' => 'Chrome on Windows', 'firm_id' => $firm->id, 'created_at' => '2026-09-13 20:11:00'],
                 ['email' => 'abc@gmail.com', 'is_client' => false, 'result' => 'failed', 'failure_reason' => 'No such account', 'ip_address' => '49.43.114.131', 'device' => 'Chrome on Windows', 'firm_id' => null, 'created_at' => '2026-09-13 16:05:00'],
                 ['email' => 'mhartwell@hartwellokafor.example', 'is_client' => false, 'result' => 'signed_in', 'failure_reason' => null, 'ip_address' => '157.50.101.205', 'device' => 'Safari on iOS', 'firm_id' => $firm->id, 'created_at' => '2026-09-13 15:45:00'],
@@ -432,8 +432,8 @@ class QuireDemoSeeder extends Seeder
         }
 
         // 11. Platform Settings
-        PlatformSetting::set('platform_name', 'Quire');
-        PlatformSetting::set('support_email', 'support@quire.example');
+        PlatformSetting::set('platform_name', config('legal.app_name', 'Vennamraj Associates'));
+        PlatformSetting::set('support_email', 'contact@vennamraj.com');
         PlatformSetting::set('idle_timeout', 12);
         if (PlatformSetting::get('maintenance_notice') === null) {
             PlatformSetting::set('maintenance_notice', '');

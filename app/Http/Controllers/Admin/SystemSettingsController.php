@@ -16,8 +16,8 @@ class SystemSettingsController extends Controller
     public function index(): View
     {
         $settings = [
-            'platform_name' => PlatformSetting::get('platform_name', config('app.name', 'Quire')),
-            'support_email' => PlatformSetting::get('support_email', 'support@quire.example'),
+            'platform_name' => PlatformSetting::get('platform_name', config('legal.app_name', 'Vennamraj Associates')),
+            'support_email' => PlatformSetting::get('support_email', 'contact@vennamraj.com'),
             'maintenance_notice' => PlatformSetting::get('maintenance_notice', ''),
             'idle_timeout' => (int) PlatformSetting::get('idle_timeout', 12),
         ];

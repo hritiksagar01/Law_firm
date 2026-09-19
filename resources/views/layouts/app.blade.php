@@ -19,7 +19,7 @@
 <body class="bg-canvas-ivory font-body-md text-body-md text-text-primary antialiased flex min-h-screen">
 <style>[x-cloak] { display: none !important; }</style>
     
-    <!-- LEFT PERSISTENT SIDEBAR (#121513 dark Quire sidebar) -->
+    <!-- LEFT PERSISTENT SIDEBAR (#121513 dark sidebar) -->
     <aside class="w-64 bg-sidebar-bg text-[#e0e3de] flex flex-col justify-between shrink-0 border-r border-sidebar-border fixed top-0 bottom-0 left-0 z-40 select-none">
         <div class="flex flex-col">
             <!-- Chambers Brand Header -->
@@ -29,7 +29,7 @@
                         {{ auth()->user()->firm->name ?? config('legal.app_name', 'Sharma Legal Chambers') }}
                     </span>
                     <span class="font-caption text-[11px] text-sidebar-text-muted uppercase tracking-wider mt-0.5">
-                        Quire Legal Workspace
+                        Legal Practice Workspace
                     </span>
                 </div>
                 <button class="text-sidebar-text-muted hover:text-white transition-colors" title="Workspace active" type="button">

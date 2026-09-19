@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', $firm->name . ' — Firms & plans — Quire Legal')
+@section('title', $firm->name . ' — Firms & plans — Platform Console')
 
 @section('content')
 <div class="space-y-6" x-data="{ 

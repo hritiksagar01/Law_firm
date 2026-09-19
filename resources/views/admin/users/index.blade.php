@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Users — Quire Legal Multi-Tenant Cloud')
+@section('title', 'Users — Platform Console')
 
 @section('content')
 <div class="space-y-6">
@@ -23,7 +23,7 @@
     </div>
     @endif
 
-    <!-- Page Header (Exact Quire styling) -->
+    <!-- Page Header -->
     <div>
         <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Users</h1>
         <p class="text-xs text-[#5e625e] mt-1 font-sans">

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">Global Chambers Search — Quire Legal</x-slot>
+    <x-slot name="title">Global Chambers Search — {{ config('legal.app_name', 'Vennamraj Associates') }}</x-slot>
 
     <!-- Header -->
     <div class="pb-6 border-b border-[#EFECE6] mb-6">

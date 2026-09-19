@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Firms & plans — Quire Legal Multi-Tenant Cloud')
+@section('title', 'Firms & plans — Platform Console')
 
 @section('content')
 <div class="space-y-6">
@@ -23,7 +23,7 @@
     </div>
     @endif
 
-    <!-- Page Header (Exact Quire styling) -->
+    <!-- Page Header -->
     <div>
         <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Firms &amp; plans</h1>
         <p class="text-xs text-[#5e625e] mt-1 font-sans">
@@ -124,7 +124,7 @@
         </div>
     </div>
 
-    <!-- Add a firm Section (Exact Quire form layout) -->
+    <!-- Add a firm Section -->
     <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
         <h2 class="text-sm font-semibold text-[#1b1c18]">Add a firm</h2>
         <p class="text-xs text-[#5e625e] mt-1 mb-5">

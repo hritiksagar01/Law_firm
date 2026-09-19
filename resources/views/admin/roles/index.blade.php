@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Roles & categories — Quire')
+@section('title', 'Roles & categories — Platform Console')
 
 @section('content')
 <div class="py-4">

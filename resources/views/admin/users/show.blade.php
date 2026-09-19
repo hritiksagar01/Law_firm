@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', $user->name . ' — Users — Quire Legal')
+@section('title', $user->name . ' — Users — Platform Console')
 
 @section('content')
 <div class="space-y-6">
