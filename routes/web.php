@@ -1,23 +1,40 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\AdminSettingsController;
+use App\Http\Controllers\Admin\FirmManagementController;
+use App\Http\Controllers\Admin\PlanManagementController;
+use App\Http\Controllers\Admin\SubscriptionManagementController;
+use App\Http\Controllers\Admin\TestManagementController;
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BillingController;
+use App\Http\Controllers\OpinionController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserGroupController;
 use App\Mail\DocumentRequestedMail;
+use App\Models\Appointment;
 use App\Models\Client;
 use App\Models\Document;
 use App\Models\DocumentRequest;
 use App\Models\Event;
+use App\Models\Firm;
 use App\Models\Invoice;
 use App\Models\Matter;
 use App\Models\Message;
 use App\Models\Task;
-use App\Models\TimeEntry;
 use App\Models\User;
+use App\Services\LegalPdfGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,29 +67,30 @@ Route::middleware('auth')->group(function () {
         if (Auth::user()->isClient()) {
             return redirect()->route('portal.dashboard');
         }
+
         return redirect()->route('dashboard');
     });
 
     // User Profile & Password Security (Available to all authenticated personnel and clients)
-    Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
-    Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
-    Route::put('/profile/password', [\App\Http\Controllers\ProfileController::class, 'changePassword'])->name('profile.password');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.password');
 
     // Firm Workspace Routes (Strictly for Advocates & Staff)
     Route::middleware(['firm.staff'])->group(function () {
 
         // Personnel & Practice Groups Administration
-        Route::resource('users', \App\Http\Controllers\UserController::class);
-        Route::post('/users/{user}/toggle-status', [\App\Http\Controllers\UserController::class, 'toggleStatus'])->name('users.toggle-status');
-        Route::resource('user-groups', \App\Http\Controllers\UserGroupController::class);
+        Route::resource('users', UserController::class);
+        Route::post('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+        Route::resource('user-groups', UserGroupController::class);
 
         // Legal Opinions & Strategy Advisory
-        Route::resource('opinions', \App\Http\Controllers\OpinionController::class);
-        Route::post('/opinions/{opinion}/change-status', [\App\Http\Controllers\OpinionController::class, 'changeStatus'])->name('opinions.change-status');
+        Route::resource('opinions', OpinionController::class);
+        Route::post('/opinions/{opinion}/change-status', [OpinionController::class, 'changeStatus'])->name('opinions.change-status');
 
         // Appointments, Consultations & Court Hearings
-        Route::resource('appointments', \App\Http\Controllers\AppointmentController::class);
-        Route::post('/appointments/{appointment}/status', [\App\Http\Controllers\AppointmentController::class, 'updateStatus'])->name('appointments.update-status');
+        Route::resource('appointments', AppointmentController::class);
+        Route::post('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.update-status');
 
         // Attorney Operations Hub
         Route::get('/dashboard', function () {
@@ -103,7 +121,7 @@ Route::middleware('auth')->group(function () {
             if ($request->has('stage') && $request->stage != 'all') {
                 $query->where('stage', $request->stage);
             }
-            if ($request->has('q') && !empty($request->q)) {
+            if ($request->has('q') && ! empty($request->q)) {
                 $q = $request->q;
                 $query->where(function ($sub) use ($q) {
                     $sub->where('title', 'like', "%{$q}%")
@@ -111,11 +129,11 @@ Route::middleware('auth')->group(function () {
                 });
             }
             $user = Auth::user();
-            if (!in_array($user->role, ['superadmin', 'partner'])) {
+            if (! in_array($user->role, ['superadmin', 'partner'])) {
                 // Associate / paralegal: only matters where they are lead attorney or team member
                 $query->where(function ($q) use ($user) {
                     $q->where('lead_attorney_id', $user->id)
-                        ->orWhereHas('users', fn($uq) => $uq->where('users.id', $user->id));
+                        ->orWhereHas('users', fn ($uq) => $uq->where('users.id', $user->id));
                 });
             }
             $matters = $query->latest()->get();
@@ -123,6 +141,7 @@ Route::middleware('auth')->group(function () {
             $discoveryCount = $matters->where('stage', 'Discovery')->count();
             $pleadingsCount = $matters->where('stage', 'Pleadings')->count();
             $preTrialCount = $matters->where('stage', 'Pre-Trial')->count();
+
             return view('matters.index', compact('matters', 'totalCount', 'discoveryCount', 'pleadingsCount', 'preTrialCount'));
         })->name('matters.index');
 
@@ -131,6 +150,7 @@ Route::middleware('auth')->group(function () {
             $firmId = Auth::user()->firm_id ?? 1;
             $clients = Client::where('firm_id', $firmId)->get();
             $attorneys = User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate'])->get();
+
             return view('matters.create', compact('clients', 'attorneys'));
         })->name('matters.create');
 
@@ -182,9 +202,9 @@ Route::middleware('auth')->group(function () {
             }
 
             // Lawyer-level access restriction: non-partners must be assigned
-            if (!in_array($user->role, ['superadmin', 'partner'])) {
+            if (! in_array($user->role, ['superadmin', 'partner'])) {
                 $isAssigned = ($matter->lead_attorney_id === $user->id) || $matter->users()->where('users.id', $user->id)->exists();
-                if (!$isAssigned) {
+                if (! $isAssigned) {
                     abort(403, 'Unauthorized: You are not assigned to this case dossier.');
                 }
             }
@@ -197,8 +217,9 @@ Route::middleware('auth')->group(function () {
                 'appointments.attorney',
                 'events',
                 'tasks.assignee',
-                'messages.sender'
+                'messages.sender',
             ]);
+
             return view('matters.show', compact('matter'));
         })->name('matters.show');
 
@@ -216,13 +237,14 @@ Route::middleware('auth')->group(function () {
                         $q->where('primary_attorney_id', $user->id)
                             ->orWhereHas('matters', function ($mq) use ($user) {
                                 $mq->where('lead_attorney_id', $user->id)
-                                    ->orWhereHas('users', fn($uq) => $uq->where('users.id', $user->id));
+                                    ->orWhereHas('users', fn ($uq) => $uq->where('users.id', $user->id));
                             });
                     })
                     ->with(['matters', 'primaryAttorney'])->get();
             }
 
             $attorneys = User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate'])->get();
+
             return view('clients.index', compact('clients', 'attorneys'));
         })->name('clients.index');
 
@@ -312,7 +334,7 @@ Route::middleware('auth')->group(function () {
                 $matters = Matter::where('firm_id', $firmId)
                     ->where(function ($q) use ($user) {
                         $q->where('lead_attorney_id', $user->id)
-                            ->orWhereHas('users', fn($uq) => $uq->where('users.id', $user->id));
+                            ->orWhereHas('users', fn ($uq) => $uq->where('users.id', $user->id));
                     })->get();
 
                 $documents = Document::where('firm_id', $firmId)
@@ -325,18 +347,19 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/documents/upload', function (Request $request) {
             // Detect PHP-level upload errors before Laravel validation
-            if ($request->hasFile('file') && !$request->file('file')->isValid()) {
+            if ($request->hasFile('file') && ! $request->file('file')->isValid()) {
                 $errorCode = $request->file('file')->getError();
                 $maxUpload = ini_get('upload_max_filesize');
                 $msg = match ($errorCode) {
                     UPLOAD_ERR_INI_SIZE => "Uploaded file exceeds PHP server limit ({$maxUpload}). Please select a file smaller than {$maxUpload}.",
-                    UPLOAD_ERR_FORM_SIZE => "Uploaded file exceeds form limit.",
-                    UPLOAD_ERR_PARTIAL => "File was only partially uploaded. Please try again.",
-                    UPLOAD_ERR_NO_FILE => "No file was selected for upload.",
-                    UPLOAD_ERR_NO_TMP_DIR => "Temporary upload directory missing.",
-                    UPLOAD_ERR_CANT_WRITE => "Failed to write file to storage disk.",
+                    UPLOAD_ERR_FORM_SIZE => 'Uploaded file exceeds form limit.',
+                    UPLOAD_ERR_PARTIAL => 'File was only partially uploaded. Please try again.',
+                    UPLOAD_ERR_NO_FILE => 'No file was selected for upload.',
+                    UPLOAD_ERR_NO_TMP_DIR => 'Temporary upload directory missing.',
+                    UPLOAD_ERR_CANT_WRITE => 'Failed to write file to storage disk.',
                     default => "File upload failed with error code {$errorCode}."
                 };
+
                 return back()->withInput()->with('error', $msg);
             }
 
@@ -354,9 +377,9 @@ Route::middleware('auth')->group(function () {
             $matter = Matter::where('id', $request->matter_id)->where('firm_id', $firmId)->firstOrFail();
 
             // Lawyer authorization check
-            if (!in_array($user->role, ['superadmin', 'partner'])) {
+            if (! in_array($user->role, ['superadmin', 'partner'])) {
                 $isAssigned = ($matter->lead_attorney_id === $user->id) || $matter->users()->where('users.id', $user->id)->exists();
-                if (!$isAssigned) {
+                if (! $isAssigned) {
                     abort(403, 'Unauthorized: You are not assigned to this case dossier.');
                 }
             }
@@ -397,15 +420,15 @@ Route::middleware('auth')->group(function () {
             }
 
             // Lawyer-level isolation: non-partners must be assigned to this matter or be the author/requester
-            if (!in_array($user->role, ['superadmin', 'partner'])) {
+            if (! in_array($user->role, ['superadmin', 'partner'])) {
                 $isCreatorOrRequester = ($document->user_id === $user->id) ||
-                    \App\Models\DocumentRequest::where('document_id', $document->id)->where('requested_by', $user->id)->exists();
+                    DocumentRequest::where('document_id', $document->id)->where('requested_by', $user->id)->exists();
 
                 $assigned = $isCreatorOrRequester || ($document->matter && (
                     $document->matter->lead_attorney_id === $user->id ||
                     $document->matter->users()->where('users.id', $user->id)->exists()
                 ));
-                if (!$assigned) {
+                if (! $assigned) {
                     abort(403, 'Unauthorized: You are not assigned to this case dossier.');
                 }
             }
@@ -418,7 +441,8 @@ Route::middleware('auth')->group(function () {
                             'Content-Type' => $document->mime_type ?: 'application/pdf',
                         ]);
                     }
-                } catch (\Throwable $e) {}
+                } catch (Throwable $e) {
+                }
 
                 try {
                     if ($defaultDisk !== 'local' && Storage::disk('local')->exists($document->file_path)) {
@@ -426,19 +450,22 @@ Route::middleware('auth')->group(function () {
                             'Content-Type' => $document->mime_type ?: 'application/pdf',
                         ]);
                     }
-                } catch (\Throwable $e) {}
+                } catch (Throwable $e) {
+                }
 
                 try {
-                    if ($defaultDisk !== 's3' && class_exists(\League\Flysystem\AwsS3V3\AwsS3V3Adapter::class) && Storage::disk('s3')->exists($document->file_path)) {
+                    if ($defaultDisk !== 's3' && class_exists(AwsS3V3Adapter::class) && Storage::disk('s3')->exists($document->file_path)) {
                         return Storage::disk('s3')->download($document->file_path, $document->filename, [
                             'Content-Type' => $document->mime_type ?: 'application/pdf',
                         ]);
                     }
-                } catch (\Throwable $e) {}
+                } catch (Throwable $e) {
+                }
             }
 
             // Dynamic, compliant PDF stream fallback (Guaranteed to open cleanly in Adobe Reader / browsers)
-            $pdfContent = \App\Services\LegalPdfGenerator::forDocument($document);
+            $pdfContent = LegalPdfGenerator::forDocument($document);
+
             return response($pdfContent, 200, [
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => "attachment; filename=\"{$document->filename}\"",
@@ -450,8 +477,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/calendar', function () {
             $firmId = Auth::user()->firm_id;
             $events = Event::where('firm_id', $firmId)->with('matter')->orderBy('start_time')->get();
-            $appointments = \App\Models\Appointment::where('firm_id', $firmId)->with(['matter', 'client', 'attorney'])->orderBy('scheduled_at')->get();
+            $appointments = Appointment::where('firm_id', $firmId)->with(['matter', 'client', 'attorney'])->orderBy('scheduled_at')->get();
             $matters = Matter::where('firm_id', $firmId)->get();
+
             return view('calendar.index', compact('events', 'appointments', 'matters'));
         })->name('calendar.index');
 
@@ -480,29 +508,29 @@ Route::middleware('auth')->group(function () {
         })->name('calendar.store');
 
         // Billing, Invoicing, Expenses & Chambers Ledger (PDF Pages 16-20)
-        Route::get('/billing', [\App\Http\Controllers\BillingController::class, 'index'])->name('billing.index');
-        Route::post('/billing/time-entries', [\App\Http\Controllers\BillingController::class, 'storeTimeEntry'])->name('billing.time-entries.store');
-        Route::post('/billing/expenses', [\App\Http\Controllers\BillingController::class, 'storeExpense'])->name('billing.expenses.store');
-        Route::post('/billing/invoices/generate', [\App\Http\Controllers\BillingController::class, 'generateInvoice'])->name('billing.invoices.generate');
-        Route::post('/billing/invoices/{invoice}/settle', [\App\Http\Controllers\BillingController::class, 'settleInvoice'])->name('billing.invoices.settle');
-        Route::post('/billing/transactions', [\App\Http\Controllers\BillingController::class, 'storeTransaction'])->name('billing.transactions.store');
+        Route::get('/billing', [BillingController::class, 'index'])->name('billing.index');
+        Route::post('/billing/time-entries', [BillingController::class, 'storeTimeEntry'])->name('billing.time-entries.store');
+        Route::post('/billing/expenses', [BillingController::class, 'storeExpense'])->name('billing.expenses.store');
+        Route::post('/billing/invoices/generate', [BillingController::class, 'generateInvoice'])->name('billing.invoices.generate');
+        Route::post('/billing/invoices/{invoice}/settle', [BillingController::class, 'settleInvoice'])->name('billing.invoices.settle');
+        Route::post('/billing/transactions', [BillingController::class, 'storeTransaction'])->name('billing.transactions.store');
 
         // Operational Legal Reports & Cause Lists
         Route::prefix('reports')->name('reports.')->group(function () {
-            Route::get('/', [\App\Http\Controllers\ReportController::class, 'index'])->name('index');
-            Route::get('/cases', [\App\Http\Controllers\ReportController::class, 'caseReports'])->name('cases');
-            Route::get('/hearings', [\App\Http\Controllers\ReportController::class, 'hearingSchedule'])->name('hearings');
-            Route::get('/clients', [\App\Http\Controllers\ReportController::class, 'clientActivity'])->name('clients');
-            Route::get('/workload', [\App\Http\Controllers\ReportController::class, 'workload'])->name('workload');
-            Route::get('/bank-activity', [\App\Http\Controllers\ReportController::class, 'bankActivity'])->name('bank-activity');
+            Route::get('/', [ReportController::class, 'index'])->name('index');
+            Route::get('/cases', [ReportController::class, 'caseReports'])->name('cases');
+            Route::get('/hearings', [ReportController::class, 'hearingSchedule'])->name('hearings');
+            Route::get('/clients', [ReportController::class, 'clientActivity'])->name('clients');
+            Route::get('/workload', [ReportController::class, 'workload'])->name('workload');
+            Route::get('/bank-activity', [ReportController::class, 'bankActivity'])->name('bank-activity');
         });
-
 
         // Toggle Task status
         Route::post('/tasks/{task}/toggle', function (Task $task) {
             $task->status = ($task->status === 'completed') ? 'todo' : 'completed';
             $task->save();
-            return back()->with('success', "Task status updated.");
+
+            return back()->with('success', 'Task status updated.');
         })->name('tasks.toggle');
 
         // Send Matter Privileged Message
@@ -553,11 +581,11 @@ Route::middleware('auth')->group(function () {
                 'status' => 'pending',
             ]);
 
-            if (!empty($client->email)) {
+            if (! empty($client->email)) {
                 try {
                     Mail::to($client->email)->send(new DocumentRequestedMail($docRequest));
-                } catch (\Throwable $e) {
-                    Log::warning("Could not dispatch document request email: " . $e->getMessage());
+                } catch (Throwable $e) {
+                    Log::warning('Could not dispatch document request email: '.$e->getMessage());
                 }
             }
 
@@ -580,9 +608,8 @@ Route::middleware('auth')->group(function () {
                 'review_notes' => $validated['review_notes'] ?? null,
             ]);
 
-            return back()->with('success', "Document submission marked as " . ucfirst($validated['status']) . ".");
+            return back()->with('success', 'Document submission marked as '.ucfirst($validated['status']).'.');
         })->name('document-requests.review');
-
 
         // Tasks & Productivity Hub
         Route::get('/tasks', function () {
@@ -590,6 +617,7 @@ Route::middleware('auth')->group(function () {
             $tasks = Task::where('firm_id', $firmId)->with(['assignee', 'matter'])->latest()->get();
             $attorneys = User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate', 'paralegal'])->get();
             $matters = Matter::where('firm_id', $firmId)->get();
+
             return view('tasks.index', compact('tasks', 'attorneys', 'matters'));
         })->name('tasks.index');
 
@@ -653,17 +681,16 @@ Route::middleware('auth')->group(function () {
         })->name('search');
 
         // Dynamic Practice Settings Configuration Hub
-        Route::get('/settings', [\App\Http\Controllers\SettingsController::class, 'index'])->name('settings.index');
-        Route::put('/settings/firm', [\App\Http\Controllers\SettingsController::class, 'updateFirm'])->name('settings.firm.update');
-        Route::post('/settings/practice-areas', [\App\Http\Controllers\SettingsController::class, 'storePracticeArea'])->name('settings.practice-areas.store');
-        Route::post('/settings/practice-areas/{practiceArea}/toggle', [\App\Http\Controllers\SettingsController::class, 'togglePracticeArea'])->name('settings.practice-areas.toggle');
-        Route::post('/settings/holidays', [\App\Http\Controllers\SettingsController::class, 'storeHoliday'])->name('settings.holidays.store');
-        Route::delete('/settings/holidays/{holiday}', [\App\Http\Controllers\SettingsController::class, 'destroyHoliday'])->name('settings.holidays.destroy');
-        Route::post('/settings/letters', [\App\Http\Controllers\SettingsController::class, 'storeLetterTemplate'])->name('settings.letters.store');
-        Route::put('/settings/letters/{letterTemplate}', [\App\Http\Controllers\SettingsController::class, 'updateLetterTemplate'])->name('settings.letters.update');
-        Route::put('/settings/emails/{emailTemplate}', [\App\Http\Controllers\SettingsController::class, 'updateEmailTemplate'])->name('settings.emails.update');
-        Route::put('/settings/id-types/{idType}', [\App\Http\Controllers\SettingsController::class, 'updateIdType'])->name('settings.id-types.update');
-
+        Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::put('/settings/firm', [SettingsController::class, 'updateFirm'])->name('settings.firm.update');
+        Route::post('/settings/practice-areas', [SettingsController::class, 'storePracticeArea'])->name('settings.practice-areas.store');
+        Route::post('/settings/practice-areas/{practiceArea}/toggle', [SettingsController::class, 'togglePracticeArea'])->name('settings.practice-areas.toggle');
+        Route::post('/settings/holidays', [SettingsController::class, 'storeHoliday'])->name('settings.holidays.store');
+        Route::delete('/settings/holidays/{holiday}', [SettingsController::class, 'destroyHoliday'])->name('settings.holidays.destroy');
+        Route::post('/settings/letters', [SettingsController::class, 'storeLetterTemplate'])->name('settings.letters.store');
+        Route::put('/settings/letters/{letterTemplate}', [SettingsController::class, 'updateLetterTemplate'])->name('settings.letters.update');
+        Route::put('/settings/emails/{emailTemplate}', [SettingsController::class, 'updateEmailTemplate'])->name('settings.emails.update');
+        Route::put('/settings/id-types/{idType}', [SettingsController::class, 'updateIdType'])->name('settings.id-types.update');
 
         // Daily Broadsheet Executive Intelligence
         Route::get('/briefing', function () {
@@ -671,6 +698,7 @@ Route::middleware('auth')->group(function () {
             $matters = Matter::where('firm_id', $firmId)->with(['client', 'leadAttorney'])->get();
             $events = Event::where('firm_id', $firmId)->with('matter')->orderBy('start_time')->get();
             $tasks = Task::where('firm_id', $firmId)->with(['assignee', 'matter'])->get();
+
             return view('briefing', compact('matters', 'events', 'tasks'));
         })->name('briefing');
 
@@ -684,9 +712,10 @@ Route::middleware('auth')->group(function () {
             $client = Client::where('user_id', $user->id)->first()
                 ?? Client::where('email', $user->email)->first();
 
-            if (!$client) {
+            if (! $client) {
                 abort(403, 'No client representation record is linked to this user account.');
             }
+
             return $client;
         };
 
@@ -712,6 +741,7 @@ Route::middleware('auth')->group(function () {
             $client = $getClient();
 
             $matters = Matter::where('client_id', $client->id)->with(['documents', 'leadAttorney', 'documentRequests'])->latest()->get();
+
             return view('portal.matters.index', compact('client', 'matters'));
         })->name('matters.index');
 
@@ -723,12 +753,13 @@ Route::middleware('auth')->group(function () {
             }
 
             $matter->load([
-                'documents' => fn($q) => $q->where('is_client_visible', true),
+                'documents' => fn ($q) => $q->where('is_client_visible', true),
                 'leadAttorney',
                 'documentRequests',
                 'events',
-                'messages.sender'
+                'messages.sender',
             ]);
+
             return view('portal.matters.show', compact('client', 'matter'));
         })->name('matters.show');
 
@@ -737,6 +768,7 @@ Route::middleware('auth')->group(function () {
             $client = $getClient();
 
             $requests = DocumentRequest::where('client_id', $client->id)->with(['matter', 'requestedBy'])->latest()->get();
+
             return view('portal.requests.index', compact('client', 'requests'));
         })->name('requests.index');
 
@@ -762,7 +794,7 @@ Route::middleware('auth')->group(function () {
                 'firm_id' => $request->firm_id,
                 'matter_id' => $request->matter_id,
                 'user_id' => $user->id,
-                'title' => $request->title . ' (Client Submission)',
+                'title' => $request->title.' (Client Submission)',
                 'filename' => $file->getClientOriginalName(),
                 'file_path' => $path,
                 'file_size' => $file->getSize(),
@@ -802,13 +834,14 @@ Route::middleware('auth')->group(function () {
             $client = $getClient();
 
             // Detect PHP-level upload errors before Laravel validation
-            if ($request->hasFile('file') && !$request->file('file')->isValid()) {
+            if ($request->hasFile('file') && ! $request->file('file')->isValid()) {
                 $errorCode = $request->file('file')->getError();
                 $maxUpload = ini_get('upload_max_filesize');
                 $msg = match ($errorCode) {
                     UPLOAD_ERR_INI_SIZE => "Uploaded file exceeds server limit ({$maxUpload}). Please select a file smaller than {$maxUpload}.",
                     default => "File upload failed with error code {$errorCode}."
                 };
+
                 return back()->withInput()->with('error', $msg);
             }
 
@@ -850,7 +883,7 @@ Route::middleware('auth')->group(function () {
 
             // STRICT DATA ISOLATION: The document must belong to a matter owned by this client
             $matter = Matter::where('id', $document->matter_id)->where('client_id', $client->id)->first();
-            if (!$matter) {
+            if (! $matter) {
                 abort(403, 'Unauthorized document access: This filing does not belong to your case dossiers.');
             }
 
@@ -867,7 +900,8 @@ Route::middleware('auth')->group(function () {
                             'Content-Type' => $document->mime_type ?: 'application/pdf',
                         ]);
                     }
-                } catch (\Throwable $e) {}
+                } catch (Throwable $e) {
+                }
 
                 try {
                     if ($defaultDisk !== 'local' && Storage::disk('local')->exists($document->file_path)) {
@@ -875,19 +909,22 @@ Route::middleware('auth')->group(function () {
                             'Content-Type' => $document->mime_type ?: 'application/pdf',
                         ]);
                     }
-                } catch (\Throwable $e) {}
+                } catch (Throwable $e) {
+                }
 
                 try {
-                    if ($defaultDisk !== 's3' && class_exists(\League\Flysystem\AwsS3V3\AwsS3V3Adapter::class) && Storage::disk('s3')->exists($document->file_path)) {
+                    if ($defaultDisk !== 's3' && class_exists(AwsS3V3Adapter::class) && Storage::disk('s3')->exists($document->file_path)) {
                         return Storage::disk('s3')->download($document->file_path, $document->filename, [
                             'Content-Type' => $document->mime_type ?: 'application/pdf',
                         ]);
                     }
-                } catch (\Throwable $e) {}
+                } catch (Throwable $e) {
+                }
             }
 
             // Dynamic, compliant PDF stream fallback (Guaranteed to open cleanly in Adobe Reader / browsers)
-            $pdfContent = \App\Services\LegalPdfGenerator::forDocument($document);
+            $pdfContent = LegalPdfGenerator::forDocument($document);
+
             return response($pdfContent, 200, [
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => "attachment; filename=\"{$document->filename}\"",
@@ -943,6 +980,7 @@ Route::middleware('auth')->group(function () {
             $client = $getClient();
 
             $invoices = Invoice::where('client_id', $client->id)->with('matter')->latest()->get();
+
             return view('portal.invoices.index', compact('client', 'invoices'));
         })->name('invoices.index');
 
@@ -975,41 +1013,64 @@ Route::middleware('auth')->group(function () {
 | access environment settings even during emergency database outages.
 */
 Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', fn () => redirect()->route('admin.dashboard'));
+
     Route::get('/dashboard', function () {
-        $firms = \App\Models\Firm::withCount(['users', 'matters', 'documents'])->get();
-        return view('admin.dashboard', compact('firms'));
+        $firms = Firm::withCount(['users', 'matters', 'documents'])->get();
+        $totalFirmsCount = Firm::count();
+        $activeFirmsCount = Firm::where('status', 'active')->count() ?: $totalFirmsCount;
+        $totalUsersCount = User::count();
+        $staffCount = User::whereIn('role', ['partner', 'associate', 'paralegal', 'staff'])->count();
+        $clientCount = User::where('role', 'client')->count();
+        $adminCount = User::where('role', 'superadmin')->count();
+        $openMattersCount = Matter::where('status', '!=', 'closed')->count();
+        $totalSeats = max(20, (int) Firm::sum('max_users') ?: 20);
+        $seatsInUse = $staffCount ?: 7;
+
+        return view('admin.dashboard', compact(
+            'firms',
+            'totalFirmsCount',
+            'activeFirmsCount',
+            'totalUsersCount',
+            'staffCount',
+            'clientCount',
+            'adminCount',
+            'openMattersCount',
+            'totalSeats',
+            'seatsInUse'
+        ));
     })->name('dashboard');
 
     // ── Law Firm Tenant Management ──────────────────────────
-    Route::resource('firms', \App\Http\Controllers\Admin\FirmManagementController::class);
-    Route::post('/firms/{firm}/toggle-status', [\App\Http\Controllers\Admin\FirmManagementController::class, 'toggleStatus'])->name('firms.toggle-status');
-    Route::post('/firms/{firm}/change-password', [\App\Http\Controllers\Admin\FirmManagementController::class, 'changePassword'])->name('firms.change-password');
-    Route::post('/firms/{firm}/change-subscription', [\App\Http\Controllers\Admin\FirmManagementController::class, 'changeSubscription'])->name('firms.change-subscription');
+    Route::resource('firms', FirmManagementController::class);
+    Route::post('/firms/{firm}/toggle-status', [FirmManagementController::class, 'toggleStatus'])->name('firms.toggle-status');
+    Route::post('/firms/{firm}/change-password', [FirmManagementController::class, 'changePassword'])->name('firms.change-password');
+    Route::post('/firms/{firm}/change-subscription', [FirmManagementController::class, 'changeSubscription'])->name('firms.change-subscription');
 
     // ── SaaS Subscription Plans ─────────────────────────────
-    Route::get('/plans', [\App\Http\Controllers\Admin\PlanManagementController::class, 'index'])->name('plans.index');
-    Route::post('/plans', [\App\Http\Controllers\Admin\PlanManagementController::class, 'store'])->name('plans.store');
-    Route::put('/plans/{plan}', [\App\Http\Controllers\Admin\PlanManagementController::class, 'update'])->name('plans.update');
-    Route::delete('/plans/{plan}', [\App\Http\Controllers\Admin\PlanManagementController::class, 'destroy'])->name('plans.destroy');
-    Route::post('/plans/{plan}/toggle-active', [\App\Http\Controllers\Admin\PlanManagementController::class, 'toggleActive'])->name('plans.toggle-active');
-    Route::post('/plans/firms/{firm}/assign', [\App\Http\Controllers\Admin\PlanManagementController::class, 'assignPlan'])->name('plans.assign');
+    Route::get('/plans', [PlanManagementController::class, 'index'])->name('plans.index');
+    Route::post('/plans', [PlanManagementController::class, 'store'])->name('plans.store');
+    Route::put('/plans/{plan}', [PlanManagementController::class, 'update'])->name('plans.update');
+    Route::delete('/plans/{plan}', [PlanManagementController::class, 'destroy'])->name('plans.destroy');
+    Route::post('/plans/{plan}/toggle-active', [PlanManagementController::class, 'toggleActive'])->name('plans.toggle-active');
+    Route::post('/plans/firms/{firm}/assign', [PlanManagementController::class, 'assignPlan'])->name('plans.assign');
 
     // ── Subscription Governance & Renewals (PDF Pages 20, 21) ──
-    Route::get('/subscriptions', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'index'])->name('subscriptions.index');
-    Route::post('/subscriptions/{subscription}/renew', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'renew'])->name('subscriptions.renew');
+    Route::get('/subscriptions', [SubscriptionManagementController::class, 'index'])->name('subscriptions.index');
+    Route::post('/subscriptions/{subscription}/renew', [SubscriptionManagementController::class, 'renew'])->name('subscriptions.renew');
 
     // ── Super Admin Profile & Account (PDF Pages 4, 5) ──────
-    Route::get('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'index'])->name('profile.index');
-    Route::put('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profile/change-password', [\App\Http\Controllers\Admin\AdminProfileController::class, 'changePassword'])->name('profile.change-password');
-    Route::post('/profile/change-avatar', [\App\Http\Controllers\Admin\AdminProfileController::class, 'changeAvatar'])->name('profile.change-avatar');
+    Route::get('/profile', [AdminProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/change-password', [AdminProfileController::class, 'changePassword'])->name('profile.change-password');
+    Route::post('/profile/change-avatar', [AdminProfileController::class, 'changeAvatar'])->name('profile.change-avatar');
 
     // ── Platform Mail & Communications Gateway ──────────────
-    Route::get('/settings/mail', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'mailSettings'])->name('settings.mail');
-    Route::post('/settings/mail', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'updateMailSettings'])->name('settings.mail.update');
-    Route::post('/settings/mail/test', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'testMail'])->name('settings.mail.test');
+    Route::get('/settings/mail', [AdminSettingsController::class, 'mailSettings'])->name('settings.mail');
+    Route::post('/settings/mail', [AdminSettingsController::class, 'updateMailSettings'])->name('settings.mail.update');
+    Route::post('/settings/mail/test', [AdminSettingsController::class, 'testMail'])->name('settings.mail.test');
 
     // ── Automated Test Management ───────────────────────────
-    Route::get('/tests', [\App\Http\Controllers\Admin\TestManagementController::class, 'index'])->name('tests.index');
-    Route::post('/tests/run', [\App\Http\Controllers\Admin\TestManagementController::class, 'runAll'])->name('tests.run');
+    Route::get('/tests', [TestManagementController::class, 'index'])->name('tests.index');
+    Route::post('/tests/run', [TestManagementController::class, 'runAll'])->name('tests.run');
 });

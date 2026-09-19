@@ -32,237 +32,168 @@
          class="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs lg:hidden transition-opacity">
     </div>
 
-    <!-- Left Sidebar Shell (Quire Persistent Dark Sidebar #121513) -->
+    <!-- Left Sidebar Shell (Quire Platform Administration #161718) -->
     <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-           class="fixed left-0 top-0 h-screen w-64 bg-sidebar-bg text-[#e0e3de] z-50 flex flex-col justify-between border-r border-sidebar-border select-none transition-transform duration-300 ease-in-out">
+           class="fixed left-0 top-0 h-screen w-64 bg-[#161718] text-[#d1d5db] z-50 flex flex-col justify-between border-r border-[#26282a] select-none transition-transform duration-300 ease-in-out">
         
         <div class="flex flex-col flex-1 overflow-y-auto">
             <!-- Brand & Platform Header -->
-            <div class="px-5 py-5 border-b border-sidebar-border flex items-center justify-between">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
-                    <img src="{{ asset('logo.png') }}" alt="Quire Legal" class="h-9 w-auto object-contain rounded shadow-xs bg-white/95 p-1"/>
-                    <div class="flex flex-col min-w-0">
-                        <span class="font-serif text-[17px] font-medium text-white tracking-tight leading-tight truncate">Platform Console</span>
-                        <span class="text-[11px] font-mono text-sidebar-text-muted uppercase tracking-wider mt-0.5">Multi-Tenant Cloud</span>
-                    </div>
+            <div class="px-6 py-5 border-b border-white/[.08] flex items-center justify-between">
+                <a href="{{ route('admin.dashboard') }}" class="block">
+                    <span class="font-serif text-[22px] tracking-tight text-white font-normal block leading-tight">Quire</span>
+                    <span class="text-[12px] text-[#8e8e8e] block mt-0.5 font-sans">Platform administration</span>
                 </a>
-                <button @click="sidebarOpen = false" class="lg:hidden p-1.5 text-sidebar-text-muted hover:text-white rounded">
+                <button @click="sidebarOpen = false" class="lg:hidden p-1.5 text-[#8e8e8e] hover:text-white rounded">
                     <span class="material-symbols-outlined text-xl">close</span>
                 </button>
             </div>
 
-            <!-- Navigation Sections -->
+            <!-- Navigation Links -->
             <nav class="px-3 py-4 flex flex-col gap-1">
-                <span class="px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-sidebar-text-muted font-medium">Governance &amp; Tenants</span>
-
-                <!-- Telemetry Dashboard -->
+                <!-- Overview -->
                 <a href="{{ route('admin.dashboard') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md font-title-sm text-[13px] transition-colors {{ request()->routeIs('admin.dashboard') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
-                    <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('admin.dashboard') ? 'text-[#C7EBD9]' : '' }}">dashboard</span>
-                    <span>Tenant Telemetry</span>
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('admin.dashboard') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('admin.dashboard') ? 'text-white' : 'text-[#9ca3af]' }}">bar_chart</span>
+                    <span>Overview</span>
                 </a>
 
-                <!-- Firms Management -->
+                <!-- Firms & plans -->
                 <a href="{{ route('admin.firms.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md font-title-sm text-[13px] transition-colors {{ request()->routeIs('admin.firms.*') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
-                    <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('admin.firms.*') ? 'text-[#C7EBD9]' : '' }}">corporate_fare</span>
-                    <span>Law Firm Practices</span>
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('admin.firms.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('admin.firms.*') ? 'text-white' : 'text-[#9ca3af]' }}">balance</span>
+                    <span>Firms &amp; plans</span>
                 </a>
 
-                <!-- Subscription Plans -->
+                <!-- Users -->
+                <a href="{{ route('admin.firms.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors text-[#9ca3af] hover:text-white hover:bg-white/[.05]">
+                    <span class="material-symbols-outlined text-[19px] text-[#9ca3af]">group</span>
+                    <span>Users</span>
+                </a>
+
+                <!-- Matters -->
+                <a href="{{ route('admin.firms.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors text-[#9ca3af] hover:text-white hover:bg-white/[.05]">
+                    <span class="material-symbols-outlined text-[19px] text-[#9ca3af]">folder</span>
+                    <span>Matters</span>
+                </a>
+
+                <!-- Payment gateways -->
                 <a href="{{ route('admin.plans.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md font-title-sm text-[13px] transition-colors {{ request()->routeIs('admin.plans.*') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
-                    <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('admin.plans.*') ? 'text-[#C7EBD9]' : '' }}">subscriptions</span>
-                    <span>Subscription Plans</span>
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('admin.plans.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('admin.plans.*') ? 'text-white' : 'text-[#9ca3af]' }}">credit_card</span>
+                    <span>Payment gateways</span>
                 </a>
 
-                <!-- Subscription Renewals & Governance -->
-                <a href="{{ route('admin.subscriptions.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md font-title-sm text-[13px] transition-colors {{ request()->routeIs('admin.subscriptions.*') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
-                    <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('admin.subscriptions.*') ? 'text-[#C7EBD9]' : '' }}">autorenew</span>
-                    <span>Renewals &amp; Status</span>
-                </a>
-
-                <span class="px-2.5 pt-4 pb-1 font-mono text-[10px] uppercase tracking-wider text-sidebar-text-muted font-medium">Infrastructure &amp; Access</span>
-
-                <!-- Mail Gateway -->
+                <!-- Email & SMS -->
                 <a href="{{ route('admin.settings.mail') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md font-title-sm text-[13px] transition-colors {{ request()->routeIs('admin.settings.*') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
-                    <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('admin.settings.*') ? 'text-[#C7EBD9]' : '' }}">mail</span>
-                    <span>Mail Gateway</span>
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('admin.settings.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('admin.settings.*') ? 'text-white' : 'text-[#9ca3af]' }}">mail</span>
+                    <span>Email &amp; SMS</span>
                 </a>
 
-                <!-- Super Admin Profile -->
+                <!-- Audit log -->
+                <a href="{{ route('admin.subscriptions.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('admin.subscriptions.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('admin.subscriptions.*') ? 'text-white' : 'text-[#9ca3af]' }}">receipt_long</span>
+                    <span>Audit log</span>
+                </a>
+
+                <!-- Sign-in history -->
                 <a href="{{ route('admin.profile.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md font-title-sm text-[13px] transition-colors {{ request()->routeIs('admin.profile.*') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
-                    <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('admin.profile.*') ? 'text-[#C7EBD9]' : '' }}">manage_accounts</span>
-                    <span>Admin Profile</span>
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors text-[#9ca3af] hover:text-white hover:bg-white/[.05]">
+                    <span class="material-symbols-outlined text-[19px] text-[#9ca3af]">key</span>
+                    <span>Sign-in history</span>
+                </a>
+
+                <!-- Roles & categories -->
+                <a href="{{ route('admin.plans.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors text-[#9ca3af] hover:text-white hover:bg-white/[.05]">
+                    <span class="material-symbols-outlined text-[19px] text-[#9ca3af]">tune</span>
+                    <span>Roles &amp; categories</span>
+                </a>
+
+                <!-- System settings -->
+                <a href="{{ route('admin.profile.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('admin.profile.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('admin.profile.*') ? 'text-white' : 'text-[#9ca3af]' }}">settings</span>
+                    <span>System settings</span>
                 </a>
             </nav>
         </div>
 
-        <!-- Sidebar Bottom Footer -->
-        <div class="p-3 border-t border-sidebar-border bg-sidebar-bg flex flex-col gap-2">
-            @if(Auth::check() && Auth::user()->firm_id)
-            <a href="{{ route('dashboard') }}" 
-               class="flex items-center justify-center gap-2 px-3 py-2 rounded-md text-xs font-medium text-[#a6aca7] hover:text-white hover:bg-sidebar-surface border border-transparent transition-all">
-                <span class="material-symbols-outlined text-[16px]">arrow_back</span>
-                <span>Switch to Firm Chambers</span>
-            </a>
-            @endif
-
-            <div class="flex items-center justify-between px-2 pt-1 text-[11px] text-sidebar-text-muted font-mono">
-                <span>Infrastructure Isolation</span>
-                <span class="inline-flex items-center gap-1.5 text-[#8fb7a4]">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Active Live</span>
-                </span>
+        <!-- Sidebar Bottom User Profile & Sign Out -->
+        <div class="p-4 border-t border-white/[.08] bg-[#161718] flex flex-col gap-2">
+            @php
+                $currentUser = Auth::user();
+                $displayName = $currentUser?->name ?? 'Rowan Blake';
+                $userEmail = $currentUser?->email ?? 'admin@quire.example';
+                $initials = 'RB';
+                if ($displayName) {
+                    $parts = explode(' ', trim($displayName));
+                    $initials = strtoupper(substr($parts[0] ?? 'R', 0, 1) . substr($parts[count($parts) - 1] ?? 'B', 0, 1));
+                }
+            @endphp
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-[#5b4382] text-white flex items-center justify-center font-semibold text-xs shrink-0 shadow-xs">
+                    {{ $initials }}
+                </div>
+                <div class="flex flex-col min-w-0">
+                    <span class="text-[13px] font-medium text-white truncate leading-tight">{{ $displayName }}</span>
+                    <span class="text-[11.5px] text-[#8e8e8e] truncate mt-0.5">{{ $userEmail }}</span>
+                </div>
+            </div>
+            <div class="pt-1 flex items-center justify-between">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="text-[12px] text-[#8e8e8e] hover:text-white transition-colors cursor-pointer">
+                        Sign out
+                    </button>
+                </form>
+                @if(Auth::check() && Auth::user()->firm_id)
+                <a href="{{ route('dashboard') }}" class="text-[11px] text-[#8e8e8e] hover:text-white transition-colors">
+                    Chambers →
+                </a>
+                @endif
             </div>
         </div>
     </aside>
 
     <!-- Main Wrapper with Left Margin on Desktop -->
-    <div class="lg:pl-64 flex flex-col min-h-screen">
+    <div class="lg:pl-64 flex flex-col min-h-screen bg-[#fbf9f5]">
         
-        <!-- Top Executive Bar (Sticky) -->
-        <header class="h-16 bg-surface-card border-b border-border-hairline px-4 lg:px-8 flex items-center justify-between sticky top-0 z-30 shadow-sm">
-            <div class="flex items-center gap-3">
-                <button @click="sidebarOpen = true" 
-                        class="lg:hidden p-2 rounded-md text-text-secondary hover:bg-surface-subtle transition-all">
-                    <span class="material-symbols-outlined text-2xl">menu</span>
-                </button>
-                <div class="flex items-center gap-2.5">
-                    <span class="font-serif text-lg font-medium text-text-primary">@yield('header_title', 'Multi-Tenant Governance Console')</span>
-                    <span class="hidden sm:inline-flex items-center gap-1 text-[11px] text-pine-primary font-mono bg-pine-primary/10 px-2 py-0.5 rounded border border-pine-primary/20">
-                        <span>Cluster Host</span>
-                        <span>·</span>
-                        <span>Root Isolation</span>
-                    </span>
-                </div>
-            </div>
+        <!-- Mobile Top Navigation Header -->
+        <div class="lg:hidden h-14 bg-[#161718] border-b border-white/[.08] px-4 flex items-center justify-between sticky top-0 z-30">
+            <a href="{{ route('admin.dashboard') }}" class="font-serif text-[19px] text-white font-normal">Quire</a>
+            <button @click="sidebarOpen = true" class="p-2 text-white">
+                <span class="material-symbols-outlined text-2xl">menu</span>
+            </button>
+        </div>
 
-            <!-- Top Right Profile Dropdown & Controls -->
-            <div class="flex items-center gap-3">
-                @php
-                    $currentUser = Auth::user();
-                    $avatar = $currentUser?->resolved_avatar;
-                    $displayName = $currentUser?->full_display_name ?? 'Super Administrator';
-                    $userEmail = $currentUser?->email ?? 'admin@sharmalegal.in';
-                    $initials = strtoupper(substr($currentUser?->first_name ?? $currentUser?->name ?? 'S', 0, 1)) . strtoupper(substr($currentUser?->surname ?? 'A', 0, 1));
-                @endphp
-
-                <!-- User Profile Menu -->
-                <div class="relative" @click.outside="userMenuOpen = false">
-                    <button @click="userMenuOpen = !userMenuOpen" 
-                            class="flex items-center gap-2.5 p-1 rounded-md hover:bg-surface-subtle transition-all focus:outline-none focus:ring-2 focus:ring-pine-primary/30">
-                        @if($avatar)
-                            <img src="{{ $avatar }}" 
-                                 alt="{{ $displayName }}" 
-                                 class="w-8 h-8 rounded-full object-cover border border-border-hairline shadow-xs"/>
-                        @else
-                            <div class="w-8 h-8 rounded-full bg-pine-primary text-white flex items-center justify-center font-bold text-xs shadow-xs">
-                                {{ $initials }}
-                            </div>
-                        @endif
-                        <div class="hidden md:flex flex-col text-left pr-1">
-                            <span class="text-xs font-semibold text-text-primary leading-tight">
-                                {{ $displayName }}
-                            </span>
-                            <span class="text-[10px] font-mono text-text-secondary leading-tight">
-                                Chief Platform Officer
-                            </span>
-                        </div>
-                        <span class="material-symbols-outlined text-sm text-text-muted">expand_more</span>
-                    </button>
-
-                    <!-- Account Management Dropdown -->
-                    <div x-show="userMenuOpen" 
-                         x-cloak
-                         x-transition:enter="transition ease-out duration-100"
-                         x-transition:enter-start="transform opacity-0 scale-95"
-                         x-transition:enter-end="transform opacity-100 scale-100"
-                         x-transition:leave="transition ease-in duration-75"
-                         x-transition:leave-start="transform opacity-100 scale-100"
-                         x-transition:leave-end="transform opacity-0 scale-95"
-                         class="absolute right-0 mt-2 w-56 bg-surface-card rounded-md shadow-quire border border-border-hairline py-1.5 z-50 divide-y divide-border-hairline">
-                        
-                        <div class="px-4 py-2.5">
-                            <p class="text-xs font-semibold text-text-primary truncate">{{ $displayName }}</p>
-                            <p class="text-[11px] font-mono text-text-secondary truncate">{{ $userEmail }}</p>
-                        </div>
-
-                        <div class="py-1">
-                            <button type="button" 
-                                    @click="userMenuOpen = false; changePasswordModal = true" 
-                                    class="w-full text-left px-4 py-2 text-xs text-text-secondary hover:bg-surface-subtle hover:text-text-primary flex items-center gap-2.5 transition-all">
-                                <span class="material-symbols-outlined text-base text-pine-primary">lock_reset</span>
-                                <span>Change Security Key</span>
-                            </button>
-
-                            <button type="button" 
-                                    @click="userMenuOpen = false; changeAvatarModal = true" 
-                                    class="w-full text-left px-4 py-2 text-xs text-text-secondary hover:bg-surface-subtle hover:text-text-primary flex items-center gap-2.5 transition-all">
-                                <span class="material-symbols-outlined text-base text-pine-primary">account_circle</span>
-                                <span>Update Avatar</span>
-                            </button>
-
-                            <a href="{{ route('admin.profile.index') }}" 
-                               class="block px-4 py-2 text-xs text-text-secondary hover:bg-surface-subtle hover:text-text-primary flex items-center gap-2.5 transition-all">
-                                <span class="material-symbols-outlined text-base text-pine-primary">settings</span>
-                                <span>Administrator Preferences</span>
-                            </a>
-                        </div>
-
-                        <div class="py-1">
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" 
-                                        class="w-full text-left px-4 py-2 text-xs text-error hover:bg-error-container/40 flex items-center gap-2.5 transition-all">
-                                    <span class="material-symbols-outlined text-base">logout</span>
-                                    <span>Sign Out Console</span>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
+        <!-- Top Demo Environment Notice Banner -->
+        <div class="w-full text-center py-2.5 text-[12px] text-[#8a8e89] font-sans border-b border-[#f0eee8]/60">
+            Demo environment · fictional firms, people and documents
+        </div>
 
         <!-- Dynamic Main Content -->
-        <main class="flex-1 p-4 lg:p-8 max-w-7xl w-full mx-auto">
+        <main class="flex-1 w-full max-w-[1240px] mx-auto px-6 sm:px-10 py-6 lg:py-8">
             <!-- Flash Message Alerts -->
             @if(session('success'))
-                <div class="mb-6 p-4 rounded-md bg-surface-card border-l-[3px] border-pine-primary border border-border-hairline shadow-sm flex items-center gap-3">
-                    <span class="material-symbols-outlined text-pine-primary text-xl">check_circle</span>
-                    <p class="text-xs text-text-primary font-medium">{{ session('success') }}</p>
+                <div class="mb-6 p-3.5 rounded-md bg-[#23493a]/10 border border-[#23493a]/20 text-xs text-[#23493a] flex items-center gap-2.5">
+                    <span class="material-symbols-outlined text-base">check_circle</span>
+                    <p class="font-medium">{{ session('success') }}</p>
                 </div>
             @endif
 
             @if(session('error'))
-                <div class="mb-6 p-4 rounded-md bg-surface-card border-l-[3px] border-error border border-border-hairline shadow-sm flex items-center gap-3">
-                    <span class="material-symbols-outlined text-error text-xl">error</span>
-                    <p class="text-xs text-error font-medium">{{ session('error') }}</p>
+                <div class="mb-6 p-3.5 rounded-md bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2.5">
+                    <span class="material-symbols-outlined text-base text-red-600">error</span>
+                    <p class="font-medium">{{ session('error') }}</p>
                 </div>
             @endif
 
             @yield('content')
         </main>
-
-        <!-- Archival Footer -->
-        <footer class="mt-auto border-t border-border-hairline bg-surface-card py-4 px-6 text-center text-xs text-text-muted font-caption flex flex-col sm:flex-row items-center justify-between gap-2">
-            <div>
-                <span>Quire Legal Cloud</span>
-                <span>·</span>
-                <span>Multi-Tenant Infrastructure Architecture</span>
-                <span>·</span>
-                <span>ISO 27001 &amp; SOC2 Type II Certified</span>
-            </div>
-            <div class="font-mono text-[10px]">
-                <span>Cluster Node: AP-SOUTH-1</span>
-                <span>·</span>
-                <span>Latency: 0.14ms</span>
-            </div>
-        </footer>
     </div>
 
     <!-- Modals (Change Password & Avatar) -->
