@@ -10,6 +10,7 @@
     --font-serif: 'Newsreader', 'Georgia', serif;
     --font-mono: 'JetBrains Mono', monospace;
 
+    /* Editorial Type Scales */
     --font-headline-xl: 'Newsreader', 'Georgia', serif;
     --font-headline-lg: 'Newsreader', 'Georgia', serif;
     --font-headline-md: 'Newsreader', 'Georgia', serif;
@@ -30,7 +31,13 @@
     --color-sidebar-text-muted: #7B827E;
     --color-sidebar-text-active: #C7EBD9;
 
-    /* Quire Brand Colors */
+    /* Quire Core Brand Colors */
+    --color-primary: #093225;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #23493A;
+    --color-on-primary-container: #8fb7a4;
+    --color-inverse-primary: #a6d0bc;
+
     --color-pine-primary: #23493A;
     --color-pine-hover: #1B3B2F;
     --color-canvas-ivory: #F8F6F0;
@@ -41,17 +48,21 @@
     --color-text-primary: #1A1E1C;
     --color-text-secondary: #646864;
     --color-text-muted: #8A8E89;
-    --color-tertiary-fixed: #C7EBD9;
-    --color-primary-container: #23493A;
-    --color-on-primary-container: #C2ECD7;
 
-    /* Backward Compatible Aliases */
-    --color-primary: #23493A;
-    --color-primary-container: #23493A;
-    --color-on-primary: #ffffff;
-    --color-background: #F8F6F0;
-    --color-surface: #F8F6F0;
-    --color-surface-dim: #f0eee8;
+    --color-secondary: #5b5f5b;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #daded9;
+    --color-on-secondary-container: #5e625e;
+
+    --color-tertiary: #113126;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #28483b;
+    --color-on-tertiary-container: #93b6a6;
+    --color-tertiary-fixed: #C7EBD9;
+    --color-tertiary-fixed-dim: #abcebd;
+
+    --color-surface: #fbf9f3;
+    --color-surface-dim: #dcdad4;
     --color-surface-bright: #fbf9f3;
     --color-surface-container-lowest: #ffffff;
     --color-surface-container-low: #f5f3ed;
@@ -60,27 +71,53 @@
     --color-surface-container-highest: #e4e2dd;
     --color-surface-variant: #e4e2dd;
     --color-surface-tint: #406656;
-    --color-on-background: #1b1c18;
+
     --color-on-surface: #1b1c18;
     --color-on-surface-variant: #414844;
-    --color-outline: #E7E4DC;
+    --color-inverse-surface: #30312d;
+    --color-inverse-on-surface: #f3f1eb;
+    --color-outline: #717974;
     --color-outline-variant: #c1c8c3;
+
     --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
     --color-error-container: #ffdad6;
+    --color-on-error-container: #93000a;
+
+    --color-primary-fixed: #c2ecd7;
+    --color-primary-fixed-dim: #a6d0bc;
+    --color-on-primary-fixed: #002116;
+    --color-on-primary-fixed-variant: #284e3f;
+
+    --color-background: #F8F6F0;
+    --color-on-background: #1A1E1C;
+
+    /* Spacing Modular Scale */
+    --spacing-space-xs: 0.25rem;
+    --spacing-space-sm: 0.5rem;
+    --spacing-space-md: 1rem;
+    --spacing-space-lg: 1.5rem;
+    --spacing-space-xl: 2rem;
+    --spacing-gutter: 1.5rem;
+    --spacing-gutter-sm: 1rem;
+    --spacing-gutter-lg: 2rem;
+    --spacing-margin: 2rem;
+    --spacing-margin-mobile: 1rem;
+    --spacing-margin-desktop: 3rem;
 }
 
 @layer base {
     html {
         font-family: var(--font-sans);
-        color: #222222;
-        background-color: #FAF8F5;
+        color: #1A1E1C;
+        background-color: #F8F6F0;
         letter-spacing: -0.011em;
     }
 
     body {
         font-family: var(--font-sans);
-        background-color: #FAF8F5;
-        color: #222222;
+        background-color: #F8F6F0;
+        color: #1A1E1C;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeLegibility;
@@ -96,75 +133,112 @@
         font-family: var(--font-serif);
         letter-spacing: -0.02em;
     }
+
+    /* Tabular numbers for legal ledgers, rates, docket numbers, and timers */
+    .tabular-nums,
+    .font-mono,
+    table td.tabular-nums {
+        font-variant-numeric: tabular-nums;
+        font-feature-settings: "tnum" 1;
+    }
 }
 
-/* Juris Prestige Buttons & UI Components */
+/* Quire Component Specifications */
 .btn-primary {
-    background-color: #9F8349;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    padding: 0 1.25rem;
+    border-radius: 0.375rem;
+    background-color: #23493A;
     color: #ffffff;
     font-family: var(--font-sans);
+    font-size: 14px;
     font-weight: 600;
-    transition: all 0.15s ease-in-out;
+    line-height: 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    cursor: pointer;
 }
 
 .btn-primary:hover {
-    background-color: #856C36;
+    background-color: #1B3B2F;
+}
+
+.btn-primary:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #F8F6F0, 0 0 0 4px #23493A;
 }
 
 .btn-secondary {
-    background-color: #F8F4EE;
-    color: #9F8349;
-    border: 1px solid #E6DDD1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    padding: 0 1rem;
+    border-radius: 0.375rem;
+    background-color: #FFFFFF;
+    color: #1A1E1C;
+    border: 1px solid #E7E4DC;
     font-family: var(--font-sans);
+    font-size: 14px;
     font-weight: 600;
-    transition: all 0.15s ease-in-out;
+    line-height: 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+    cursor: pointer;
 }
 
 .btn-secondary:hover {
-    background-color: #F0EAE0;
+    background-color: #F6F4EE;
+    border-color: #DCDAD4;
 }
 
-.btn-outline {
-    background-color: #ffffff;
-    color: #9F8349;
-    border: 1px solid #9F8349;
+.btn-tertiary {
+    display: inline-flex;
+    align-items: center;
+    background: transparent;
+    color: #23493A;
     font-family: var(--font-sans);
+    font-size: 13px;
     font-weight: 600;
-    transition: all 0.15s ease-in-out;
+    transition: color 0.15s ease-in-out;
+    cursor: pointer;
 }
 
-.btn-outline:hover {
-    background-color: #9F8349;
-    color: #ffffff;
+.btn-tertiary:hover {
+    color: #1B3B2F;
 }
 
-.btn-inverted {
-    background-color: #222222;
-    color: #ffffff;
-    font-family: var(--font-sans);
-    font-weight: 600;
-    transition: all 0.15s ease-in-out;
+/* Document Status Callout Memo Strip */
+.memo-callout {
+    border-left: 3px solid #23493A;
+    background-color: #F6F4EE;
+    border-radius: 0 0.375rem 0.375rem 0;
+    padding: 0.75rem 1rem;
 }
 
-.btn-inverted:hover {
-    background-color: #383838;
+/* Quire Editorial Contact Shadow */
+.shadow-quire {
+    box-shadow: 0 4px 20px -2px rgba(26, 30, 28, 0.06), 0 0 0 1px #E7E4DC;
 }
 
-/* Warm Scrollbar */
+/* Archival Ivory Scrollbars */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #FAF8F5;
+    background: #F8F6F0;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #E0D7CD;
+    background: #DCDAD4;
     border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #B88B56;
+    background: #C1C8C3;
 }

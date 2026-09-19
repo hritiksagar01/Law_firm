@@ -8,21 +8,24 @@
             <div class="flex flex-col gap-1">
                 <div class="flex items-center gap-space-xs text-text-muted font-label-sm text-label-sm uppercase tracking-wider">
                     <span>Chambers of {{ auth()->user()->firm->name ?? 'Sharma Legal' }}</span>
-                    <span>•</span>
+                    <span>·</span>
                     <span>Executive Practice Roster</span>
-                    <span>•</span>
+                    <span>·</span>
                     <span class="text-pine-primary font-medium">Session Term Q2</span>
                 </div>
-                <h1 class="font-headline-xl text-headline-xl text-primary font-serif font-normal tracking-tight">
+                <h1 class="font-headline-xl text-headline-xl text-primary font-serif font-medium tracking-tight">
                     Litigation Briefs &amp; Chambers Docket
                 </h1>
+                <p class="font-body-md text-body-md text-text-secondary">
+                    Chambers causelist, priority dockets, and high court appearance roster.
+                </p>
             </div>
             <div class="flex items-center gap-space-sm">
                 <div class="hidden sm:flex items-center gap-space-xs px-space-sm py-1.5 rounded bg-surface-card border border-border-hairline shadow-sm text-text-secondary font-label-sm text-label-sm">
-                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-700 animate-pulse"></span>
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
                     <span>High Court Cause List Live</span>
                 </div>
-                <a href="{{ route('matters.create') }}" class="flex items-center gap-space-xs px-space-md py-2 rounded bg-pine-primary text-on-primary font-title-sm text-title-sm hover:bg-pine-hover shadow-sm transition-all duration-150">
+                <a href="{{ route('matters.create') }}" class="btn-primary flex items-center gap-2">
                     <span class="material-symbols-outlined text-[18px]">add_circle</span>
                     <span>File New Matter</span>
                 </a>
@@ -39,14 +42,17 @@
                 </div>
                 <div class="mt-space-sm">
                     <div class="flex items-baseline gap-2">
-                        <span class="font-headline-lg text-headline-lg text-primary font-serif font-normal">{{ $mattersCount ?? $matters->count() }}</span>
+                        <span class="font-headline-lg text-headline-lg text-primary font-serif font-normal tabular-nums">{{ $mattersCount ?? $matters->count() }}</span>
                         <span class="text-pine-primary font-label-sm text-label-sm font-medium">+4 this month</span>
                     </div>
                     <p class="font-body-sm text-body-sm text-text-secondary mt-1">High Court, NCLT &amp; District Tribunals</p>
                 </div>
                 <div class="mt-space-sm pt-2 bg-surface-subtle border-t border-border-hairline -mx-space-md -mb-space-md px-space-md py-2 flex items-center justify-between text-text-muted font-caption text-caption">
                     <span>31 High Court · 17 Tribunals</span>
-                    <a href="{{ route('matters.index') }}" class="text-pine-primary font-medium hover:underline cursor-pointer">View registry →</a>
+                    <a href="{{ route('matters.index') }}" class="text-pine-primary font-medium hover:underline cursor-pointer group flex items-center gap-0.5">
+                        <span>View registry</span>
+                        <span class="group-hover:translate-x-0.5 transition-transform">→</span>
+                    </a>
                 </div>
             </div>
 
@@ -58,14 +64,17 @@
                 </div>
                 <div class="mt-space-sm">
                     <div class="flex items-baseline gap-2">
-                        <span class="font-headline-lg text-headline-lg text-primary font-serif font-normal">{{ $eventsCount ?? $events->count() }}</span>
+                        <span class="font-headline-lg text-headline-lg text-primary font-serif font-normal tabular-nums">{{ $eventsCount ?? $events->count() }}</span>
                         <span class="px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-800 font-label-sm text-label-sm font-medium">2 Priority Arguments</span>
                     </div>
                     <p class="font-body-sm text-body-sm text-text-secondary mt-1">Scheduled next 5 days across benches</p>
                 </div>
                 <div class="mt-space-sm pt-2 bg-surface-subtle border-t border-border-hairline -mx-space-md -mb-space-md px-space-md py-2 flex items-center justify-between text-text-muted font-caption text-caption">
                     <span>Earliest: Today 10:30 AM</span>
-                    <a href="{{ route('calendar.index') }}" class="text-pine-primary font-medium hover:underline cursor-pointer">Cause list →</a>
+                    <a href="{{ route('calendar.index') }}" class="text-pine-primary font-medium hover:underline cursor-pointer group flex items-center gap-0.5">
+                        <span>Cause list</span>
+                        <span class="group-hover:translate-x-0.5 transition-transform">→</span>
+                    </a>
                 </div>
             </div>
 
@@ -77,14 +86,17 @@
                 </div>
                 <div class="mt-space-sm">
                     <div class="flex items-baseline gap-2">
-                        <span class="font-headline-lg text-headline-lg text-primary font-serif font-normal">{{ $tasksCount ?? $tasks->count() }}</span>
-                        <span class="text-error font-label-sm text-label-sm font-medium">Due ≤ 5 Days</span>
+                        <span class="font-headline-lg text-headline-lg text-primary font-serif font-normal tabular-nums">{{ $tasksCount ?? $tasks->count() }}</span>
+                        <span class="px-2 py-0.5 rounded bg-red-50 text-red-800 border border-red-200 font-label-sm text-label-sm font-medium">Due ≤ 5 Days</span>
                     </div>
                     <p class="font-body-sm text-body-sm text-text-secondary mt-1">Caveats, Rejoinders &amp; Submissions</p>
                 </div>
                 <div class="mt-space-sm pt-2 bg-surface-subtle border-t border-border-hairline -mx-space-md -mb-space-md px-space-md py-2 flex items-center justify-between text-text-muted font-caption text-caption">
                     <span>3 awaiting Senior Counsel clearance</span>
-                    <a href="{{ route('tasks.index') }}" class="text-pine-primary font-medium hover:underline cursor-pointer">Review queue →</a>
+                    <a href="{{ route('tasks.index') }}" class="text-pine-primary font-medium hover:underline cursor-pointer group flex items-center gap-0.5">
+                        <span>Review queue</span>
+                        <span class="group-hover:translate-x-0.5 transition-transform">→</span>
+                    </a>
                 </div>
             </div>
 
@@ -97,10 +109,10 @@
                 <div class="mt-space-sm">
                     <div class="flex items-baseline justify-between">
                         <div class="flex items-baseline gap-1">
-                            <span class="font-headline-lg text-headline-lg text-primary font-serif font-normal">₹42.8L</span>
-                            <span class="font-label-sm text-label-sm text-text-muted">/ ₹58.0L</span>
+                            <span class="font-headline-lg text-headline-lg text-primary font-serif font-normal tabular-nums">₹42.8L</span>
+                            <span class="font-label-sm text-label-sm text-text-muted tabular-nums">/ ₹58.0L</span>
                         </div>
-                        <span class="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-title-sm text-title-sm">82%</span>
+                        <span class="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-title-sm text-title-sm tabular-nums">82%</span>
                     </div>
                     <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
                         <div class="bg-pine-primary h-full rounded-full" style="width: 82%;"></div>
@@ -108,7 +120,10 @@
                 </div>
                 <div class="mt-space-sm pt-2 bg-surface-subtle border-t border-border-hairline -mx-space-md -mb-space-md px-space-md py-2 flex items-center justify-between text-text-muted font-caption text-caption">
                     <span>₹15.2L uncollected across clients</span>
-                    <a href="{{ route('billing.index') }}" class="text-pine-primary font-medium hover:underline cursor-pointer">Chambers ledger →</a>
+                    <a href="{{ route('billing.index') }}" class="text-pine-primary font-medium hover:underline cursor-pointer group flex items-center gap-0.5">
+                        <span>Chambers ledger</span>
+                        <span class="group-hover:translate-x-0.5 transition-transform">→</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -132,10 +147,10 @@
                             <h2 class="font-headline-md text-headline-md text-primary font-serif font-medium">Critical Litigation Dockets &amp; Upcoming Hearings</h2>
                         </div>
                         <div class="flex items-center gap-space-xs">
-                            <a href="{{ route('matters.index') }}" class="px-space-sm py-1 rounded bg-surface-card border border-border-hairline text-text-secondary text-label-sm font-label-sm hover:text-text-primary shadow-sm">
+                            <a href="{{ route('matters.index') }}" class="btn-secondary h-8 px-2.5 text-xs">
                                 All Matters ({{ $matters->count() }})
                             </a>
-                            <span class="px-space-sm py-1 rounded bg-pine-primary text-white text-label-sm font-label-sm">
+                            <span class="px-2.5 py-1 rounded bg-pine-primary text-white text-xs font-semibold">
                                 Active Hearings
                             </span>
                         </div>
@@ -153,12 +168,12 @@
                                     <th class="py-space-sm px-space-md text-right">Action</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-surface-subtle font-body-sm text-body-sm">
+                            <tbody class="divide-y divide-border-hairline font-body-sm text-body-sm">
                                 @forelse($matters as $matter)
-                                <tr class="hover:bg-surface-subtle transition-colors group">
+                                <tr class="hover:bg-canvas-ivory transition-colors group">
                                     <td class="py-space-md px-space-md align-top">
                                         <div class="flex flex-col">
-                                            <a href="{{ route('matters.show', $matter->id) }}" class="font-title-sm text-title-sm text-text-primary group-hover:text-pine-primary transition-colors">
+                                            <a href="{{ route('matters.show', $matter->id) }}" class="font-title-sm text-title-sm text-text-primary group-hover:text-pine-primary transition-colors font-semibold">
                                                 {{ $matter->title }}
                                             </a>
                                             <span class="font-caption text-caption text-text-muted font-mono mt-0.5">
@@ -174,16 +189,16 @@
                                     </td>
                                     <td class="py-space-md px-space-md align-top">
                                         <div class="flex flex-col">
-                                            <span class="font-label-md text-label-md text-text-primary">{{ $matter->court_name ?? 'High Court of Delhi' }}</span>
+                                            <span class="font-label-md text-label-md text-text-primary font-medium">{{ $matter->court_name ?? 'High Court of Delhi' }}</span>
                                             <span class="text-text-muted font-caption text-caption">Courtroom 14 · Commercial Bench</span>
                                         </div>
                                     </td>
                                     <td class="py-space-md px-space-md align-top">
                                         <div class="flex flex-col gap-1 items-start">
                                             <span class="font-label-sm text-label-sm text-text-primary">Scheduled Term Q2</span>
-                                            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-label-sm text-label-sm inline-flex items-center gap-1">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                                                {{ $matter->stage }}
+                                            <span class="px-2 py-0.5 rounded bg-pine-primary/10 text-pine-primary border border-pine-primary/20 font-label-sm text-label-sm inline-flex items-center gap-1.5 font-medium">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-pine-primary"></span>
+                                                <span>{{ $matter->stage }}</span>
                                             </span>
                                         </div>
                                     </td>
@@ -194,9 +209,9 @@
                                         </div>
                                     </td>
                                     <td class="py-space-md px-space-md align-top text-right whitespace-nowrap">
-                                        <a href="{{ route('matters.show', $matter->id) }}" class="inline-flex items-center gap-1 font-title-sm text-title-sm text-pine-primary hover:text-pine-hover">
+                                        <a href="{{ route('matters.show', $matter->id) }}" class="inline-flex items-center gap-1 font-title-sm text-title-sm text-pine-primary hover:text-pine-hover group">
                                             <span>Open Brief</span>
-                                            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                                            <span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
                                         </a>
                                     </td>
                                 </tr>
@@ -230,7 +245,7 @@
                         </div>
                         <div class="flex items-center gap-space-sm">
                             <span class="font-caption text-caption text-text-muted">{{ $tasks->count() }} Active items in queue</span>
-                            <a href="{{ route('tasks.index') }}" class="px-3 py-1.5 rounded bg-surface-subtle border border-border-hairline text-text-primary text-label-sm font-label-sm hover:bg-surface-container-high transition-colors">
+                            <a href="{{ route('tasks.index') }}" class="btn-secondary h-8 px-2.5 text-xs">
                                 + New Pleading Draft
                             </a>
                         </div>
@@ -245,13 +260,13 @@
                                     <span class="px-1.5 py-0.5 rounded bg-surface-card border border-border-hairline text-pine-primary font-caption text-caption font-semibold">AFFIDAVIT</span>
                                     <span class="text-text-muted font-caption text-caption">Due 4:00 PM</span>
                                 </div>
-                                <h4 class="font-title-sm text-title-sm text-text-primary mt-1">Affidavit in Reply to Contempt Notice</h4>
+                                <h4 class="font-title-sm text-title-sm text-text-primary mt-1 font-semibold">Affidavit in Reply to Contempt Notice</h4>
                                 <p class="font-caption text-caption text-text-secondary">Ready for client deponent attestation &amp; notary stamp.</p>
                             </div>
                             <div class="flex flex-col gap-2 pt-2">
                                 <div class="flex items-center justify-between text-text-muted font-caption text-caption">
                                     <span>Drafted by Chambers Team</span>
-                                    <span class="text-pine-primary font-medium">90% Complete</span>
+                                    <span class="text-pine-primary font-medium tabular-nums">90% Complete</span>
                                 </div>
                                 <div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
                                     <div class="bg-pine-primary h-full rounded-full" style="width: 90%;"></div>
@@ -261,7 +276,7 @@
                                         <input checked type="checkbox" class="accent-pine-primary rounded"/>
                                         <span>Advocate Approved</span>
                                     </label>
-                                    <span class="text-pine-primary font-title-sm text-title-sm text-[12px]">Sign brief →</span>
+                                    <span class="text-pine-primary font-title-sm text-title-sm text-[12px] group hover:underline cursor-pointer">Sign brief →</span>
                                 </div>
                             </div>
                         </div>
@@ -271,9 +286,9 @@
                             <div class="flex flex-col gap-1">
                                 <div class="flex items-center justify-between">
                                     <span class="px-1.5 py-0.5 rounded bg-surface-card border border-border-hairline text-pine-primary font-caption text-caption font-semibold">CAVEAT PETITION</span>
-                                    <span class="text-error font-caption text-caption font-medium">Urgent Today</span>
+                                    <span class="text-red-700 font-caption text-caption font-medium">Urgent Today</span>
                                 </div>
-                                <h4 class="font-title-sm text-title-sm text-text-primary mt-1">Caveat u/S 148A CPC (NCLT Bench II)</h4>
+                                <h4 class="font-title-sm text-title-sm text-text-primary mt-1 font-semibold">Caveat u/S 148A CPC (NCLT Bench II)</h4>
                                 <p class="font-caption text-caption text-text-secondary">Prevents ex-parte interim injunction against debt rollover.</p>
                             </div>
                             <div class="flex flex-col gap-2 pt-2">
@@ -289,7 +304,7 @@
                                         <input type="checkbox" class="accent-pine-primary rounded"/>
                                         <span>Vakalatnama Stamped</span>
                                     </label>
-                                    <span class="text-pine-primary font-title-sm text-title-sm text-[12px]">E-File →</span>
+                                    <span class="text-pine-primary font-title-sm text-title-sm text-[12px] group hover:underline cursor-pointer">E-File →</span>
                                 </div>
                             </div>
                         </div>
@@ -301,7 +316,7 @@
                                     <span class="px-1.5 py-0.5 rounded bg-surface-card border border-border-hairline text-pine-primary font-caption text-caption font-semibold">REJOINDER</span>
                                     <span class="text-text-muted font-caption text-caption">Due Friday</span>
                                 </div>
-                                <h4 class="font-title-sm text-title-sm text-text-primary mt-1">Rejoinder to Written Statement</h4>
+                                <h4 class="font-title-sm text-title-sm text-text-primary mt-1 font-semibold">Rejoinder to Written Statement</h4>
                                 <p class="font-caption text-caption text-text-secondary">Citing Hon'ble SC precedent on holographic codicil validity.</p>
                             </div>
                             <div class="flex flex-col gap-2 pt-2">
@@ -317,7 +332,7 @@
                                         <input checked type="checkbox" class="accent-pine-primary rounded"/>
                                         <span>Citation Verified</span>
                                     </label>
-                                    <span class="text-pine-primary font-title-sm text-title-sm text-[12px]">Print docket →</span>
+                                    <span class="text-pine-primary font-title-sm text-title-sm text-[12px] group hover:underline cursor-pointer">Print docket →</span>
                                 </div>
                             </div>
                         </div>
@@ -337,12 +352,12 @@
                     </div>
                     <h3 class="font-headline-sm text-headline-sm text-primary font-serif font-medium">Chambers Quick Actions</h3>
                     <div class="grid grid-cols-1 gap-2.5">
-                        <a href="{{ route('matters.create') }}" class="w-full py-2.5 px-space-md rounded bg-pine-primary text-on-primary font-title-sm text-title-sm flex items-center justify-between hover:bg-pine-hover transition-colors shadow-sm text-left">
+                        <a href="{{ route('matters.create') }}" class="btn-primary w-full flex items-center justify-between text-left">
                             <span class="flex items-center gap-2">
                                 <span class="material-symbols-outlined text-[18px]">post_add</span>
                                 <span>+ File New Matter</span>
                             </span>
-                            <span class="text-caption font-caption text-on-primary-container">E-Filing Portal</span>
+                            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
                         </a>
 
                         <a href="{{ route('calendar.index') }}" class="w-full py-2.5 px-space-md rounded bg-surface-subtle border border-border-hairline text-text-primary font-title-sm text-title-sm flex items-center justify-between hover:bg-surface-container-high transition-colors text-left">
@@ -385,20 +400,20 @@
                         @forelse($events->take(3) as $event)
                         <div class="flex gap-space-sm items-start relative">
                             <div class="flex flex-col items-center">
-                                <span class="w-2.5 h-2.5 rounded-full {{ $event->is_statutory_deadline ? 'bg-error' : 'bg-pine-primary' }} ring-4 ring-emerald-100 mt-1"></span>
+                                <span class="w-2.5 h-2.5 rounded-full {{ $event->is_statutory_deadline ? 'bg-red-600' : 'bg-pine-primary' }} ring-4 ring-emerald-100 mt-1"></span>
                                 <span class="w-0.5 h-16 bg-surface-container-high mt-1"></span>
                             </div>
                             <div class="flex-1 bg-surface-subtle border border-border-hairline rounded p-space-sm flex flex-col gap-1">
                                 <div class="flex items-center justify-between">
-                                    <span class="font-title-sm text-title-sm text-text-primary">{{ $event->start_time->format('g:i A') }}</span>
-                                    <span class="px-1.5 py-0.5 rounded {{ $event->is_statutory_deadline ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800' }} font-caption text-caption font-medium">
+                                    <span class="font-title-sm text-title-sm text-text-primary tabular-nums font-semibold">{{ $event->start_time->format('g:i A') }}</span>
+                                    <span class="px-1.5 py-0.5 rounded {{ $event->is_statutory_deadline ? 'bg-red-50 text-red-800 border border-red-200' : 'bg-pine-primary/10 text-pine-primary border border-pine-primary/20' }} font-caption text-caption font-medium">
                                         {{ $event->event_type }}
                                     </span>
                                 </div>
-                                <p class="font-label-sm text-label-sm text-text-primary">{{ $event->title }}</p>
+                                <p class="font-label-sm text-label-sm text-text-primary font-medium">{{ $event->title }}</p>
                                 <div class="flex items-center justify-between font-caption text-caption text-text-muted">
                                     <span>{{ $event->location ?? 'Court hearing' }}</span>
-                                    <span class="text-pine-primary font-medium">{{ $event->matter?->case_number }}</span>
+                                    <span class="text-pine-primary font-mono font-medium">{{ $event->matter?->case_number }}</span>
                                 </div>
                             </div>
                         </div>
@@ -422,49 +437,49 @@
                         <!-- Associate 1 -->
                         <div class="flex items-center justify-between p-space-sm rounded border border-border-hairline bg-surface-subtle">
                             <div class="flex items-center gap-space-sm">
-                                <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-title-sm text-title-sm">
+                                <div class="w-8 h-8 rounded-full bg-pine-primary text-white flex items-center justify-center font-title-sm text-title-sm font-semibold shadow-xs">
                                     AS
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="font-title-sm text-title-sm text-text-primary">Adv. Ananya Sharma</span>
+                                    <span class="font-title-sm text-title-sm text-text-primary font-semibold">Adv. Ananya Sharma</span>
                                     <span class="font-caption text-caption text-text-muted">Managing Counsel · High Court</span>
                                 </div>
                             </div>
-                            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 font-label-sm text-label-sm flex items-center gap-1 border border-emerald-200">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                                In Court 14
+                            <span class="px-2 py-0.5 rounded bg-pine-primary/10 text-pine-primary font-label-sm text-label-sm flex items-center gap-1.5 border border-pine-primary/20 font-medium">
+                                <span class="w-1.5 h-1.5 rounded-full bg-pine-primary"></span>
+                                <span>In Court 14</span>
                             </span>
                         </div>
 
                         <!-- Associate 2 -->
                         <div class="flex items-center justify-between p-space-sm rounded border border-border-hairline bg-surface-subtle">
                             <div class="flex items-center gap-space-sm">
-                                <div class="w-8 h-8 rounded-full bg-surface-container-high text-primary flex items-center justify-center font-title-sm text-title-sm font-semibold">
+                                <div class="w-8 h-8 rounded-full bg-surface-card border border-border-hairline text-pine-primary flex items-center justify-center font-title-sm text-title-sm font-semibold shadow-xs">
                                     DO
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="font-title-sm text-title-sm text-text-primary">Adv. Daniel Okafor</span>
+                                    <span class="font-title-sm text-title-sm text-text-primary font-semibold">Adv. Daniel Okafor</span>
                                     <span class="font-caption text-caption text-text-muted">Senior Retained Counsel</span>
                                 </div>
                             </div>
-                            <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-800 font-label-sm text-label-sm flex items-center gap-1 border border-blue-200">
+                            <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-800 font-label-sm text-label-sm flex items-center gap-1.5 border border-blue-200 font-medium">
                                 <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                                Briefing Session
+                                <span>Briefing Session</span>
                             </span>
                         </div>
 
                         <!-- Associate 3 -->
                         <div class="flex items-center justify-between p-space-sm rounded border border-border-hairline bg-surface-subtle">
                             <div class="flex items-center gap-space-sm">
-                                <div class="w-8 h-8 rounded-full bg-surface-container-high text-primary flex items-center justify-center font-title-sm text-title-sm font-semibold">
+                                <div class="w-8 h-8 rounded-full bg-surface-card border border-border-hairline text-text-secondary flex items-center justify-center font-title-sm text-title-sm font-semibold shadow-xs">
                                     LO
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="font-title-sm text-title-sm text-text-primary">Luis Ortega</span>
+                                    <span class="font-title-sm text-title-sm text-text-primary font-semibold">Luis Ortega</span>
                                     <span class="font-caption text-caption text-text-muted">Senior Paralegal · Docket Registry</span>
                                 </div>
                             </div>
-                            <span class="px-2 py-0.5 rounded bg-surface-card border border-border-hairline text-text-secondary font-label-sm text-label-sm">
+                            <span class="px-2 py-0.5 rounded bg-surface-card border border-border-hairline text-text-secondary font-label-sm text-label-sm font-medium">
                                 Chambers (Drafting)
                             </span>
                         </div>
