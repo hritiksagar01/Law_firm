@@ -30,6 +30,7 @@ jobs:
           script: |
             echo "Connected to EC2 server successfully."
             cd /var/www/lawfirm
+            sudo chown -R ubuntu:ubuntu /var/www/lawfirm || true
             git config --global --add safe.directory /var/www/lawfirm || true
 
             echo "=== Fetching target commit from origin ==="
