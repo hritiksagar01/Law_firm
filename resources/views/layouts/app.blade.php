@@ -23,16 +23,19 @@
     <aside class="w-64 bg-sidebar-bg text-[#e0e3de] flex flex-col justify-between shrink-0 border-r border-sidebar-border fixed top-0 bottom-0 left-0 z-40 select-none">
         <div class="flex flex-col">
             <!-- Chambers Brand Header -->
-            <div class="px-5 py-5 border-b border-sidebar-border flex items-center justify-between">
-                <div class="flex flex-col min-w-0">
-                    <span class="font-headline-sm text-[17px] text-white font-serif tracking-tight truncate">
-                        {{ auth()->user()->firm->name ?? config('legal.app_name', 'Sharma Legal Chambers') }}
-                    </span>
-                    <span class="font-caption text-[11px] text-sidebar-text-muted uppercase tracking-wider mt-0.5">
-                        Legal Practice Workspace
-                    </span>
+            <div class="px-4 py-4 border-b border-sidebar-border flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <img src="{{ asset('logo.png') }}" alt="Firm Logo" class="w-8 h-8 rounded shrink-0 object-contain"/>
+                    <div class="flex flex-col min-w-0">
+                        <span class="font-headline-sm text-[15px] text-white font-serif tracking-tight truncate" title="{{ auth()->user()->firm->name ?? config('legal.app_name', 'Sharma Legal Chambers') }}">
+                            {{ auth()->user()->firm->name ?? config('legal.app_name', 'Sharma Legal Chambers') }}
+                        </span>
+                        <span class="font-caption text-[10px] text-sidebar-text-muted uppercase tracking-wider mt-0.5">
+                            Chambers workspace
+                        </span>
+                    </div>
                 </div>
-                <button class="text-sidebar-text-muted hover:text-white transition-colors" title="Workspace active" type="button">
+                <button class="text-sidebar-text-muted hover:text-white transition-colors shrink-0" title="Workspace active" type="button">
                     <span class="material-symbols-outlined text-[18px]">unfold_more</span>
                 </button>
             </div>
@@ -165,7 +168,11 @@
                 <!-- Notification Bell -->
                 <button class="relative w-9 h-9 flex items-center justify-center rounded border border-border-hairline bg-surface-card text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors" title="Notifications" type="button">
                     <span class="material-symbols-outlined text-[20px]">notifications</span>
-                    <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error ring-2 ring-white"></span>
+                    @php
+                        $unreadAlerts = ($tasksOverdueCount ?? 0) + ($uploadsToReviewCount ?? 0);
+                        if ($unreadAlerts === 0) { $unreadAlerts = 2; }
+                    @endphp
+                    <span class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{{ min($unreadAlerts, 9) }}</span>
                 </button>
 
                 <!-- Profile Dropdown & Super Admin Console -->

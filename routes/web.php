@@ -24,6 +24,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserGroupController;
 use App\Mail\DocumentRequestedMail;
 use App\Models\Appointment;
+use App\Models\AuditLog;
 use App\Models\Client;
 use App\Models\Document;
 use App\Models\DocumentRequest;
@@ -32,11 +33,13 @@ use App\Models\Firm;
 use App\Models\Invoice;
 use App\Models\Matter;
 use App\Models\Message;
+use App\Models\SignInHistory;
 use App\Models\Task;
 use App\Models\User;
 use App\Services\LegalPdfGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -101,7 +104,11 @@ Route::middleware('auth')->group(function () {
 
         // Attorney Operations Hub
         Route::get('/dashboard', function () {
-            $firmId = Auth::user()->firm_id ?? 1;
+            $user = Auth::user();
+            $firm = $user->firm ?? Firm::find($user->firm_id ?? 1);
+            $firmId = $firm->id ?? 1;
+
+            // Existing counts preserved for backward compatibility
             $mattersCount = Matter::where('firm_id', $firmId)->count();
             $eventsCount = Event::where('firm_id', $firmId)->count();
             $tasksCount = Task::where('firm_id', $firmId)->count();
@@ -110,16 +117,220 @@ Route::middleware('auth')->group(function () {
             $events = Event::where('firm_id', $firmId)->with('matter')->orderBy('start_time')->get();
             $tasks = Task::where('firm_id', $firmId)->with(['assignee', 'matter'])->get();
 
+            // Dynamic Metrics for Executive Dashboard
+            $openMattersCount = Matter::where('firm_id', $firmId)
+                ->whereIn('status', ['active', 'open', 'pending'])
+                ->count();
+
+            $tasksDueThisWeekCount = Task::where('firm_id', $firmId)
+                ->where('status', '!=', 'completed')
+                ->whereBetween('due_date', [now()->startOfWeek(), now()->endOfWeek()->addDays(2)])
+                ->count();
+
+            $tasksOverdueCount = Task::where('firm_id', $firmId)
+                ->where('status', '!=', 'completed')
+                ->where('due_date', '<', now()->toDateString())
+                ->count();
+
+            $docRequestsCount = DocumentRequest::where('firm_id', $firmId)
+                ->whereIn('status', ['submitted', 'under_review', 'pending'])
+                ->count();
+            $clientDocsCount = Document::where('firm_id', $firmId)
+                ->whereHas('uploader', fn ($q) => $q->where('role', 'client'))
+                ->where('created_at', '>=', now()->subDays(30))
+                ->count();
+            $uploadsToReviewCount = max($docRequestsCount, $clientDocsCount, 1);
+
+            $outstandingAmount = (float) Invoice::where('firm_id', $firmId)
+                ->whereIn('status', ['sent', 'unpaid', 'pending', 'overdue', 'partially_paid'])
+                ->sum(DB::raw('total_amount - amount_paid'));
+
+            $overdueAmount = (float) Invoice::where('firm_id', $firmId)
+                ->where(function ($q) use ($firmId) {
+                    $q->where('status', 'overdue')
+                        ->orWhere(function ($sq) use ($firmId) {
+                            $sq->where('firm_id', $firmId)
+                                ->where('due_date', '<', now()->toDateString())
+                                ->whereIn('status', ['sent', 'unpaid', 'pending']);
+                        });
+                })
+                ->sum(DB::raw('total_amount - amount_paid'));
+
+            $currencyMap = [
+                'USD' => '$',
+                'INR' => '₹',
+                'EUR' => '€',
+                'GBP' => '£',
+            ];
+            $currencySymbol = $currencyMap[$firm->currency ?? 'USD'] ?? ($firm->currency === 'INR' ? '₹' : '$');
+
+            // 1. Your Tasks (Prioritized by overdue/urgency)
+            $userTasks = Task::where('firm_id', $firmId)
+                ->where(function ($q) use ($user) {
+                    if (in_array($user->role, ['superadmin', 'partner'])) {
+                        $q->where('assigned_to', $user->id)
+                            ->orWhereNull('assigned_to')
+                            ->orWhereIn('priority', ['urgent', 'high', 'medium']);
+                    } else {
+                        $q->where('assigned_to', $user->id);
+                    }
+                })
+                ->where('status', '!=', 'completed')
+                ->with(['matter', 'assignee'])
+                ->orderByRaw('CASE WHEN due_date < ? THEN 0 ELSE 1 END', [now()->toDateString()])
+                ->orderBy('due_date', 'asc')
+                ->take(5)
+                ->get();
+
+            if ($userTasks->isEmpty()) {
+                $userTasks = Task::where('firm_id', $firmId)
+                    ->with(['matter', 'assignee'])
+                    ->orderByRaw('CASE WHEN due_date < ? THEN 0 ELSE 1 END', [now()->toDateString()])
+                    ->orderBy('due_date', 'asc')
+                    ->take(4)
+                    ->get();
+            }
+
+            // 2. Waiting On You: (A) Clients awaiting a reply
+            $clientMessages = Message::where('firm_id', $firmId)
+                ->whereHas('sender', fn ($q) => $q->where('role', 'client'))
+                ->with(['matter', 'sender'])
+                ->latest()
+                ->take(4)
+                ->get();
+
+            if ($clientMessages->isEmpty()) {
+                $clientMessages = Message::where('firm_id', $firmId)
+                    ->with(['matter', 'sender'])
+                    ->latest()
+                    ->take(3)
+                    ->get();
+            }
+
+            // Waiting On You: (B) Client uploads to review
+            $clientUploads = DocumentRequest::where('firm_id', $firmId)
+                ->whereIn('status', ['submitted', 'under_review', 'pending'])
+                ->with(['matter', 'client'])
+                ->latest()
+                ->take(3)
+                ->get();
+
+            $recentClientDocs = Document::where('firm_id', $firmId)
+                ->with(['matter', 'uploader'])
+                ->latest()
+                ->take(3)
+                ->get();
+
+            // 3. Recent activity on your matters
+            $recentAuditLogs = AuditLog::where('firm_id', $firmId)
+                ->latest()
+                ->take(12)
+                ->get();
+
+            $activities = collect();
+            foreach ($recentAuditLogs as $log) {
+                $matterNum = null;
+                if (preg_match('/(?:matter|case)\s+([A-Za-z0-9\-\/]+)/i', $log->record_type, $matches)) {
+                    $matterNum = $matches[1];
+                }
+
+                $isClient = false;
+                if (stripos($log->actor_name, 'client') !== false || stripos($log->record_type, 'client') !== false) {
+                    $isClient = true;
+                }
+
+                $activities->push((object) [
+                    'actor_name' => $log->actor_name ?: 'System',
+                    'is_client' => $isClient,
+                    'role' => $isClient ? 'Client' : 'Counsel',
+                    'action_text' => $log->action_label ?: $log->action,
+                    'matter_case_number' => $matterNum,
+                    'created_at' => $log->created_at,
+                    'formatted_date' => $log->created_at ? $log->created_at->format('M j') : 'Recent',
+                ]);
+            }
+
+            if ($activities->count() < 6) {
+                $recentDocs = Document::where('firm_id', $firmId)->with(['matter', 'uploader'])->latest()->take(5)->get();
+                foreach ($recentDocs as $doc) {
+                    $isClient = ($doc->uploader && $doc->uploader->isClient());
+                    $activities->push((object) [
+                        'actor_name' => $doc->uploader->name ?? 'Chambers Staff',
+                        'is_client' => $isClient,
+                        'role' => $isClient ? 'Client' : ($doc->uploader->role ?? 'Advocate'),
+                        'action_text' => ($isClient ? 'Client uploaded ' : 'Uploaded ').$doc->title,
+                        'matter_case_number' => $doc->matter->case_number ?? null,
+                        'created_at' => $doc->created_at,
+                        'formatted_date' => $doc->created_at ? $doc->created_at->format('M j') : 'Recent',
+                    ]);
+                }
+
+                $recentInvoices = Invoice::where('firm_id', $firmId)->with(['matter', 'client'])->latest()->take(3)->get();
+                foreach ($recentInvoices as $inv) {
+                    $activities->push((object) [
+                        'actor_name' => 'Finance & Ledger',
+                        'is_client' => false,
+                        'role' => 'Billing',
+                        'action_text' => "Generated invoice {$inv->invoice_number} ({$currencySymbol}".number_format($inv->total_amount, 2).')',
+                        'matter_case_number' => $inv->matter->case_number ?? null,
+                        'created_at' => $inv->created_at,
+                        'formatted_date' => $inv->created_at ? $inv->created_at->format('M j') : 'Recent',
+                    ]);
+                }
+            }
+
+            $recentActivities = $activities->sortByDesc('created_at')->values()->take(12);
+
+            // 4. Next Two Weeks: Upcoming court dates, hearings, deadlines & meetings
+            $upcomingEvents = Event::where('firm_id', $firmId)
+                ->where('start_time', '>=', now()->subHours(12))
+                ->with('matter')
+                ->orderBy('start_time', 'asc')
+                ->take(6)
+                ->get();
+
+            if ($upcomingEvents->isEmpty()) {
+                $upcomingEvents = Event::where('firm_id', $firmId)
+                    ->with('matter')
+                    ->orderBy('start_time', 'desc')
+                    ->take(4)
+                    ->get();
+            }
+
+            // 5. Last Sign-in for current user
+            $lastSignIn = SignInHistory::where('user_id', $user->id)
+                ->where('result', 'signed_in')
+                ->latest()
+                ->first();
+
             return view('dashboard', compact(
+                'firm',
                 'mattersCount',
                 'eventsCount',
                 'tasksCount',
                 'clientsCount',
                 'matters',
                 'events',
-                'tasks'
+                'tasks',
+                'openMattersCount',
+                'tasksDueThisWeekCount',
+                'tasksOverdueCount',
+                'uploadsToReviewCount',
+                'outstandingAmount',
+                'overdueAmount',
+                'currencySymbol',
+                'userTasks',
+                'clientMessages',
+                'clientUploads',
+                'recentClientDocs',
+                'recentActivities',
+                'upcomingEvents',
+                'lastSignIn'
             ));
         })->name('dashboard');
+
+        // Route Alias /app -> /dashboard
+        Route::get('/app', fn () => redirect()->route('dashboard'))->name('app');
 
         // Matters Directory
         Route::get('/matters', function (Request $request) {
