@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', $user->name . ' — Users — Platform Console')
+@section('title', $user->name . ' — Clients — Platform Console')
 
 @section('content')
 <div class="space-y-6">
@@ -18,7 +18,7 @@
     <!-- Breadcrumb & Header -->
     <div>
         <nav class="text-xs text-[#5e625e] mb-1 font-sans flex items-center gap-1.5">
-            <a href="{{ route('admin.users.index') }}" class="hover:underline text-[#5e625e]">Users</a>
+            <a href="{{ route('admin.users.index') }}" class="hover:underline text-[#5e625e]">Clients</a>
             <span class="text-[#a3a5a8]">&nbsp;/&nbsp;</span>
             <span class="text-[#1b1c18] font-medium">{{ $user->name }}</span>
         </nav>

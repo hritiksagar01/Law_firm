@@ -1032,6 +1032,7 @@ Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(funct
 
     // ── Platform User Management ─────────────────────────────
     Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
+    Route::get('/clients', fn () => redirect()->route('admin.users.index'))->name('clients.index');
     Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
     Route::get('/users/{user}', [UserManagementController::class, 'show'])->name('users.show');
     Route::post('/users/{user}/role', [UserManagementController::class, 'updateRole'])->name('users.update-role');

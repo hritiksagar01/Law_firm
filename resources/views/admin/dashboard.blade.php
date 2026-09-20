@@ -36,9 +36,9 @@
             <div class="text-[12px] text-[#8a8a8a] mt-1">of {{ $totalFirmsCount ?? 0 }} on the platform</div>
         </a>
 
-        <!-- Users -->
+        <!-- Clients -->
         <a href="{{ route('admin.users.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
-            <div class="text-[12.5px] text-[#646864]">Users</div>
+            <div class="text-[12.5px] text-[#646864]">Clients</div>
             <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ $totalUsersCount ?? 0 }}</div>
             <div class="text-[12px] text-[#8a8a8a] mt-1">{{ $staffCount ?? 0 }} staff · {{ $clientCount ?? 0 }} clients · {{ $adminCount ?? 0 }} platform</div>
         </a>

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Users — Platform Console')
+@section('title', 'Clients — Platform Console')
 
 @section('content')
 <div class="space-y-6">
@@ -25,7 +25,7 @@
 
     <!-- Page Header -->
     <div>
-        <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Users</h1>
+        <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Clients</h1>
         <p class="text-xs text-[#5e625e] mt-1 font-sans">
             Firm staff and client portal accounts, sorted by firm then name
         </p>
