@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', $user->name . ' — Users — Platform Console')
-@section('header_title', 'User Details')
+@section('title', $user->name . ' — Clients — Platform Console')
+@section('header_title', 'Clients')
 
 @section('content')
 <div class="space-y-6" x-data="{ editModalOpen: false }">
@@ -28,7 +28,7 @@
     <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div>
             <nav class="text-xs text-[#5e625e] mb-1 font-sans flex items-center gap-1.5">
-                <a href="{{ route('admin.users.index') }}" class="hover:underline text-[#5e625e]">Users</a>
+                <a href="{{ route('admin.users.index') }}" class="hover:underline text-[#5e625e]">Clients</a>
                 <span class="text-[#a3a5a8]">&nbsp;/&nbsp;</span>
                 <span class="text-[#1b1c18] font-medium">{{ $user->full_display_name }}</span>
             </nav>

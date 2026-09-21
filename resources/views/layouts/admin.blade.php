@@ -67,11 +67,11 @@
                     <span>Firms</span>
                 </a>
 
-                <!-- Users -->
+                <!-- Clients -->
                 <a href="{{ route('admin.users.index') }}" 
                    class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ (request()->routeIs('admin.users.*') || request()->routeIs('admin.clients.*')) ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
                     <span class="material-symbols-outlined text-[19px] {{ (request()->routeIs('admin.users.*') || request()->routeIs('admin.clients.*')) ? 'text-white' : 'text-[#9ca3af]' }}">group</span>
-                    <span>Users</span>
+                    <span>Clients</span>
                 </a>
 
                 <!-- Matters -->

@@ -42,8 +42,8 @@ class SuperAdminUserManagementAndAuditTest extends TestCase
         $response = $this->actingAs($this->superadmin)->get(route('admin.users.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Users');
-        $response->assertSee('Platform administrators, firm advocates, staff, and client portal accounts');
+        $response->assertSee('Clients');
+        $response->assertSee('Firm staff and client portal accounts, sorted by firm then name');
         $response->assertSee('Invite a staff member');
         $response->assertSee('Mobile Phone');
         $response->assertSee('Username');
@@ -343,6 +343,6 @@ class SuperAdminUserManagementAndAuditTest extends TestCase
         $response->assertSee('Platform Notifications');
         $response->assertSee('System Settings');
         $response->assertSee(route('admin.system.index'));
-        $response->assertSee('Users');
+        $response->assertSee('Clients');
     }
 }
