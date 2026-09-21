@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', $firm->name . ' — Firms & plans — Platform Console')
+@section('title', $firm->name . ' — Firms — Platform Console')
 
 @section('content')
 <div class="space-y-6" x-data="{ 
@@ -37,7 +37,7 @@
     <!-- Breadcrumb & Header -->
     <div>
         <nav class="text-xs text-[#5e625e] mb-1 font-sans flex items-center gap-1.5">
-            <a href="{{ route('admin.firms.index') }}" class="hover:underline text-[#5e625e]">Firms &amp; plans</a>
+            <a href="{{ route('admin.firms.index') }}" class="hover:underline text-[#5e625e]">Firms</a>
             <span class="text-[#a3a5a8]">&nbsp;/&nbsp;</span>
             <span class="text-[#1b1c18] font-medium">{{ $firm->name }}</span>
         </nav>
@@ -57,20 +57,6 @@
             @else
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#fee2e2] text-[#991b1b] border border-[#fecaca]">
                 Firm {{ $firm->status }}
-            </span>
-            @endif
-
-            @php
-                $sub = $currentSubscription;
-                $isPastDue = ($sub && $sub->status === 'past_due');
-            @endphp
-            @if($isPastDue)
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#fef3c7] text-[#92400e] border border-[#fde68a]">
-                Payment past due
-            </span>
-            @else
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#dcfce7] text-[#166534] border border-[#bbf7d0]">
-                Billing current
             </span>
             @endif
 
@@ -333,88 +319,8 @@
 
         </div>
 
-        <!-- Right Column: Subscription, Usage, Firm Access -->
+        <!-- Right Column: Usage & Firm Access -->
         <div class="lg:col-span-4 space-y-6">
-
-            <!-- Subscription Card -->
-            <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
-                <h2 class="text-sm font-semibold text-[#1b1c18] mb-4">Subscription</h2>
-
-                <form method="POST" action="{{ route('admin.firms.change-subscription', $firm) }}" class="space-y-4">
-                    @csrf
-
-                    <!-- Plan -->
-                    <div>
-                        <label for="sub_plan_id" class="block text-xs font-medium text-[#1b1c18] mb-1.5">Plan</label>
-                        <div class="relative">
-                            <select name="plan_id" id="sub_plan_id" required
-                                    class="w-full px-3 py-2 text-xs rounded-sm border border-[#dcdad4] bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a] focus:ring-1 focus:ring-[#23493a] appearance-none pr-8">
-                                @foreach($plans as $p)
-                                <option value="{{ $p->id }}" {{ ($currentSubscription?->plan_id == $p->id || (empty($currentSubscription) && str_contains(strtolower($p->name), 'practice'))) ? 'selected' : '' }}>
-                                    {{ $p->name }} &mdash; ${{ number_format($p->price, 2) }}/mo
-                                </option>
-                                @endforeach
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-[#5e625e]">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Seats -->
-                    <div>
-                        <label for="sub_seats" class="block text-xs font-medium text-[#1b1c18] mb-1.5">Seats</label>
-                        <input type="number" name="seats" id="sub_seats" min="1"
-                               value="{{ $currentSubscription?->plan?->max_users ?? 15 }}"
-                               class="w-full px-3 py-2 text-xs rounded-sm border border-[#dcdad4] bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]" />
-                        <span class="block text-[11px] text-[#5e625e] mt-1">
-                            {{ $staffCount }} staff accounts in use (active and invited).
-                        </span>
-                    </div>
-
-                    <!-- Billing status -->
-                    <div>
-                        <label for="sub_status" class="block text-xs font-medium text-[#1b1c18] mb-1.5">Billing status</label>
-                        <div class="relative">
-                            <select name="billing_status" id="sub_status"
-                                    class="w-full px-3 py-2 text-xs rounded-sm border border-[#dcdad4] bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a] appearance-none pr-8">
-                                <option value="active" {{ ($currentSubscription?->status === 'active' || empty($currentSubscription)) ? 'selected' : '' }}>Billing current</option>
-                                <option value="past_due" {{ $currentSubscription?->status === 'past_due' ? 'selected' : '' }}>Payment past due</option>
-                                <option value="trialing" {{ $currentSubscription?->status === 'trialing' ? 'selected' : '' }}>Trialing</option>
-                                <option value="canceled" {{ $currentSubscription?->status === 'canceled' ? 'selected' : '' }}>Canceled</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-[#5e625e]">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Renews on -->
-                    @php
-                        $renewalDate = $currentSubscription?->ends_at ?? now()->addYear();
-                    @endphp
-                    <div>
-                        <label for="sub_renews" class="block text-xs font-medium text-[#1b1c18] mb-1.5">Renews on</label>
-                        <input type="date" name="ends_at" id="sub_renews"
-                               value="{{ $renewalDate->format('Y-m-d') }}"
-                               class="w-full px-3 py-2 text-xs rounded-sm border border-[#dcdad4] bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]" />
-                        <span class="block text-[11px] text-[#5e625e] mt-1">
-                            Currently {{ $renewalDate->format('M j, Y') }}
-                        </span>
-                    </div>
-
-                    <div class="pt-2">
-                        <button type="submit"
-                                class="inline-flex items-center px-4 py-2 bg-[#23493a] text-white text-xs font-medium rounded-sm hover:bg-[#1a382c] transition-colors shadow-none">
-                            Save subscription
-                        </button>
-                    </div>
-                </form>
-
-                <p class="text-[11px] text-[#5e625e] mt-4 pt-3 border-t border-[#e5e3dc]">
-                    Billing status is a record only. Suspend the firm below to block access.
-                </p>
-            </div>
 
             <!-- Usage Card -->
             <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
@@ -453,9 +359,9 @@
                     </div>
 
                     <div>
-                        <span class="text-[#5e625e] block text-[11px]">Seats used</span>
+                        <span class="text-[#5e625e] block text-[11px]">Staff accounts</span>
                         <strong class="font-medium text-[#1b1c18] text-sm block mt-0.5">
-                            {{ $staffCount }} of {{ $currentSubscription?->plan?->max_users ?? 15 }}
+                            {{ $staffCount }}
                         </strong>
                     </div>
 

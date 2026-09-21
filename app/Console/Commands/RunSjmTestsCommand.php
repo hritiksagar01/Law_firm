@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 class RunSjmTestsCommand extends Command
 {
     protected $signature = 'sjm:test';
+
     protected $description = 'Execute all 23 automated test suites for SJM Law Firm Management Platform';
 
     public function handle(TestManagementSystem $tester): int

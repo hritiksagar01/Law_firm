@@ -23,6 +23,7 @@ class DocumentRequestedMail extends Mailable
     public function envelope(): Envelope
     {
         $matterTitle = $this->documentRequest->matter->title ?? 'Case File';
+
         return new Envelope(
             subject: "Action Required: Document Requested for {$matterTitle}",
         );

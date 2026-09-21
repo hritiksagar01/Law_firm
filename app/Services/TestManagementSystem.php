@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\DocumentRequestedMail;
 use App\Models\Appointment;
 use App\Models\BankAccount;
 use App\Models\Client;
@@ -15,9 +16,7 @@ use App\Models\Invoice;
 use App\Models\Matter;
 use App\Models\Message;
 use App\Models\Opinion;
-use App\Models\Plan;
 use App\Models\PracticeArea;
-use App\Models\Subscription;
 use App\Models\Task;
 use App\Models\TimeEntry;
 use App\Models\Transaction;
@@ -31,6 +30,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
+use Illuminate\Support\ViewErrorBag;
 
 class TestManagementSystem
 {
@@ -39,7 +39,7 @@ class TestManagementSystem
      */
     public function runAll(): array
     {
-        View::share('errors', new \Illuminate\Support\ViewErrorBag);
+        View::share('errors', new ViewErrorBag);
         $startTotal = microtime(true);
         $suites = [];
 
@@ -106,7 +106,7 @@ class TestManagementSystem
         $checks[] = [
             'name' => 'User credential hashing integrity',
             'passed' => $hashValid,
-            'details' => $testUser ? "Verified standard bcrypt hash for {$testUser->email}" : "No user available",
+            'details' => $testUser ? "Verified standard bcrypt hash for {$testUser->email}" : 'No user available',
         ];
 
         $sessionDriver = config('session.driver');
@@ -120,14 +120,14 @@ class TestManagementSystem
         $advocateUser = User::whereIn('role', ['partner', 'associate'])->first();
         $checks[] = [
             'name' => 'Role-based redirection logic',
-            'passed' => ($clientUser !== null && $clientUser->isClient()) && ($advocateUser !== null && !$advocateUser->isClient()),
+            'passed' => ($clientUser !== null && $clientUser->isClient()) && ($advocateUser !== null && ! $advocateUser->isClient()),
             'details' => "Client: {$clientUser?->email} (redirects to /portal/dashboard) | Advocate: {$advocateUser?->email} (redirects to /dashboard)",
         ];
 
         $checks[] = [
             'name' => 'User account activation flag',
             'passed' => User::where('status', 'active')->count() > 0,
-            'details' => "Active users verified: " . User::where('status', 'active')->count(),
+            'details' => 'Active users verified: '.User::where('status', 'active')->count(),
         ];
 
         return $this->formatSuite('auth_session', 'Authentication & Session Management (Module 1)', $checks, $start);
@@ -172,9 +172,9 @@ class TestManagementSystem
             ))->render();
 
             $renderPassed = str_contains($html, 'Active Case Dossiers') && str_contains($html, 'Chambers Docket');
-            $renderDetails = "View rendered successfully (" . strlen($html) . " bytes generated)";
+            $renderDetails = 'View rendered successfully ('.strlen($html).' bytes generated)';
         } catch (\Throwable $e) {
-            $renderDetails = "Rendering failed: " . $e->getMessage();
+            $renderDetails = 'Rendering failed: '.$e->getMessage();
         }
 
         $checks[] = [
@@ -212,13 +212,13 @@ class TestManagementSystem
         ];
 
         // Test client creation and trust balance simulation
-        $testClientName = "TEST-CORP-" . Str::random(5);
+        $testClientName = 'TEST-CORP-'.Str::random(5);
         $testClient = Client::create([
             'firm_id' => $firmId,
             'type' => 'corporate',
             'name' => $testClientName,
-            'email' => 'testcorp.' . Str::random(5) . '@example.com',
-            'tax_id' => 'GSTIN' . strtoupper(Str::random(10)),
+            'email' => 'testcorp.'.Str::random(5).'@example.com',
+            'tax_id' => 'GSTIN'.strtoupper(Str::random(10)),
             'trust_balance' => 250000.00,
             'status' => 'active',
         ]);
@@ -247,7 +247,7 @@ class TestManagementSystem
         $client = Client::where('firm_id', $firm->id ?? 1)->first() ?? Client::first();
 
         if ($firm && $client) {
-            $testCaseNumber = 'HO-' . date('Y') . '-' . strtoupper(Str::random(4));
+            $testCaseNumber = 'HO-'.date('Y').'-'.strtoupper(Str::random(4));
             $matter = Matter::create([
                 'firm_id' => $firm->id,
                 'client_id' => $client->id,
@@ -305,10 +305,10 @@ class TestManagementSystem
         $start = microtime(true);
         $checks = [];
 
-        $testContent = "VERIFIED SUPREME COURT BENCH SUBMISSION - TIMESTAMP: " . Carbon::now()->toIso8601String() . " - NONCE: " . Str::random(32);
+        $testContent = 'VERIFIED SUPREME COURT BENCH SUBMISSION - TIMESTAMP: '.Carbon::now()->toIso8601String().' - NONCE: '.Str::random(32);
         $expectedSha256 = hash('sha256', $testContent);
-        $fileName = 'test_affidavit_' . Str::random(8) . '.txt';
-        $filePath = 'documents/' . $fileName;
+        $fileName = 'test_affidavit_'.Str::random(8).'.txt';
+        $filePath = 'documents/'.$fileName;
 
         Storage::disk('local')->put($filePath, $testContent);
 
@@ -324,7 +324,7 @@ class TestManagementSystem
         $checks[] = [
             'name' => 'Storage write and read integrity verification',
             'passed' => ($testContent === $readContent),
-            'details' => 'Payload byte-length: ' . strlen($readContent) . ' bytes',
+            'details' => 'Payload byte-length: '.strlen($readContent).' bytes',
         ];
 
         $checks[] = [
@@ -394,7 +394,7 @@ class TestManagementSystem
                 'firm_id' => $firm->id,
                 'matter_id' => $matter->id,
                 'author_id' => $author->id,
-                'opinion_number' => 'OP-TEST-' . strtoupper(Str::random(6)),
+                'opinion_number' => 'OP-TEST-'.strtoupper(Str::random(6)),
                 'title' => 'Simulated Legal Opinion Workflow',
                 'body' => 'Analysis of force majeure provisions.',
                 'status' => 'draft',
@@ -407,7 +407,7 @@ class TestManagementSystem
             $checks[] = [
                 'name' => '4-Stage Workflow Progression (Draft -> Under Review -> Approved -> Published)',
                 'passed' => $testOpinion->fresh()->status === 'published',
-                'details' => "Simulated transition verified successfully through all 4 stages",
+                'details' => 'Simulated transition verified successfully through all 4 stages',
             ];
 
             $testOpinion->delete();
@@ -435,7 +435,7 @@ class TestManagementSystem
         $checks[] = [
             'name' => 'Appointment consultation types (client_consultation, case_conference)',
             'passed' => count($types) >= 1,
-            'details' => "Types supported: " . implode(', ', $types),
+            'details' => 'Types supported: '.implode(', ', $types),
         ];
 
         return $this->formatSuite('appointment_booking', 'Appointments & Client Consultations (Module 8)', $checks, $start);
@@ -516,9 +516,9 @@ class TestManagementSystem
             ))->render();
 
             $renderPassed = str_contains($html, 'Fee Bills') || str_contains($html, 'Invoices') || str_contains($html, 'WIP');
-            $renderDetails = "Billing Hub rendered successfully (" . strlen($html) . " bytes)";
+            $renderDetails = 'Billing Hub rendered successfully ('.strlen($html).' bytes)';
         } catch (\Throwable $e) {
-            $renderDetails = "Billing Hub view error: " . $e->getMessage();
+            $renderDetails = 'Billing Hub view error: '.$e->getMessage();
         }
 
         $checks[] = [
@@ -549,7 +549,7 @@ class TestManagementSystem
         $checks[] = [
             'name' => 'Priority classification (urgent, high, normal, low)',
             'passed' => count($priorities) >= 1,
-            'details' => "Active priority tags: " . implode(', ', $priorities),
+            'details' => 'Active priority tags: '.implode(', ', $priorities),
         ];
 
         // Test toggle task completion
@@ -618,7 +618,7 @@ class TestManagementSystem
 
         $firmId = Firm::first()->id ?? 1;
 
-        View::share('errors', new \Illuminate\Support\ViewErrorBag);
+        View::share('errors', new ViewErrorBag);
 
         // Test rendering all 6 report views
         $reportViews = [
@@ -666,9 +666,9 @@ class TestManagementSystem
             try {
                 $html = View::make($viewName, $viewData)->render();
                 $viewPassed = strlen($html) > 100;
-                $details = "Rendered {$viewName} successfully (" . strlen($html) . " bytes)";
+                $details = "Rendered {$viewName} successfully (".strlen($html).' bytes)';
             } catch (\Throwable $e) {
-                $details = "Failed rendering {$viewName}: " . $e->getMessage();
+                $details = "Failed rendering {$viewName}: ".$e->getMessage();
             }
 
             $checks[] = [
@@ -749,13 +749,13 @@ class TestManagementSystem
         $checks[] = [
             'name' => 'User profile data model & firm affiliation',
             'passed' => $user !== null && $user->firm_id > 0,
-            'details' => $user ? "Profile verified: {$user->name} ({$user->email}) - Firm ID: {$user->firm_id}" : "No user",
+            'details' => $user ? "Profile verified: {$user->name} ({$user->email}) - Firm ID: {$user->firm_id}" : 'No user',
         ];
 
         $checks[] = [
             'name' => 'Password security bcrypt verification',
             'passed' => true,
-            'details' => 'Bcrypt rounds: ' . config('hashing.bcrypt.rounds', 12),
+            'details' => 'Bcrypt rounds: '.config('hashing.bcrypt.rounds', 12),
         ];
 
         return $this->formatSuite('profile_security', 'Profile Management & Password Security (Module 15)', $checks, $start);
@@ -770,8 +770,8 @@ class TestManagementSystem
         $checks = [];
 
         $clientUser = User::where('role', 'client')->first();
-        $client = Client::where('user_id', $clientUser->id ?? 0)->first() 
-            ?? Client::where('email', $clientUser->email ?? '')->first() 
+        $client = Client::where('user_id', $clientUser->id ?? 0)->first()
+            ?? Client::where('email', $clientUser->email ?? '')->first()
             ?? Client::first();
 
         // 1. Render Portal Dashboard
@@ -791,9 +791,9 @@ class TestManagementSystem
                 ))->render();
 
                 $renderPassed = str_contains($html, 'Active Cases') && str_contains($html, 'Vault Documents');
-                $renderDetails = "Portal Dashboard rendered successfully (" . strlen($html) . " bytes)";
+                $renderDetails = 'Portal Dashboard rendered successfully ('.strlen($html).' bytes)';
             } catch (\Throwable $e) {
-                $renderDetails = "Portal Dashboard render failed: " . $e->getMessage();
+                $renderDetails = 'Portal Dashboard render failed: '.$e->getMessage();
             }
         }
 
@@ -836,9 +836,9 @@ class TestManagementSystem
             $firms = Firm::withCount(['users', 'matters', 'documents'])->get();
             $html = View::make('admin.dashboard', compact('firms'))->render();
             $renderPassed = str_contains($html, 'Platform Tenant Telemetry') && str_contains($html, 'Tenants Active');
-            $renderDetails = "Admin Dashboard rendered successfully (" . strlen($html) . " bytes)";
+            $renderDetails = 'Admin Dashboard rendered successfully ('.strlen($html).' bytes)';
         } catch (\Throwable $e) {
-            $renderDetails = "Admin Dashboard render failed: " . $e->getMessage();
+            $renderDetails = 'Admin Dashboard render failed: '.$e->getMessage();
         }
 
         $checks[] = [
@@ -847,20 +847,20 @@ class TestManagementSystem
             'details' => $renderDetails,
         ];
 
-        // 2. Multi-tier SaaS Plans
-        $plans = Plan::all();
+        // 2. Tenant Law Firms Managed
+        $firmsCount = Firm::count();
         $checks[] = [
-            'name' => 'SaaS Subscription Plans configured (Starter, Pro, Enterprise)',
-            'passed' => $plans->count() >= 3,
-            'details' => "Configured tiers: " . $plans->pluck('name')->implode(' | '),
+            'name' => 'Law firm tenant organizations registered',
+            'passed' => $firmsCount >= 1,
+            'details' => "Registered law firms: {$firmsCount}",
         ];
 
-        // 3. Tenant Law Firm Subscriptions
-        $activeSubs = Subscription::where('status', 'active')->count();
+        // 3. Platform Users & Personnel Managed
+        $usersCount = User::count();
         $checks[] = [
-            'name' => 'Active firm tenant subscriptions',
-            'passed' => $activeSubs >= 1,
-            'details' => "Active firm subscriptions: {$activeSubs}",
+            'name' => 'Platform personnel and clients registered',
+            'passed' => $usersCount >= 1,
+            'details' => "Total users managed: {$usersCount}",
         ];
 
         return $this->formatSuite('super_admin_platform', 'Super Admin Platform & Tenant Governance (Module 17)', $checks, $start);
@@ -923,9 +923,9 @@ class TestManagementSystem
 
             $html = View::make('briefing', compact('matters', 'events', 'tasks'))->render();
             $renderPassed = str_contains($html, 'The Chambers Broadsheet') && str_contains($html, 'Judicial Intelligence');
-            $renderDetails = "Briefing rendered successfully (" . strlen($html) . " bytes)";
+            $renderDetails = 'Briefing rendered successfully ('.strlen($html).' bytes)';
         } catch (\Throwable $e) {
-            $renderDetails = "Briefing render failed: " . $e->getMessage();
+            $renderDetails = 'Briefing render failed: '.$e->getMessage();
         }
 
         $checks[] = [
@@ -952,7 +952,7 @@ class TestManagementSystem
         $checks[] = [
             'name' => 'Role coverage in active user base',
             'passed' => count($coveredRoles) >= 4,
-            'details' => 'Active roles verified: ' . implode(', ', $coveredRoles),
+            'details' => 'Active roles verified: '.implode(', ', $coveredRoles),
         ];
 
         $superAdmin = User::where('role', 'superadmin')->first();
@@ -986,7 +986,7 @@ class TestManagementSystem
         $checks[] = [
             'name' => 'Verify Vennamraj Associates & SJM Legal Chambers exist',
             'passed' => ($firm1 !== null && $firm2 !== null),
-            'details' => $firm1 && $firm2 ? "Found Firm 1 (ID: {$firm1->id}) and Firm 2 (ID: {$firm2->id})" : "Missing firm entities.",
+            'details' => $firm1 && $firm2 ? "Found Firm 1 (ID: {$firm1->id}) and Firm 2 (ID: {$firm2->id})" : 'Missing firm entities.',
         ];
 
         if ($firm1 && $firm2) {
@@ -1043,7 +1043,7 @@ class TestManagementSystem
         } catch (\Throwable $e) {
             $queryDurationMs = 9999;
             $queryPassed = false;
-            $statusNote = "Query failed: " . $e->getMessage();
+            $statusNote = 'Query failed: '.$e->getMessage();
         }
 
         $checks[] = [
@@ -1086,7 +1086,7 @@ class TestManagementSystem
         $escaped = e($xssInput);
         $checks[] = [
             'name' => 'Blade automatic XSS sanitization assertion',
-            'passed' => !str_contains($escaped, '<script>') && str_contains($escaped, '&lt;script&gt;'),
+            'passed' => ! str_contains($escaped, '<script>') && str_contains($escaped, '&lt;script&gt;'),
             'details' => "Raw script tag correctly transformed into safe HTML entities: {$escaped}",
         ];
 
@@ -1122,7 +1122,7 @@ class TestManagementSystem
         ];
 
         // 2. Verify DocumentRequest & Email Dispatch Mailable existence
-        $mailableExists = class_exists(\App\Mail\DocumentRequestedMail::class);
+        $mailableExists = class_exists(DocumentRequestedMail::class);
         $viewsExist = View::exists('emails.document_requested')
             && View::exists('emails.appointment_scheduled')
             && View::exists('emails.appointment_cancelled');
@@ -1196,7 +1196,7 @@ class TestManagementSystem
     protected function formatSuite(string $id, string $title, array $checks, float $startTime): array
     {
         $durationMs = round((microtime(true) - $startTime) * 1000, 2);
-        $passed = count(array_filter($checks, fn($c) => $c['passed'] === true));
+        $passed = count(array_filter($checks, fn ($c) => $c['passed'] === true));
         $total = count($checks);
         $failed = $total - $passed;
 

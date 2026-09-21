@@ -8,7 +8,6 @@ use App\Models\Invoice;
 use App\Models\Matter;
 use App\Models\TimeEntry;
 use App\Models\Transaction;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -151,7 +150,7 @@ class BillingController extends Controller
         ]);
 
         return redirect()->route('billing.index', ['tab' => 'expenses'])
-            ->with('success', "Expense of ₹" . number_format($validated['amount'], 2) . " logged.");
+            ->with('success', 'Expense of ₹'.number_format($validated['amount'], 2).' logged.');
     }
 
     /**
@@ -214,7 +213,7 @@ class BillingController extends Controller
         Expense::where('matter_id', $matter->id)->where('status', 'unbilled')->update(['status' => 'billed']);
 
         return redirect()->route('billing.index', ['tab' => 'invoices'])
-            ->with('success', "Invoice {$invoiceNumber} for ₹" . number_format($totalAmount, 2) . " successfully generated for {$matter->client->name}.");
+            ->with('success', "Invoice {$invoiceNumber} for ₹".number_format($totalAmount, 2)." successfully generated for {$matter->client->name}.");
     }
 
     /**
@@ -247,13 +246,13 @@ class BillingController extends Controller
             'type' => 'payment',
             'amount' => $amount,
             'payment_method' => $validated['payment_method'],
-            'reference_number' => $validated['reference_number'] ?? ('TXN-' . time()),
+            'reference_number' => $validated['reference_number'] ?? ('TXN-'.time()),
             'date' => now()->toDateString(),
             'notes' => $validated['notes'] ?? "Settlement for {$invoice->invoice_number}",
         ]);
 
         return redirect()->route('billing.index', ['tab' => 'invoices'])
-            ->with('success', "Payment of ₹" . number_format($amount, 2) . " credited toward {$invoice->invoice_number}.");
+            ->with('success', 'Payment of ₹'.number_format($amount, 2)." credited toward {$invoice->invoice_number}.");
     }
 
     /**
@@ -281,7 +280,7 @@ class BillingController extends Controller
             'type' => $validated['type'],
             'amount' => $validated['amount'],
             'payment_method' => $validated['payment_method'],
-            'reference_number' => $validated['reference_number'] ?? ('ADV-' . time()),
+            'reference_number' => $validated['reference_number'] ?? ('ADV-'.time()),
             'date' => $validated['date'],
             'notes' => $validated['notes'],
         ]);
@@ -295,6 +294,6 @@ class BillingController extends Controller
         }
 
         return redirect()->route('billing.index', ['tab' => 'ledger'])
-            ->with('success', "Transaction of ₹" . number_format($validated['amount'], 2) . " registered in chambers ledger.");
+            ->with('success', 'Transaction of ₹'.number_format($validated['amount'], 2).' registered in chambers ledger.');
     }
 }

@@ -193,7 +193,7 @@ return new class extends Migration
             $table->dropForeign(['firm_id']);
             $table->dropColumn([
                 'firm_id', 'role', 'title', 'hourly_rate', 'phone',
-                'avatar_url', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at'
+                'avatar_url', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at',
             ]);
         });
         Schema::dropIfExists('firms');

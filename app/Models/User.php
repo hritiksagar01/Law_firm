@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -16,6 +17,15 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $guarded = [];
+
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            if (empty($user->uuid)) {
+                $user->uuid = (string) Str::uuid();
+            }
+        });
+    }
 
     protected $hidden = [
         'password',
@@ -32,17 +42,20 @@ class User extends Authenticatable
             'password' => 'hashed',
             'hourly_rate' => 'decimal:2',
             'id_expiration' => 'date',
+            'last_login_at' => 'datetime',
         ];
     }
 
     /**
-     * Get full display name. Uses first_name + surname if set, else falls back to name.
+     * Get full display name. Uses first_name + middle_name + surname if set, else falls back to name.
      */
     public function getFullDisplayNameAttribute(): string
     {
-        if ($this->first_name || $this->surname) {
-            return trim(($this->first_name ?? '') . ' ' . ($this->surname ?? ''));
+        $parts = array_filter([$this->first_name, $this->middle_name, $this->surname]);
+        if (! empty($parts)) {
+            return implode(' ', $parts);
         }
+
         return $this->name;
     }
 
@@ -55,8 +68,10 @@ class User extends Authenticatable
             if (str_starts_with($this->avatar_url, 'http://') || str_starts_with($this->avatar_url, 'https://')) {
                 return $this->avatar_url;
             }
-            return asset('storage/' . $this->avatar_url);
+
+            return asset('storage/'.$this->avatar_url);
         }
+
         return null;
     }
 
@@ -95,6 +110,16 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id');
     }
 
+    public function auditLogs(): HasMany
+    {
+        return $this->hasMany(AuditLog::class);
+    }
+
+    public function signInHistories(): HasMany
+    {
+        return $this->hasMany(SignInHistory::class);
+    }
+
     public function groups(): BelongsToMany
     {
         return $this->belongsToMany(UserGroup::class, 'group_user');
@@ -103,7 +128,7 @@ class User extends Authenticatable
     public function hasRole(string|array $roles): bool
     {
         $roleList = is_array($roles) ? $roles : [$roles];
-        
+
         if (in_array($this->role, $roleList)) {
             return true;
         }
@@ -144,11 +169,39 @@ class User extends Authenticatable
         $defaultMatrix = [
             'admin' => ['*'],
             'partner' => ['*'],
-            'lawyer' => ['matters.view', 'matters.create', 'matters.edit', 'clients.view', 'clients.create', 'clients.edit', 'documents.view', 'documents.upload', 'tasks.view', 'tasks.create', 'tasks.edit', 'tasks.assign', 'opinions.view', 'opinions.create', 'opinions.review', 'calendar.view', 'hearings.manage', 'appointments.manage', 'reports.view'],
-            'associate' => ['matters.view', 'matters.create', 'matters.edit', 'clients.view', 'clients.create', 'clients.edit', 'documents.view', 'documents.upload', 'tasks.view', 'tasks.create', 'tasks.edit', 'tasks.assign', 'opinions.view', 'opinions.create', 'opinions.review', 'calendar.view', 'hearings.manage', 'appointments.manage', 'reports.view'],
-            'paralegal' => ['matters.view', 'clients.view', 'documents.view', 'documents.upload', 'tasks.view', 'tasks.edit', 'calendar.view', 'hearings.manage', 'appointments.manage'],
-            'support_staff' => ['clients.view', 'calendar.view', 'appointments.manage', 'tasks.view'],
-            'client' => ['portal.access'],
+            'lawyer' => [
+                'matters.view', 'matter.view', 'matters.create', 'matter.create', 'matters.edit', 'matter.edit', 'matters.close', 'matter.close', 'matters.assign',
+                'clients.view', 'client.view', 'clients.create', 'clients.edit',
+                'documents.view', 'document.view', 'documents.upload', 'document.upload', 'documents.download', 'document.download', 'documents.share', 'document.share', 'documents.request', 'document.request',
+                'message.view', 'message.send',
+                'tasks.view', 'task.view', 'tasks.create', 'task.create', 'tasks.edit', 'tasks.assign', 'task.assign', 'tasks.complete', 'task.complete',
+                'note.view', 'note.create',
+                'opinions.view', 'opinions.create', 'opinions.review', 'opinions.publish',
+                'calendar.view', 'hearings.manage', 'appointments.manage',
+                'reports.view', 'reports.export',
+            ],
+            'associate' => [
+                'matters.view', 'matter.view', 'matters.create', 'matter.create', 'matters.edit', 'matter.edit', 'matters.close', 'matter.close', 'matters.assign',
+                'clients.view', 'client.view', 'clients.create', 'clients.edit',
+                'documents.view', 'document.view', 'documents.upload', 'document.upload', 'documents.download', 'document.download', 'documents.share', 'document.share', 'documents.request', 'document.request',
+                'message.view', 'message.send',
+                'tasks.view', 'task.view', 'tasks.create', 'task.create', 'tasks.edit', 'tasks.assign', 'task.assign', 'tasks.complete', 'task.complete',
+                'note.view', 'note.create',
+                'opinions.view', 'opinions.create', 'opinions.review', 'opinions.publish',
+                'calendar.view', 'hearings.manage', 'appointments.manage',
+                'reports.view', 'reports.export',
+            ],
+            'paralegal' => [
+                'matters.view', 'matter.view', 'clients.view', 'client.view',
+                'documents.view', 'document.view', 'documents.upload', 'document.upload', 'documents.download', 'document.download',
+                'message.view',
+                'tasks.view', 'task.view', 'tasks.create', 'task.create', 'tasks.edit', 'tasks.complete', 'task.complete',
+                'note.view', 'note.create',
+                'opinions.view', 'opinions.create',
+                'calendar.view', 'hearings.manage', 'appointments.manage',
+            ],
+            'support_staff' => ['clients.view', 'client.view', 'calendar.view', 'appointments.manage', 'tasks.view', 'task.view'],
+            'client' => ['portal.access', 'client.view', 'document.view', 'matters.view'],
         ];
 
         $currentRole = $this->roleRelation ? $this->roleRelation->slug : $this->role;
@@ -197,5 +250,3 @@ class User extends Authenticatable
         return $this->role === 'superadmin';
     }
 }
-
-

@@ -7,13 +7,11 @@ use App\Models\AuditLog;
 use App\Models\Firm;
 use App\Models\Invoice;
 use App\Models\Matter;
-use App\Models\Plan;
 use App\Models\SignInHistory;
 use App\Models\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\View\View;
-use Throwable;
 
 class AdminDashboardController extends Controller
 {
@@ -32,16 +30,7 @@ class AdminDashboardController extends Controller
         $adminCount = User::where('role', 'superadmin')->count();
         $openMattersCount = Matter::where('status', '!=', 'closed')->count();
 
-        // 2. Seats Provisioning & Utilization
-        $totalSeats = 20;
-        try {
-            $planSeats = (int) Plan::sum('max_users');
-            if ($planSeats > 0) {
-                $totalSeats = max(20, $planSeats);
-            }
-        } catch (Throwable) {
-            $totalSeats = 20;
-        }
+        // 2. Active Staff Utilization
         $seatsInUse = User::whereNotNull('firm_id')
             ->whereHas('firm', fn ($q) => $q->where('status', 'active'))
             ->count() ?: ($staffCount ?: 7);
@@ -147,11 +136,8 @@ class AdminDashboardController extends Controller
             ->take(8)
             ->get();
 
-        // 6. Firms Needing Attention (Suspended, Inactive, Past Due)
-        $attentionFirms = Firm::with(['currentSubscription.plan'])
-            ->whereIn('status', ['suspended', 'inactive'])
-            ->orWhereHas('subscriptions', fn ($q) => $q->where('status', 'past_due'))
-            ->get();
+        // 6. Firms Needing Attention (Suspended or Inactive)
+        $attentionFirms = Firm::whereIn('status', ['suspended', 'inactive'])->get();
 
         // 7. Administrators 2FA Status Review
         $adminUsers = User::whereIn('role', ['superadmin', 'partner'])
@@ -173,7 +159,6 @@ class AdminDashboardController extends Controller
             'clientCount',
             'adminCount',
             'openMattersCount',
-            'totalSeats',
             'seatsInUse',
             'sixMonthsData',
             'totalSixMonthsPayments',

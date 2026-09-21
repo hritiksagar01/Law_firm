@@ -60,18 +60,18 @@
                     <span>Overview</span>
                 </a>
 
-                <!-- Firms & plans -->
+                <!-- Firms -->
                 <a href="{{ route('admin.firms.index') }}" 
                    class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('admin.firms.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
                     <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('admin.firms.*') ? 'text-white' : 'text-[#9ca3af]' }}">balance</span>
-                    <span>Firms &amp; plans</span>
+                    <span>Firms</span>
                 </a>
 
-                <!-- Clients -->
+                <!-- Users -->
                 <a href="{{ route('admin.users.index') }}" 
                    class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ (request()->routeIs('admin.users.*') || request()->routeIs('admin.clients.*')) ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
                     <span class="material-symbols-outlined text-[19px] {{ (request()->routeIs('admin.users.*') || request()->routeIs('admin.clients.*')) ? 'text-white' : 'text-[#9ca3af]' }}">group</span>
-                    <span>Clients</span>
+                    <span>Users</span>
                 </a>
 
                 <!-- Matters -->
@@ -158,20 +158,141 @@
     <!-- Main Wrapper with Left Margin on Desktop -->
     <div class="lg:pl-64 flex flex-col min-h-screen bg-[#fbf9f5]">
         
-        <!-- Mobile Top Navigation Header -->
-        <div class="lg:hidden h-14 bg-[#161718] border-b border-white/[.08] px-4 flex items-center justify-between sticky top-0 z-30">
-            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5">
-                <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-8 w-auto object-contain rounded"/>
-                <span class="text-[13.5px] font-medium text-white">Super Admin</span>
-            </a>
-            <button @click="sidebarOpen = true" class="p-2 text-white">
-                <span class="material-symbols-outlined text-2xl">menu</span>
-            </button>
-        </div>
+        <!-- Desktop & Mobile Top Header Bar with Notifications, Settings & Profile -->
+        <header class="h-14 bg-white border-b border-[#e5e3dc] px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30 shadow-xs">
+            <!-- Left: Mobile toggle + Breadcrumb / Context -->
+            <div class="flex items-center gap-3">
+                <button @click="sidebarOpen = true" class="lg:hidden p-1.5 text-[#5e625e] hover:text-[#1b1c18] rounded-md transition-colors">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
+                </button>
+                <div class="flex items-center gap-2 text-xs text-[#5e625e]">
+                    <span class="font-medium text-[#1b1c18] tracking-tight text-[13px]">Super Admin Platform</span>
+                    <span class="text-[#c1c8c3] hidden sm:inline">/</span>
+                    <span class="hidden sm:inline text-[12px] font-sans">@yield('header_title', 'Platform Console')</span>
+                </div>
+            </div>
+
+            <!-- Right: System Status, Notifications, Settings, Profile Dropdown -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Status Pill -->
+                <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse"></span>
+                    Operational
+                </span>
+
+                <!-- Notification Bell Dropdown -->
+                <div class="relative" x-data="{ notificationsOpen: false }" @click.outside="notificationsOpen = false">
+                    <button @click="notificationsOpen = !notificationsOpen" 
+                            type="button" 
+                            class="relative p-2 text-[#5e625e] hover:text-[#1b1c18] hover:bg-[#f5f3ed] rounded-md transition-colors cursor-pointer" 
+                            title="Platform Notifications">
+                        <span class="material-symbols-outlined text-[20px]">notifications</span>
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#23493a]"></span>
+                    </button>
+
+                    <!-- Notifications Menu -->
+                    <div x-show="notificationsOpen"
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute right-0 mt-2 w-80 bg-white border border-[#e5e3dc] rounded-md shadow-lg py-2 z-50 text-xs">
+                        <div class="px-4 py-2 border-b border-[#f0eee8] flex items-center justify-between">
+                            <span class="font-semibold text-[#1b1c18] text-[12.5px]">Platform Notifications</span>
+                            <span class="text-[10.5px] px-1.5 py-0.5 rounded bg-[#f5f3ed] text-[#5e625e]">Live</span>
+                        </div>
+                        <div class="divide-y divide-[#f5f3ed] max-h-64 overflow-y-auto">
+                            <div class="px-4 py-2.5 hover:bg-[#faf8f5] transition-colors">
+                                <div class="flex items-center gap-1.5 text-[11px] font-medium text-[#23493a]">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#23493a]"></span> Security &amp; MFA
+                                </div>
+                                <p class="text-[11.5px] text-[#414844] mt-0.5">Two-step sign-in enforcement active across firms.</p>
+                                <span class="text-[10px] text-[#8a8e89] mt-1 block">Platform default active</span>
+                            </div>
+                            <div class="px-4 py-2.5 hover:bg-[#faf8f5] transition-colors">
+                                <div class="flex items-center gap-1.5 text-[11px] font-medium text-[#0369a1]">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#0284c7]"></span> Audit Storage
+                                </div>
+                                <p class="text-[11.5px] text-[#414844] mt-0.5">Append-only audit trail logging active and tamper-evident.</p>
+                                <span class="text-[10px] text-[#8a8e89] mt-1 block">Continuous logging</span>
+                            </div>
+                        </div>
+                        <div class="px-4 py-2 border-t border-[#f0eee8] bg-[#faf8f5] text-center">
+                            <a href="{{ route('admin.settings.mail') }}" class="text-[11.5px] font-medium text-[#23493a] hover:underline">
+                                View delivery gateway logs &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Gear Icon -->
+                <a href="{{ route('admin.system.index') }}" 
+                   class="p-2 text-[#5e625e] hover:text-[#1b1c18] hover:bg-[#f5f3ed] rounded-md transition-colors" 
+                   title="System Settings">
+                    <span class="material-symbols-outlined text-[20px]">settings</span>
+                </a>
+
+                <div class="h-5 w-px bg-[#e5e3dc] mx-1"></div>
+
+                <!-- User Profile Dropdown -->
+                <div class="relative" x-data="{ profileDropdownOpen: false }" @click.outside="profileDropdownOpen = false">
+                    <button @click="profileDropdownOpen = !profileDropdownOpen" 
+                            type="button" 
+                            class="flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-md hover:bg-[#f5f3ed] transition-colors cursor-pointer">
+                        <div class="w-7 h-7 rounded-full bg-[#23493a] text-white flex items-center justify-center font-semibold text-[11px] shrink-0 shadow-xs">
+                            {{ $initials }}
+                        </div>
+                        <span class="hidden sm:inline text-xs font-medium text-[#1b1c18] max-w-[120px] truncate">
+                            {{ $displayName }}
+                        </span>
+                        <span class="material-symbols-outlined text-[16px] text-[#5e625e]">expand_more</span>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div x-show="profileDropdownOpen"
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute right-0 mt-2 w-56 bg-white border border-[#e5e3dc] rounded-md shadow-lg py-1.5 z-50 text-xs">
+                        <div class="px-3.5 py-2 border-b border-[#f0eee8]">
+                            <p class="font-medium text-[#1b1c18] text-[12.5px] truncate">{{ $displayName }}</p>
+                            <p class="text-[11px] text-[#5e625e] font-mono truncate mt-0.5">{{ $userEmail }}</p>
+                        </div>
+                        <a href="{{ route('admin.profile.index') }}" class="flex items-center gap-2 px-3.5 py-2 text-[#414844] hover:bg-[#faf8f5] hover:text-[#1b1c18]">
+                            <span class="material-symbols-outlined text-base">person</span>
+                            <span>Super Admin Profile</span>
+                        </a>
+                        <button type="button" @click="profileDropdownOpen = false; changePasswordModal = true" class="w-full flex items-center gap-2 px-3.5 py-2 text-[#414844] hover:bg-[#faf8f5] hover:text-[#1b1c18] text-left cursor-pointer">
+                            <span class="material-symbols-outlined text-base">lock</span>
+                            <span>Change Password</span>
+                        </button>
+                        <button type="button" @click="profileDropdownOpen = false; changeAvatarModal = true" class="w-full flex items-center gap-2 px-3.5 py-2 text-[#414844] hover:bg-[#faf8f5] hover:text-[#1b1c18] text-left cursor-pointer">
+                            <span class="material-symbols-outlined text-base">photo_camera</span>
+                            <span>Change Avatar</span>
+                        </button>
+                        <div class="border-t border-[#f0eee8] my-1"></div>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center gap-2 px-3.5 py-2 text-[#ba1a1a] hover:bg-red-50 text-left cursor-pointer">
+                                <span class="material-symbols-outlined text-base">logout</span>
+                                <span>Sign out</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </header>
 
         <!-- Top Demo Environment Notice Banner -->
-        <div class="w-full text-center py-2.5 text-[12px] text-[#8a8e89] font-sans border-b border-[#f0eee8]/60">
-            Demo environment · fictional firms, people and documents
+        <div class="w-full text-center py-2 text-[12px] text-[#8a8e89] font-sans border-b border-[#f0eee8]/60 bg-[#faf8f5]">
+            Demo environment &middot; fictional firms, people and documents
         </div>
 
         <!-- Dynamic Main Content -->

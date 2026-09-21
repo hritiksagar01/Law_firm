@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Middleware\CheckPermission;
+use App\Http\Middleware\EnsureClient;
+use App\Http\Middleware\EnsureFirmStaff;
+use App\Http\Middleware\EnsureSuperAdmin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,10 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'firm.staff' => \App\Http\Middleware\EnsureFirmStaff::class,
-            'portal.client' => \App\Http\Middleware\EnsureClient::class,
-            'admin.super' => \App\Http\Middleware\EnsureSuperAdmin::class,
-            'permission' => \App\Http\Middleware\CheckPermission::class,
+            'firm.staff' => EnsureFirmStaff::class,
+            'portal.client' => EnsureClient::class,
+            'admin.super' => EnsureSuperAdmin::class,
+            'permission' => CheckPermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

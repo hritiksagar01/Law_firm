@@ -6,10 +6,8 @@ use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\AuditManagementController;
 use App\Http\Controllers\Admin\FirmManagementController;
 use App\Http\Controllers\Admin\MatterManagementController;
-use App\Http\Controllers\Admin\PlanManagementController;
 use App\Http\Controllers\Admin\RolesCategoriesController;
 use App\Http\Controllers\Admin\SignInHistoryController;
-use App\Http\Controllers\Admin\SubscriptionManagementController;
 use App\Http\Controllers\Admin\SystemSettingsController;
 use App\Http\Controllers\Admin\TestManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
@@ -1239,14 +1237,16 @@ Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(funct
     Route::resource('firms', FirmManagementController::class);
     Route::post('/firms/{firm}/toggle-status', [FirmManagementController::class, 'toggleStatus'])->name('firms.toggle-status');
     Route::post('/firms/{firm}/change-password', [FirmManagementController::class, 'changePassword'])->name('firms.change-password');
-    Route::post('/firms/{firm}/change-subscription', [FirmManagementController::class, 'changeSubscription'])->name('firms.change-subscription');
 
     // ── Platform User Management ─────────────────────────────
     Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
     Route::get('/clients', fn () => redirect()->route('admin.users.index'))->name('clients.index');
     Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
     Route::get('/users/{user}', [UserManagementController::class, 'show'])->name('users.show');
+    Route::put('/users/{user}', [UserManagementController::class, 'update'])->name('users.update');
     Route::post('/users/{user}/role', [UserManagementController::class, 'updateRole'])->name('users.update-role');
+    Route::post('/users/{user}/status', [UserManagementController::class, 'updateStatus'])->name('users.update-status');
+    Route::post('/users/{user}/resend-invitation', [UserManagementController::class, 'resendInvitation'])->name('users.resend-invitation');
     Route::post('/users/{user}/reset-password', [UserManagementController::class, 'sendPasswordReset'])->name('users.reset-password');
     Route::post('/users/{user}/sign-out-everywhere', [UserManagementController::class, 'signOutEverywhere'])->name('users.sign-out-everywhere');
     Route::post('/users/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])->name('users.toggle-status');
@@ -1254,17 +1254,9 @@ Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(funct
     // ── Platform Matters Governance ──────────────────────────
     Route::get('/matters', [MatterManagementController::class, 'index'])->name('matters.index');
 
-    // ── SaaS Subscription Plans ─────────────────────────────
-    Route::get('/plans', [PlanManagementController::class, 'index'])->name('plans.index');
-    Route::post('/plans', [PlanManagementController::class, 'store'])->name('plans.store');
-    Route::put('/plans/{plan}', [PlanManagementController::class, 'update'])->name('plans.update');
-    Route::delete('/plans/{plan}', [PlanManagementController::class, 'destroy'])->name('plans.destroy');
-    Route::post('/plans/{plan}/toggle-active', [PlanManagementController::class, 'toggleActive'])->name('plans.toggle-active');
-    Route::post('/plans/firms/{firm}/assign', [PlanManagementController::class, 'assignPlan'])->name('plans.assign');
-
-    // ── Subscription Governance & Renewals (PDF Pages 20, 21) ──
-    Route::get('/subscriptions', [SubscriptionManagementController::class, 'index'])->name('subscriptions.index');
-    Route::post('/subscriptions/{subscription}/renew', [SubscriptionManagementController::class, 'renew'])->name('subscriptions.renew');
+    // ── Deprecated SaaS Plans & Subscriptions Redirects ──────
+    Route::get('/plans', fn () => redirect()->route('admin.firms.index'));
+    Route::get('/subscriptions', fn () => redirect()->route('admin.firms.index'));
 
     // ── Super Admin Profile & Account (PDF Pages 4, 5) ──────
     Route::get('/profile', [AdminProfileController::class, 'index'])->name('profile.index');

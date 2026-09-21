@@ -28,8 +28,8 @@ class UserController extends Controller
             $search = $request->q;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('title', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('title', 'like', "%{$search}%");
             });
         }
 
@@ -37,9 +37,9 @@ class UserController extends Controller
             $roleFilter = $request->role;
             $query->where(function ($q) use ($roleFilter) {
                 $q->where('role', $roleFilter)
-                  ->orWhereHas('roleRelation', function ($sub) use ($roleFilter) {
-                      $sub->where('slug', $roleFilter);
-                  });
+                    ->orWhereHas('roleRelation', function ($sub) use ($roleFilter) {
+                        $sub->where('slug', $roleFilter);
+                    });
             });
         }
 
@@ -102,7 +102,7 @@ class UserController extends Controller
             'status' => 'active',
         ]);
 
-        if (!empty($validated['groups'])) {
+        if (! empty($validated['groups'])) {
             $user->groups()->sync($validated['groups']);
         }
 
@@ -166,7 +166,7 @@ class UserController extends Controller
             'status' => $validated['status'],
         ];
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $updateData['password'] = Hash::make($validated['password']);
         }
 
@@ -201,6 +201,7 @@ class UserController extends Controller
         $user->update(['status' => $newStatus]);
 
         $label = ucfirst($newStatus);
+
         return back()->with('success', "User '{$user->name}' is now {$label}.");
     }
 }

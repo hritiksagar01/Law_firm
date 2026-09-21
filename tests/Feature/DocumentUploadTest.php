@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Document;
-use App\Models\Firm;
 use App\Models\Matter;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
@@ -29,7 +28,7 @@ class DocumentUploadTest extends TestCase
         $user = User::where('role', 'partner')->first();
         $matter = Matter::where('firm_id', $user->firm_id)->first();
 
-        $content = "%PDF-1.4 TEST PLEADING " . str_repeat('A', 500 * 1024);
+        $content = '%PDF-1.4 TEST PLEADING '.str_repeat('A', 500 * 1024);
         $expectedSha = hash('sha256', $content);
         $file = UploadedFile::fake()->createWithContent('verified_pleading.pdf', $content);
 
@@ -60,7 +59,7 @@ class DocumentUploadTest extends TestCase
         $user = User::where('role', 'partner')->first();
         $matter = Matter::where('firm_id', $user->firm_id)->first();
 
-        $content = "%PDF-1.4 HEAVY EVIDENCE BUNDLE " . str_repeat('B', 5 * 1024 * 1024);
+        $content = '%PDF-1.4 HEAVY EVIDENCE BUNDLE '.str_repeat('B', 5 * 1024 * 1024);
         $expectedSha = hash('sha256', $content);
         $file = UploadedFile::fake()->createWithContent('heavy_evidence_bundle.pdf', $content);
 

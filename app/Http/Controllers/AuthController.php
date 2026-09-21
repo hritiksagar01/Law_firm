@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ResetPasswordMail;
+use App\Models\Client;
+use App\Models\Firm;
+use App\Models\Matter;
+use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -96,12 +100,12 @@ class AuthController extends Controller
             'bar_number' => 'nullable|string|max:100',
         ]);
 
-        $slug = \Illuminate\Support\Str::slug($validated['firm_name']);
-        if (\App\Models\Firm::where('slug', $slug)->exists()) {
-            $slug .= '-' . rand(100, 999);
+        $slug = Str::slug($validated['firm_name']);
+        if (Firm::where('slug', $slug)->exists()) {
+            $slug .= '-'.rand(100, 999);
         }
 
-        $firm = \App\Models\Firm::create([
+        $firm = Firm::create([
             'name' => $validated['firm_name'],
             'slug' => $slug,
             'email' => $validated['email'],
@@ -123,7 +127,7 @@ class AuthController extends Controller
         ]);
 
         // Seed initial inaugural client & matter for immediate operation
-        $client = \App\Models\Client::create([
+        $client = Client::create([
             'firm_id' => $firm->id,
             'type' => 'corporate',
             'name' => 'Inaugural Enterprise Holdings Pvt Ltd',
@@ -135,10 +139,10 @@ class AuthController extends Controller
             'status' => 'active',
         ]);
 
-        $matter = \App\Models\Matter::create([
+        $matter = Matter::create([
             'firm_id' => $firm->id,
             'client_id' => $client->id,
-            'case_number' => 'CS (COMM) ' . rand(100, 999) . '/' . date('Y'),
+            'case_number' => 'CS (COMM) '.rand(100, 999).'/'.date('Y'),
             'title' => 'Inaugural Enterprise Holdings v. Global Tech Consortium',
             'practice_area' => $validated['practice_area'],
             'court_name' => 'High Court of Delhi, New Delhi',
@@ -151,7 +155,7 @@ class AuthController extends Controller
             'opened_at' => now()->toDateString(),
         ]);
 
-        \App\Models\Task::create([
+        Task::create([
             'firm_id' => $firm->id,
             'matter_id' => $matter->id,
             'assigned_to' => $user->id,
@@ -168,7 +172,7 @@ class AuthController extends Controller
         }
 
         return redirect()->route('dashboard')
-            ->with('success', "Chambers established for {$firm->name}. Welcome to " . config('legal.app_name', 'Vennamraj Associates') . ", {$user->name}!");
+            ->with('success', "Chambers established for {$firm->name}. Welcome to ".config('legal.app_name', 'Vennamraj Associates').", {$user->name}!");
     }
 
     public function showForgotPassword()
@@ -184,7 +188,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $validated['email'])->first();
 
-        if (!$user) {
+        if (! $user) {
             // Security measure: Do not leak whether user exists, but give reassuring message
             return back()->with('status', 'If an active representation or counsel account exists for this email, an encrypted password reset dispatch has been sent.');
         }
@@ -211,14 +215,14 @@ class AuthController extends Controller
             Mail::to($user->email)->send(new ResetPasswordMail($user, $resetUrl));
             $mailSent = true;
         } catch (\Throwable $e) {
-            Log::warning("Password reset email delivery failed for {$user->email}: " . $e->getMessage());
+            Log::warning("Password reset email delivery failed for {$user->email}: ".$e->getMessage());
             Log::info("Password Reset Direct Link for {$user->email}: {$resetUrl}");
         }
 
         $redirect = back()->with('status', "An encrypted password reset dispatch has been generated for {$user->email}.");
 
         // In local/debug environments or if SMTP is offline, provide direct link in session for immediate access
-        if (config('app.debug') || app()->environment('local') || !$mailSent) {
+        if (config('app.debug') || app()->environment('local') || ! $mailSent) {
             $redirect->with('reset_link', $resetUrl);
         }
 
@@ -234,7 +238,7 @@ class AuthController extends Controller
             ->where('email', $email)
             ->first();
 
-        if (!$record || Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+        if (! $record || Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
             return redirect()->route('password.request')
                 ->withErrors(['email' => 'This password reset link is invalid or has expired. Please request a fresh reset link.']);
         }
@@ -258,13 +262,13 @@ class AuthController extends Controller
             ->where('email', $validated['email'])
             ->first();
 
-        if (!$record || Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+        if (! $record || Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
             return back()->withErrors(['email' => 'This password reset link is invalid or has expired. Please request a fresh reset link.']);
         }
 
         $user = User::where('email', $validated['email'])->first();
 
-        if (!$user) {
+        if (! $user) {
             return back()->withErrors(['email' => 'Unable to locate an account for this email address.']);
         }
 

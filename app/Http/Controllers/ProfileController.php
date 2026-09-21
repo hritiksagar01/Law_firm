@@ -18,6 +18,7 @@ class ProfileController extends Controller
     public function show(): View
     {
         $user = Auth::user()->load(['roleRelation', 'groups', 'firm']);
+
         return view('profile.index', compact('user'));
     }
 
@@ -37,7 +38,7 @@ class ProfileController extends Controller
 
         $user->name = $validated['name'];
         $user->phone = $validated['phone'] ?? null;
-        if (!empty($validated['title'])) {
+        if (! empty($validated['title'])) {
             $user->title = $validated['title'];
         }
 
@@ -63,7 +64,7 @@ class ProfileController extends Controller
             'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()],
         ]);
 
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'The provided current password does not match our records.']);
         }
 

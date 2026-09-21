@@ -11,7 +11,7 @@ class EnsureClient
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && !Auth::user()->isClient()) {
+        if (Auth::check() && ! Auth::user()->isClient()) {
             return redirect()->route('dashboard')
                 ->with('info', 'Advocates and staff manage cases from the Chambers workspace.');
         }

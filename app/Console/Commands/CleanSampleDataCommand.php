@@ -2,19 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Appointment;
 use App\Models\Client;
 use App\Models\Document;
-use App\Models\DocumentRequest;
-use App\Models\Event;
-use App\Models\Expense;
-use App\Models\Invoice;
-use App\Models\Matter;
-use App\Models\Message;
-use App\Models\Opinion;
-use App\Models\Task;
-use App\Models\TimeEntry;
-use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -23,12 +12,14 @@ use Illuminate\Support\Facades\Storage;
 class CleanSampleDataCommand extends Command
 {
     protected $signature = 'legal:clean-data {--force : Bypass confirmation prompt}';
+
     protected $description = 'Purge all sample/seeded matters, documents, clients, and transactional records while preserving Firms and Staff accounts.';
 
     public function handle(): int
     {
-        if (!$this->option('force') && !$this->confirm('WARNING: This will permanently purge all sample clients, matters, documents, invoices, appointments, and messages. Continue?')) {
+        if (! $this->option('force') && ! $this->confirm('WARNING: This will permanently purge all sample clients, matters, documents, invoices, appointments, and messages. Continue?')) {
             $this->info('Data purge aborted.');
+
             return 0;
         }
 

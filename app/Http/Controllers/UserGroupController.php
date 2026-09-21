@@ -55,11 +55,11 @@ class UserGroupController extends Controller
             'color' => $validated['color'] ?? '#9F8349',
         ]);
 
-        if (!empty($validated['user_ids'])) {
+        if (! empty($validated['user_ids'])) {
             $group->users()->sync($validated['user_ids']);
         }
 
-        if (!empty($validated['permission_ids'])) {
+        if (! empty($validated['permission_ids'])) {
             $group->permissions()->sync($validated['permission_ids']);
         }
 

@@ -97,7 +97,7 @@ class SettingsController extends Controller
      */
     public function togglePracticeArea(PracticeArea $practiceArea)
     {
-        $practiceArea->is_active = !$practiceArea->is_active;
+        $practiceArea->is_active = ! $practiceArea->is_active;
         $practiceArea->save();
 
         return redirect()->route('settings.index', ['tab' => 'practice-areas'])

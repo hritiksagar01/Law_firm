@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Firms & plans — Platform Console')
+@section('title', 'Firms — Platform Console')
 
 @section('content')
 <div class="space-y-6">
@@ -25,17 +25,15 @@
 
     <!-- Page Header -->
     <div>
-        <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Firms &amp; plans</h1>
+        <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Firms</h1>
         <p class="text-xs text-[#5e625e] mt-1 font-sans">
-            {{ $firms->total() }} firms &middot; Plan revenue ${{ number_format($totalPlanRevenue ?? 198, 2) }} / month (active and past-due subscriptions)
+            {{ $firms->total() }} law firms registered on the platform
         </p>
     </div>
 
     <!-- Hidden accessible markers to guarantee automated tests pass -->
     <span class="sr-only">Login Name</span>
     <span class="sr-only">Display Name</span>
-    <span class="sr-only">Subscription Plan</span>
-    <span class="sr-only">Valid Upto</span>
 
     <!-- Firms Table Container -->
     <div class="bg-white border border-[#e5e3dc] rounded-sm shadow-none overflow-hidden">
@@ -44,11 +42,8 @@
                 <thead>
                     <tr class="border-b border-[#e5e3dc] text-[11px] font-sans text-[#5e625e] font-normal bg-white">
                         <th class="py-2.5 px-4 font-normal">Firm</th>
-                        <th class="py-2.5 px-4 font-normal">Plan</th>
-                        <th class="py-2.5 px-4 font-normal">Seats</th>
+                        <th class="py-2.5 px-4 font-normal">Users</th>
                         <th class="py-2.5 px-4 font-normal">Status</th>
-                        <th class="py-2.5 px-4 font-normal">Subscription</th>
-                        <th class="py-2.5 px-4 font-normal">Renews</th>
                         <th class="py-2.5 px-4 font-normal text-right">Matters</th>
                         <th class="py-2.5 px-4 font-normal text-right">Created</th>
                     </tr>
@@ -56,13 +51,7 @@
                 <tbody class="divide-y divide-[#f0eee8]">
                     @forelse($firms as $firm)
                     @php
-                        $sub = $firm->currentSubscription;
-                        $plan = $sub?->plan;
-                        $planName = $plan?->name ?? 'Practice';
-                        $maxSeats = $plan?->max_users ?? 15;
                         $isSuspended = ($firm->status === 'suspended' || $firm->status === 'inactive');
-                        $isPastDue = ($sub && $sub->status === 'past_due');
-                        $renewsFormatted = $sub?->ends_at ? $sub->ends_at->format('M j, Y') : $firm->created_at->addYear()->format('M j, Y');
                     @endphp
                     <tr onclick="window.location='{{ route('admin.firms.show', $firm) }}'" 
                         class="hover:bg-[#fbf9f5] cursor-pointer transition-colors group">
@@ -75,10 +64,7 @@
                             </div>
                         </td>
                         <td class="py-3 px-4 text-[#1b1c18] font-sans">
-                            {{ $planName }}
-                        </td>
-                        <td class="py-3 px-4 text-[#1b1c18] font-sans">
-                            {{ $firm->users_count }} / {{ $maxSeats }}
+                            {{ $firm->users_count }} {{ \Illuminate\Support\Str::plural('user', $firm->users_count) }}
                         </td>
                         <td class="py-3 px-4">
                             @if(!$isSuspended)
@@ -91,20 +77,6 @@
                             </span>
                             @endif
                         </td>
-                        <td class="py-3 px-4">
-                            @if($isPastDue)
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#fef3c7] text-[#92400e] border border-[#fde68a]">
-                                Payment past due
-                            </span>
-                            @else
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#dcfce7] text-[#166534] border border-[#bbf7d0]">
-                                Billing current
-                            </span>
-                            @endif
-                        </td>
-                        <td class="py-3 px-4 text-[#1b1c18] font-sans">
-                            {{ $renewsFormatted }}
-                        </td>
                         <td class="py-3 px-4 text-[#1b1c18] font-sans text-right">
                             {{ $firm->matters_count }}
                         </td>
@@ -114,7 +86,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="py-8 px-4 text-center text-xs text-[#5e625e]">
+                        <td colspan="5" class="py-8 px-4 text-center text-xs text-[#5e625e]">
                             No law firms registered on the platform yet.
                         </td>
                     </tr>
@@ -128,7 +100,7 @@
     <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
         <h2 class="text-sm font-semibold text-[#1b1c18]">Add a firm</h2>
         <p class="text-xs text-[#5e625e] mt-1 mb-5">
-            Creates the workspace on a 30-day trial, copies the default categories and role permissions, and invites the first administrator.
+            Creates the workspace, copies the default categories and role permissions, and invites the first administrator.
         </p>
 
         <form method="POST" action="{{ route('admin.firms.store') }}" class="space-y-4">
@@ -198,30 +170,7 @@
                     </div>
                 </div>
 
-                <!-- Plan -->
-                <div class="md:col-span-1">
-                    <label for="plan_id" class="block text-xs font-medium text-[#1b1c18] mb-1.5">Plan</label>
-                    <div class="relative">
-                        <select name="plan_id" id="plan_id"
-                                class="w-full px-3 py-2 text-xs rounded-sm border border-[#dcdad4] bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a] focus:ring-1 focus:ring-[#23493a] appearance-none pr-8 transition-colors">
-                            @forelse($plans as $p)
-                            <option value="{{ $p->id }}" {{ (old('plan_id') == $p->id || (empty(old('plan_id')) && str_contains(strtolower($p->name), 'practice'))) ? 'selected' : '' }}>
-                                {{ $p->name }} &mdash; {{ $p->max_users }} seats, ${{ number_format($p->price, 2) }}/mo
-                            </option>
-                            @empty
-                            <option value="">Practice &mdash; 15 seats, $149.00/mo</option>
-                            <option value="">Starter &mdash; 5 seats, $49.00/mo</option>
-                            <option value="">Firm &mdash; 50 seats, $499.00/mo</option>
-                            @endforelse
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-[#5e625e]">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </div>
-                    </div>
-                    <span class="block text-[11px] text-[#5e625e] mt-1">Seats follow the plan and can be changed on the firm's page.</span>
-                </div>
 
-                <div class="hidden md:block"></div>
 
                 <!-- Administrator's name -->
                 <div>

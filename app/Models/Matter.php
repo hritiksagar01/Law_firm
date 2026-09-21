@@ -105,4 +105,3 @@ class Matter extends Model
         return (float) $this->timeEntries()->sum('hours');
     }
 }
-

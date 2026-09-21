@@ -23,7 +23,7 @@ class TestManagementController extends Controller
     {
         $results = Cache::get('sjm_test_results');
 
-        if (!$results || $request->has('run')) {
+        if (! $results || $request->has('run')) {
             $results = $this->testSystem->runAll();
             Cache::put('sjm_test_results', $results, now()->addHours(24));
         }

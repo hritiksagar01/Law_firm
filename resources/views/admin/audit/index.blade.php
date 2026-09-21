@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Audit log — Platform Console')
+@section('header_title', 'Audit Logs')
 
 @section('content')
 <div class="space-y-6">
@@ -27,17 +28,17 @@
 
     <!-- Tenant Privacy Notice Banner -->
     <div class="bg-[#f5f3ed] border border-[#e5e3dc] rounded-md p-4 text-[13px] text-[#414844] leading-relaxed">
-        Platform staff see record types, counts, statuses and matter numbers. Client identities, matter titles, document and message content, and individual amounts stay with each firm. Exports are logged.
+        Platform staff see record types, counts, statuses, and matter numbers. Client identities, matter titles, document and message content, and individual amounts stay with each firm. Exports and administrative actions are logged to this audit trail.
     </div>
 
     <!-- Filter Card -->
     <div class="bg-white border border-[#e5e3dc] rounded-sm p-4 shadow-none">
-        <form method="GET" action="{{ route('admin.audit.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
+        <form method="GET" action="{{ route('admin.audit.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 items-end">
             <!-- Firm Filter -->
             <div>
                 <label class="block text-[11.5px] font-medium text-[#5e625e] mb-1">Firm</label>
                 <select name="firm_id" class="w-full h-8 px-2.5 rounded-md border border-[#c1c8c3] bg-white text-xs text-[#1b1c18] focus:outline-none focus:border-[#23493a]">
-                    <option value="all">All</option>
+                    <option value="all">All Firms</option>
                     <option value="platform" {{ request('firm_id') === 'platform' ? 'selected' : '' }}>Platform</option>
                     @foreach($firms as $f)
                         <option value="{{ $f->id }}" {{ request('firm_id') == $f->id ? 'selected' : '' }}>
@@ -47,34 +48,70 @@
                 </select>
             </div>
 
-            <!-- Action Filter -->
+            <!-- Module Filter -->
             <div>
-                <label class="block text-[11.5px] font-medium text-[#5e625e] mb-1">Action</label>
-                <select name="action" class="w-full h-8 px-2.5 rounded-md border border-[#c1c8c3] bg-white text-xs text-[#1b1c18] focus:outline-none focus:border-[#23493a]">
-                    <option value="all">Any action</option>
-                    <option value="auth.login" {{ request('action') === 'auth.login' ? 'selected' : '' }}>Signed in (auth.login)</option>
-                    <option value="document.downloaded" {{ request('action') === 'document.downloaded' ? 'selected' : '' }}>Downloaded document</option>
-                    <option value="document.viewed" {{ request('action') === 'document.viewed' ? 'selected' : '' }}>Previewed document</option>
-                    <option value="document.uploaded" {{ request('action') === 'document.uploaded' ? 'selected' : '' }}>Uploaded document</option>
-                    <option value="message.sent" {{ request('action') === 'message.sent' ? 'selected' : '' }}>Sent message</option>
-                    <option value="thread.created" {{ request('action') === 'thread.created' ? 'selected' : '' }}>Started thread</option>
-                    <option value="user.invited" {{ request('action') === 'user.invited' ? 'selected' : '' }}>Invited user</option>
-                    <option value="matter.update_posted" {{ request('action') === 'matter.update_posted' ? 'selected' : '' }}>Posted case update</option>
-                    <option value="payment.recorded" {{ request('action') === 'payment.recorded' ? 'selected' : '' }}>Recorded payment</option>
-                    <option value="request.accepted" {{ request('action') === 'request.accepted' ? 'selected' : '' }}>Accepted submission</option>
-                    <option value="invoice.sent" {{ request('action') === 'invoice.sent' ? 'selected' : '' }}>Sent invoice</option>
-                    <option value="payment.succeeded" {{ request('action') === 'payment.succeeded' ? 'selected' : '' }}>Payment received</option>
-                    <option value="matter.created" {{ request('action') === 'matter.created' ? 'selected' : '' }}>Opened matter</option>
+                <label class="block text-[11.5px] font-medium text-[#5e625e] mb-1">Module</label>
+                <select name="module" class="w-full h-8 px-2.5 rounded-md border border-[#c1c8c3] bg-white text-xs text-[#1b1c18] focus:outline-none focus:border-[#23493a]">
+                    <option value="all">All Modules</option>
+                    @foreach($modules as $m)
+                        <option value="{{ $m }}" {{ request('module') === $m ? 'selected' : '' }}>
+                            {{ $m }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
 
-            <!-- Staff / Email Search -->
+            <!-- Action Filter -->
+            <div>
+                <label class="block text-[11.5px] font-medium text-[#5e625e] mb-1">Action Type</label>
+                <select name="action" class="w-full h-8 px-2.5 rounded-md border border-[#c1c8c3] bg-white text-xs text-[#1b1c18] focus:outline-none focus:border-[#23493a]">
+                    <option value="all">Any Action</option>
+                    <optgroup label="Authentication & Access">
+                        <option value="auth.login" {{ request('action') === 'auth.login' ? 'selected' : '' }}>Sign in (auth.login)</option>
+                        <option value="auth.force_logout" {{ request('action') === 'auth.force_logout' ? 'selected' : '' }}>Force logout (auth.force_logout)</option>
+                        <option value="auth.password_reset_sent" {{ request('action') === 'auth.password_reset_sent' ? 'selected' : '' }}>Password reset (auth.password_reset_sent)</option>
+                    </optgroup>
+                    <optgroup label="User & Permission Management">
+                        <option value="user.invited" {{ request('action') === 'user.invited' ? 'selected' : '' }}>User invited (user.invited)</option>
+                        <option value="user.updated" {{ request('action') === 'user.updated' ? 'selected' : '' }}>User updated (user.updated)</option>
+                        <option value="user.status_changed" {{ request('action') === 'user.status_changed' ? 'selected' : '' }}>Status changed (user.status_changed)</option>
+                        <option value="user.role_changed" {{ request('action') === 'user.role_changed' ? 'selected' : '' }}>Role changed (user.role_changed)</option>
+                        <option value="user.invitation_resent" {{ request('action') === 'user.invitation_resent' ? 'selected' : '' }}>Invite resent (user.invitation_resent)</option>
+                        <option value="role.permissions_updated" {{ request('action') === 'role.permissions_updated' ? 'selected' : '' }}>Permissions updated (role.permissions_updated)</option>
+                    </optgroup>
+                    <optgroup label="Matters & Cases">
+                        <option value="matter.created" {{ request('action') === 'matter.created' ? 'selected' : '' }}>Matter opened (matter.created)</option>
+                        <option value="matter.update_posted" {{ request('action') === 'matter.update_posted' ? 'selected' : '' }}>Case update posted (matter.update_posted)</option>
+                        <option value="matter.assigned" {{ request('action') === 'matter.assigned' ? 'selected' : '' }}>Attorney assigned (matter.assigned)</option>
+                    </optgroup>
+                    <optgroup label="Documents">
+                        <option value="document.uploaded" {{ request('action') === 'document.uploaded' ? 'selected' : '' }}>Document uploaded (document.uploaded)</option>
+                        <option value="document.downloaded" {{ request('action') === 'document.downloaded' ? 'selected' : '' }}>Document downloaded (document.downloaded)</option>
+                        <option value="document.viewed" {{ request('action') === 'document.viewed' ? 'selected' : '' }}>Document viewed (document.viewed)</option>
+                        <option value="document.shared" {{ request('action') === 'document.shared' ? 'selected' : '' }}>Document shared (document.shared)</option>
+                        <option value="request.accepted" {{ request('action') === 'request.accepted' ? 'selected' : '' }}>Submission accepted (request.accepted)</option>
+                    </optgroup>
+                    <optgroup label="Communication & Work">
+                        <option value="message.sent" {{ request('action') === 'message.sent' ? 'selected' : '' }}>Message sent (message.sent)</option>
+                        <option value="thread.created" {{ request('action') === 'thread.created' ? 'selected' : '' }}>Thread created (thread.created)</option>
+                        <option value="task.assigned" {{ request('action') === 'task.assigned' ? 'selected' : '' }}>Task assigned (task.assigned)</option>
+                        <option value="task.completed" {{ request('action') === 'task.completed' ? 'selected' : '' }}>Task completed (task.completed)</option>
+                    </optgroup>
+                    <optgroup label="Billing & Payments">
+                        <option value="payment.recorded" {{ request('action') === 'payment.recorded' ? 'selected' : '' }}>Payment recorded (payment.recorded)</option>
+                        <option value="invoice.sent" {{ request('action') === 'invoice.sent' ? 'selected' : '' }}>Invoice sent (invoice.sent)</option>
+                        <option value="payment.succeeded" {{ request('action') === 'payment.succeeded' ? 'selected' : '' }}>Payment received (payment.succeeded)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- Search Query -->
             <div class="lg:col-span-2">
-                <label class="block text-[11.5px] font-medium text-[#5e625e] mb-1">Staff name or email</label>
+                <label class="block text-[11.5px] font-medium text-[#5e625e] mb-1">Actor, Email or Description</label>
                 <input type="text" 
                        name="q" 
                        value="{{ request('q') }}" 
-                       placeholder=""
+                       placeholder="e.g. Rowan Blake or user profile..."
                        class="w-full h-8 px-2.5 rounded-md border border-[#c1c8c3] bg-white text-xs text-[#1b1c18] focus:outline-none focus:border-[#23493a]">
             </div>
 
@@ -97,7 +134,7 @@
                            class="w-full h-8 px-2 rounded-md border border-[#c1c8c3] bg-white text-xs text-[#1b1c18] focus:outline-none focus:border-[#23493a]">
                 </div>
                 <button type="submit" 
-                        class="h-8 px-3 rounded-md border border-[#c1c8c3] bg-white hover:bg-[#f5f3ed] text-xs font-medium text-[#1b1c18] transition-colors self-end shadow-xs">
+                        class="h-8 px-3 rounded-md border border-[#c1c8c3] bg-white hover:bg-[#f5f3ed] text-xs font-medium text-[#1b1c18] transition-colors self-end shadow-xs cursor-pointer">
                     Apply
                 </button>
             </div>
@@ -110,28 +147,42 @@
             <table class="w-full text-left text-xs border-collapse">
                 <thead>
                     <tr class="border-b border-[#e5e3dc] text-[11px] font-sans text-[#5e625e] bg-white font-normal">
-                        <th class="py-2.5 px-4 font-normal">Time</th>
-                        <th class="py-2.5 px-4 font-normal">Action</th>
+                        <th class="py-2.5 px-4 font-normal w-16">Audit ID</th>
+                        <th class="py-2.5 px-4 font-normal whitespace-nowrap">Time (UTC)</th>
+                        <th class="py-2.5 px-4 font-normal">Action &amp; Module</th>
                         <th class="py-2.5 px-4 font-normal">Actor</th>
                         <th class="py-2.5 px-4 font-normal">Firm</th>
-                        <th class="py-2.5 px-4 font-normal">Record</th>
-                        <th class="py-2.5 px-4 font-normal text-right">IP</th>
+                        <th class="py-2.5 px-4 font-normal">Record / Entity</th>
+                        <th class="py-2.5 px-4 font-normal text-right">IP &amp; Client</th>
+                        <th class="py-2.5 px-4 font-normal text-center w-16">Diff</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#f0eee8]">
                     @forelse($logs as $log)
-                    <tr class="hover:bg-[#fbf9f5] transition-colors">
+                    @php
+                        $hasDiff = !empty($log->description) || !empty($log->previous_value) || !empty($log->new_value) || !empty($log->user_agent);
+                    @endphp
+                    <tr class="hover:bg-[#fbf9f5] transition-colors" x-data="{ expanded: false }">
+                        <td class="py-3 px-4 font-mono text-[11px] text-[#5e625e]">
+                            #{{ $log->id }}
+                        </td>
+
                         <td class="py-3 px-4 text-[#5e625e] font-sans whitespace-nowrap">
-                            {{ $log->created_at->format('M j, Y, g:i A') }} UTC
+                            {{ $log->created_at->format('M j, Y, g:i A') }}
                         </td>
 
                         <td class="py-3 px-4">
                             <span class="font-medium text-[#1b1c18] block">
                                 {{ $log->action_label }}
                             </span>
-                            <span class="font-mono text-[11px] text-[#717974] block mt-0.5">
-                                {{ $log->action }}
-                            </span>
+                            <div class="flex items-center gap-1.5 mt-0.5">
+                                <span class="font-mono text-[10.5px] text-[#717974]">{{ $log->action }}</span>
+                                @if($log->module)
+                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] bg-[#f5f3ed] text-[#23493a] font-medium">
+                                    {{ $log->module }}
+                                </span>
+                                @endif
+                            </div>
                         </td>
 
                         <td class="py-3 px-4">
@@ -156,16 +207,77 @@
                         </td>
 
                         <td class="py-3 px-4 text-[#414844]">
-                            {{ $log->record_type }}
+                            <div>{{ $log->record_type }}</div>
+                            @if($log->entity_id)
+                            <span class="font-mono text-[10px] text-[#8e8e8e]">Entity ID: #{{ $log->entity_id }}</span>
+                            @endif
                         </td>
 
-                        <td class="py-3 px-4 text-right font-mono text-[11px] text-[#5e625e]">
-                            {{ $log->ip_address ?? '—' }}
+                        <td class="py-3 px-4 text-right">
+                            <div class="font-mono text-[11px] text-[#5e625e]">{{ $log->ip_address ?? '—' }}</div>
+                            @if($log->user_agent)
+                            <div class="text-[10px] text-[#8e8e8e] truncate max-w-[140px] ml-auto" title="{{ $log->user_agent }}">
+                                {{ Str::limit($log->user_agent, 20) }}
+                            </div>
+                            @endif
+                        </td>
+
+                        <td class="py-3 px-4 text-center">
+                            @if($hasDiff)
+                            <button type="button" 
+                                    @click="expanded = !expanded" 
+                                    class="p-1 text-[#5e625e] hover:text-[#1b1c18] hover:bg-[#f5f3ed] rounded transition-colors cursor-pointer"
+                                    :title="expanded ? 'Hide details' : 'View audit diff and details'">
+                                <span class="material-symbols-outlined text-[18px]" x-text="expanded ? 'expand_less' : 'tune'"></span>
+                            </button>
+                            @else
+                            <span class="text-[#c1c8c3]">&mdash;</span>
+                            @endif
                         </td>
                     </tr>
+
+                    <!-- Expandable Row for Details & Diff -->
+                    @if($hasDiff)
+                    <tr x-show="expanded" x-cloak class="bg-[#faf8f5] border-t border-b border-[#e5e3dc]">
+                        <td colspan="8" class="p-4">
+                            <div class="space-y-3 text-xs">
+                                @if($log->description)
+                                <div>
+                                    <span class="font-semibold text-[#1b1c18] block text-[11.5px] mb-0.5">Description:</span>
+                                    <p class="text-[#414844] font-sans">{{ $log->description }}</p>
+                                </div>
+                                @endif
+
+                                @if($log->user_agent)
+                                <div>
+                                    <span class="font-semibold text-[#1b1c18] block text-[11.5px] mb-0.5">Client User Agent:</span>
+                                    <p class="text-[#5e625e] font-mono text-[11px]">{{ $log->user_agent }}</p>
+                                </div>
+                                @endif
+
+                                @if($log->previous_value || $log->new_value)
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                                    <div class="bg-white p-3 rounded border border-[#e5e3dc]">
+                                        <span class="font-semibold text-[#ba1a1a] block text-[11.5px] mb-1.5 flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-[14px]">remove_circle</span> Previous Value
+                                        </span>
+                                        <pre class="bg-[#fafafa] p-2.5 rounded font-mono text-[11px] text-[#414844] overflow-x-auto whitespace-pre-wrap">{{ is_array($log->previous_value) ? json_encode($log->previous_value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : ($log->previous_value ?? 'None recorded') }}</pre>
+                                    </div>
+                                    <div class="bg-white p-3 rounded border border-[#e5e3dc]">
+                                        <span class="font-semibold text-[#166534] block text-[11.5px] mb-1.5 flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-[14px]">add_circle</span> New Value
+                                        </span>
+                                        <pre class="bg-[#fafafa] p-2.5 rounded font-mono text-[11px] text-[#414844] overflow-x-auto whitespace-pre-wrap">{{ is_array($log->new_value) ? json_encode($log->new_value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : ($log->new_value ?? 'None recorded') }}</pre>
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                    @endif
                     @empty
                     <tr>
-                        <td colspan="6" class="py-8 text-center text-xs text-[#5e625e]">
+                        <td colspan="8" class="py-8 text-center text-xs text-[#5e625e]">
                             No audit log entries matching criteria.
                         </td>
                     </tr>
@@ -176,7 +288,7 @@
 
         @if($logs->hasPages())
         <div class="p-3 border-t border-[#e5e3dc] bg-white flex items-center justify-between text-xs text-[#5e625e]">
-            <span>Page {{ $logs->currentPage() }} · {{ $logs->total() }} rows</span>
+            <span>Page {{ $logs->currentPage() }} &middot; {{ $logs->total() }} rows</span>
             <div class="flex gap-1">
                 @if($logs->onFirstPage())
                     <span class="px-2.5 py-1 rounded border border-[#e5e3dc] text-[#a0a0a0] cursor-not-allowed">Previous</span>

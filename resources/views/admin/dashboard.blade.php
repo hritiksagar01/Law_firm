@@ -50,10 +50,10 @@
             <div class="text-[12px] text-[#8a8a8a] mt-1">Not closed, all firms</div>
         </a>
 
-        <!-- Seats in use -->
+        <!-- Active personnel -->
         <a href="{{ route('admin.firms.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
-            <div class="text-[12.5px] text-[#646864]">Seats in use</div>
-            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ $seatsInUse ?? 0 }} of {{ $totalSeats ?? 20 }}</div>
+            <div class="text-[12.5px] text-[#646864]">Active personnel</div>
+            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ $seatsInUse ?? 0 }}</div>
             <div class="text-[12px] text-[#8a8a8a] mt-1">Across active firms</div>
         </a>
     </div>
@@ -140,18 +140,12 @@
                                             Suspended · Requires administrator review
                                         @elseif($firmItem->status === 'inactive')
                                             Inactive · Pending activation
-                                        @elseif($firmItem->currentSubscription && $firmItem->currentSubscription->status === 'past_due')
-                                            Suspended · Payment past due
                                         @else
                                             Requires administrative review
                                         @endif
                                     </div>
                                     <div class="text-[12px] text-[#8a8a8a] mt-0.5 font-mono">
-                                        @if($firmItem->currentSubscription && $firmItem->currentSubscription->ends_at)
-                                            Renewal date {{ $firmItem->currentSubscription->ends_at->format('M j, Y') }}
-                                        @else
-                                            Tenant identifier: {{ $firmItem->slug }}
-                                        @endif
+                                        Tenant identifier: {{ $firmItem->slug }}
                                     </div>
                                 </td>
                             </tr>

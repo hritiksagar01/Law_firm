@@ -9,8 +9,6 @@ use App\Models\Matter;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\MultiFirmSjmSeeder;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class DocumentIsolationAndDownloadTest extends TestCase
@@ -53,7 +51,7 @@ class DocumentIsolationAndDownloadTest extends TestCase
             'user_id' => $partner->id,
             'title' => 'Missing File Dynamic Fallback Pleading',
             'filename' => 'missing_pleading.pdf',
-            'file_path' => 'documents/non_existent_file_' . uniqid() . '.pdf',
+            'file_path' => 'documents/non_existent_file_'.uniqid().'.pdf',
             'file_size' => 1000,
             'mime_type' => 'application/pdf',
             'sha256' => hash('sha256', 'fallback'),
@@ -94,7 +92,7 @@ class DocumentIsolationAndDownloadTest extends TestCase
     public function test_cross_client_document_access_in_same_firm_is_forbidden(): void
     {
         $firm = Firm::first();
-        
+
         // Client A
         $clientAUser = User::factory()->create(['role' => 'client', 'firm_id' => $firm->id]);
         $clientA = Client::create([

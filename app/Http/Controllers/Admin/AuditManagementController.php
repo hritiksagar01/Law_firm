@@ -29,6 +29,10 @@ class AuditManagementController extends Controller
             }
         }
 
+        if ($request->filled('module') && ! in_array(strtolower($request->module), ['any', 'all', ''])) {
+            $query->where('module', $request->module);
+        }
+
         if ($request->filled('action') && ! in_array(strtolower($request->action), ['any', 'all', ''])) {
             $query->where('action', $request->action);
         }
@@ -38,7 +42,8 @@ class AuditManagementController extends Controller
             $query->where(function ($sub) use ($q) {
                 $sub->where('actor_name', 'like', "%{$q}%")
                     ->orWhere('actor_email', 'like', "%{$q}%")
-                    ->orWhere('record_type', 'like', "%{$q}%");
+                    ->orWhere('record_type', 'like', "%{$q}%")
+                    ->orWhere('description', 'like', "%{$q}%");
             });
         }
 
@@ -60,7 +65,23 @@ class AuditManagementController extends Controller
 
         $logs = $query->orderByDesc('created_at')->paginate(50)->withQueryString();
 
-        return view('admin.audit.index', compact('logs', 'firms'));
+        $availableModules = [
+            'Administration',
+            'Billing',
+            'Calendar',
+            'Clients',
+            'Communication',
+            'Documents',
+            'Matters',
+            'Security',
+            'Tasks',
+            'Work',
+        ];
+        $dbModules = AuditLog::whereNotNull('module')->distinct()->pluck('module')->toArray();
+        $modules = array_values(array_unique(array_merge($availableModules, $dbModules)));
+        sort($modules);
+
+        return view('admin.audit.index', compact('logs', 'firms', 'modules'));
     }
 
     /**
@@ -78,6 +99,10 @@ class AuditManagementController extends Controller
             }
         }
 
+        if ($request->filled('module') && ! in_array(strtolower($request->module), ['any', 'all', ''])) {
+            $query->where('module', $request->module);
+        }
+
         if ($request->filled('action') && ! in_array(strtolower($request->action), ['any', 'all', ''])) {
             $query->where('action', $request->action);
         }
@@ -86,7 +111,8 @@ class AuditManagementController extends Controller
             $q = trim($request->q);
             $query->where(function ($sub) use ($q) {
                 $sub->where('actor_name', 'like', "%{$q}%")
-                    ->orWhere('actor_email', 'like', "%{$q}%");
+                    ->orWhere('actor_email', 'like', "%{$q}%")
+                    ->orWhere('description', 'like', "%{$q}%");
             });
         }
 
@@ -94,19 +120,42 @@ class AuditManagementController extends Controller
 
         return response()->streamDownload(function () use ($query) {
             $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['Time (UTC)', 'Action Code', 'Action Label', 'Actor Name', 'Actor Email', 'Firm', 'Record', 'IP Address']);
+            fputcsv($handle, [
+                'Audit ID',
+                'Time (UTC)',
+                'Action Code',
+                'Action Label',
+                'Module',
+                'Actor Name',
+                'Actor Email',
+                'Firm',
+                'Record / Entity',
+                'Entity ID',
+                'Description',
+                'Previous Value',
+                'New Value',
+                'IP Address',
+                'User Agent',
+            ]);
 
             $query->orderByDesc('created_at')->chunk(500, function ($batch) use ($handle) {
                 foreach ($batch as $log) {
                     fputcsv($handle, [
+                        '#'.$log->id,
                         $log->created_at->format('Y-m-d H:i:s').' UTC',
                         $log->action,
                         $log->action_label,
+                        $log->module ?? '—',
                         $log->actor_name,
                         $log->actor_email ?? '',
                         $log->firm ? $log->firm->name : 'Platform',
-                        $log->record_type,
+                        $log->record_type ?? ($log->entity_type ?? '—'),
+                        $log->entity_id ?? '—',
+                        $log->description ?? '',
+                        is_array($log->previous_value) ? json_encode($log->previous_value) : ($log->previous_value ?? ''),
+                        is_array($log->new_value) ? json_encode($log->new_value) : ($log->new_value ?? ''),
                         $log->ip_address ?? '—',
+                        $log->user_agent ?? '—',
                     ]);
                 }
             });

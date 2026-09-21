@@ -27,8 +27,8 @@ class OpinionController extends Controller
             $search = $request->q;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('opinion_number', 'like', "%{$search}%")
-                  ->orWhere('summary', 'like', "%{$search}%");
+                    ->orWhere('opinion_number', 'like', "%{$search}%")
+                    ->orWhere('summary', 'like', "%{$search}%");
             });
         }
 
@@ -178,7 +178,7 @@ class OpinionController extends Controller
         ]);
 
         $publishedAt = $opinion->published_at;
-        if ($validated['status'] === 'published' && !$opinion->published_at) {
+        if ($validated['status'] === 'published' && ! $opinion->published_at) {
             $publishedAt = now();
         }
 
@@ -197,7 +197,7 @@ class OpinionController extends Controller
         ]);
 
         return redirect()->route('opinions.show', $opinion)
-            ->with('success', "Legal opinion updated successfully.");
+            ->with('success', 'Legal opinion updated successfully.');
     }
 
     /**
@@ -216,16 +216,16 @@ class OpinionController extends Controller
         ]);
 
         $updateData = ['status' => $validated['status']];
-        if ($validated['status'] === 'published' && !$opinion->published_at) {
+        if ($validated['status'] === 'published' && ! $opinion->published_at) {
             $updateData['published_at'] = now();
         }
-        if ($validated['status'] === 'approved' && !$opinion->reviewer_id) {
+        if ($validated['status'] === 'approved' && ! $opinion->reviewer_id) {
             $updateData['reviewer_id'] = Auth::id();
         }
 
         $opinion->update($updateData);
 
-        return back()->with('success', "Opinion status updated to " . ucfirst(str_replace('_', ' ', $validated['status'])) . ".");
+        return back()->with('success', 'Opinion status updated to '.ucfirst(str_replace('_', ' ', $validated['status'])).'.');
     }
 
     /**

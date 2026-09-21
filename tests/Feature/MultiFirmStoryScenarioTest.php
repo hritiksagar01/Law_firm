@@ -24,25 +24,39 @@ use Tests\TestCase;
 class MultiFirmStoryScenarioTest extends TestCase
 {
     protected Firm $firm1;
+
     protected Firm $firm2;
+
     protected Firm $firm3;
 
     protected User $lawyer1Partner;
+
     protected User $lawyer1Associate;
+
     protected User $client1User;
+
     protected Client $client1;
+
     protected Matter $matter1;
 
     protected User $lawyer2Partner;
+
     protected User $lawyer2Associate;
+
     protected User $client2User;
+
     protected Client $client2;
+
     protected Matter $matter2;
 
     protected User $lawyer3Partner;
+
     protected User $lawyer3Associate;
+
     protected User $client3User;
+
     protected Client $client3;
+
     protected Matter $matter3;
 
     protected function setUp(): void
@@ -281,7 +295,7 @@ class MultiFirmStoryScenarioTest extends TestCase
         $viewResponse->assertSee('Income Tax Assessment Order FY22-23');
 
         // Create sample filing with known SHA-256 hash
-        $fileContent = "%PDF-1.4 CERTIFIED SJM AUDIT REPORT HASH-VERIFIED 2026";
+        $fileContent = '%PDF-1.4 CERTIFIED SJM AUDIT REPORT HASH-VERIFIED 2026';
         $expectedSha256 = hash('sha256', $fileContent);
         $uploadedFile = UploadedFile::fake()->createWithContent('audit_report_fy23.pdf', $fileContent);
 
@@ -318,7 +332,7 @@ class MultiFirmStoryScenarioTest extends TestCase
         Storage::fake('s3');
         config(['filesystems.default' => 's3']);
 
-        $fileContent = "CONFIDENTIAL STATUTORY FILING WITH HIGH COURT REGISTRY";
+        $fileContent = 'CONFIDENTIAL STATUTORY FILING WITH HIGH COURT REGISTRY';
         $sha256 = hash('sha256', $fileContent);
         $storedPath = Storage::disk('s3')->put('documents/client_uploads/statutory_filing.pdf', $fileContent);
         $actualPath = 'documents/client_uploads/statutory_filing.pdf';
@@ -381,7 +395,7 @@ class MultiFirmStoryScenarioTest extends TestCase
     public function test_story_act_6_two_way_privileged_matter_chat(): void
     {
         // 1. Lawyer sends strategy query to client
-        $lawyerMsg = "Please confirm whether clause 12.3 includes the penalty clause for delay in delivery.";
+        $lawyerMsg = 'Please confirm whether clause 12.3 includes the penalty clause for delay in delivery.';
         $lawyerResponse = $this->actingAs($this->lawyer2Associate)->post(route('messages.store'), [
             'matter_id' => $this->matter2->id,
             'body' => $lawyerMsg,
@@ -389,7 +403,7 @@ class MultiFirmStoryScenarioTest extends TestCase
         $lawyerResponse->assertStatus(302);
 
         // 2. Client logs into portal and replies
-        $clientReply = "Yes, Counsel. Clause 12.3 stipulates 0.5% per week penalty capped at 10% total contract value.";
+        $clientReply = 'Yes, Counsel. Clause 12.3 stipulates 0.5% per week penalty capped at 10% total contract value.';
         $clientResponse = $this->actingAs($this->client2User)->post(route('portal.messages.store'), [
             'matter_id' => $this->matter2->id,
             'body' => $clientReply,
@@ -403,12 +417,12 @@ class MultiFirmStoryScenarioTest extends TestCase
         $firstMsg = $messages->firstWhere('body', $lawyerMsg);
         $this->assertNotNull($firstMsg);
         $this->assertEquals($this->lawyer2Associate->id, $firstMsg->sender_id);
-        $this->assertTrue((bool)$firstMsg->is_privileged);
+        $this->assertTrue((bool) $firstMsg->is_privileged);
 
         $secondMsg = $messages->firstWhere('body', $clientReply);
         $this->assertNotNull($secondMsg);
         $this->assertEquals($this->client2User->id, $secondMsg->sender_id);
-        $this->assertTrue((bool)$secondMsg->is_privileged);
+        $this->assertTrue((bool) $secondMsg->is_privileged);
     }
 
     /**
@@ -419,7 +433,7 @@ class MultiFirmStoryScenarioTest extends TestCase
         Storage::fake('s3');
         config(['filesystems.default' => 's3']);
 
-        $agreementContent = "DELHI ARBITRATION CENTRE INTERIM CONSENT ORDER 2026";
+        $agreementContent = 'DELHI ARBITRATION CENTRE INTERIM CONSENT ORDER 2026';
         $sha256 = hash('sha256', $agreementContent);
         $filePath = 'documents/arbitration_agreement.pdf';
         Storage::disk('s3')->put($filePath, $agreementContent);
@@ -442,7 +456,7 @@ class MultiFirmStoryScenarioTest extends TestCase
 
         // Client Anita Desai downloads directly from portal
         $downloadResponse = $this->actingAs($this->client3User)->get(route('portal.documents.download', $document));
-        
+
         // Assert client is NOT redirected to portal dashboard and gets direct file stream
         $downloadResponse->assertStatus(200);
 

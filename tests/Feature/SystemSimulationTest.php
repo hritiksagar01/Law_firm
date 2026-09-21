@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Firm;
 use App\Models\Matter;
 use App\Models\User;
+use App\Services\TestManagementSystem;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\MultiFirmSjmSeeder;
 use Tests\TestCase;
@@ -143,7 +144,7 @@ class SystemSimulationTest extends TestCase
         $this->assertNotNull($firm1Advocate, 'Firm 1 partner must exist');
         $this->assertNotNull($firm2Matter, 'Firm 2 matter must exist');
 
-        $response = $this->actingAs($firm1Advocate)->get('/matters/' . $firm2Matter->id);
+        $response = $this->actingAs($firm1Advocate)->get('/matters/'.$firm2Matter->id);
         $response->assertStatus(403);
     }
 
@@ -153,7 +154,7 @@ class SystemSimulationTest extends TestCase
     public function test_cross_client_isolation_blocks_other_client_matter(): void
     {
         $clientUser = User::where('role', 'client')->first();
-        $client = Client::where('user_id', $clientUser->id)->first() 
+        $client = Client::where('user_id', $clientUser->id)->first()
             ?? Client::where('email', $clientUser->email)->first();
 
         $this->assertNotNull($clientUser);
@@ -162,7 +163,7 @@ class SystemSimulationTest extends TestCase
         $otherMatter = Matter::where('client_id', '!=', $client->id)->first();
         $this->assertNotNull($otherMatter);
 
-        $response = $this->actingAs($clientUser)->get('/portal/matters/' . $otherMatter->id);
+        $response = $this->actingAs($clientUser)->get('/portal/matters/'.$otherMatter->id);
         $response->assertStatus(403);
     }
 
@@ -171,7 +172,7 @@ class SystemSimulationTest extends TestCase
      */
     public function test_automated_test_management_system_audit(): void
     {
-        $tms = new \App\Services\TestManagementSystem();
+        $tms = new TestManagementSystem;
         $results = $tms->runAll();
 
         $this->assertEquals('PASSED', $results['status']);

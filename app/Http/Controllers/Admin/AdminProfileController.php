@@ -18,6 +18,7 @@ class AdminProfileController extends Controller
     public function index(): View
     {
         $user = Auth::user();
+
         return view('admin.profile.index', compact('user'));
     }
 
@@ -72,7 +73,7 @@ class AdminProfileController extends Controller
             'new_password' => 'required|string|min:8|confirmed',
         ]);
 
-        if (!Hash::check($validated['current_password'], $user->password)) {
+        if (! Hash::check($validated['current_password'], $user->password)) {
             return back()->withErrors(['current_password' => 'The current password is incorrect.']);
         }
 

@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Appointment;
+use App\Models\BankAccount;
 use App\Models\Client;
-use App\Models\Document;
 use App\Models\Event;
+use App\Models\Expense;
 use App\Models\Matter;
 use App\Models\Task;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -194,6 +195,7 @@ class ReportController extends Controller
                 $advocate->active_matters_count = Matter::where('lead_attorney_id', $advocate->id)
                     ->where('status', 'active')
                     ->count();
+
                 return $advocate;
             });
 
@@ -207,18 +209,17 @@ class ReportController extends Controller
     {
         $firmId = Auth::user()->firm_id ?? 1;
 
-        $bankAccounts = \App\Models\BankAccount::where('firm_id', $firmId)->get();
+        $bankAccounts = BankAccount::where('firm_id', $firmId)->get();
 
-        $transactions = \App\Models\Transaction::where('firm_id', $firmId)
+        $transactions = Transaction::where('firm_id', $firmId)
             ->with(['matter.client', 'client', 'invoice'])
             ->latest('date')
             ->get();
 
         $totalInflow = $transactions->whereIn('type', ['payment', 'advance_deposit'])->sum('amount');
-        $totalOutflow = \App\Models\Expense::where('firm_id', $firmId)->sum('amount');
+        $totalOutflow = Expense::where('firm_id', $firmId)->sum('amount');
         $netOperatingBalance = $totalInflow - $totalOutflow;
 
         return view('reports.bank-activity', compact('bankAccounts', 'transactions', 'totalInflow', 'totalOutflow', 'netOperatingBalance'));
     }
 }
-

@@ -31,8 +31,8 @@ class AppointmentController extends Controller
             $search = $request->q;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('location', 'like', "%{$search}%")
-                  ->orWhere('notes', 'like', "%{$search}%");
+                    ->orWhere('location', 'like', "%{$search}%")
+                    ->orWhere('notes', 'like', "%{$search}%");
             });
         }
 
@@ -122,11 +122,11 @@ class AppointmentController extends Controller
         // Dispatch email notification to client if client exists
         if ($appointment->client_id) {
             $client = Client::find($appointment->client_id);
-            if ($client && !empty($client->email)) {
+            if ($client && ! empty($client->email)) {
                 try {
                     Mail::to($client->email)->send(new AppointmentScheduledMail($appointment));
                 } catch (\Throwable $e) {
-                    Log::warning("Could not dispatch appointment email: " . $e->getMessage());
+                    Log::warning('Could not dispatch appointment email: '.$e->getMessage());
                 }
             }
         }
@@ -171,16 +171,16 @@ class AppointmentController extends Controller
         // Dispatch cancellation notice if appointment is cancelled
         if ($validated['status'] === 'cancelled' && $appointment->client_id) {
             $client = Client::find($appointment->client_id);
-            if ($client && !empty($client->email)) {
+            if ($client && ! empty($client->email)) {
                 try {
                     Mail::to($client->email)->send(new AppointmentCancelledMail($appointment));
                 } catch (\Throwable $e) {
-                    Log::warning("Could not dispatch appointment cancellation email: " . $e->getMessage());
+                    Log::warning('Could not dispatch appointment cancellation email: '.$e->getMessage());
                 }
             }
         }
 
-        return back()->with('success', "Appointment status updated to " . ucfirst($validated['status']) . ".");
+        return back()->with('success', 'Appointment status updated to '.ucfirst($validated['status']).'.');
     }
 
     /**

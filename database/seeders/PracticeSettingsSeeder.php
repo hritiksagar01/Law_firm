@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Firm;
-use App\Models\PracticeArea;
-use App\Models\Holiday;
 use App\Models\ActivityCategory;
-use App\Models\LetterTemplate;
 use App\Models\EmailTemplate;
+use App\Models\Firm;
+use App\Models\Holiday;
 use App\Models\IdType;
+use App\Models\LetterTemplate;
+use App\Models\PracticeArea;
+use Illuminate\Database\Seeder;
 
 class PracticeSettingsSeeder extends Seeder
 {

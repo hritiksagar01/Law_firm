@@ -99,12 +99,11 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
             'connect_timeout' => env('DB_CONNECT_TIMEOUT', 5),
             'options' => [
-                \PDO::ATTR_TIMEOUT => 5,
-                \PDO::ATTR_EMULATE_PREPARES => true, // Essential for Supabase PgBouncer Transaction Pooler (Port 6543)
-                \PDO::ATTR_PERSISTENT => env('DB_PERSISTENT', false),
+                PDO::ATTR_TIMEOUT => 5,
+                PDO::ATTR_EMULATE_PREPARES => true, // Essential for Supabase PgBouncer Transaction Pooler (Port 6543)
+                PDO::ATTR_PERSISTENT => env('DB_PERSISTENT', false),
             ],
         ],
-
 
         'sqlsrv' => [
             'driver' => 'sqlsrv',

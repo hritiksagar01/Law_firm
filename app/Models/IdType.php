@@ -22,7 +22,7 @@ class IdType extends Model
         $seq = str_pad($this->next_number, 4, '0', STR_PAD_LEFT);
         $year = date('Y');
         $prefix = $this->prefix ?? 'HO';
-        
+
         $number = str_replace(
             ['{PREFIX}', '{YYYY}', '{SEQ}'],
             [$prefix, $year, $seq],

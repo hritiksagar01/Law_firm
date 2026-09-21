@@ -5,10 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\Firm;
-use App\Models\Plan;
-use App\Models\Subscription;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +23,7 @@ class FirmManagementController extends Controller
     public function index(Request $request): View
     {
         $query = Firm::withCount(['users', 'matters', 'documents', 'clients'])
-            ->with(['currentSubscription.plan', 'primaryAdmin']);
+            ->with(['primaryAdmin']);
 
         if ($request->filled('q')) {
             $search = $request->q;
@@ -44,7 +41,6 @@ class FirmManagementController extends Controller
         }
 
         $firms = $query->latest()->paginate(15)->withQueryString();
-        $plans = Plan::where('is_active', true)->get();
 
         $stats = [
             'total' => Firm::count(),
@@ -53,20 +49,7 @@ class FirmManagementController extends Controller
             'total_users' => User::whereNotNull('firm_id')->count(),
         ];
 
-        $totalPlanRevenue = 0;
-        try {
-            $activeSubs = Subscription::whereIn('status', ['active', 'past_due', 'trialing'])
-                ->with('plan')
-                ->get();
-            $totalPlanRevenue = $activeSubs->sum(fn ($sub) => (float) ($sub->plan?->price ?? 0));
-            if ($totalPlanRevenue <= 0) {
-                $totalPlanRevenue = 198.00;
-            }
-        } catch (\Throwable) {
-            $totalPlanRevenue = 198.00;
-        }
-
-        return view('admin.firms.index', compact('firms', 'stats', 'plans', 'totalPlanRevenue'));
+        return view('admin.firms.index', compact('firms', 'stats'));
     }
 
     /**
@@ -110,7 +93,6 @@ class FirmManagementController extends Controller
             'postal_code' => 'nullable|string|max:20',
             'currency' => 'nullable|string|max:10',
             'timezone' => 'nullable|string|max:100',
-            'plan_id' => 'nullable|exists:plans,id',
             'default_hourly_rate' => 'nullable|numeric|min:0',
             'practice_areas' => 'nullable|array',
             'notes' => 'nullable|string',
@@ -156,19 +138,6 @@ class FirmManagementController extends Controller
                 'notes' => $validated['notes'] ?? null,
             ]);
 
-            // Assign plan subscription
-            $planId = $request->input('plan_id') ?: Plan::first()?->id;
-            if ($planId) {
-                Subscription::create([
-                    'firm_id' => $firm->id,
-                    'plan_id' => $planId,
-                    'status' => 'trialing',
-                    'starts_at' => now(),
-                    'ends_at' => now()->addDays(30),
-                    'trial_ends_at' => now()->addDays(30),
-                ]);
-            }
-
             // If initial admin details provided, create the managing partner user
             if ($request->filled('admin_email')) {
                 User::create([
@@ -196,8 +165,6 @@ class FirmManagementController extends Controller
         $users = $firm->users()->latest()->get();
         $matters = $firm->matters()->with('client')->latest()->take(10)->get();
         $clients = $firm->clients()->latest()->take(10)->get();
-        $plans = Plan::where('is_active', true)->get();
-        $currentSubscription = $firm->currentSubscription;
 
         // Count staff vs client portal accounts
         $staffCount = $firm->users()->whereIn('role', ['partner', 'associate', 'paralegal', 'staff'])->count();
@@ -214,9 +181,7 @@ class FirmManagementController extends Controller
             'users',
             'matters',
             'clients',
-            'plans',
             'openMattersCount',
-            'currentSubscription',
             'staffCount',
             'clientPortalCount',
             'storageFormatted'
@@ -344,48 +309,6 @@ class FirmManagementController extends Controller
         $admin->update(['password' => Hash::make($validated['new_password'])]);
 
         return back()->with('success', "Password for '{$admin->name}' ({$admin->email}) at '{$firm->name}' has been reset successfully.");
-    }
-
-    /**
-     * Upgrade, downgrade, or renew a firm's subscription plan.
-     * POST /admin/firms/{firm}/change-subscription
-     */
-    public function changeSubscription(Request $request, Firm $firm): RedirectResponse
-    {
-        $validated = $request->validate([
-            'plan_id' => 'required|exists:plans,id',
-            'duration_months' => 'nullable|integer|min:1|max:36',
-            'seats' => 'nullable|integer|min:1',
-            'billing_status' => 'nullable|string|max:50',
-            'ends_at' => 'nullable|date',
-        ]);
-
-        $plan = Plan::findOrFail($validated['plan_id']);
-        $durationMonths = (int) ($validated['duration_months'] ?? 12);
-
-        $currentSub = $firm->currentSubscription;
-        $startsAt = ($currentSub && $currentSub->ends_at && $currentSub->ends_at->isFuture())
-            ? $currentSub->ends_at
-            : now();
-        $endsAt = ! empty($validated['ends_at'])
-            ? Carbon::parse($validated['ends_at'])
-            : $startsAt->copy()->addMonths($durationMonths);
-
-        $status = ! empty($validated['billing_status']) ? $validated['billing_status'] : 'active';
-
-        $firm->subscriptions()
-            ->where('status', 'active')
-            ->update(['status' => 'upgraded']);
-
-        Subscription::create([
-            'firm_id' => $firm->id,
-            'plan_id' => $plan->id,
-            'status' => $status,
-            'starts_at' => $startsAt,
-            'ends_at' => $endsAt,
-        ]);
-
-        return back()->with('success', "'{$firm->name}' subscription updated to {$plan->name}, valid through {$endsAt->format('d M Y')}.");
     }
 
     /**

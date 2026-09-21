@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Clients — Platform Console')
+@section('title', 'Users — Platform Console')
+@section('header_title', 'User Directory')
 
 @section('content')
 <div class="space-y-6">
@@ -25,9 +26,9 @@
 
     <!-- Page Header -->
     <div>
-        <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Clients</h1>
+        <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Users</h1>
         <p class="text-xs text-[#5e625e] mt-1 font-sans">
-            Firm staff and client portal accounts, sorted by firm then name
+            Platform administrators, firm advocates, staff, and client portal accounts
         </p>
     </div>
 
@@ -55,11 +56,14 @@
                         class="hover:bg-[#fbf9f5] cursor-pointer transition-colors group">
                         <td class="py-3 px-4">
                             <a href="{{ route('admin.users.show', $admin) }}" class="font-medium text-[#1b1c18] group-hover:underline text-[13px] block">
-                                {{ $admin->name }}
+                                {{ $admin->full_display_name }}
                             </a>
-                            <span class="text-[11px] text-[#5e625e] font-mono block mt-0.5">
-                                {{ $admin->email }}
-                            </span>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="text-[11px] text-[#5e625e] font-mono">{{ $admin->email }}</span>
+                                @if($admin->username)
+                                <span class="text-[11px] text-[#8e8e8e] font-mono">&#64;{{ $admin->username }}</span>
+                                @endif
+                            </div>
                         </td>
                         <td class="py-3 px-4 text-[#1b1c18] font-sans">
                             Platform admin
@@ -99,7 +103,7 @@
             <form method="GET" action="{{ route('admin.users.index') }}" class="flex flex-wrap items-center gap-3">
                 <div class="flex-1 min-w-[240px]">
                     <input type="text" name="q" value="{{ request('q') }}"
-                           placeholder="Staff name or email, or a client's full email"
+                           placeholder="Search name, email, username, phone, or job title..."
                            class="w-full px-3 py-1.5 text-xs rounded-sm border border-[#dcdad4] bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a] focus:ring-1 focus:ring-[#23493a] transition-colors" />
                 </div>
 
@@ -199,9 +203,15 @@
                             <a href="{{ route('admin.users.show', $u) }}" class="font-medium text-[#1b1c18] group-hover:underline text-[13px] block">
                                 {{ $displayName }}
                             </a>
-                            <span class="text-[11px] text-[#5e625e] font-mono block mt-0.5">
-                                {{ $displayEmail }}
-                            </span>
+                            <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5">
+                                <span class="text-[11px] text-[#5e625e] font-mono">{{ $displayEmail }}</span>
+                                @if($u->username)
+                                <span class="text-[11px] text-[#8e8e8e] font-mono">&#64;{{ $u->username }}</span>
+                                @endif
+                                @if($u->title)
+                                <span class="text-[11px] text-[#23493a] font-sans">&bull; {{ $u->title }}</span>
+                                @endif
+                            </div>
                         </td>
                         <td class="py-3 px-4 text-[#1b1c18] font-sans">
                             {{ $roleDisplay }}
@@ -304,8 +314,9 @@
 
                 <!-- Name -->
                 <div>
-                    <label for="inv_name" class="block text-xs font-medium text-[#1b1c18] mb-1.5">Name</label>
+                    <label for="inv_name" class="block text-xs font-medium text-[#1b1c18] mb-1.5">Full Name</label>
                     <input type="text" name="name" id="inv_name" required value="{{ old('name') }}"
+                           placeholder="e.g. Eleanor Vance"
                            class="w-full px-3 py-2 text-xs rounded-sm border border-[#dcdad4] bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]" />
                     @error('name')
                     <p class="text-[11px] text-red-600 mt-1">{{ $message }}</p>
@@ -314,21 +325,45 @@
 
                 <!-- Email -->
                 <div>
-                    <label for="inv_email" class="block text-xs font-medium text-[#1b1c18] mb-1.5">Email</label>
+                    <label for="inv_email" class="block text-xs font-medium text-[#1b1c18] mb-1.5">Email Address</label>
                     <input type="email" name="email" id="inv_email" required value="{{ old('email') }}"
+                           placeholder="e.g. eleanor@lawfirm.example"
                            class="w-full px-3 py-2 text-xs rounded-sm border border-[#dcdad4] bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]" />
                     @error('email')
                     <p class="text-[11px] text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
+                <!-- Username (Optional) -->
+                <div>
+                    <label for="inv_username" class="block text-xs font-medium text-[#1b1c18] mb-1.5">
+                        Username <span class="text-[#5e625e] font-normal">Optional.</span>
+                    </label>
+                    <input type="text" name="username" id="inv_username" value="{{ old('username') }}"
+                           placeholder="e.g. evance"
+                           class="w-full px-3 py-2 text-xs rounded-sm border border-[#dcdad4] bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]" />
+                    @error('username')
+                    <p class="text-[11px] text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Mobile (Optional) -->
+                <div>
+                    <label for="inv_mobile" class="block text-xs font-medium text-[#1b1c18] mb-1.5">
+                        Mobile Phone <span class="text-[#5e625e] font-normal">Optional.</span>
+                    </label>
+                    <input type="text" name="mobile" id="inv_mobile" value="{{ old('mobile') }}"
+                           placeholder="e.g. +1 (555) 234-5678"
+                           class="w-full px-3 py-2 text-xs rounded-sm border border-[#dcdad4] bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]" />
+                </div>
+
                 <!-- Title (Optional) -->
                 <div class="md:col-span-2">
                     <label for="inv_title" class="block text-xs font-medium text-[#1b1c18] mb-1.5">
-                        Title <span class="text-[#5e625e] font-normal">Optional.</span>
+                        Job Title <span class="text-[#5e625e] font-normal">Optional.</span>
                     </label>
                     <input type="text" name="title" id="inv_title" value="{{ old('title') }}"
-                           placeholder="e.g. Associate"
+                           placeholder="e.g. Senior Litigation Associate"
                            class="w-full px-3 py-2 text-xs rounded-sm border border-[#dcdad4] bg-white text-[#1b1c18] focus:outline-none focus:border-[#23493a]" />
                 </div>
             </div>
