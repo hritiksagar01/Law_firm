@@ -95,6 +95,16 @@ class Matter extends Model
         return $this->hasMany(Transaction::class);
     }
 
+    public function caseNotes(): HasMany
+    {
+        return $this->hasMany(CaseNote::class);
+    }
+
+    public function todos(): HasMany
+    {
+        return $this->hasMany(Todo::class);
+    }
+
     public function totalBilledAmount(): float
     {
         return (float) $this->timeEntries()->where('is_billable', true)->sum('total_amount');

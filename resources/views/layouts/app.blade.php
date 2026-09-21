@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>{{ $title ?? (config('legal.app_name', 'Sharma Legal Chambers') . ' — Legal Practice Platform') }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}"/>
+    <title>@yield('title', $title ?? (config('legal.app_name', 'Sharma Legal Chambers') . ' — Chambers Practice Console'))</title>
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}"/>
     
     <!-- Google Fonts: Newsreader & Inter -->
@@ -12,212 +13,356 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 
-    <!-- Vite Assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    <style>
+        [x-cloak] { display: none !important; }
+        /* Single Unified Font Family (Inter) across Practice Console */
+        body, h1, h2, h3, h4, h5, h6, p, span, a, input, select, textarea, button, table, td, th {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .font-mono, code, pre, [data-mono] {
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+    </style>
 </head>
-<body class="bg-canvas-ivory font-body-md text-body-md text-text-primary antialiased flex min-h-screen">
-<style>[x-cloak] { display: none !important; }</style>
-    
-    <!-- LEFT PERSISTENT SIDEBAR (#121513 dark sidebar) -->
-    <aside class="w-64 bg-sidebar-bg text-[#e0e3de] flex flex-col justify-between shrink-0 border-r border-sidebar-border fixed top-0 bottom-0 left-0 z-40 select-none">
-        <div class="flex flex-col">
-            <!-- Chambers Brand Header -->
-            <div class="px-4 py-4 border-b border-sidebar-border flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2.5 min-w-0">
-                    <img src="{{ asset('logo.png') }}" alt="Firm Logo" class="w-8 h-8 rounded shrink-0 object-contain"/>
+<body class="bg-[#fbf9f5] font-sans text-[#1b1c18] antialiased min-h-screen"
+      x-data="{ 
+          sidebarOpen: false, 
+          userMenuOpen: false, 
+          changePasswordModal: false, 
+          changeAvatarModal: false 
+      }">
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div x-show="sidebarOpen" 
+         x-cloak
+         @click="sidebarOpen = false" 
+         class="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs lg:hidden transition-opacity">
+    </div>
+
+    <!-- Left Sidebar Shell (Practice Workspace #161718) -->
+    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+           class="fixed left-0 top-0 h-screen w-64 bg-[#161718] text-[#d1d5db] z-50 flex flex-col justify-between border-r border-[#26282a] select-none transition-transform duration-300 ease-in-out">
+        
+        <div class="flex flex-col flex-1 overflow-y-auto">
+            <!-- Brand & Chambers Header -->
+            <div class="px-6 py-5 border-b border-white/[.08] flex items-center justify-between">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
+                    <img src="{{ asset('logo.png') }}" alt="{{ auth()->user()->firm->name ?? config('legal.app_name', 'Sharma Legal Chambers') }}" class="h-10 w-auto object-contain rounded"/>
                     <div class="flex flex-col min-w-0">
-                        <span class="font-headline-sm text-[15px] text-white font-serif tracking-tight truncate" title="{{ auth()->user()->firm->name ?? config('legal.app_name', 'Sharma Legal Chambers') }}">
+                        <span class="text-[13.5px] font-semibold text-white tracking-wide block leading-tight truncate max-w-[140px]" title="{{ auth()->user()->firm->name ?? config('legal.app_name', 'Sharma Legal Chambers') }}">
                             {{ auth()->user()->firm->name ?? config('legal.app_name', 'Sharma Legal Chambers') }}
                         </span>
-                        <span class="font-caption text-[10px] text-sidebar-text-muted uppercase tracking-wider mt-0.5">
-                            Chambers workspace
-                        </span>
+                        <span class="text-[11px] text-[#8e8e8e] block mt-0.5 font-sans">Chambers Workspace</span>
                     </div>
-                </div>
-                <button class="text-sidebar-text-muted hover:text-white transition-colors shrink-0" title="Workspace active" type="button">
-                    <span class="material-symbols-outlined text-[18px]">unfold_more</span>
+                </a>
+                <button @click="sidebarOpen = false" class="lg:hidden p-1.5 text-[#8e8e8e] hover:text-white rounded">
+                    <span class="material-symbols-outlined text-xl">close</span>
                 </button>
             </div>
 
             <!-- Navigation Links -->
-            <nav class="flex flex-col gap-1 px-3 py-4">
+            <nav class="px-3 py-4 flex flex-col gap-1">
                 <!-- Dashboard -->
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-title-sm text-[13px] transition-colors {{ request()->routeIs('dashboard') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
-                    <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('dashboard') ? 'text-[#C7EBD9]' : '' }}">dashboard</span>
+                <a href="{{ route('dashboard') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('dashboard') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('dashboard') ? 'text-white' : 'text-[#9ca3af]' }}">dashboard</span>
                     <span>Dashboard</span>
                 </a>
 
                 <!-- Matters -->
-                <a href="{{ route('matters.index') }}" class="flex items-center justify-between px-3 py-2 rounded-lg font-title-sm text-[13px] transition-colors {{ request()->routeIs('matters.*') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
+                <a href="{{ route('matters.index') }}" 
+                   class="flex items-center justify-between px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('matters.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
                     <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('matters.*') ? 'text-[#C7EBD9]' : '' }}">folder_open</span>
+                        <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('matters.*') ? 'text-white' : 'text-[#9ca3af]' }}">folder_open</span>
                         <span>Matters</span>
                     </div>
                     @php $mCount = \App\Models\Matter::where('firm_id', auth()->user()->firm_id ?? 1)->count(); @endphp
-                    <span class="font-caption text-[11px] px-1.5 py-0.2 rounded-full {{ request()->routeIs('matters.*') ? 'bg-white/20 text-white' : 'bg-sidebar-surface text-sidebar-text-muted' }}">{{ $mCount }}</span>
+                    <span class="text-[11px] px-1.5 py-0.5 rounded font-mono {{ request()->routeIs('matters.*') ? 'bg-white/20 text-white' : 'bg-white/[.06] text-[#8e8e8e]' }}">{{ $mCount }}</span>
                 </a>
 
                 <!-- Clients -->
-                <a href="{{ route('clients.index') }}" class="flex items-center justify-between px-3 py-2 rounded-lg font-title-sm text-[13px] transition-colors {{ request()->routeIs('clients.*') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
+                <a href="{{ route('clients.index') }}" 
+                   class="flex items-center justify-between px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('clients.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
                     <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('clients.*') ? 'text-[#C7EBD9]' : '' }}">corporate_fare</span>
+                        <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('clients.*') ? 'text-white' : 'text-[#9ca3af]' }}">corporate_fare</span>
                         <span>Clients</span>
                     </div>
                     @php $cCount = \App\Models\Client::where('firm_id', auth()->user()->firm_id ?? 1)->count(); @endphp
-                    <span class="font-caption text-[11px] px-1.5 py-0.2 rounded-full {{ request()->routeIs('clients.*') ? 'bg-white/20 text-white' : 'bg-sidebar-surface text-sidebar-text-muted' }}">{{ $cCount }}</span>
+                    <span class="text-[11px] px-1.5 py-0.5 rounded font-mono {{ request()->routeIs('clients.*') ? 'bg-white/20 text-white' : 'bg-white/[.06] text-[#8e8e8e]' }}">{{ $cCount }}</span>
                 </a>
 
                 <!-- Documents -->
-                <a href="{{ route('documents.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-title-sm text-[13px] transition-colors {{ request()->routeIs('documents.*') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
-                    <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('documents.*') ? 'text-[#C7EBD9]' : '' }}">description</span>
+                <a href="{{ route('documents.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('documents.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('documents.*') ? 'text-white' : 'text-[#9ca3af]' }}">description</span>
                     <span>Documents</span>
                 </a>
 
                 <!-- Legal Opinions -->
-                <a href="{{ route('opinions.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-title-sm text-[13px] transition-colors {{ request()->routeIs('opinions.*') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
-                    <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('opinions.*') ? 'text-[#C7EBD9]' : '' }}">draw</span>
+                <a href="{{ route('opinions.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('opinions.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('opinions.*') ? 'text-white' : 'text-[#9ca3af]' }}">draw</span>
                     <span>Legal Opinions</span>
                 </a>
 
                 <!-- Tasks -->
-                <a href="{{ route('tasks.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-title-sm text-[13px] transition-colors {{ request()->routeIs('tasks.*') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
-                    <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('tasks.*') ? 'text-[#C7EBD9]' : '' }}">checklist</span>
+                <a href="{{ route('tasks.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('tasks.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('tasks.*') ? 'text-white' : 'text-[#9ca3af]' }}">checklist</span>
                     <span>Tasks</span>
                 </a>
 
-                <!-- Calendar & Docket -->
-                <a href="{{ route('calendar.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-title-sm text-[13px] transition-colors {{ request()->routeIs('calendar.*') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
-                    <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('calendar.*') ? 'text-[#C7EBD9]' : '' }}">calendar_month</span>
+                <!-- My Todos (F-11) -->
+                @if(Route::has('todos.index'))
+                <a href="{{ route('todos.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('todos.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('todos.*') ? 'text-white' : 'text-[#9ca3af]' }}">task_alt</span>
+                    <span>My Todos</span>
+                </a>
+                @endif
+
+                <!-- Litigation Calendar -->
+                <a href="{{ route('calendar.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('calendar.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('calendar.*') ? 'text-white' : 'text-[#9ca3af]' }}">calendar_month</span>
                     <span>Litigation Calendar</span>
                 </a>
 
                 <!-- Billing & Retainers -->
-                <a href="{{ route('billing.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-title-sm text-[13px] transition-colors {{ request()->routeIs('billing.*') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
-                    <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('billing.*') ? 'text-[#C7EBD9]' : '' }}">receipt_long</span>
+                <a href="{{ route('billing.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('billing.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('billing.*') ? 'text-white' : 'text-[#9ca3af]' }}">receipt_long</span>
                     <span>Billing</span>
                 </a>
 
                 <!-- Advocates & Staff -->
-                <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-title-sm text-[13px] transition-colors {{ request()->routeIs('users.*') || request()->routeIs('user-groups.*') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
-                    <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('users.*') ? 'text-[#C7EBD9]' : '' }}">group</span>
+                <a href="{{ route('users.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('users.*') || request()->routeIs('user-groups.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('users.*') || request()->routeIs('user-groups.*') ? 'text-white' : 'text-[#9ca3af]' }}">group</span>
                     <span>Advocates &amp; Staff</span>
                 </a>
 
+                <!-- Reports -->
+                <a href="{{ route('reports.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('reports.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('reports.*') ? 'text-white' : 'text-[#9ca3af]' }}">bar_chart</span>
+                    <span>Reports</span>
+                </a>
+
                 <!-- Firm Settings -->
-                <a href="{{ route('settings.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-title-sm text-[13px] transition-colors {{ request()->routeIs('settings.*') ? 'bg-pine-primary text-white shadow-sm font-semibold' : 'text-[#a6aca7] hover:text-white hover:bg-sidebar-surface' }}">
-                    <span class="material-symbols-outlined text-[18px] {{ request()->routeIs('settings.*') ? 'text-[#C7EBD9]' : '' }}">settings</span>
+                <a href="{{ route('settings.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('settings.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('settings.*') ? 'text-white' : 'text-[#9ca3af]' }}">settings</span>
                     <span>Firm settings</span>
                 </a>
             </nav>
         </div>
 
-        <!-- Sidebar Footer (User & Sign Out) -->
-        <div class="p-3 border-t border-sidebar-border flex flex-col gap-2">
-            <div class="flex items-center gap-3 p-2 rounded-lg bg-sidebar-surface">
-                @php
-                    $uName = auth()->user()->name ?? 'Counsel';
-                    $words = explode(' ', trim($uName));
-                    $initials = count($words) >= 2 ? strtoupper(substr($words[0], 0, 1) . substr($words[count($words)-1], 0, 1)) : strtoupper(substr($uName, 0, 2));
-                @endphp
-                <div class="w-8 h-8 rounded-full bg-pine-primary text-[#C7EBD9] flex items-center justify-center font-title-sm text-[12px] font-semibold shrink-0">
+        <!-- Sidebar Bottom User Profile & Sign Out -->
+        <div class="p-4 border-t border-white/[.08] bg-[#161718] flex flex-col gap-2">
+            @php
+                $currentUser = Auth::user();
+                $displayName = $currentUser?->name ?? 'Advocate';
+                $userEmail = $currentUser?->email ?? 'counsel@sharmalegal.in';
+                $initials = 'CL';
+                if ($displayName) {
+                    $parts = explode(' ', trim($displayName));
+                    $initials = count($parts) >= 2 
+                        ? strtoupper(substr($parts[0], 0, 1) . substr($parts[count($parts) - 1], 0, 1))
+                        : strtoupper(substr($displayName, 0, 2));
+                }
+            @endphp
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-[#5b4382] text-white flex items-center justify-center font-semibold text-xs shrink-0 shadow-xs">
                     {{ $initials }}
                 </div>
                 <div class="flex flex-col min-w-0">
-                    <span class="font-title-sm text-[12px] text-white truncate">{{ $uName }}</span>
-                    <span class="font-caption text-[10px] text-sidebar-text-muted truncate">
-                        {{ auth()->user()->title ?? ucfirst(auth()->user()->role ?? 'Partner') }}
-                    </span>
+                    <span class="text-[13px] font-medium text-white truncate leading-tight">{{ $displayName }}</span>
+                    <span class="text-[11.5px] text-[#8e8e8e] truncate mt-0.5">{{ $userEmail }}</span>
                 </div>
             </div>
-            <div class="flex items-center justify-between px-2 text-[11px] text-sidebar-text-muted">
-                <span>Chambers Seal #SL-8821</span>
-                <form action="{{ route('logout') }}" method="POST" class="inline">
+            <div class="pt-1 flex items-center justify-between">
+                <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button class="hover:text-white transition-colors flex items-center gap-1 cursor-pointer" type="submit" title="Sign out of Chambers">
-                        <span>Sign out</span>
-                        <span class="material-symbols-outlined text-[14px]">logout</span>
+                    <button type="submit" class="text-[12px] text-[#8e8e8e] hover:text-white transition-colors cursor-pointer">
+                        Sign out
                     </button>
                 </form>
+                @if(Auth::check() && Auth::user()->isSuperAdmin())
+                <a href="{{ route('admin.dashboard') }}" class="text-[11px] text-[#8e8e8e] hover:text-white transition-colors">
+                    Super Admin &rarr;
+                </a>
+                @endif
             </div>
         </div>
     </aside>
 
-    <!-- MAIN WRAPPER WITH TOP BAR & CONTENT AREA -->
-    <div class="flex-1 flex flex-col pl-64 min-w-0 bg-canvas-ivory min-h-screen">
+    <!-- Main Wrapper with Left Margin on Desktop -->
+    <div class="lg:pl-64 flex flex-col min-h-screen bg-[#fbf9f5]">
         
-        <!-- TOP BAR -->
-        <header class="h-16 bg-surface-card/95 backdrop-blur-md border-b border-border-hairline px-6 lg:px-8 flex items-center justify-between gap-4 sticky top-0 z-30">
-            <!-- Search Input -->
-            <div class="relative w-full max-w-md">
-                <form action="{{ route('search') }}" method="GET" class="relative">
-                    <span class="material-symbols-outlined text-[18px] text-text-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
-                    <input name="q" value="{{ request('q') }}" class="w-full bg-surface-subtle border border-border-hairline rounded pl-9 pr-12 py-1.5 text-body-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-pine-primary focus:ring-1 focus:ring-pine-primary transition-all" placeholder="Search matters, clients, documents..." type="text"/>
-                    <kbd class="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-surface-card border border-border-hairline font-caption text-[11px] text-text-secondary">⌘K</kbd>
-                </form>
+        <!-- Desktop & Mobile Top Header Bar with Notifications, Settings & Profile -->
+        <header class="h-14 bg-white border-b border-[#e5e3dc] px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30 shadow-xs">
+            <!-- Left: Mobile toggle + Breadcrumb / Context -->
+            <div class="flex items-center gap-3">
+                <button @click="sidebarOpen = true" class="lg:hidden p-1.5 text-[#5e625e] hover:text-[#1b1c18] rounded-md transition-colors">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
+                </button>
+                <div class="flex items-center gap-2 text-xs text-[#5e625e]">
+                    <span class="font-medium text-[#1b1c18] tracking-tight text-[13px]">{{ auth()->user()->firm->name ?? 'Lawyer Workspace' }}</span>
+                    <span class="text-[#c1c8c3] hidden sm:inline">/</span>
+                    <span class="hidden sm:inline text-[12px] font-sans">@yield('header_title', $title ?? 'Chambers Dashboard')</span>
+                </div>
             </div>
 
-            <!-- Right Header Tools -->
-            <div class="flex items-center gap-3 shrink-0">
-                <!-- Subtle Live Environment Indicator -->
-                <span class="hidden md:inline-flex items-center gap-1.5 text-[11px] text-text-secondary bg-surface-subtle border border-border-hairline px-2.5 py-1 rounded">
-                    <span class="w-1.5 h-1.5 rounded-full bg-pine-primary animate-pulse"></span>
-                    <span>Chambers live environment · Q2 Term</span>
+            <!-- Right: System Status, Search, Notifications, Settings, Profile Dropdown -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Status Pill -->
+                <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse"></span>
+                    Operational
                 </span>
 
-                <!-- Notification Bell -->
-                <button class="relative w-9 h-9 flex items-center justify-center rounded border border-border-hairline bg-surface-card text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors" title="Notifications" type="button">
-                    <span class="material-symbols-outlined text-[20px]">notifications</span>
-                    @php
-                        $unreadAlerts = ($tasksOverdueCount ?? 0) + ($uploadsToReviewCount ?? 0);
-                        if ($unreadAlerts === 0) { $unreadAlerts = 2; }
-                    @endphp
-                    <span class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{{ min($unreadAlerts, 9) }}</span>
-                </button>
+                <!-- Quick Global Search Button / Link -->
+                <a href="{{ route('search') }}" 
+                   class="p-2 text-[#5e625e] hover:text-[#1b1c18] hover:bg-[#f5f3ed] rounded-md transition-colors" 
+                   title="Global Search (⌘K)">
+                    <span class="material-symbols-outlined text-[20px]">search</span>
+                </a>
 
-                <!-- Profile Dropdown & Super Admin Console -->
-                <div class="relative" x-data="{ userMenuOpen: false }">
-                    <button @click="userMenuOpen = !userMenuOpen" class="flex items-center gap-1.5 p-1 rounded hover:bg-surface-subtle transition-all cursor-pointer">
-                        <div class="w-8 h-8 rounded-full bg-pine-primary text-white flex items-center justify-center font-title-sm text-[12px] font-semibold">
-                            {{ $initials }}
-                        </div>
-                        <span class="material-symbols-outlined text-sm text-text-muted">expand_more</span>
+                <!-- Notification Bell Dropdown -->
+                <div class="relative" x-data="{ notificationsOpen: false }" @click.outside="notificationsOpen = false">
+                    <button @click="notificationsOpen = !notificationsOpen" 
+                            type="button" 
+                            class="relative p-2 text-[#5e625e] hover:text-[#1b1c18] hover:bg-[#f5f3ed] rounded-md transition-colors cursor-pointer" 
+                            title="Chambers Notifications">
+                        <span class="material-symbols-outlined text-[20px]">notifications</span>
+                        @php
+                            $unreadCount = auth()->check() ? auth()->user()->unreadNotifications()->count() : 0;
+                        @endphp
+                        @if($unreadCount > 0)
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#23493a]"></span>
+                        @else
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#23493a]"></span>
+                        @endif
                     </button>
 
-                    <div x-show="userMenuOpen" @click.away="userMenuOpen = false" x-transition class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-border-hairline py-2 z-50 text-xs">
-                        <div class="px-4 py-2.5 border-b border-border-hairline">
-                            <span class="font-semibold text-sm text-text-primary block">{{ auth()->user()->name }}</span>
-                            <span class="text-[11px] text-text-muted block">{{ auth()->user()->email }}</span>
-                            <span class="inline-block mt-1 px-1.5 py-0.5 rounded text-[10px] font-mono uppercase bg-surface-subtle text-pine-primary font-bold border border-border-hairline">
-                                {{ auth()->user()->title ?? ucfirst(auth()->user()->role) }}
-                            </span>
+                    <!-- Notifications Menu -->
+                    <div x-show="notificationsOpen"
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute right-0 mt-2 w-80 bg-white border border-[#e5e3dc] rounded-md shadow-lg py-2 z-50 text-xs">
+                        <div class="px-4 py-2 border-b border-[#f0eee8] flex items-center justify-between">
+                            <span class="font-semibold text-[#1b1c18] text-[12.5px]">Notifications</span>
+                            <span class="text-[10.5px] px-1.5 py-0.5 rounded bg-[#f5f3ed] text-[#5e625e]">Live</span>
                         </div>
-
-                        @if(auth()->user()->isSuperAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 hover:bg-surface-subtle text-pine-primary font-semibold flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm text-pine-primary">admin_panel_settings</span>
-                            <span>Platform Super Admin</span>
-                        </a>
-                        <div class="h-px bg-border-hairline my-1"></div>
+                        <div class="divide-y divide-[#f5f3ed] max-h-64 overflow-y-auto">
+                            @if(auth()->check() && auth()->user()->unreadNotifications->isNotEmpty())
+                                @foreach(auth()->user()->unreadNotifications->take(4) as $notification)
+                                    <div class="px-4 py-2.5 hover:bg-[#faf8f5] transition-colors">
+                                        <div class="flex items-center gap-1.5 text-[11px] font-medium text-[#23493a]">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-[#23493a]"></span> 
+                                            {{ $notification->data['title'] ?? 'Notice' }}
+                                        </div>
+                                        <p class="text-[11.5px] text-[#414844] mt-0.5">{{ $notification->data['message'] ?? $notification->data['body'] ?? '' }}</p>
+                                        <span class="text-[10px] text-[#8a8e89] mt-1 block">{{ $notification->created_at->diffForHumans() }}</span>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="px-4 py-2.5 hover:bg-[#faf8f5] transition-colors">
+                                    <div class="flex items-center gap-1.5 text-[11px] font-medium text-[#23493a]">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-[#23493a]"></span> Matter Updates
+                                    </div>
+                                    <p class="text-[11.5px] text-[#414844] mt-0.5">Automated docket synchronization active for current active matters.</p>
+                                    <span class="text-[10px] text-[#8a8e89] mt-1 block">Continuous sync</span>
+                                </div>
+                                <div class="px-4 py-2.5 hover:bg-[#faf8f5] transition-colors">
+                                    <div class="flex items-center gap-1.5 text-[11px] font-medium text-[#0369a1]">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-[#0284c7]"></span> Vault Archival
+                                    </div>
+                                    <p class="text-[11.5px] text-[#414844] mt-0.5">Encrypted chambers vault storage ready for client and court filings.</p>
+                                    <span class="text-[10px] text-[#8a8e89] mt-1 block">Storage operational</span>
+                                </div>
+                            @endif
+                        </div>
+                        @if(Route::has('notifications.index'))
+                        <div class="px-4 py-2 border-t border-[#f0eee8] bg-[#faf8f5] text-center">
+                            <a href="{{ route('notifications.index') }}" class="text-[11.5px] font-medium text-[#23493a] hover:underline">
+                                View all notifications &rarr;
+                            </a>
+                        </div>
                         @endif
+                    </div>
+                </div>
 
-                        <a href="{{ route('profile.show') }}" class="px-4 py-2 hover:bg-surface-subtle text-text-secondary flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm text-pine-primary">person</span>
+                <!-- Settings Gear Icon -->
+                <a href="{{ route('settings.index') }}" 
+                   class="p-2 text-[#5e625e] hover:text-[#1b1c18] hover:bg-[#f5f3ed] rounded-md transition-colors" 
+                   title="Firm Settings">
+                    <span class="material-symbols-outlined text-[20px]">settings</span>
+                </a>
+
+                <div class="h-5 w-px bg-[#e5e3dc] mx-1"></div>
+
+                <!-- User Profile Dropdown -->
+                <div class="relative" x-data="{ profileDropdownOpen: false }" @click.outside="profileDropdownOpen = false">
+                    <button @click="profileDropdownOpen = !profileDropdownOpen" 
+                            type="button" 
+                            class="flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-md hover:bg-[#f5f3ed] transition-colors cursor-pointer">
+                        <div class="w-7 h-7 rounded-full bg-[#23493a] text-white flex items-center justify-center font-semibold text-[11px] shrink-0 shadow-xs">
+                            {{ $initials }}
+                        </div>
+                        <span class="hidden sm:inline text-xs font-medium text-[#1b1c18] max-w-[120px] truncate">
+                            {{ $displayName }}
+                        </span>
+                        <span class="material-symbols-outlined text-[16px] text-[#5e625e]">expand_more</span>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div x-show="profileDropdownOpen"
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute right-0 mt-2 w-56 bg-white border border-[#e5e3dc] rounded-md shadow-lg py-1.5 z-50 text-xs">
+                        <div class="px-3.5 py-2 border-b border-[#f0eee8]">
+                            <p class="font-medium text-[#1b1c18] text-[12.5px] truncate">{{ $displayName }}</p>
+                            <p class="text-[11px] text-[#5e625e] font-mono truncate mt-0.5">{{ $userEmail }}</p>
+                        </div>
+                        <a href="{{ route('profile.show') }}" class="flex items-center gap-2 px-3.5 py-2 text-[#414844] hover:bg-[#faf8f5] hover:text-[#1b1c18]">
+                            <span class="material-symbols-outlined text-base">person</span>
                             <span>My Profile &amp; Security</span>
                         </a>
-
-                        <a href="{{ route('settings.index') }}" class="px-4 py-2 hover:bg-surface-subtle text-text-secondary flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm">settings</span>
-                            <span>Firm Settings</span>
+                        <button type="button" @click="profileDropdownOpen = false; changePasswordModal = true" class="w-full flex items-center gap-2 px-3.5 py-2 text-[#414844] hover:bg-[#faf8f5] hover:text-[#1b1c18] text-left cursor-pointer">
+                            <span class="material-symbols-outlined text-base">lock</span>
+                            <span>Change Password</span>
+                        </button>
+                        <button type="button" @click="profileDropdownOpen = false; changeAvatarModal = true" class="w-full flex items-center gap-2 px-3.5 py-2 text-[#414844] hover:bg-[#faf8f5] hover:text-[#1b1c18] text-left cursor-pointer">
+                            <span class="material-symbols-outlined text-base">photo_camera</span>
+                            <span>Change Avatar</span>
+                        </button>
+                        @if(auth()->check() && auth()->user()->isSuperAdmin())
+                        <div class="border-t border-[#f0eee8] my-1"></div>
+                        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 px-3.5 py-2 text-[#23493a] hover:bg-[#faf8f5] font-medium">
+                            <span class="material-symbols-outlined text-base">admin_panel_settings</span>
+                            <span>Platform Super Admin</span>
                         </a>
-
-                        <div class="h-px bg-border-hairline my-1"></div>
-
-                        <form action="{{ route('logout') }}" method="POST">
+                        @endif
+                        <div class="border-t border-[#f0eee8] my-1"></div>
+                        <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="w-full text-left px-4 py-2 text-red-700 hover:bg-red-50 flex items-center gap-2 font-medium cursor-pointer">
-                                <span class="material-symbols-outlined text-sm">logout</span>
-                                <span>Sign Out</span>
+                            <button type="submit" class="w-full flex items-center gap-2 px-3.5 py-2 text-[#ba1a1a] hover:bg-red-50 text-left cursor-pointer">
+                                <span class="material-symbols-outlined text-base">logout</span>
+                                <span>Sign out</span>
                             </button>
                         </form>
                     </div>
@@ -225,50 +370,92 @@
             </div>
         </header>
 
-        <!-- MAIN PAGE CONTENT -->
-        <main class="flex-1 p-6 lg:p-8 max-w-[1400px] w-full mx-auto">
-            <!-- Flash Alerts -->
+        <!-- Top Demo Environment Notice Banner -->
+        <div class="w-full text-center py-2 text-[12px] text-[#8a8e89] font-sans border-b border-[#f0eee8]/60 bg-[#faf8f5]">
+            Demo environment &middot; fictional firms, people and documents
+        </div>
+
+        <!-- Dynamic Main Content -->
+        <main class="flex-1 w-full max-w-[1240px] mx-auto px-6 sm:px-10 py-6 lg:py-8">
+            <!-- Flash Message Alerts -->
             @if(session('success'))
-            <div class="mb-6 p-3.5 rounded-lg bg-[#eef5f1] border border-[#c4ded0] text-xs text-[#1e4636] flex items-center justify-between shadow-xs">
-                <div class="flex items-center gap-2.5">
-                    <span class="material-symbols-outlined text-lg text-pine-primary">check_circle</span>
-                    <span class="font-medium">{{ session('success') }}</span>
+                <div class="mb-6 p-3.5 rounded-md bg-[#23493a]/10 border border-[#23493a]/20 text-xs text-[#23493a] flex items-center gap-2.5">
+                    <span class="material-symbols-outlined text-base">check_circle</span>
+                    <p class="font-medium">{{ session('success') }}</p>
                 </div>
-                <span class="text-[10px] font-mono uppercase text-pine-primary font-bold">Confirmed</span>
-            </div>
             @endif
 
             @if(session('error') || (isset($errors) && $errors->any()))
-            <div class="mb-6 p-3.5 rounded-lg bg-red-50 border border-red-200 text-xs text-red-900 flex items-center justify-between shadow-xs">
-                <div class="flex items-center gap-2.5">
-                    <span class="material-symbols-outlined text-lg text-error">error</span>
-                    <span class="font-medium">{{ session('error') ?? ($errors->first() ?? '') }}</span>
+                <div class="mb-6 p-3.5 rounded-md bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2.5">
+                    <span class="material-symbols-outlined text-base text-red-600">error</span>
+                    <p class="font-medium">{{ session('error') ?? ($errors->first() ?? '') }}</p>
                 </div>
-                <span class="text-[10px] font-mono uppercase text-error font-bold">Alert</span>
-            </div>
             @endif
 
             {{ $slot ?? '' }}
             @yield('content')
         </main>
+    </div>
 
-        <!-- FOOTER -->
-        <footer class="w-full bg-surface-card border-t border-border-hairline py-3 px-8 mt-auto">
-            <div class="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-2 font-caption text-caption text-text-secondary">
-                <div class="flex items-center gap-space-sm">
-                    <span class="material-symbols-outlined text-[16px] text-pine-primary">shield_locked</span>
-                    <span>Archival grade chambers encryption</span>
-                    <span class="inline-block w-1 h-1 rounded-full bg-outline-variant"></span>
-                    <span>Two-step sign-in active</span>
-                    <span class="inline-block w-1 h-1 rounded-full bg-outline-variant"></span>
-                    <span>Audit trail enabled</span>
-                </div>
-                <div class="flex items-center gap-space-lg text-text-muted">
-                    <span class="font-mono">DOCKET-SYNC v4.12.0</span>
-                    <span>Chambers Seal #SL-8821</span>
-                </div>
+    <!-- Modals (Change Password & Avatar) -->
+    <!-- Modal: Change Password -->
+    <div x-show="changePasswordModal" 
+         x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+        <div @click.outside="changePasswordModal = false"
+             class="bg-white border border-[#e5e3dc] rounded-md max-w-md w-full p-6 shadow-xl">
+            <div class="flex items-center justify-between pb-4 border-b border-[#f0eee8]">
+                <h3 class="text-[15px] font-semibold text-[#1a1a1a]">Update Security Credentials</h3>
+                <button @click="changePasswordModal = false" class="text-[#8a8a8a] hover:text-[#1a1a1a] cursor-pointer">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
             </div>
-        </footer>
+            <form action="{{ route('profile.change-password') }}" method="POST" class="mt-4 flex flex-col gap-4">
+                @csrf
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold text-[#1a1a1a]">Current Password</label>
+                    <input type="password" name="current_password" required class="h-10 px-3 rounded-md border border-[#e5e3dc] bg-white text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold text-[#1a1a1a]">New Password</label>
+                    <input type="password" name="password" required class="h-10 px-3 rounded-md border border-[#e5e3dc] bg-white text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold text-[#1a1a1a]">Confirm New Password</label>
+                    <input type="password" name="password_confirmation" required class="h-10 px-3 rounded-md border border-[#e5e3dc] bg-white text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                </div>
+                <div class="flex items-center justify-end gap-2.5 pt-2">
+                    <button type="button" @click="changePasswordModal = false" class="btn-secondary h-9 text-xs">Cancel</button>
+                    <button type="submit" class="btn-primary h-9 text-xs">Save Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Change Avatar -->
+    <div x-show="changeAvatarModal" 
+         x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+        <div @click.outside="changeAvatarModal = false"
+             class="bg-white border border-[#e5e3dc] rounded-md max-w-md w-full p-6 shadow-xl">
+            <div class="flex items-center justify-between pb-4 border-b border-[#f0eee8]">
+                <h3 class="text-[15px] font-semibold text-[#1a1a1a]">Update Avatar Portrait</h3>
+                <button @click="changeAvatarModal = false" class="text-[#8a8a8a] hover:text-[#1a1a1a] cursor-pointer">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+            </div>
+            <form action="{{ route('profile.change-avatar') }}" method="POST" enctype="multipart/form-data" class="mt-4 flex flex-col gap-4">
+                @csrf
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold text-[#1a1a1a]">Select Image File</label>
+                    <input type="file" name="avatar" accept="image/*" required class="h-10 text-xs text-[#1a1a1a] file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#f5f3ed] file:text-[#23493a] hover:file:bg-[#eae8e2] cursor-pointer"/>
+                </div>
+                <div class="flex items-center justify-end gap-2.5 pt-2">
+                    <button type="button" @click="changeAvatarModal = false" class="btn-secondary h-9 text-xs">Cancel</button>
+                    <button type="submit" class="btn-primary h-9 text-xs">Upload Avatar</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     @livewireScripts

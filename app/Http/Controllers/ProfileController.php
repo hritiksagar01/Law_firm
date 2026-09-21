@@ -74,4 +74,21 @@ class ProfileController extends Controller
 
         return back()->with('success', 'Password successfully updated. Your account is secured.');
     }
+
+    /**
+     * Handle profile picture upload.
+     */
+    public function changeAvatar(Request $request): RedirectResponse
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'avatar' => 'required|file|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        $path = $request->file('avatar')->store('avatars', 'public');
+        $user->update(['avatar_url' => Storage::url($path)]);
+
+        return back()->with('success', 'Profile picture updated successfully.');
+    }
 }

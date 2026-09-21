@@ -1,162 +1,168 @@
-<x-app-layout>
-    <x-slot name="title">Clients &amp; Corporate Entities — {{ config('legal.app_name', 'Vennamraj Associates') }}</x-slot>
+@extends('layouts.app')
 
-    <div x-data="{ openCreateModal: false }">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#EFECE6] mb-6">
+@section('title', 'Client Directory — ' . (config('legal.app_name', 'Sharma Legal Chambers')))
+@section('header_title', 'Client Directory')
+
+@section('content')
+<div x-data="{ openCreateModal: false }" class="flex flex-col w-full text-[#1a1a1a]">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Client Directory</h1>
+            <p class="text-[13px] text-[#646864] mt-1">Enterprise retainers, advance balances, and ongoing representation portfolios</p>
+        </div>
+        <button @click="openCreateModal = true" class="btn-primary h-9 px-3.5 text-xs inline-flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">person_add</span>
+            <span>New Client Onboarding</span>
+        </button>
+    </div>
+
+    <!-- Client Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        @forelse($clients as $client)
+        <div class="border border-[#e5e3dc] bg-white rounded-md p-5 shadow-xs hover:border-[#23493a]/40 transition-all flex flex-col justify-between">
             <div>
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="font-mono text-xs text-[#766A5E] uppercase tracking-wider">Enterprise &amp; Individual Relationships</span>
+                <div class="flex items-start justify-between mb-3">
+                    <span class="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-[#f5f3ed] text-[#23493a] border border-[#e5e3dc] font-semibold">
+                        {{ $client->type }}
+                    </span>
+                    <span class="inline-flex items-center gap-1 text-[11px] font-medium text-[#065f46] bg-[#ecfdf5] border border-[#a7f3d0] px-2 py-0.5 rounded-full">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span> Active
+                    </span>
                 </div>
-                <h1 class="text-2xl font-serif font-bold text-[#222222]">Client Directory</h1>
-                <p class="text-sm text-[#766A5E]">Retainers, client advance ledger balances, and active matters</p>
-            </div>
-            <button @click="openCreateModal = true" class="inline-flex items-center gap-2 px-4 h-10 rounded-lg bg-[#9F8349] text-white text-xs font-medium hover:bg-[#856C36] shadow-sm transition-colors">
-                <span class="material-symbols-outlined text-base">person_add</span>
-                <span>New Client Onboarding</span>
-            </button>
-        </div>
+                <h3 class="text-[15px] font-semibold text-[#1a1a1a] mb-1">{{ $client->name }}</h3>
+                <p class="text-xs text-[#8a8a8a]">{{ $client->contact_person ?? 'Direct Representation' }}</p>
+                <div class="flex items-center gap-1.5 text-xs text-[#646864] mt-2.5">
+                    <span class="material-symbols-outlined text-[15px] text-[#8a8a8a]">mail</span>
+                    <span class="truncate font-mono">{{ $client->email }}</span>
+                </div>
+                @if($client->phone)
+                <div class="flex items-center gap-1.5 text-xs text-[#8a8a8a] mt-1">
+                    <span class="material-symbols-outlined text-[15px]">call</span>
+                    <span class="font-mono">{{ $client->phone }}</span>
+                </div>
+                @endif
 
-        <!-- Client Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-            @foreach($clients as $client)
-            <div class="bg-white rounded-xl border border-[#EFECE6] p-5 shadow-sm hover:border-[#8C7F72] transition-all flex flex-col justify-between">
+                <div class="mt-2.5 text-[11.5px] text-[#646864] flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[16px] text-[#23493a]">gavel</span>
+                    <span>Counsel: <strong class="text-[#1a1a1a]">{{ $client->primaryAttorney->name ?? 'Managing Chambers' }}</strong></span>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-[#f0eee8] flex items-center justify-between text-xs">
                 <div>
-                    <div class="flex items-start justify-between mb-3">
-                        <span class="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-[#F4EFEA] text-[#554D45]">
-                            {{ $client->type }}
-                        </span>
-                        <span class="inline-flex items-center gap-1 text-[11px] font-medium text-[#9F8349]">
-                            <span class="w-1.5 h-1.5 rounded-full bg-[#F8F4EE]0"></span> Active
-                        </span>
-                    </div>
-                    <h3 class="text-base font-semibold text-[#222222] mb-1">{{ $client->name }}</h3>
-                    <p class="text-xs text-[#766A5E]">{{ $client->contact_person ?? 'Direct Representation' }}</p>
-                    <div class="flex items-center gap-1.5 text-xs text-[#554D45] mt-2">
-                        <span class="material-symbols-outlined text-sm text-[#766A5E]">mail</span>
-                        <span class="truncate">{{ $client->email }}</span>
-                    </div>
-                    @if($client->phone)
-                    <div class="flex items-center gap-1.5 text-xs text-[#766A5E] mt-1">
-                        <span class="material-symbols-outlined text-sm text-[#766A5E]">call</span>
-                        <span>{{ $client->phone }}</span>
-                    </div>
-                    @endif
-
-                    <div class="mt-2 text-[11px] text-[#554D45] flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-sm text-[#9F8349]">gavel</span>
-                        <span>Counsel: <strong>{{ $client->primaryAttorney->name ?? 'Managing Chambers' }}</strong></span>
-                    </div>
+                    <span class="text-[10px] text-[#8a8a8a] block uppercase font-mono">Dossiers</span>
+                    <span class="font-mono font-semibold text-[#1a1a1a]">{{ $client->matters->count() }} active</span>
                 </div>
-
-                <div class="mt-4 pt-3 border-t border-[#F4EFEA] flex items-center justify-between text-xs">
-                    <div>
-                        <span class="text-[10px] text-[#766A5E] block uppercase font-mono">Matters &amp; Dossiers</span>
-                        <span class="font-mono font-semibold text-[#222222]">{{ $client->matters->count() }} active</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        @if($client->user_id)
-                            <span class="inline-flex items-center gap-1 text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                                <span class="material-symbols-outlined text-xs">verified_user</span>
-                                <span>Portal Active</span>
-                            </span>
-                        @else
-                            <form action="{{ route('clients.invite', $client->id) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="py-1 px-2 text-[10px] font-medium text-white bg-[#9F8349] hover:bg-[#856C36] rounded transition-colors flex items-center gap-0.5">
-                                    <span class="material-symbols-outlined text-xs">send</span>
-                                    <span>Invite Portal</span>
-                                </button>
-                            </form>
-                        @endif
-                        <a href="{{ route('matters.index') }}" class="py-1 px-2.5 text-center text-[11px] font-medium text-[#9F8349] bg-[#F8F4EE] hover:bg-[#F4ECE1]/50 rounded transition-colors flex items-center gap-1">
-                            <span class="material-symbols-outlined text-xs">folder_open</span>
-                            <span>Cases</span>
-                        </a>
-                    </div>
+                <div class="flex items-center gap-1.5">
+                    @if($client->user_id)
+                        <span class="inline-flex items-center gap-1 text-[10.5px] text-[#065f46] bg-[#ecfdf5] border border-[#a7f3d0] px-2 py-0.5 rounded-full font-medium">
+                            <span class="material-symbols-outlined text-[13px]">verified_user</span>
+                            <span>Portal</span>
+                        </span>
+                    @else
+                        <form action="{{ route('clients.invite', $client->id) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="btn-primary h-7 px-2 text-[10.5px] inline-flex items-center gap-1" title="Send Client Portal Invitation">
+                                <span class="material-symbols-outlined text-[13px]">send</span>
+                                <span>Invite</span>
+                            </button>
+                        </form>
+                    @endif
+                    <a href="{{ route('matters.index') }}" class="btn-secondary h-7 px-2 text-[10.5px] inline-flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[13px]">folder_open</span>
+                        <span>Cases</span>
+                    </a>
                 </div>
             </div>
-            @endforeach
         </div>
+        @empty
+        <div class="col-span-full border border-[#e5e3dc] bg-white rounded-md p-8 text-center text-xs text-[#8a8a8a] shadow-xs">
+            No client records found. Onboard your first client using the button above.
+        </div>
+        @endforelse
+    </div>
 
-        <!-- New Client Onboarding Modal -->
-        <div x-show="openCreateModal" @click.away="openCreateModal = false" x-transition class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl shadow-2xl border border-[#EFECE6] w-full max-w-lg p-6 flex flex-col">
-                <div class="flex items-center justify-between pb-4 border-b border-[#F4EFEA] mb-4">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#9F8349]">person_add</span>
-                        <h3 class="text-sm font-semibold text-[#222222]">New Client Representation Intake</h3>
-                    </div>
-                    <button type="button" @click="openCreateModal = false" class="text-[#766A5E] hover:text-[#222222]">
-                        <span class="material-symbols-outlined">close</span>
-                    </button>
+    <!-- New Client Onboarding Modal -->
+    <div x-show="openCreateModal" 
+         x-cloak 
+         @click.away="openCreateModal = false" 
+         class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white border border-[#e5e3dc] rounded-md shadow-xl w-full max-w-lg p-6 flex flex-col">
+            <div class="flex items-center justify-between pb-4 border-b border-[#f0eee8] mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[#23493a]">person_add</span>
+                    <h3 class="text-[15px] font-semibold text-[#1a1a1a]">New Client Representation Intake</h3>
                 </div>
+                <button type="button" @click="openCreateModal = false" class="text-[#8a8a8a] hover:text-[#1a1a1a] cursor-pointer">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+            </div>
 
-                <form action="{{ route('clients.store') }}" method="POST" class="flex flex-col gap-3 text-xs">
-                    @csrf
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="flex flex-col gap-1">
-                            <label class="font-medium text-[#222222]">Client / Entity Name</label>
-                            <input name="name" required type="text" placeholder="e.g. Malhotra Enterprises Pvt Ltd" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-medium text-[#222222]">Client Classification</label>
-                            <select name="type" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]">
-                                <option value="corporate" selected>Corporate Entity (Pvt Ltd / Ltd)</option>
-                                <option value="individual">Individual Private Client</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="flex flex-col gap-1">
-                            <label class="font-medium text-[#222222]">Primary Contact Person</label>
-                            <input name="contact_person" type="text" placeholder="e.g. Vikram Malhotra, Managing Director" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-medium text-[#222222]">Official Email</label>
-                            <input name="email" required type="email" placeholder="client@company.in" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="flex flex-col gap-1">
-                            <label class="font-medium text-[#222222]">Telephone / Mobile</label>
-                            <input name="phone" type="text" placeholder="+91 98100 12345" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-medium text-[#222222]">GSTIN / PAN</label>
-                            <input name="tax_id" type="text" placeholder="07AAACM1234F1Z5" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]"/>
-                        </div>
-                    </div>
-
+            <form action="{{ route('clients.store') }}" method="POST" class="flex flex-col gap-3.5 text-xs">
+                @csrf
+                <div class="grid grid-cols-2 gap-3">
                     <div class="flex flex-col gap-1">
-                        <label class="font-medium text-[#222222]">Lead Consulting Counsel</label>
-                        <select name="primary_attorney_id" class="w-full px-3 py-2 rounded-lg bg-white border border-[#EAE4DC] outline-none focus:border-[#9F8349]">
-                            @foreach($attorneys as $attorney)
-                                <option value="{{ $attorney->id }}" {{ Auth::id() === $attorney->id ? 'selected' : '' }}>
-                                    {{ $attorney->name }} ({{ ucfirst($attorney->role) }})
-                                </option>
-                            @endforeach
+                        <label class="font-semibold text-[#1a1a1a]">Client / Entity Name *</label>
+                        <input name="name" required type="text" placeholder="e.g. Malhotra Enterprises Pvt Ltd" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Client Classification</label>
+                        <select name="type" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                            <option value="corporate" selected>Corporate Entity (Pvt Ltd / Ltd)</option>
+                            <option value="individual">Individual Private Client</option>
                         </select>
                     </div>
+                </div>
 
-                    <div class="p-3 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] flex items-start gap-2.5">
-                        <input type="checkbox" name="invite_portal" id="invite_portal" value="1" checked class="mt-0.5 rounded border-[#EAE4DC] text-[#9F8349] focus:ring-[#9F8349]"/>
-                        <label for="invite_portal" class="text-xs text-[#222222] font-medium flex flex-col cursor-pointer">
-                            <span class="font-semibold text-[#222222]">Provision Client Portal User Account</span>
-                            <span class="text-[11px] text-[#766A5E] font-normal">Creates a client login associated with this legal counsel. Default password: Client@1234</span>
-                        </label>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Primary Contact Person</label>
+                        <input name="contact_person" type="text" placeholder="e.g. Vikram Malhotra, Managing Director" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
                     </div>
-
-                    <input type="hidden" name="trust_balance" value="0"/>
-
-                    <div class="pt-3 border-t border-[#F4EFEA] flex items-center justify-end gap-2">
-                        <button type="button" @click="openCreateModal = false" class="px-4 py-2 rounded-lg border border-[#EAE4DC] text-[#554D45] hover:bg-[#FAF8F5]">Cancel</button>
-                        <button type="submit" class="px-4 py-2 rounded-lg bg-[#9F8349] text-white font-semibold hover:bg-[#856C36]">Onboard Client</button>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Official Email *</label>
+                        <input name="email" required type="email" placeholder="client@company.in" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
                     </div>
-                </form>
-            </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Telephone / Mobile</label>
+                        <input name="phone" type="text" placeholder="+91 98100 12345" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">GSTIN / PAN</label>
+                        <input name="tax_id" type="text" placeholder="07AAACM1234F1Z5" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label class="font-semibold text-[#1a1a1a]">Lead Consulting Counsel</label>
+                    <select name="primary_attorney_id" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                        @foreach($attorneys as $attorney)
+                            <option value="{{ $attorney->id }}" {{ Auth::id() === $attorney->id ? 'selected' : '' }}>
+                                {{ $attorney->name }} ({{ ucfirst($attorney->role) }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="p-3 rounded-md bg-[#faf8f5] border border-[#e5e3dc] flex items-start gap-2.5">
+                    <input type="checkbox" name="invite_portal" id="invite_portal" value="1" checked class="mt-0.5 rounded border-[#e5e3dc] text-[#23493a] focus:ring-[#23493a]"/>
+                    <label for="invite_portal" class="text-xs text-[#1a1a1a] font-medium flex flex-col cursor-pointer">
+                        <span class="font-semibold text-[#1a1a1a]">Provision Client Portal User Account</span>
+                        <span class="text-[11px] text-[#8a8a8a] font-normal">Creates a client login associated with this legal counsel. Default temporary password: Client@1234</span>
+                    </label>
+                </div>
+
+                <input type="hidden" name="trust_balance" value="0"/>
+
+                <div class="pt-3 border-t border-[#f0eee8] flex items-center justify-end gap-2">
+                    <button type="button" @click="openCreateModal = false" class="btn-secondary h-9 px-4 text-xs">Cancel</button>
+                    <button type="submit" class="btn-primary h-9 px-4 text-xs">Onboard Client</button>
+                </div>
+            </form>
         </div>
-
     </div>
-</x-app-layout>
+</div>
+@endsection

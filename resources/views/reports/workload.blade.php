@@ -1,24 +1,26 @@
 @extends('layouts.app')
 
+@section('title', 'Advocate Workload Allocation — ' . config('legal.app_name', 'Lawyer Workspace'))
+
 @section('content')
 <div class="max-w-7xl mx-auto space-y-6">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#EFECE6] pb-5">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#e5e3dc] pb-5">
         <div>
-            <div class="flex items-center gap-2 text-xs font-mono text-[#9F8349] uppercase tracking-wider mb-1">
+            <div class="flex items-center gap-2 text-[11px] font-mono text-[#23493a] uppercase tracking-wider mb-1 font-semibold">
                 <a href="{{ route('reports.index') }}" class="hover:underline">Reports</a>
                 <span>/</span>
                 <span>Advocate Workload</span>
             </div>
-            <h1 class="text-3xl font-serif font-semibold text-[#222222] tracking-tight">Advocate &amp; Team Workload Allocation</h1>
-            <p class="text-sm text-[#766A5E] mt-1">Operational capacity planning, active matter distribution, and task throughput across chambers personnel.</p>
+            <h1 class="text-2xl font-bold text-[#1a1a1a] tracking-tight">Advocate &amp; Team Workload Allocation</h1>
+            <p class="text-xs text-[#646864] mt-0.5">Operational capacity planning, active matter distribution, and task throughput across chambers personnel.</p>
         </div>
         <div class="flex items-center gap-2">
-            <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-[#EFECE6] text-xs font-medium text-[#554D45] hover:bg-[#FAF8F5] transition-all shadow-xs">
+            <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-[#e5e3dc] text-xs font-medium text-[#1a1a1a] hover:bg-[#faf8f5] transition-all shadow-xs">
                 <span class="material-symbols-outlined text-sm">print</span>
                 <span>Print Allocation</span>
             </button>
-            <a href="{{ route('users.index') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] transition-all shadow-xs">
+            <a href="{{ route('users.index') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#23493a] text-white text-xs font-medium hover:bg-[#1a382c] transition-all shadow-xs">
                 <span class="material-symbols-outlined text-sm">people</span>
                 <span>Staff Roster</span>
             </a>
@@ -26,12 +28,13 @@
     </div>
 
     <!-- Quick Navigation Sub-Tabs -->
-    <div class="flex items-center gap-2 border-b border-[#EFECE6] overflow-x-auto pb-2">
-        <a href="{{ route('reports.index') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-[#554D45] hover:bg-white hover:text-[#9F8349] border border-transparent hover:border-[#EFECE6] transition-all">Overview</a>
-        <a href="{{ route('reports.cases') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-[#554D45] hover:bg-white hover:text-[#9F8349] border border-transparent hover:border-[#EFECE6] transition-all">Case Progress &amp; Stages</a>
-        <a href="{{ route('reports.hearings') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-[#554D45] hover:bg-white hover:text-[#9F8349] border border-transparent hover:border-[#EFECE6] transition-all">Daily Cause List &amp; Hearings</a>
-        <a href="{{ route('reports.clients') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-[#554D45] hover:bg-white hover:text-[#9F8349] border border-transparent hover:border-[#EFECE6] transition-all">Client Portfolio</a>
-        <a href="{{ route('reports.workload') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#9F8349] text-white shadow-xs">Advocate Workload</a>
+    <div class="flex items-center gap-2 border-b border-[#e5e3dc] overflow-x-auto pb-2">
+        <a href="{{ route('reports.index') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-[#646864] hover:bg-white hover:text-[#1a1a1a] border border-transparent hover:border-[#e5e3dc] transition-all">Overview</a>
+        <a href="{{ route('reports.cases') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-[#646864] hover:bg-white hover:text-[#1a1a1a] border border-transparent hover:border-[#e5e3dc] transition-all">Case Progress &amp; Stages</a>
+        <a href="{{ route('reports.hearings') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-[#646864] hover:bg-white hover:text-[#1a1a1a] border border-transparent hover:border-[#e5e3dc] transition-all">Daily Cause List &amp; Hearings</a>
+        <a href="{{ route('reports.clients') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-[#646864] hover:bg-white hover:text-[#1a1a1a] border border-transparent hover:border-[#e5e3dc] transition-all">Client Portfolio</a>
+        <a href="{{ route('reports.workload') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-medium bg-[#23493a] text-white shadow-xs">Advocate Workload</a>
+        <a href="{{ route('reports.bank-activity') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-[#646864] hover:bg-white hover:text-[#1a1a1a] border border-transparent hover:border-[#e5e3dc] transition-all">Bank Activity &amp; Reconciliation</a>
     </div>
 
     <!-- Workload Cards Grid -->
@@ -55,62 +58,62 @@
                 $loadBadge = 'bg-emerald-50 text-emerald-800 border-emerald-200';
             }
         @endphp
-        <div class="p-5 rounded-xl bg-white border border-[#EFECE6] shadow-xs flex flex-col justify-between">
+        <div class="p-5 rounded-xl bg-white border border-[#e5e3dc] shadow-sm flex flex-col justify-between">
             <div>
                 <div class="flex items-start justify-between gap-3 mb-3">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-[#FAF8F5] border border-[#EAE4DC] flex items-center justify-between font-serif font-bold text-[#9F8349] text-sm shrink-0">
-                            <span class="w-full text-center">{{ substr($advocate->name, 0, 2) }}</span>
+                        <div class="w-9 h-9 rounded-full bg-[#23493a]/10 border border-[#23493a]/20 flex items-center justify-center font-bold text-[#23493a] text-xs shrink-0">
+                            <span>{{ strtoupper(substr($advocate->name, 0, 2)) }}</span>
                         </div>
                         <div>
-                            <h3 class="font-semibold text-sm text-[#222222]">{{ $advocate->name }}</h3>
-                            <div class="text-[11px] text-[#766A5E]">{{ $advocate->title ?? ucfirst($advocate->role) }}</div>
+                            <h3 class="font-semibold text-xs text-[#1a1a1a]">{{ $advocate->name }}</h3>
+                            <div class="text-[11px] text-[#646864]">{{ $advocate->title ?? ucfirst($advocate->role) }}</div>
                         </div>
                     </div>
-                    <span class="inline-block px-2 py-0.5 rounded text-[10px] font-semibold border {{ $loadBadge }}">
+                    <span class="inline-block px-2 py-0.5 rounded text-[10px] font-medium border {{ $loadBadge }}">
                         {{ $loadStatus }}
                     </span>
                 </div>
 
                 <!-- Stats -->
-                <div class="grid grid-cols-3 gap-2 py-3 border-y border-[#FAF8F5] text-center my-3">
-                    <div class="p-2 rounded-lg bg-[#FAF8F5]">
-                        <div class="font-mono text-base font-bold text-[#9F8349]">{{ $advocate->active_matters_count }}</div>
-                        <div class="text-[9px] font-mono uppercase text-[#766A5E]">Active Cases</div>
+                <div class="grid grid-cols-3 gap-2 py-3 border-y border-[#e5e3dc] text-center my-3">
+                    <div class="p-2 rounded-lg bg-[#faf8f5]">
+                        <div class="font-mono text-base font-bold text-[#23493a]">{{ $advocate->active_matters_count }}</div>
+                        <div class="text-[9px] font-mono uppercase text-[#646864]">Active Cases</div>
                     </div>
-                    <div class="p-2 rounded-lg bg-[#FAF8F5]">
-                        <div class="font-mono text-base font-bold text-[#8B263E]">{{ $pendingTasks }}</div>
-                        <div class="text-[9px] font-mono uppercase text-[#766A5E]">Pending Tasks</div>
+                    <div class="p-2 rounded-lg bg-[#faf8f5]">
+                        <div class="font-mono text-base font-bold text-rose-700">{{ $pendingTasks }}</div>
+                        <div class="text-[9px] font-mono uppercase text-[#646864]">Pending Tasks</div>
                     </div>
-                    <div class="p-2 rounded-lg bg-[#FAF8F5]">
+                    <div class="p-2 rounded-lg bg-[#faf8f5]">
                         <div class="font-mono text-base font-bold text-emerald-700">{{ $completedTasks }}</div>
-                        <div class="text-[9px] font-mono uppercase text-[#766A5E]">Completed</div>
+                        <div class="text-[9px] font-mono uppercase text-[#646864]">Completed</div>
                     </div>
                 </div>
 
                 <!-- Completion Progress -->
                 <div class="space-y-1">
                     <div class="flex items-center justify-between text-[11px]">
-                        <span class="text-[#766A5E]">Task Clearance Rate</span>
-                        <span class="font-mono font-bold text-[#222222]">{{ $completionRate }}%</span>
+                        <span class="text-[#646864]">Task Clearance Rate</span>
+                        <span class="font-mono font-bold text-[#1a1a1a]">{{ $completionRate }}%</span>
                     </div>
-                    <div class="w-full h-1.5 rounded-full bg-[#FAF8F5] border border-[#EFECE6] overflow-hidden">
-                        <div class="h-full bg-[#9F8349] rounded-full" style="width: {{ $completionRate }}%"></div>
+                    <div class="w-full h-1.5 rounded-full bg-[#faf8f5] border border-[#e5e3dc] overflow-hidden">
+                        <div class="h-full bg-[#23493a] rounded-full" style="width: {{ $completionRate }}%"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-4 pt-3 border-t border-[#FAF8F5] flex items-center justify-between text-xs">
-                <a href="{{ route('reports.cases', ['attorney_id' => $advocate->id]) }}" class="text-[#9F8349] font-semibold hover:underline">
+            <div class="mt-4 pt-3 border-t border-[#e5e3dc] flex items-center justify-between text-xs">
+                <a href="{{ route('reports.cases', ['attorney_id' => $advocate->id]) }}" class="text-[#23493a] font-medium hover:underline">
                     Assigned Cases &rarr;
                 </a>
-                <a href="{{ route('tasks.index') }}" class="text-[#766A5E] hover:text-[#222222]">
+                <a href="{{ route('tasks.index') }}" class="text-[#646864] hover:text-[#1a1a1a]">
                     Assign Task
                 </a>
             </div>
         </div>
         @empty
-        <div class="col-span-full py-10 text-center text-[#766A5E]">
+        <div class="col-span-full py-10 text-center text-[#646864]">
             No advocate records logged.
         </div>
         @endforelse

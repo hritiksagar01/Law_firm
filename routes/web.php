@@ -14,10 +14,13 @@ use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\NoteController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpinionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\TodoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserGroupController;
 use App\Mail\DocumentRequestedMail;
@@ -83,6 +86,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.password');
+    Route::post('/profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.change-password');
+    Route::post('/profile/change-avatar', [ProfileController::class, 'changeAvatar'])->name('profile.change-avatar');
 
     // Firm Workspace Routes (Strictly for Advocates & Staff)
     Route::middleware(['firm.staff'])->group(function () {
@@ -99,6 +104,25 @@ Route::middleware('auth')->group(function () {
         // Appointments, Consultations & Court Hearings
         Route::resource('appointments', AppointmentController::class);
         Route::post('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.update-status');
+
+        // Case & Practice Notes (F-12)
+        Route::post('/notes', [NoteController::class, 'store'])->name('notes.store');
+        Route::put('/notes/{note}', [NoteController::class, 'update'])->name('notes.update');
+        Route::post('/notes/{note}/toggle-pin', [NoteController::class, 'togglePin'])->name('notes.toggle-pin');
+        Route::delete('/notes/{note}', [NoteController::class, 'destroy'])->name('notes.destroy');
+
+        // Personal Productivity Todos (F-11)
+        Route::get('/todos', [TodoController::class, 'index'])->name('todos.index');
+        Route::post('/todos', [TodoController::class, 'store'])->name('todos.store');
+        Route::put('/todos/{todo}', [TodoController::class, 'update'])->name('todos.update');
+        Route::patch('/todos/{todo}/toggle', [TodoController::class, 'toggle'])->name('todos.toggle');
+        Route::delete('/todos/{todo}', [TodoController::class, 'destroy'])->name('todos.destroy');
+
+        // Notifications Center (F-18)
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+        Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+        Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 
         // Attorney Operations Hub
         Route::get('/dashboard', function () {
@@ -610,7 +634,7 @@ Route::middleware('auth')->group(function () {
                 ? $request->boolean('is_client_visible')
                 : ($request->privilege !== 'Work Product');
 
-            Document::create([
+            $doc = Document::create([
                 'firm_id' => $firmId,
                 'matter_id' => $matter->id,
                 'user_id' => $user->id,
@@ -626,8 +650,56 @@ Route::middleware('auth')->group(function () {
                 'version' => 1,
             ]);
 
+            $doc->versions()->create([
+                'version_number' => 1,
+                'file_path' => $path,
+                'file_size' => $file->getSize(),
+                'file_hash' => $sha256,
+                'uploaded_by' => $user->id,
+                'change_summary' => 'Initial filing',
+            ]);
+
             return back()->with('success', 'Filing securely uploaded and SHA-256 authenticated.');
         })->name('documents.upload');
+
+        Route::post('/documents/{document}/versions', function (Request $request, Document $document) {
+            $user = Auth::user();
+            if ($document->firm_id !== ($user->firm_id ?? 1)) {
+                abort(403);
+            }
+
+            $request->validate([
+                'file' => 'required|file|max:51200',
+                'change_summary' => 'nullable|string|max:500',
+            ]);
+
+            $file = $request->file('file');
+            $sha256 = hash_file('sha256', $file->getRealPath());
+            $disk = config('filesystems.default', 'local');
+            $path = $file->store('documents', $disk);
+
+            $newVersionNumber = ($document->version ?? 1) + 1;
+
+            $document->versions()->create([
+                'version_number' => $newVersionNumber,
+                'file_path' => $path,
+                'file_size' => $file->getSize(),
+                'file_hash' => $sha256,
+                'uploaded_by' => $user->id,
+                'change_summary' => $request->change_summary ?? 'New revision uploaded',
+            ]);
+
+            $document->update([
+                'version' => $newVersionNumber,
+                'filename' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'file_size' => $file->getSize(),
+                'mime_type' => $file->getClientMimeType() ?: 'application/pdf',
+                'sha256' => $sha256,
+            ]);
+
+            return back()->with('success', 'New document version v'.$newVersionNumber.' uploaded.');
+        })->name('documents.versions.store');
 
         Route::get('/documents/{document}/download', function (Document $document) {
             $user = Auth::user();
@@ -830,7 +902,7 @@ Route::middleware('auth')->group(function () {
         // Tasks & Productivity Hub
         Route::get('/tasks', function () {
             $firmId = Auth::user()->firm_id ?? 1;
-            $tasks = Task::where('firm_id', $firmId)->with(['assignee', 'matter'])->latest()->get();
+            $tasks = Task::where('firm_id', $firmId)->with(['assignee', 'matter', 'comments.user'])->latest()->get();
             $attorneys = User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate', 'paralegal'])->get();
             $matters = Matter::where('firm_id', $firmId)->get();
 
@@ -859,6 +931,19 @@ Route::middleware('auth')->group(function () {
 
             return back()->with('success', 'Litigation task successfully logged.');
         })->name('tasks.store');
+
+        Route::post('/tasks/{task}/comments', function (Request $request, Task $task) {
+            $validated = $request->validate([
+                'comment' => 'required|string|max:2000',
+            ]);
+
+            $task->comments()->create([
+                'user_id' => Auth::id(),
+                'comment' => $validated['comment'],
+            ]);
+
+            return back()->with('success', 'Comment added.');
+        })->name('tasks.comments.store');
 
         // Global Search Engine
         Route::get('/search', function (Request $request) {
