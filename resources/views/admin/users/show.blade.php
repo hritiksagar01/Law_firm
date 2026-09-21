@@ -44,13 +44,13 @@
                             $initials = strtoupper(substr($user->name, 0, 2));
                         }
                     @endphp
-                    <div class="w-13 h-13 rounded-full bg-[#23493a] text-white flex items-center justify-center font-serif text-lg font-medium shadow-xs shrink-0">
+                    <div class="w-13 h-13 rounded-full bg-[#23493a] text-white flex items-center justify-center text-lg font-semibold shadow-xs shrink-0">
                         {{ $initials }}
                     </div>
                 @endif
 
                 <div>
-                    <h1 class="text-2xl sm:text-3xl font-serif text-[#1b1c18] tracking-tight">
+                    <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">
                         {{ $user->full_display_name }}
                     </h1>
 
@@ -148,7 +148,7 @@
             <!-- Account Card -->
             <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
                 <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#f0eee8]">
-                    <h2 class="text-sm font-semibold text-[#1b1c18]">User Account &amp; Profile Details</h2>
+                    <h2 class="text-[14px] font-semibold text-[#1a1a1a]">User Account &amp; Profile Details</h2>
                     <span class="text-xs text-[#5e625e] font-mono">ID: #{{ $user->id }}</span>
                 </div>
 
@@ -307,7 +307,7 @@
             <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h2 class="text-sm font-semibold text-[#1b1c18]">Active Sessions</h2>
+                        <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Active Sessions</h2>
                         <p class="text-xs text-[#5e625e] mt-0.5">{{ count($activeSessions) }} signed-in devices</p>
                     </div>
                     @if(count($activeSessions) > 0)
@@ -356,7 +356,7 @@
             <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h2 class="text-sm font-semibold text-[#1b1c18]">Login History</h2>
+                        <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Login History</h2>
                         <p class="text-xs text-[#5e625e] mt-0.5">Recent sign-in attempts and access logs</p>
                     </div>
                 </div>
@@ -406,7 +406,7 @@
             <!-- Recent Actions by this account Card -->
             <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-sm font-semibold text-[#1b1c18]">Recent Actions by this Account</h2>
+                    <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Recent Actions by this Account</h2>
                     <span class="text-xs text-[#5e625e]">Platform Audit Log</span>
                 </div>
 
@@ -452,7 +452,7 @@
 
             <!-- Role Card -->
             <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
-                <h2 class="text-sm font-semibold text-[#1b1c18] mb-1.5">Role Management</h2>
+                <h2 class="text-[14px] font-semibold text-[#1a1a1a] mb-1.5">Role Management</h2>
                 <p class="text-xs text-[#5e625e] mb-3">Adjust user RBAC permissions and capabilities</p>
 
                 <form method="POST" action="{{ route('admin.users.update-role', $user) }}" class="space-y-3">
@@ -482,7 +482,7 @@
 
             <!-- Status Switcher Card -->
             <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
-                <h2 class="text-sm font-semibold text-[#1b1c18] mb-1.5">Account Status</h2>
+                <h2 class="text-[14px] font-semibold text-[#1a1a1a] mb-1.5">Account Status</h2>
                 <p class="text-xs text-[#5e625e] mb-3">Activate, deactivate, or suspend access</p>
 
                 <form method="POST" action="{{ route('admin.users.update-status', $user) }}" class="space-y-3">
@@ -510,7 +510,7 @@
 
             <!-- Access & Security Controls Card -->
             <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none space-y-4">
-                <h2 class="text-sm font-semibold text-[#1b1c18]">Security Controls</h2>
+                <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Security Controls</h2>
 
                 <!-- Send Password Reset -->
                 <div>
@@ -567,7 +567,7 @@
              class="bg-white border border-[#e5e3dc] rounded-md max-w-2xl w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
             
             <div class="flex items-center justify-between pb-3 border-b border-[#f0eee8]">
-                <h3 class="font-serif text-lg font-medium text-[#1b1c18]">Edit User Profile</h3>
+                <h3 class="text-[15px] font-semibold text-[#1a1a1a]">Edit User Profile</h3>
                 <button @click="editModalOpen = false" class="text-[#8e8e8e] hover:text-[#1b1c18]">
                     <span class="material-symbols-outlined text-xl">close</span>
                 </button>

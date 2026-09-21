@@ -25,8 +25,8 @@
 
     <!-- Page Header -->
     <div>
-        <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Email &amp; SMS</h1>
-        <p class="text-xs text-[#5e625e] mt-1 font-sans">
+        <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Email &amp; SMS</h1>
+        <p class="text-[13px] text-[#646864] mt-1">
             Outbound notification delivery for every firm
         </p>
     </div>
@@ -37,7 +37,7 @@
         <!-- Card 1: Channels -->
         <div class="bg-white border border-[#e5e3dc] rounded-sm p-4 flex flex-col justify-between shadow-xs">
             <div>
-                <h2 class="text-sm font-semibold text-[#1b1c18]">Channels</h2>
+                <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Channels</h2>
                 <p class="text-xs text-[#717974] mt-0.5 mb-4">A channel switched off here is off for every firm.</p>
 
                 <form method="POST" action="{{ route('admin.settings.mail.channels') }}" id="channels-form" class="space-y-3">
@@ -78,7 +78,7 @@
         <!-- Card 2: Providers -->
         <div class="bg-white border border-[#e5e3dc] rounded-sm p-4 flex flex-col justify-between shadow-xs">
             <div>
-                <h2 class="text-sm font-semibold text-[#1b1c18] mb-3">Providers</h2>
+                <h2 class="text-[14px] font-semibold text-[#1a1a1a] mb-3">Providers</h2>
 
                 <div class="space-y-3 text-xs">
                     <!-- Email Provider -->
@@ -121,7 +121,7 @@
 
         <!-- Card 3: Send a test -->
         <div class="bg-white border border-[#e5e3dc] rounded-sm p-4 shadow-xs">
-            <h2 class="text-sm font-semibold text-[#1b1c18] mb-3">Send a test</h2>
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a] mb-3">Send a test</h2>
 
             <!-- Test Email Form -->
             <form method="POST" action="{{ route('admin.settings.mail.test-email') }}" class="mb-4">
@@ -165,7 +165,7 @@
     <div class="bg-white border border-[#e5e3dc] rounded-sm p-5 shadow-xs">
         <div class="flex items-center justify-between border-b border-[#f0eee8] pb-3.5 mb-4">
             <div>
-                <h2 class="text-sm font-semibold text-[#1b1c18] flex items-center gap-2">
+                <h2 class="text-[14px] font-semibold text-[#1a1a1a] flex items-center gap-2">
                     <span class="material-symbols-outlined text-[18px] text-[#23493a]">mail</span>
                     <span>Platform Mail &amp; SMTP Gateway</span>
                 </h2>
@@ -249,7 +249,7 @@
         
         <!-- Delivery Log Header & Notice -->
         <div class="p-4 border-b border-[#e5e3dc] bg-white">
-            <h2 class="text-sm font-semibold text-[#1b1c18]">Delivery log</h2>
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Delivery log</h2>
             <p class="text-xs text-[#5e625e] mt-1 leading-relaxed">
                 Platform staff see record types, counts, statuses and matter numbers. Client identities, matter titles, document and message content, and individual amounts stay with each firm. Recipients are masked and message wording is withheld; test messages are shown in full.
             </p>

@@ -11,8 +11,8 @@
             <span class="material-symbols-outlined text-sm">arrow_back</span>
             <span>All Law Firms</span>
         </a>
-        <h1 class="text-3xl font-serif font-bold text-[#222222]">Provision New Law Firm</h1>
-        <p class="text-sm text-[#766A5E] mt-1">Register a new independent law practice or chambers organization on the platform</p>
+        <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Provision New Law Firm</h1>
+        <p class="text-[13px] text-[#646864] mt-1">Register a new independent law practice or chambers organization on the platform</p>
     </div>
 
     <form method="POST" action="{{ route('admin.firms.store') }}" class="space-y-6">
@@ -20,7 +20,7 @@
 
         <!-- Section 1: Firm Identity -->
         <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#EFECE6] shadow-xs">
-            <h2 class="text-base font-serif font-bold text-[#222222] mb-4 flex items-center gap-2">
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a] mb-4 flex items-center gap-2">
                 <span class="material-symbols-outlined text-[#9F8349]">domain</span>
                 <span>Firm Identity & Branding</span>
             </h2>
@@ -76,7 +76,7 @@
 
         <!-- Section 2: Location & Jurisdiction -->
         <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#EFECE6] shadow-xs">
-            <h2 class="text-base font-serif font-bold text-[#222222] mb-4 flex items-center gap-2">
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a] mb-4 flex items-center gap-2">
                 <span class="material-symbols-outlined text-[#9F8349]">location_on</span>
                 <span>Address &amp; Jurisdiction</span>
             </h2>
@@ -128,7 +128,7 @@
 
         <!-- Section 3: Practice Areas -->
         <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#EFECE6] shadow-xs">
-            <h2 class="text-base font-serif font-bold text-[#222222] mb-2 flex items-center gap-2">
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a] mb-2 flex items-center gap-2">
                 <span class="material-symbols-outlined text-[#9F8349]">gavel</span>
                 <span>Practice Areas</span>
             </h2>
@@ -147,7 +147,7 @@
 
         <!-- Section 4: Initial Managing Partner Account (Optional) -->
         <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#EFECE6] shadow-xs">
-            <h2 class="text-base font-serif font-bold text-[#222222] mb-1 flex items-center gap-2">
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a] mb-1 flex items-center gap-2">
                 <span class="material-symbols-outlined text-[#9F8349]">person_add</span>
                 <span>Initial Firm Administrator / Managing Partner</span>
             </h2>

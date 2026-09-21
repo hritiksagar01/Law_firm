@@ -26,8 +26,8 @@
 
     <!-- Page Header -->
     <div>
-        <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Clients</h1>
-        <p class="text-xs text-[#5e625e] mt-1 font-sans">
+        <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Clients</h1>
+        <p class="text-[13px] text-[#646864] mt-1">
             Firm staff and client portal accounts, sorted by firm then name
         </p>
     </div>
@@ -35,7 +35,7 @@
     <!-- 1. Platform Administrators Card -->
     <div class="bg-white border border-[#e5e3dc] rounded-sm shadow-none overflow-hidden">
         <div class="p-4 border-b border-[#e5e3dc] bg-white">
-            <h2 class="text-sm font-semibold text-[#1b1c18]">Platform administrators</h2>
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Platform administrators</h2>
             <p class="text-xs text-[#5e625e] mt-0.5">Not attached to any firm</p>
         </div>
 
@@ -95,7 +95,7 @@
     <!-- 2. Firm Accounts Card & Filter Bar -->
     <div class="bg-white border border-[#e5e3dc] rounded-sm shadow-none overflow-hidden">
         <div class="p-4 border-b border-[#e5e3dc] bg-white">
-            <h2 class="text-sm font-semibold text-[#1b1c18]">Firm accounts</h2>
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Firm accounts</h2>
         </div>
 
         <!-- Filter Bar -->
@@ -267,7 +267,7 @@
 
     <!-- 3. Invite a staff member Section -->
     <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
-        <h2 class="text-sm font-semibold text-[#1b1c18]">Invite a staff member</h2>
+        <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Invite a staff member</h2>
         <p class="text-xs text-[#5e625e] mt-1 mb-5">
             Counts against the firm's seats. Clients are invited by their firm from the client record.
         </p>

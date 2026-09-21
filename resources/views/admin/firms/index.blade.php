@@ -25,8 +25,8 @@
 
     <!-- Page Header -->
     <div>
-        <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Firms</h1>
-        <p class="text-xs text-[#5e625e] mt-1 font-sans">
+        <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Firms</h1>
+        <p class="text-[13px] text-[#646864] mt-1">
             {{ $firms->total() }} law firms registered on the platform
         </p>
     </div>
@@ -98,7 +98,7 @@
 
     <!-- Add a firm Section -->
     <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
-        <h2 class="text-sm font-semibold text-[#1b1c18]">Add a firm</h2>
+        <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Add a firm</h2>
         <p class="text-xs text-[#5e625e] mt-1 mb-5">
             Creates the workspace, copies the default categories and role permissions, and invites the first administrator.
         </p>

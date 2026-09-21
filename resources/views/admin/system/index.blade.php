@@ -6,8 +6,8 @@
 <div class="py-4">
     <!-- Header -->
     <div class="mb-6">
-        <h1 class="font-serif text-[28px] text-[#191c1e] font-normal tracking-tight">System settings</h1>
-        <p class="text-[13px] text-[#5c6063] mt-0.5">Platform-wide values</p>
+        <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">System settings</h1>
+        <p class="text-[13px] text-[#646864] mt-1">Platform-wide values</p>
     </div>
 
     <!-- Success Message -->
@@ -33,7 +33,7 @@
         
         <!-- Left: General Form Card (2 cols) -->
         <div class="lg:col-span-2 bg-white rounded-lg border border-[#e5e7eb] shadow-xs p-6">
-            <h2 class="text-[14.5px] font-semibold text-[#111827] mb-6">General</h2>
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a] mb-6">General</h2>
 
             <form action="{{ route('admin.system.update') }}" method="POST" class="space-y-6">
                 @csrf
@@ -98,7 +98,7 @@
 
         <!-- Right: Deployment Card (1 col) -->
         <div class="lg:col-span-1 bg-white rounded-lg border border-[#e5e7eb] shadow-xs p-6">
-            <h2 class="text-[14.5px] font-semibold text-[#111827] mb-6">Deployment</h2>
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a] mb-6">Deployment</h2>
 
             <div class="space-y-5">
                 <!-- Public URL -->

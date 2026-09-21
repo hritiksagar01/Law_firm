@@ -11,8 +11,8 @@
     
     <!-- Header -->
     <div class="mb-5">
-        <h1 class="font-serif text-[32px] font-normal text-[#1a1a1a] tracking-tight leading-tight">Platform overview</h1>
-        <p class="text-[13px] text-[#646864] mt-1 font-sans">All firms · times in UTC</p>
+        <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Platform overview</h1>
+        <p class="text-[13px] text-[#646864] mt-1">All firms · times in UTC</p>
     </div>
 
     <!-- Yellow / Amber Warning Banner (Dynamic 2FA Status) -->

@@ -42,7 +42,7 @@
             <span class="text-[#1b1c18] font-medium">{{ $firm->name }}</span>
         </nav>
 
-        <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">{{ $firm->name }}</h1>
+        <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">{{ $firm->name }}</h1>
 
         <!-- Badges Row -->
         <div class="flex flex-wrap items-center gap-2.5 mt-2 text-xs">
@@ -74,7 +74,7 @@
 
             <!-- Profile Card -->
             <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
-                <h2 class="text-sm font-semibold text-[#1b1c18] mb-4">Profile</h2>
+                <h2 class="text-[14px] font-semibold text-[#1a1a1a] mb-4">Profile</h2>
 
                 <form method="POST" action="{{ route('admin.firms.update', $firm) }}" class="space-y-4">
                     @csrf
@@ -201,7 +201,7 @@
             <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                     <div>
-                        <h2 class="text-sm font-semibold text-[#1b1c18]">People</h2>
+                        <h2 class="text-[14px] font-semibold text-[#1a1a1a]">People</h2>
                         <p class="text-xs text-[#5e625e] mt-0.5">
                             {{ $staffCount }} staff accounts &middot; {{ $clientPortalCount }} client portal accounts (identities withheld)
                         </p>
@@ -272,7 +272,7 @@
 
             <!-- Recent Activity Card -->
             <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
-                <h2 class="text-sm font-semibold text-[#1b1c18]">Recent activity</h2>
+                <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Recent activity</h2>
                 <p class="text-xs text-[#5e625e] mt-0.5 mb-4">
                     Platform staff see record types, counts, statuses and matter numbers. Client identities, matter titles, document and message content, and individual amounts stay with each firm.
                 </p>
@@ -324,7 +324,7 @@
 
             <!-- Usage Card -->
             <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
-                <h2 class="text-sm font-semibold text-[#1b1c18]">Usage</h2>
+                <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Usage</h2>
                 <p class="text-xs text-[#5e625e] mt-0.5 mb-4">
                     Counts only; amounts stay with the firm
                 </p>
@@ -390,7 +390,7 @@
 
             <!-- Firm access (Danger Zone) -->
             <div class="bg-white border border-[#e5e3dc] rounded-sm p-6 shadow-none">
-                <h2 class="text-sm font-semibold text-[#1b1c18]">Firm access</h2>
+                <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Firm access</h2>
                 <p class="text-xs text-[#5e625e] mt-1 mb-4">
                     Signs out {{ $staffCount }} staff and {{ $clientPortalCount }} clients immediately. The workspace and client portal show a suspended notice until you reactivate. Nothing is deleted.
                 </p>

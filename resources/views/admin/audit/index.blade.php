@@ -9,8 +9,8 @@
     <!-- Page Header with Export CSV -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Audit log</h1>
-            <p class="text-xs text-[#5e625e] mt-1 font-sans">
+            <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Audit log</h1>
+            <p class="text-[13px] text-[#646864] mt-1">
                 Append-only record of sign-ins, changes, document access and payments · UTC
             </p>
         </div>

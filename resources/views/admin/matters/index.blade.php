@@ -7,8 +7,8 @@
 
     <!-- Page Header -->
     <div>
-        <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Matters</h1>
-        <p class="text-xs text-[#5e625e] mt-1 font-sans">
+        <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Matters</h1>
+        <p class="text-[13px] text-[#646864] mt-1">
             Volume and activity across firms, for support and capacity planning
         </p>
     </div>

@@ -7,15 +7,15 @@
 
     <!-- Page Header -->
     <div>
-        <h1 class="text-3xl font-serif text-[#1b1c18] tracking-tight">Sign-in history</h1>
-        <p class="text-xs text-[#5e625e] mt-1 font-sans">
+        <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Sign-in history</h1>
+        <p class="text-[13px] text-[#646864] mt-1">
             Every attempt, successful or not · UTC
         </p>
     </div>
 
     <!-- Failed Sign-ins Alert Card -->
     <div class="bg-[#faf9f6] border border-[#e5e3dc] rounded-sm p-4">
-        <h2 class="text-sm font-semibold text-[#1b1c18]">Failed sign-ins by IP, last 24 hours</h2>
+        <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Failed sign-ins by IP, last 24 hours</h2>
         <p class="text-xs text-[#717974] mt-0.5 mb-3">
             Five failures lock that account for 15 minutes; thirty from one address lock the address.
         </p>
@@ -39,7 +39,7 @@
     <!-- Sign-in Attempts Card -->
     <div class="bg-white border border-[#e5e3dc] rounded-sm shadow-none overflow-hidden">
         <div class="p-4 border-b border-[#e5e3dc] bg-white">
-            <h2 class="text-sm font-semibold text-[#1b1c18]">Sign-in attempts</h2>
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Sign-in attempts</h2>
         </div>
 
         <!-- Filter Bar -->

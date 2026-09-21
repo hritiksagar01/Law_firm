@@ -6,8 +6,8 @@
 <div class="py-4">
     <!-- Header -->
     <div class="mb-6">
-        <h1 class="font-serif text-[28px] text-[#191c1e] font-normal tracking-tight">Roles &amp; categories</h1>
-        <p class="text-[13px] text-[#5c6063] mt-0.5">Starting configuration for new firms</p>
+        <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Roles &amp; categories</h1>
+        <p class="text-[13px] text-[#646864] mt-1">Starting configuration for new firms</p>
     </div>
 
     <!-- Alert / Notice Banner -->
@@ -26,7 +26,7 @@
     <form action="{{ route('admin.roles.permissions') }}" method="POST" class="bg-white rounded-lg border border-[#e5e7eb] shadow-xs overflow-hidden mb-10">
         @csrf
         <div class="px-6 py-4 border-b border-[#f3f4f6]">
-            <h2 class="text-[14.5px] font-semibold text-[#111827]">Default role permissions</h2>
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Default role permissions</h2>
             <p class="text-[12px] text-[#6b7280] mt-0.5">Firm administrators always hold every permission.</p>
         </div>
 
@@ -90,7 +90,7 @@
     <!-- 2. Default Document Categories Card -->
     <div class="bg-white rounded-lg border border-[#e5e7eb] shadow-xs p-6">
         <div class="mb-4">
-            <h2 class="text-[14.5px] font-semibold text-[#111827]">Default document categories</h2>
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Default document categories</h2>
             <p class="text-[12px] text-[#6b7280] mt-0.5">Order controls how categories are listed in upload forms.</p>
         </div>
 

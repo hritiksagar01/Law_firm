@@ -9,8 +9,8 @@
     <!-- Page Title -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-serif font-bold text-[#222222]">Super Administrator Profile</h1>
-            <p class="text-sm text-[#766A5E] mt-1">Configure credentials, identity verification documents, and administrative contact details</p>
+            <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Super Administrator Profile</h1>
+            <p class="text-[13px] text-[#646864] mt-1">Configure credentials, identity verification documents, and administrative contact details</p>
         </div>
         <div class="flex items-center gap-2">
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-[#9F8349]/10 text-[#9F8349] border border-[#9F8349]/20">
@@ -32,7 +32,7 @@
                             <span class="material-symbols-outlined text-2xl">badge</span>
                         </div>
                         <div>
-                            <h2 class="font-serif text-xl font-bold text-[#222222]">User Profile</h2>
+                            <h2 class="text-[14px] font-semibold text-[#1a1a1a]">User Profile</h2>
                             <p class="text-xs text-[#766A5E]">Personal identification & contact configuration</p>
                         </div>
                     </div>
@@ -221,7 +221,7 @@
             <div class="bg-white rounded-3xl border border-[#EFECE6] shadow-xs p-6">
                 <div class="flex items-center gap-3 pb-4 border-b border-[#EFECE6] mb-5">
                     <span class="material-symbols-outlined text-[#9F8349]">account_circle</span>
-                    <h3 class="font-serif text-lg font-bold text-[#222222]">Profile Avatar</h3>
+                    <h3 class="text-[14px] font-semibold text-[#1a1a1a]">Profile Avatar</h3>
                 </div>
 
                 <div class="flex flex-col items-center text-center">
@@ -253,7 +253,7 @@
             <div class="bg-white rounded-3xl border border-[#EFECE6] shadow-xs p-6">
                 <div class="flex items-center gap-3 pb-4 border-b border-[#EFECE6] mb-5">
                     <span class="material-symbols-outlined text-[#9F8349]">lock</span>
-                    <h3 class="font-serif text-lg font-bold text-[#222222]">Change Password</h3>
+                    <h3 class="text-[14px] font-semibold text-[#1a1a1a]">Change Password</h3>
                 </div>
 
                 <form method="POST" action="{{ route('admin.profile.change-password') }}" class="space-y-4">

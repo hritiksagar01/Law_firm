@@ -13,8 +13,8 @@
                 <span>/</span>
                 <span>Verification Audit</span>
             </div>
-            <h1 class="text-3xl font-serif font-semibold text-[#222222] tracking-tight">Automated Test Management System</h1>
-            <p class="text-sm text-[#766A5E] mt-1">End-to-end multi-tenant isolation, RBAC matrix, financial arithmetic, and Supabase connection pooler resilience.</p>
+            <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Automated Test Management System</h1>
+            <p class="text-[13px] text-[#646864] mt-1">End-to-end multi-tenant isolation, RBAC matrix, financial arithmetic, and Supabase connection pooler resilience.</p>
         </div>
         <div class="flex items-center gap-2">
             <form action="{{ route('admin.tests.run') }}" method="POST">
@@ -49,7 +49,7 @@
                 </span>
             </div>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-2xl font-serif font-bold {{ ($results['status'] ?? '') === 'PASSED' ? 'text-emerald-700' : 'text-rose-700' }}">
+                <span class="text-2xl font-semibold {{ ($results['status'] ?? '') === 'PASSED' ? 'text-emerald-700' : 'text-rose-700' }}">
                     {{ $results['status'] ?? 'PENDING' }}
                 </span>
                 <span class="text-[11px] font-mono text-[#766A5E]">100% Verified</span>
@@ -62,7 +62,7 @@
                 <span class="material-symbols-outlined text-base text-[#9F8349]">rule</span>
             </div>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-2xl font-serif font-bold text-[#222222]">{{ $results['total_suites'] ?? 13 }}</span>
+                <span class="text-2xl font-semibold text-[#1a1a1a]">{{ $results['total_suites'] ?? 13 }}</span>
                 <span class="text-[11px] font-mono text-[#766A5E]">Active Categories</span>
             </div>
         </div>
@@ -73,7 +73,7 @@
                 <span class="material-symbols-outlined text-base text-emerald-500">task_alt</span>
             </div>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-2xl font-serif font-bold text-emerald-700">{{ $results['passed'] ?? 0 }} / {{ $results['total_tests'] ?? 0 }}</span>
+                <span class="text-2xl font-semibold text-emerald-700">{{ $results['passed'] ?? 0 }} / {{ $results['total_tests'] ?? 0 }}</span>
                 <span class="text-[11px] font-mono text-emerald-600 font-semibold">{{ $results['success_rate'] ?? 100 }}%</span>
             </div>
         </div>
@@ -84,7 +84,7 @@
                 <span class="material-symbols-outlined text-base text-[#9F8349]">timer</span>
             </div>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-2xl font-serif font-bold text-[#222222]">{{ $results['duration_ms'] ?? 0 }}</span>
+                <span class="text-2xl font-semibold text-[#1a1a1a]">{{ $results['duration_ms'] ?? 0 }}</span>
                 <span class="text-[11px] font-mono text-[#766A5E]">milliseconds</span>
             </div>
         </div>
@@ -93,7 +93,7 @@
     <!-- Test Suites Detailed List -->
     <div class="space-y-4">
         <div class="flex items-center justify-between">
-            <h2 class="text-lg font-serif font-semibold text-[#222222]">Automated Verification Suites ({{ $results['total_suites'] ?? 23 }}/{{ $results['total_suites'] ?? 23 }})</h2>
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Automated Verification Suites ({{ $results['total_suites'] ?? 23 }}/{{ $results['total_suites'] ?? 23 }})</h2>
             <span class="text-xs text-[#766A5E] font-mono">Last Run: {{ isset($results['timestamp']) ? \Carbon\Carbon::parse($results['timestamp'])->diffForHumans() : 'Just now' }}</span>
         </div>
 
@@ -106,7 +106,7 @@
                             {{ $index + 1 }}
                         </span>
                         <div>
-                            <h3 class="text-sm font-serif font-bold text-[#222222]">{{ $suite['title'] }}</h3>
+                            <h3 class="text-sm font-semibold text-[#1a1a1a]">{{ $suite['title'] }}</h3>
                             <span class="text-[11px] font-mono text-[#766A5E]">{{ $suite['passed'] }}/{{ $suite['total'] }} Checks Passed &bull; {{ $suite['duration_ms'] }}ms</span>
                         </div>
                     </div>
@@ -144,7 +144,7 @@
 
     <!-- Platform Optimization & Fail-Safe Architecture Card -->
     <div class="p-6 rounded-xl bg-[#FAF8F5] border border-[#EFECE6]">
-        <h3 class="text-sm font-serif font-bold text-[#222222] mb-2 flex items-center gap-2">
+        <h3 class="text-sm font-semibold text-[#1a1a1a] mb-2 flex items-center gap-2">
             <span class="material-symbols-outlined text-base text-[#9F8349]">speed</span>
             <span>Supabase Low-Latency &amp; Multi-Firm Fail-Safe Architecture</span>
         </h3>

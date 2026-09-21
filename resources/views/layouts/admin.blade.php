@@ -15,7 +15,16 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
-    <style>[x-cloak] { display: none !important; }</style>
+    <style>
+        [x-cloak] { display: none !important; }
+        /* Single Unified Font Family (Inter) across Super Admin Console */
+        body, h1, h2, h3, h4, h5, h6, p, span, a, input, select, textarea, button, table, td, th {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .font-mono, code, pre, [data-mono] {
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+    </style>
 </head>
 <body class="bg-[#fbf9f5] font-sans text-[#1b1c18] antialiased min-h-screen"
       x-data="{ 
@@ -324,7 +333,7 @@
         <div @click.outside="changePasswordModal = false"
              class="bg-surface-card border border-border-hairline rounded-lg max-w-md w-full p-6 shadow-xl">
             <div class="flex items-center justify-between pb-4 border-b border-border-hairline">
-                <h3 class="font-serif text-lg font-medium text-text-primary">Update Security Credentials</h3>
+                <h3 class="text-[15px] font-semibold text-text-primary">Update Security Credentials</h3>
                 <button @click="changePasswordModal = false" class="text-text-muted hover:text-text-primary">
                     <span class="material-symbols-outlined text-xl">close</span>
                 </button>
@@ -358,7 +367,7 @@
         <div @click.outside="changeAvatarModal = false"
              class="bg-surface-card border border-border-hairline rounded-lg max-w-md w-full p-6 shadow-xl">
             <div class="flex items-center justify-between pb-4 border-b border-border-hairline">
-                <h3 class="font-serif text-lg font-medium text-text-primary">Update Avatar Portrait</h3>
+                <h3 class="text-[15px] font-semibold text-text-primary">Update Avatar Portrait</h3>
                 <button @click="changeAvatarModal = false" class="text-text-muted hover:text-text-primary">
                     <span class="material-symbols-outlined text-xl">close</span>
                 </button>
