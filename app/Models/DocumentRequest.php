@@ -15,6 +15,8 @@ class DocumentRequest extends Model
     protected $casts = [
         'due_date' => 'date',
         'submitted_at' => 'datetime',
+        'reviewed_at' => 'datetime',
+        'is_assisted_submission' => 'boolean',
     ];
 
     public function firm(): BelongsTo
@@ -37,6 +39,16 @@ class DocumentRequest extends Model
         return $this->belongsTo(User::class, 'requested_by');
     }
 
+    public function assistedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assisted_by_user_id');
+    }
+
+    public function reviewedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
     public function document(): BelongsTo
     {
         return $this->belongsTo(Document::class);
@@ -55,5 +67,10 @@ class DocumentRequest extends Model
     public function isCompleted(): bool
     {
         return $this->status === 'completed';
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->status === 'rejected';
     }
 }

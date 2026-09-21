@@ -401,9 +401,16 @@
             <div class="border border-[#e5e3dc] bg-white rounded-md p-5 shadow-xs">
                 <h3 class="text-xs font-mono uppercase tracking-wider text-[#8a8a8a] mb-3">Client Information</h3>
                 <div class="flex flex-col gap-2.5 text-xs">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-lg text-[#23493a]">corporate_fare</span>
-                        <span class="font-semibold text-sm text-[#1a1a1a]">{{ $matter->client->name ?? 'Unassigned' }}</span>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg text-[#23493a]">corporate_fare</span>
+                            <a href="{{ $matter->client ? route('clients.show', $matter->client->id) : '#' }}" class="font-semibold text-sm text-[#1a1a1a] hover:text-[#23493a] transition-colors">
+                                {{ $matter->client->name ?? 'Unassigned' }}
+                            </a>
+                        </div>
+                        @if($matter->client)
+                            <a href="{{ route('clients.show', $matter->client->id) }}" class="text-[11px] text-[#23493a] hover:underline font-medium">Dossier →</a>
+                        @endif
                     </div>
                     <div class="text-[#646864]">
                         <span class="text-[#8a8a8a] block text-[11px]">Primary Contact</span>

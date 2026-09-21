@@ -3,8 +3,8 @@
 @section('title', 'Document Requests')
 
 @section('content')
-<div class="flex flex-col gap-6" x-data="{ uploadModalOpen: false, selectedRequestId: null, selectedRequestTitle: '', selectedMatterTitle: '' }">
-    
+<div class="flex flex-col gap-6" x-data="{ uploadModalOpen: false, selectedRequestId: null, selectedRequestTitle: '', selectedMatterTitle: '', isResubmission: false }">
+
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -12,8 +12,9 @@
             <p class="text-xs text-[#766A5E] mt-1">Specific documents, contracts, and filings requested by your legal team for active proceedings.</p>
         </div>
         <div class="flex items-center gap-2 text-xs">
-            <span class="px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg font-mono font-medium">
-                {{ $requests->where('status', 'pending')->count() }} Pending Upload
+            @php $pendingCount = $requests->whereIn('status', ['pending', 'rejected'])->count(); @endphp
+            <span class="px-3 py-1 {{ $pendingCount > 0 ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200' }} border rounded-lg font-mono font-medium">
+                {{ $pendingCount }} Action Required
             </span>
         </div>
     </div>
@@ -29,11 +30,14 @@
         <a href="{{ route('portal.requests.index', ['status' => 'pending']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $activeTab === 'pending' ? 'bg-amber-700 text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
             Pending ({{ $requests->where('status', 'pending')->count() }})
         </a>
+        <a href="{{ route('portal.requests.index', ['status' => 'rejected']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $activeTab === 'rejected' ? 'bg-red-700 text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
+            Re-submission Needed ({{ $requests->where('status', 'rejected')->count() }})
+        </a>
         <a href="{{ route('portal.requests.index', ['status' => 'submitted']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $activeTab === 'submitted' ? 'bg-blue-700 text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
             Submitted ({{ $requests->where('status', 'submitted')->count() }})
         </a>
         <a href="{{ route('portal.requests.index', ['status' => 'completed']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $activeTab === 'completed' ? 'bg-[#856C36] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
-            Completed ({{ $requests->where('status', 'completed')->count() }})
+            Completed &amp; Accepted ({{ $requests->where('status', 'completed')->count() }})
         </a>
     </div>
 
@@ -71,6 +75,14 @@
                                     @endif
                                 </div>
                                 <p class="text-[11px] text-[#766A5E] leading-relaxed">{{ $req->description }}</p>
+
+                                @if($req->status === 'rejected' && ($req->rejection_reason || $req->review_notes))
+                                <div class="p-2 rounded bg-red-50 border border-red-200 mt-1.5 text-red-800 text-[11px]">
+                                    <strong class="block text-[10px] uppercase font-mono text-red-900">Advocate's Remarks / Correction Needed:</strong>
+                                    {{ $req->rejection_reason ?: $req->review_notes }}
+                                </div>
+                                @endif
+
                                 @if($req->client_notes)
                                 <p class="text-[10px] font-mono text-[#9F8349] bg-[#F4ECE1]/30 p-1 rounded mt-0.5">
                                     Your Submission: {{ $req->client_notes }}
@@ -108,24 +120,30 @@
                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                                 <span>Pending Upload</span>
                             </span>
+                            @elseif($req->status === 'rejected')
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-800 border border-red-200">
+                                <span class="material-symbols-outlined text-[13px]">error</span>
+                                <span>Re-submission Required</span>
+                            </span>
                             @elseif($req->status === 'submitted')
                             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200">
                                 <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                                <span>Submitted</span>
+                                <span>Submitted for Counsel Review</span>
                             </span>
                             @else
                             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F8F4EE] text-[#856C36] border border-[#E8DAC8]">
                                 <span class="material-symbols-outlined text-xs text-[#9F8349]">check</span>
-                                <span>Verified &amp; Completed</span>
+                                <span>Verified &amp; Filed</span>
                             </span>
                             @endif
                         </td>
 
                         <td class="py-4 px-4 text-right">
-                            @if($req->status === 'pending')
-                            <button type="button" @click="selectedRequestId = {{ $req->id }}; selectedRequestTitle = '{{ addslashes($req->title) }}'; selectedMatterTitle = '{{ addslashes($req->matter->title ?? '') }}'; uploadModalOpen = true" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] transition-colors shadow-sm">
-                                <span class="material-symbols-outlined text-sm">upload_file</span>
-                                <span>Upload &amp; Fulfill</span>
+                            @if($req->status === 'pending' || $req->status === 'rejected')
+                            <button type="button" @click="selectedRequestId = {{ $req->id }}; selectedRequestTitle = '{{ addslashes($req->title) }}'; selectedMatterTitle = '{{ addslashes($req->matter->title ?? '') }}'; isResubmission = {{ $req->status === 'rejected' ? 'true' : 'false' }}; uploadModalOpen = true"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg {{ $req->status === 'rejected' ? 'bg-red-700 hover:bg-red-800' : 'bg-[#9F8349] hover:bg-[#856C36]' }} text-white text-xs font-semibold transition-colors shadow-sm">
+                                <span class="material-symbols-outlined text-sm">{{ $req->status === 'rejected' ? 'replay' : 'upload_file' }}</span>
+                                <span>{{ $req->status === 'rejected' ? 'Re-upload Document' : 'Upload & Fulfill' }}</span>
                             </button>
                             @else
                             <span class="text-xs text-[#766A5E] font-mono">
@@ -152,8 +170,8 @@
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-[#EFECE6] flex flex-col gap-5 relative">
             <div class="flex items-start justify-between">
                 <div class="flex flex-col">
-                    <span class="font-mono text-[10px] uppercase tracking-wider text-[#9F8349] font-semibold">Fulfill Document Request</span>
-                    <h3 class="text-base font-bold text-[#222222] mt-0.5" x-text="selectedRequestTitle">Upload Document</h3>
+                    <span class="font-mono text-[10px] uppercase tracking-wider text-[#9F8349] font-semibold" x-text="isResubmission ? 'Re-submission Upload' : 'Fulfill Document Request'"></span>
+                    <h3 class="text-base font-bold text-[#222222] mt-0.5" x-text="selectedRequestTitle"></h3>
                     <p class="text-xs text-[#766A5E]" x-text="selectedMatterTitle"></p>
                 </div>
                 <button type="button" @click="uploadModalOpen = false" class="text-[#766A5E] hover:text-[#222222]">
@@ -165,18 +183,18 @@
                 @csrf
 
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-xs font-semibold text-[#222222]">Select Document File (PDF, DOCX, Images)</label>
+                    <label class="text-xs font-semibold text-[#222222]">Select Document File (PDF, DOCX, JPG, PNG up to 50MB) *</label>
                     <input type="file" name="file" required class="w-full text-xs file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#9F8349] file:text-white hover:file:bg-[#856C36] file:cursor-pointer p-2 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC]"/>
                 </div>
 
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-xs font-semibold text-[#222222]">Client Submission Notes (Optional)</label>
-                    <textarea name="client_notes" rows="3" placeholder="Add any details, date of execution, or remarks for counsel..." class="w-full p-3 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:bg-white focus:border-[#9F8349]"></textarea>
+                    <label class="text-xs font-semibold text-[#222222]">Client Submission Remarks (Optional)</label>
+                    <textarea name="client_notes" rows="3" placeholder="Add any details, date of execution, certified copy number, or remarks for counsel..." class="w-full p-3 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:bg-white focus:border-[#9F8349]"></textarea>
                 </div>
 
                 <div class="p-3 bg-[#F8F4EE] rounded-lg border border-[#F4ECE1] flex items-center gap-2 text-[11px] text-[#9F8349]">
                     <span class="material-symbols-outlined text-base text-[#9F8349] shrink-0">lock</span>
-                    <span>Document will be authenticated and securely transmitted to your counsel's case file.</span>
+                    <span>Protected under Section 126 Evidence Act. System computes SHA-256 hash for evidentiary integrity.</span>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#FAF8F5]">
@@ -184,7 +202,7 @@
                         Cancel
                     </button>
                     <button type="submit" class="px-5 py-2 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm">
-                        Submit Document to Legal Team
+                        Submit Document to Legal Counsel
                     </button>
                 </div>
             </form>

@@ -14,16 +14,18 @@ use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\DocumentRequestController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpinionController;
+use App\Http\Controllers\Portal\InvitationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TodoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserGroupController;
-use App\Mail\DocumentRequestedMail;
 use App\Models\Appointment;
 use App\Models\AuditLog;
 use App\Models\Client;
@@ -63,6 +65,10 @@ Route::middleware('guest')->group(function () {
     Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 });
+
+// Client Portal Invitation Acceptance (Guest / Public)
+Route::get('/portal/accept-invitation/{token}', [InvitationController::class, 'accept'])->name('portal.invitation.accept');
+Route::post('/portal/accept-invitation/{token}', [InvitationController::class, 'complete'])->name('portal.invitation.complete');
 
 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -463,103 +469,14 @@ Route::middleware('auth')->group(function () {
             return view('matters.show', compact('matter'));
         })->name('matters.show');
 
-        // Clients Directory & Creation
-        Route::get('/clients', function () {
-            $user = Auth::user();
-            $firmId = $user->firm_id ?? 1;
-
-            if (in_array($user->role, ['superadmin', 'partner'])) {
-                $clients = Client::where('firm_id', $firmId)->with(['matters', 'primaryAttorney'])->get();
-            } else {
-                // Associate / paralegal: only clients they consult or have assigned matters with
-                $clients = Client::where('firm_id', $firmId)
-                    ->where(function ($q) use ($user) {
-                        $q->where('primary_attorney_id', $user->id)
-                            ->orWhereHas('matters', function ($mq) use ($user) {
-                                $mq->where('lead_attorney_id', $user->id)
-                                    ->orWhereHas('users', fn ($uq) => $uq->where('users.id', $user->id));
-                            });
-                    })
-                    ->with(['matters', 'primaryAttorney'])->get();
-            }
-
-            $attorneys = User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate'])->get();
-
-            return view('clients.index', compact('clients', 'attorneys'));
-        })->name('clients.index');
-
-        Route::post('/clients', function (Request $request) {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'type' => 'required|in:corporate,individual',
-                'contact_person' => 'nullable|string|max:255',
-                'email' => 'required|email|max:255',
-                'phone' => 'nullable|string|max:50',
-                'tax_id' => 'nullable|string|max:50',
-                'trust_balance' => 'nullable|numeric|min:0',
-                'primary_attorney_id' => 'nullable|exists:users,id',
-            ]);
-
-            $firmId = Auth::user()->firm_id ?? 1;
-            $attorneyId = $validated['primary_attorney_id'] ?? Auth::id();
-
-            $client = Client::create([
-                'firm_id' => $firmId,
-                'primary_attorney_id' => $attorneyId,
-                'type' => $validated['type'],
-                'name' => $validated['name'],
-                'contact_person' => $validated['contact_person'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
-                'tax_id' => $validated['tax_id'],
-                'trust_balance' => $validated['trust_balance'] ?? 0.00,
-                'status' => 'active',
-            ]);
-
-            // Provision Client Portal user login automatically if requested
-            if ($request->boolean('invite_portal', true)) {
-                $portalUser = User::firstOrCreate(
-                    ['email' => $validated['email']],
-                    [
-                        'firm_id' => $firmId,
-                        'name' => $validated['contact_person'] ?: $validated['name'],
-                        'password' => Hash::make('Client@1234'),
-                        'role' => 'client',
-                        'title' => 'Client Representative',
-                        'phone' => $validated['phone'],
-                    ]
-                );
-                $client->update(['user_id' => $portalUser->id]);
-
-                return redirect()->route('clients.index')
-                    ->with('success', "Client '{$validated['name']}' onboarded and invited to Client Portal. Temporary Password: Client@1234");
-            }
-
-            return redirect()->route('clients.index')->with('success', "Client '{$validated['name']}' added to firm roster.");
-        })->name('clients.store');
-
-        Route::post('/clients/{client}/invite', function (Client $client) {
-            $firmId = Auth::user()->firm_id ?? 1;
-            if ($client->firm_id !== $firmId) {
-                abort(403, 'Unauthorized.');
-            }
-
-            $portalUser = User::firstOrCreate(
-                ['email' => $client->email],
-                [
-                    'firm_id' => $firmId,
-                    'name' => $client->contact_person ?: $client->name,
-                    'password' => Hash::make('Client@1234'),
-                    'role' => 'client',
-                    'title' => 'Client Representative',
-                    'phone' => $client->phone,
-                ]
-            );
-
-            $client->update(['user_id' => $portalUser->id]);
-
-            return back()->with('success', "Portal access active for {$client->name} ({$client->email}). Password: Client@1234");
-        })->name('clients.invite');
+        // Clients Directory, Dossier & Indian Practice Intake
+        Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
+        Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
+        Route::get('/clients/{client}', [ClientController::class, 'show'])->name('clients.show');
+        Route::put('/clients/{client}', [ClientController::class, 'update'])->name('clients.update');
+        Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
+        Route::post('/clients/{client}/invite', [ClientController::class, 'invite'])->name('clients.invite');
+        Route::get('/clients/{client}/intake-slip', [ClientController::class, 'generateIntakeSlip'])->name('clients.intake-slip');
 
         // Documents Vault
         Route::get('/documents', function () {
@@ -840,64 +757,9 @@ Route::middleware('auth')->group(function () {
         })->name('messages.store');
 
         // Document Requests from Counsel to Client (F-07)
-        Route::post('/document-requests', function (Request $request) {
-            $firmId = Auth::user()->firm_id ?? 1;
-
-            $validated = $request->validate([
-                'matter_id' => 'required|exists:matters,id',
-                'client_id' => 'required|exists:clients,id',
-                'title' => 'required|string|max:255',
-                'description' => 'nullable|string|max:1000',
-                'category' => 'nullable|string|max:100',
-                'priority' => 'nullable|in:low,normal,high,urgent',
-                'due_date' => 'nullable|date',
-            ]);
-
-            $matter = Matter::where('id', $validated['matter_id'])->where('firm_id', $firmId)->firstOrFail();
-            $client = Client::where('id', $validated['client_id'])->where('firm_id', $firmId)->firstOrFail();
-
-            $docRequest = DocumentRequest::create([
-                'firm_id' => $firmId,
-                'matter_id' => $matter->id,
-                'client_id' => $client->id,
-                'requested_by' => Auth::id(),
-                'title' => $validated['title'],
-                'description' => $validated['description'] ?? null,
-                'category' => $validated['category'] ?? 'Financial Statements',
-                'priority' => $validated['priority'] ?? 'normal',
-                'due_date' => $validated['due_date'] ?? now()->addDays(7),
-                'status' => 'pending',
-            ]);
-
-            if (! empty($client->email)) {
-                try {
-                    Mail::to($client->email)->send(new DocumentRequestedMail($docRequest));
-                } catch (Throwable $e) {
-                    Log::warning('Could not dispatch document request email: '.$e->getMessage());
-                }
-            }
-
-            return back()->with('success', "Document request '{$docRequest->title}' dispatched to {$client->name}.");
-        })->name('document-requests.store');
-
-        Route::post('/document-requests/{request}/review', function (Request $httpRequest, DocumentRequest $request) {
-            $firmId = Auth::user()->firm_id ?? 1;
-            if ($request->firm_id !== $firmId) {
-                abort(403, 'Unauthorized document request review.');
-            }
-
-            $validated = $httpRequest->validate([
-                'status' => 'required|in:under_review,completed,rejected',
-                'review_notes' => 'nullable|string|max:1000',
-            ]);
-
-            $request->update([
-                'status' => $validated['status'],
-                'review_notes' => $validated['review_notes'] ?? null,
-            ]);
-
-            return back()->with('success', 'Document submission marked as '.ucfirst($validated['status']).'.');
-        })->name('document-requests.review');
+        Route::post('/document-requests', [DocumentRequestController::class, 'store'])->name('document-requests.store');
+        Route::post('/document-requests/{documentRequest}/review', [DocumentRequestController::class, 'review'])->name('document-requests.review');
+        Route::post('/document-requests/{documentRequest}/assisted-upload', [DocumentRequestController::class, 'assistedUpload'])->name('document-requests.assisted-upload');
 
         // Tasks & Productivity Hub
         Route::get('/tasks', function () {
