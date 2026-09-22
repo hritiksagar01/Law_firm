@@ -36,9 +36,9 @@ Before relying on a package's API, confirm its installed version:
 
 - You must only create documentation files if explicitly requested by the user.
 
-## Replies
+## Git & Version Control
 
-- Be concise in your explanations - focus on what's important rather than explaining obvious details.
+- Always commit and push changes to GitHub after completing tasks.
 
 === boost rules ===
 

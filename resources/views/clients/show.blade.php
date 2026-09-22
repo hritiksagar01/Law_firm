@@ -13,7 +13,7 @@
     selectedRequest: null,
     reviewStatus: 'completed',
     rejectionReason: '',
-    selectedMatterId: '{{ $client->matters->first()->id ?? '' }}',
+    selectedMatterId: '{{ $client->matters->first()->id ?? 'auto_create' }}',
     presetCategory: 'KYC & Identification',
     presetTitle: '',
     presetDescription: '',
@@ -82,12 +82,10 @@
                 </a>
 
                 <!-- Request Document Button -->
-                @if($client->matters->isNotEmpty())
-                    <button @click="openRequestModal = true" class="btn-primary h-8 px-3 text-xs inline-flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-[16px]">add_task</span>
-                        <span>Request Document</span>
-                    </button>
-                @endif
+                <button type="button" @click="openRequestModal = true" class="btn-primary h-8 px-3 text-xs inline-flex items-center gap-1.5" title="Request evidentiary document or KYC submission from client">
+                    <span class="material-symbols-outlined text-[16px]">add_task</span>
+                    <span>Request Document</span>
+                </button>
 
                 <!-- Portal Invite Button if Email Exists -->
                 @if($client->email && ! $client->isOfflineOnly())
@@ -445,12 +443,10 @@
                 <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Client Evidentiary Document Requests (F-07)</h2>
                 <p class="text-[12px] text-[#8a8a8a]">Clients can only upload files against explicit active requests. Protected under Section 126 Evidence Act.</p>
             </div>
-            @if($client->matters->isNotEmpty())
-            <button @click="openRequestModal = true" class="btn-primary h-8 px-3 text-xs inline-flex items-center gap-1.5 self-start">
+            <button type="button" @click="openRequestModal = true" class="btn-primary h-8 px-3 text-xs inline-flex items-center gap-1.5 self-start" title="Initiate an evidentiary document request">
                 <span class="material-symbols-outlined text-[16px]">add_task</span>
                 <span>Initiate Document Request</span>
             </button>
-            @endif
         </div>
 
         <div class="border border-[#e5e3dc] bg-white rounded-md shadow-xs overflow-x-auto">
@@ -541,8 +537,20 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="p-8 text-center text-xs text-[#8a8a8a]">
-                            No document requests initiated for this client yet. Click <strong>"Initiate Document Request"</strong> above.
+                        <td colspan="6" class="py-12 px-4 text-center">
+                            <div class="flex flex-col items-center justify-center gap-2.5 max-w-md mx-auto">
+                                <div class="w-10 h-10 rounded-full bg-[#23493a]/10 text-[#23493a] flex items-center justify-center mb-1">
+                                    <span class="material-symbols-outlined text-[22px]">assignment_add</span>
+                                </div>
+                                <h4 class="text-sm font-semibold text-[#1a1a1a]">No document requests initiated yet</h4>
+                                <p class="text-xs text-[#8a8a8a] leading-relaxed">
+                                    You haven't requested any documents from {{ $client->name }} yet. You can request identification proofs (Aadhaar / PAN), signed Vakalatnama, or case evidentiary files.
+                                </p>
+                                <button type="button" @click="openRequestModal = true" class="btn-primary h-8 px-4 text-xs inline-flex items-center gap-1.5 mt-2 shadow-xs">
+                                    <span class="material-symbols-outlined text-[16px]">add_task</span>
+                                    <span>Initiate Document Request</span>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     @endforelse
@@ -752,10 +760,18 @@
                 <div class="flex flex-col gap-1">
                     <label class="font-semibold text-[#1a1a1a]">Target Matter / Case Docket *</label>
                     <select name="matter_id" required class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]">
-                        @foreach($client->matters as $matter)
+                        @forelse($client->matters as $matter)
                             <option value="{{ $matter->id }}">{{ $matter->case_number }} — {{ $matter->title }}</option>
-                        @endforeach
+                        @empty
+                            <option value="auto_create" selected>Client Intake &amp; Onboarding Dossier (Auto-organized)</option>
+                        @endforelse
+                        @if($client->matters->isNotEmpty())
+                            <option value="auto_create">+ New Client Intake &amp; Onboarding Dossier</option>
+                        @endif
                     </select>
+                    @if($client->matters->isEmpty())
+                        <p class="text-[11px] text-[#8a8a8a] mt-0.5">This client has no active court case yet. Documents will be automatically organized under a <em>Client Onboarding &amp; Intake Dossier</em> docket.</p>
+                    @endif
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">

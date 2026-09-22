@@ -22,7 +22,7 @@ class DocumentRequestController extends Controller
         $firmId = Auth::user()->firm_id ?? 1;
 
         $validated = $request->validate([
-            'matter_id' => 'required|exists:matters,id',
+            'matter_id' => 'required',
             'client_id' => 'required|exists:clients,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
@@ -31,8 +31,38 @@ class DocumentRequestController extends Controller
             'due_date' => 'nullable|date',
         ]);
 
-        $matter = Matter::where('id', $validated['matter_id'])->where('firm_id', $firmId)->firstOrFail();
         $client = Client::where('id', $validated['client_id'])->where('firm_id', $firmId)->firstOrFail();
+
+        if ($validated['matter_id'] === 'auto_create' || ! is_numeric($validated['matter_id'])) {
+            $matter = Matter::where('firm_id', $firmId)
+                ->where('client_id', $client->id)
+                ->where('title', 'Client Onboarding & Intake Dossier')
+                ->first();
+
+            if (! $matter) {
+                $baseCaseNum = 'INTK-'.date('Y').'-'.str_pad((string) $client->id, 4, '0', STR_PAD_LEFT);
+                $caseNum = $baseCaseNum;
+                $counter = 1;
+                while (Matter::where('case_number', $caseNum)->exists()) {
+                    $caseNum = $baseCaseNum.'-'.$counter++;
+                }
+
+                $matter = Matter::create([
+                    'firm_id' => $firmId,
+                    'client_id' => $client->id,
+                    'title' => 'Client Onboarding & Intake Dossier',
+                    'case_number' => $caseNum,
+                    'practice_area' => 'General Advisory',
+                    'court_name' => 'Chambers Filing Desk',
+                    'stage' => 'Intake',
+                    'status' => 'active',
+                    'lead_attorney_id' => Auth::id() ?: $client->primary_attorney_id,
+                    'opened_at' => now(),
+                ]);
+            }
+        } else {
+            $matter = Matter::where('id', $validated['matter_id'])->where('firm_id', $firmId)->firstOrFail();
+        }
 
         $docRequest = DocumentRequest::create([
             'firm_id' => $firmId,

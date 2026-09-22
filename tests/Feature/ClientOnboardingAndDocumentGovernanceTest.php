@@ -428,4 +428,75 @@ class ClientOnboardingAndDocumentGovernanceTest extends TestCase
         $response->assertSee('Physical Litigation Dossier &amp; Intake Sheet', false);
         $response->assertSee($client->name);
     }
+
+    /**
+     * 12. Test client show view renders Initiate Document Request button even when client has 0 matters.
+     */
+    public function test_client_show_renders_initiate_document_request_button_even_without_matters(): void
+    {
+        $newClient = Client::create([
+            'firm_id' => $this->firm1->id,
+            'name' => 'Sumanth K. Rao',
+            'email' => 'sumanth.rao@example.com',
+            'phone' => '+91 99887 76655',
+            'category' => 'individual',
+            'onboarding_mode' => 'portal_online',
+            'primary_attorney_id' => $this->partnerFirm1->id,
+        ]);
+
+        $this->assertCount(0, $newClient->matters);
+
+        $response = $this->actingAs($this->partnerFirm1)->get(route('clients.show', $newClient->id));
+        $response->assertStatus(200);
+        $response->assertSee('Request Document');
+        $response->assertSee('Initiate Document Request');
+        $response->assertSee('No document requests initiated yet');
+    }
+
+    /**
+     * 13. Test initiating document request with auto_create matter provisions an onboarding dossier docket.
+     */
+    public function test_can_initiate_document_request_for_client_without_matters_via_auto_intake_dossier(): void
+    {
+        $newClient = Client::create([
+            'firm_id' => $this->firm1->id,
+            'name' => 'Kavita Verma',
+            'email' => 'kavita.verma@example.com',
+            'phone' => '+91 91234 56789',
+            'category' => 'individual',
+            'onboarding_mode' => 'portal_online',
+            'primary_attorney_id' => $this->partnerFirm1->id,
+        ]);
+
+        $response = $this->actingAs($this->partnerFirm1)->post(route('document-requests.store'), [
+            'client_id' => $newClient->id,
+            'matter_id' => 'auto_create',
+            'title' => 'Self-Attested Aadhaar & PAN Card',
+            'category' => 'KYC & Identification',
+            'priority' => 'high',
+            'due_date' => now()->addDays(5)->format('Y-m-d'),
+            'description' => 'Please upload clear color scans of your Aadhaar card and PAN card.',
+        ]);
+
+        $response->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('matters', [
+            'firm_id' => $this->firm1->id,
+            'client_id' => $newClient->id,
+            'title' => 'Client Onboarding & Intake Dossier',
+            'stage' => 'Intake',
+        ]);
+
+        $createdMatter = Matter::where('firm_id', $this->firm1->id)
+            ->where('client_id', $newClient->id)
+            ->firstOrFail();
+
+        $this->assertDatabaseHas('document_requests', [
+            'firm_id' => $this->firm1->id,
+            'client_id' => $newClient->id,
+            'matter_id' => $createdMatter->id,
+            'title' => 'Self-Attested Aadhaar & PAN Card',
+            'priority' => 'high',
+        ]);
+    }
 }
