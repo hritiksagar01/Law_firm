@@ -80,7 +80,7 @@
                         :class="tab === 'firm' ? 'text-[#23493A]' : 'text-[#646864]'">balance</span>
                     <span>Advocate</span>
                 </button>
-                <button type="button" @click="setCredential('client', 'vikram@malhotragroup.in', 'password123')"
+                <button type="button" @click="setCredential('client', 'hritik.srivastava28@gmail.com', '12345678')"
                     :class="tab === 'client' ? 'bg-white text-[#23493A] shadow-xs font-semibold border border-[#E7E4DC]' : 'text-[#646864] hover:text-[#1A1E1C] font-medium border border-transparent'"
                     class="py-2 px-1.5 rounded-[4px] text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer">
                     <span class="material-symbols-outlined text-[15px]"
@@ -175,7 +175,7 @@
                         class="px-2 py-1 rounded-[4px] bg-[#F6F4EE] hover:bg-[#eae8e2] border border-[#E7E4DC] text-[11px] text-[#1A1E1C] transition-colors cursor-pointer">
                         Adv. Rajesh
                     </button>
-                    <button type="button" @click="setCredential('client', 'vikram@malhotragroup.in', 'password123')"
+                    <button type="button" @click="setCredential('client', 'hritik.srivastava28@gmail.com', '12345678')"
                         class="px-2 py-1 rounded-[4px] bg-[#F6F4EE] hover:bg-[#eae8e2] border border-[#E7E4DC] text-[11px] text-[#1A1E1C] transition-colors cursor-pointer">
                         Client Vikram
                     </button>
