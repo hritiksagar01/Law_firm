@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class PlatformSetting extends Model
 {
@@ -12,19 +13,74 @@ class PlatformSetting extends Model
     protected $guarded = [];
 
     /**
+     * Local in-memory runtime cache of platform settings.
+     *
+     * @var array<string, mixed>|null
+     */
+    protected static ?array $runtimeCache = null;
+
+    /**
+     * Clear the platform settings runtime and persistent cache.
+     */
+    public static function flushCache(): void
+    {
+        static::$runtimeCache = null;
+        try {
+            Cache::forget('platform_settings_all');
+        } catch (\Throwable) {
+            // Ignore in early bootstrap or testing
+        }
+    }
+
+    /**
+     * Load all settings into an associative array with in-memory memoization.
+     *
+     * @return array<string, mixed>
+     */
+    public static function allSettings(): array
+    {
+        if (static::$runtimeCache !== null) {
+            return static::$runtimeCache;
+        }
+
+        try {
+            $raw = Cache::remember('platform_settings_all', 3600, function () {
+                return static::pluck('value', 'key')->all();
+            });
+        } catch (\Throwable) {
+            try {
+                $raw = static::pluck('value', 'key')->all();
+            } catch (\Throwable) {
+                $raw = [];
+            }
+        }
+
+        $decoded = [];
+        foreach ($raw as $k => $v) {
+            if ($v === null || $v === '') {
+                $decoded[$k] = null;
+
+                continue;
+            }
+            $dec = json_decode($v, true);
+            $decoded[$k] = (json_last_error() === JSON_ERROR_NONE) ? $dec : $v;
+        }
+
+        return static::$runtimeCache = $decoded;
+    }
+
+    /**
      * Get a setting by key, with optional fallback.
      */
     public static function get(string $key, mixed $default = null): mixed
     {
-        $setting = static::where('key', $key)->first();
+        $settings = static::allSettings();
 
-        if (! $setting || $setting->value === null || $setting->value === '') {
+        if (! array_key_exists($key, $settings) || $settings[$key] === null || $settings[$key] === '') {
             return $default;
         }
 
-        $decoded = json_decode($setting->value, true);
-
-        return json_last_error() === JSON_ERROR_NONE ? $decoded : $setting->value;
+        return $settings[$key];
     }
 
     /**
@@ -36,10 +92,14 @@ class PlatformSetting extends Model
             ? null
             : (is_array($value) || is_object($value) || is_bool($value) ? json_encode($value) : (string) $value);
 
-        return static::updateOrCreate(
+        $record = static::updateOrCreate(
             ['key' => $key],
             ['value' => $encoded]
         );
+
+        static::flushCache();
+
+        return $record;
     }
 
     /**

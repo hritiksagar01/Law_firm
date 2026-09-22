@@ -149,9 +149,9 @@ Route::middleware('auth')->group(function () {
             $eventsCount = Event::where('firm_id', $firmId)->count();
             $tasksCount = Task::where('firm_id', $firmId)->count();
             $clientsCount = Client::where('firm_id', $firmId)->count();
-            $matters = Matter::where('firm_id', $firmId)->with(['client', 'leadAttorney'])->latest()->get();
-            $events = Event::where('firm_id', $firmId)->with('matter')->orderBy('start_time')->get();
-            $tasks = Task::where('firm_id', $firmId)->with(['assignee', 'matter'])->get();
+            $matters = Matter::where('firm_id', $firmId)->with(['client', 'leadAttorney'])->latest()->take(15)->get();
+            $events = Event::where('firm_id', $firmId)->with('matter')->orderBy('start_time')->take(15)->get();
+            $tasks = Task::where('firm_id', $firmId)->with(['assignee', 'matter'])->take(15)->get();
 
             // Dynamic Metrics for Executive Dashboard
             $openMattersCount = Matter::where('firm_id', $firmId)

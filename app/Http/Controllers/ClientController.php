@@ -26,7 +26,11 @@ class ClientController extends Controller
         $firmId = $user->firm_id ?? 1;
 
         $query = Client::where('firm_id', $firmId)
-            ->with(['matters', 'primaryAttorney', 'members']);
+            ->with([
+                'primaryAttorney:id,name',
+                'members:id,client_id,name',
+                'matters:id,client_id,title,status',
+            ]);
 
         // Attorney-level scoping for non-partners
         if (! in_array($user->role, ['superadmin', 'partner'])) {
@@ -93,7 +97,10 @@ class ClientController extends Controller
             ->count();
         $activeMattersCount = Matter::where('firm_id', $firmId)->where('status', 'active')->count();
 
-        $attorneys = User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate'])->get();
+        $attorneys = User::where('firm_id', $firmId)
+            ->whereIn('role', ['partner', 'associate'])
+            ->select(['id', 'name', 'role'])
+            ->get();
 
         return view('clients.index', compact(
             'clients',
