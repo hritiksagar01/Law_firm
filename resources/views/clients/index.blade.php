@@ -6,6 +6,7 @@
 @section('content')
 <div x-data="{
     openCreateModal: false,
+    isSubmitting: false,
     activeTab: '{{ request('category', 'all') }}',
     entityType: 'individual',
     onboardingMode: 'portal_online',
@@ -287,7 +288,7 @@
             </div>
 
             <!-- Modal Form -->
-            <form action="{{ route('clients.store') }}" method="POST" class="overflow-y-auto pr-1 flex flex-col gap-4 text-xs">
+            <form action="{{ route('clients.store') }}" method="POST" @submit="if(isSubmitting) { $event.preventDefault(); return false; } isSubmitting = true" class="overflow-y-auto pr-1 flex flex-col gap-4 text-xs">
                 @csrf
 
                 <!-- Step 1: Entity Classification Radio Chips -->
@@ -629,10 +630,11 @@
 
                 <!-- Modal Footer -->
                 <div class="pt-3 border-t border-[#f0eee8] flex items-center justify-end gap-2.5">
-                    <button type="button" @click="openCreateModal = false" class="btn-secondary h-9 px-4 text-xs">Cancel</button>
-                    <button type="submit" class="btn-primary h-9 px-5 text-xs inline-flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-[16px]">how_to_reg</span>
-                        <span>Complete Client Intake</span>
+                    <button type="button" @click="openCreateModal = false" :disabled="isSubmitting" class="btn-secondary h-9 px-4 text-xs">Cancel</button>
+                    <button type="submit" :disabled="isSubmitting" :class="isSubmitting ? 'opacity-70 cursor-not-allowed' : ''" class="btn-primary h-9 px-5 text-xs inline-flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px]" x-show="!isSubmitting">how_to_reg</span>
+                        <span class="material-symbols-outlined text-[16px] animate-spin" x-show="isSubmitting" style="display: none;">progress_activity</span>
+                        <span x-text="isSubmitting ? 'Registering Client...' : 'Complete Client Intake'"></span>
                     </button>
                 </div>
             </form>

@@ -129,7 +129,7 @@
                                             <span class="text-[#1a1a1a] font-medium">{{ $t->matter->case_number }} {{ $t->matter->title }}</span>
                                             <span class="text-[#c1c8c3]">&middot;</span>
                                         @endif
-                                        <span>{{ $t->assignee->name ?? auth()->user()->name }}</span>
+                                        <span>{{ $t->assignee ? ($t->assigned_to === auth()->id() ? 'Assigned to you' : $t->assignee->name) : 'Unassigned' }}</span>
                                         @if($t->due_date)
                                             <span class="text-[#c1c8c3]">&middot;</span>
                                             @if($isOverdue)
