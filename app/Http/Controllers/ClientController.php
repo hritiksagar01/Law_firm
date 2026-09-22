@@ -380,8 +380,24 @@ class ClientController extends Controller
             abort(403, 'Unauthorized.');
         }
 
-        $client->update(['status' => 'archived']);
+        $clientName = $client->name;
 
-        return redirect()->route('clients.index')->with('success', "Client record for '{$client->name}' archived.");
+        // Clean up linked portal user if created exclusively for this client
+        if ($client->user_id && $client->user && $client->user->role === 'client') {
+            $clientUser = $client->user;
+            $otherClients = Client::where('user_id', $clientUser->id)->where('id', '!=', $client->id)->count();
+            if ($otherClients === 0) {
+                $clientUser->delete();
+            }
+        }
+
+        // Clean up client members and document requests
+        $client->members()->delete();
+        $client->documentRequests()->delete();
+
+        // Delete client record
+        $client->delete();
+
+        return redirect()->route('clients.index')->with('success', "Client record for '{$clientName}' deleted successfully.");
     }
 }

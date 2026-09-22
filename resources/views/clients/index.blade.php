@@ -247,6 +247,16 @@
                         <span>Dossier</span>
                         <span class="material-symbols-outlined text-[13px]">arrow_forward</span>
                     </a>
+
+                    <!-- Delete Client Button -->
+                    <form action="{{ route('clients.destroy', $client->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete client {{ addslashes($client->name) }}? This cannot be undone.');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn-secondary h-7 px-2 text-[11px] inline-flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" title="Delete Client">
+                            <span class="material-symbols-outlined text-[13px]">delete</span>
+                            <span class="sr-only sm:not-sr-only">Delete</span>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

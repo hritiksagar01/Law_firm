@@ -499,4 +499,28 @@ class ClientOnboardingAndDocumentGovernanceTest extends TestCase
             'priority' => 'high',
         ]);
     }
+
+    /**
+     * 14. Test advocate can delete a client and its associated records.
+     */
+    public function test_advocate_can_delete_client_and_clean_up_records(): void
+    {
+        $client = Client::create([
+            'firm_id' => $this->firm1->id,
+            'name' => 'Client To Delete',
+            'email' => 'delete.me@example.com',
+            'phone' => '+91 99999 11111',
+            'category' => 'individual',
+            'onboarding_mode' => 'portal_online',
+            'primary_attorney_id' => $this->partnerFirm1->id,
+        ]);
+
+        $response = $this->actingAs($this->partnerFirm1)->delete(route('clients.destroy', $client->id));
+        $response->assertRedirect(route('clients.index'));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseMissing('clients', [
+            'id' => $client->id,
+        ]);
+    }
 }

@@ -103,6 +103,16 @@
                     <span class="material-symbols-outlined text-[16px]">edit</span>
                     <span>Edit</span>
                 </button>
+
+                <!-- Delete Client Button -->
+                <form action="{{ route('clients.destroy', $client->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to permanently delete client {{ addslashes($client->name) }}? This cannot be undone.');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn-secondary h-8 px-2.5 text-xs inline-flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" title="Delete Client Record">
+                        <span class="material-symbols-outlined text-[16px]">delete</span>
+                        <span>Delete</span>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
