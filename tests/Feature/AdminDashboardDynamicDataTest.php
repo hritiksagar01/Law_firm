@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\AuditLog;
+use App\Models\DocumentRequest;
+use App\Models\Event;
 use App\Models\Firm;
 use App\Models\Matter;
 use App\Models\SignInHistory;
@@ -140,5 +142,101 @@ class AdminDashboardDynamicDataTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('$5.4K');
+    }
+
+    /**
+     * Test date-based greeting header and admin context render.
+     */
+    public function test_dashboard_shows_date_greeting_and_admin_name(): void
+    {
+        $response = $this->actingAs($this->superadmin)->get(route('admin.dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertSee(Carbon::now()->isoFormat('dddd, MMMM D'));
+        $response->assertSee($this->superadmin->name);
+        $response->assertSee('Platform Governance');
+    }
+
+    /**
+     * Test platform quick stats ribbon renders key platform counts.
+     */
+    public function test_dashboard_shows_platform_quick_stats_ribbon(): void
+    {
+        $response = $this->actingAs($this->superadmin)->get(route('admin.dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertSee('active');
+        $response->assertSee('open');
+        $response->assertSee('pending doc');
+        $response->assertSee('trust balance');
+        $response->assertSee('outstanding');
+    }
+
+    /**
+     * Test next two weeks schedule calendar card renders upcoming events.
+     */
+    public function test_dashboard_shows_next_two_weeks_schedule(): void
+    {
+        $firm = Firm::firstOrFail();
+        $matter = Matter::firstOrFail();
+
+        Event::create([
+            'firm_id' => $firm->id,
+            'matter_id' => $matter->id,
+            'user_id' => $this->superadmin->id,
+            'title' => 'High Court Division Bench Special Hearing',
+            'event_type' => 'Court Hearing',
+            'start_time' => Carbon::now()->addDays(3)->setHour(10)->setMinute(30),
+            'end_time' => Carbon::now()->addDays(3)->setHour(12)->setMinute(0),
+            'is_statutory_deadline' => false,
+        ]);
+
+        $response = $this->actingAs($this->superadmin)->get(route('admin.dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Next two weeks');
+        $response->assertSee('High Court Division Bench Special Hearing');
+        $response->assertSee('Hearing');
+        $response->assertSee('Client can see');
+    }
+
+    /**
+     * Test waiting on review card renders submitted document requests.
+     */
+    public function test_dashboard_shows_waiting_on_review_section(): void
+    {
+        $firm = Firm::firstOrFail();
+        $matter = Matter::firstOrFail();
+
+        DocumentRequest::create([
+            'firm_id' => $firm->id,
+            'matter_id' => $matter->id,
+            'client_id' => $matter->client_id,
+            'requested_by' => $this->superadmin->id,
+            'title' => 'Certified Title Deeds & Municipal Clearance',
+            'status' => 'submitted',
+            'submitted_at' => Carbon::now(),
+        ]);
+
+        $response = $this->actingAs($this->superadmin)->get(route('admin.dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Waiting on review');
+        $response->assertSee('Client uploads to review');
+        $response->assertSee('Certified Title Deeds & Municipal Clearance');
+    }
+
+    /**
+     * Test matter stage distribution renders lifecycle breakdown.
+     */
+    public function test_dashboard_shows_matter_stage_distribution(): void
+    {
+        $response = $this->actingAs($this->superadmin)->get(route('admin.dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Matter stage distribution');
+        $response->assertSee('Discovery');
+        $response->assertSee('Intake');
+        $response->assertSee('Pleadings');
     }
 }
