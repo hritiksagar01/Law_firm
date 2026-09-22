@@ -13,7 +13,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#FAF8F5] text-[#222222] font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4 relative">
+<body class="bg-[#f4f2ed] text-[#222222] font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4 relative">
 
     <div class="w-full max-w-md flex flex-col items-center my-8">
         

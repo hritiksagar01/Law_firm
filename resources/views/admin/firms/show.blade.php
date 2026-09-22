@@ -234,7 +234,7 @@
                                 };
                                 $isClient = ($u->role === 'client');
                             @endphp
-                            <tr class="hover:bg-[#fbf9f5] transition-colors">
+                            <tr class="hover:bg-[#f4f2ed] transition-colors">
                                 <td class="py-2.5 px-3">
                                     <span class="font-medium text-[#1b1c18] block">
                                         {{ $isClient ? 'Client portal user' : $u->name }}

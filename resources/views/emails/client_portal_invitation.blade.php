@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Chambers Portal Invitation</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #fbf9f5; margin: 0; padding: 24px; color: #1a1a1a; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f2ed; margin: 0; padding: 24px; color: #1a1a1a; }
         .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; border: 1px solid #e5e3dc; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .header { border-bottom: 2px solid #23493a; padding-bottom: 16px; margin-bottom: 24px; }
         .firm-title { font-size: 20px; font-weight: 700; color: #161718; margin: 8px 0 0 0; }

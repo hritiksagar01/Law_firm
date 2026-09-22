@@ -30,7 +30,7 @@
                 </div>
                 <h3 class="text-[15px] font-semibold text-[#111827]">Registry &amp; Support Email</h3>
                 <p class="text-[12.5px] text-[#6b7280] mt-1 mb-4">For matter filings, document submissions, or account support:</p>
-                <div class="font-mono text-[13.5px] text-[#093225] font-medium bg-[#fbf9f5] p-2.5 rounded border border-[#e5e7eb] break-all">
+                <div class="font-mono text-[13.5px] text-[#093225] font-medium bg-[#f4f2ed] p-2.5 rounded border border-[#e5e7eb] break-all">
                     {{ $data['contact_email'] ?? 'contact@vennamraj.com' }}
                 </div>
             </div>
@@ -50,7 +50,7 @@
                 </div>
                 <h3 class="text-[15px] font-semibold text-[#111827]">Direct Chambers Telephone</h3>
                 <p class="text-[12.5px] text-[#6b7280] mt-1 mb-4">Urgent consultation inquiries and hearing date status:</p>
-                <div class="font-mono text-[13.5px] text-[#093225] font-medium bg-[#fbf9f5] p-2.5 rounded border border-[#e5e7eb]">
+                <div class="font-mono text-[13.5px] text-[#093225] font-medium bg-[#f4f2ed] p-2.5 rounded border border-[#e5e7eb]">
                     {{ $data['contact_phone'] ?? '+91 11 2338 4567' }}
                 </div>
             </div>
@@ -69,7 +69,7 @@
             </div>
             <h3 class="text-[15px] font-semibold text-[#111827]">Chambers &amp; Court Office Address</h3>
             <p class="text-[12.5px] text-[#6b7280] mt-1 mb-3">Official registered physical location:</p>
-            <div class="text-[13px] text-[#374151] leading-relaxed whitespace-pre-line bg-[#fbf9f5] p-3.5 rounded border border-[#e5e7eb]">
+            <div class="text-[13px] text-[#374151] leading-relaxed whitespace-pre-line bg-[#f4f2ed] p-3.5 rounded border border-[#e5e7eb]">
                 {{ $data['contact_address'] ?? "Chamber Block C-14, Lawyers Chambers Complex\nHigh Court of Delhi, Sher Shah Road\nNew Delhi, DL 110003, India" }}
             </div>
         </div>
@@ -81,7 +81,7 @@
             </div>
             <h3 class="text-[15px] font-semibold text-[#111827]">Registry Timings &amp; Operating Hours</h3>
             <p class="text-[12.5px] text-[#6b7280] mt-1 mb-3">Court working hours and consultation windows:</p>
-            <div class="text-[13px] text-[#374151] leading-relaxed bg-[#fbf9f5] p-3.5 rounded border border-[#e5e7eb]">
+            <div class="text-[13px] text-[#374151] leading-relaxed bg-[#f4f2ed] p-3.5 rounded border border-[#e5e7eb]">
                 <div class="font-medium text-[#111827]">{{ $data['contact_hours'] ?? 'Monday – Saturday: 09:30 AM – 07:00 PM IST (Court Days)' }}</div>
                 <div class="text-[12px] text-[#6b7280] mt-2">Emergency filing contacts remain active for pending High Court and Supreme Court urgent stay listings.</div>
             </div>

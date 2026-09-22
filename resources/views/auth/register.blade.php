@@ -14,7 +14,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#FAF8F5] text-[#222222] font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4 relative" x-data="{
+<body class="bg-[#f4f2ed] text-[#222222] font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4 relative" x-data="{
     firmName: 'Verma & Associates, Advocates & Solicitors',
     practiceArea: 'Commercial Litigation & Arbitration',
     barNumber: 'D/1892/2010 (Bar Council of Delhi)',

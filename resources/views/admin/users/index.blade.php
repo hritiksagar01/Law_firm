@@ -53,7 +53,7 @@
                 <tbody class="divide-y divide-[#f0eee8]">
                     @forelse($platformAdmins as $admin)
                     <tr onclick="window.location='{{ route('admin.users.show', $admin) }}'"
-                        class="hover:bg-[#fbf9f5] cursor-pointer transition-colors group">
+                        class="hover:bg-[#f4f2ed] cursor-pointer transition-colors group">
                         <td class="py-3 px-4">
                             <a href="{{ route('admin.users.show', $admin) }}" class="font-medium text-[#1b1c18] group-hover:underline text-[13px] block">
                                 {{ $admin->full_display_name }}
@@ -99,7 +99,7 @@
         </div>
 
         <!-- Filter Bar -->
-        <div class="p-3 bg-[#fbf9f5] border-b border-[#e5e3dc]">
+        <div class="p-3 bg-[#f4f2ed] border-b border-[#e5e3dc]">
             <form method="GET" action="{{ route('admin.users.index') }}" class="flex flex-wrap items-center gap-3">
                 <div class="flex-1 min-w-[240px]">
                     <input type="text" name="q" value="{{ request('q') }}"
@@ -198,7 +198,7 @@
                         $isInvited = ($u->status === 'invited' || empty($u->email_verified_at) && $u->created_at->diffInDays() < 7 && !$u->two_factor_confirmed_at);
                     @endphp
                     <tr onclick="window.location='{{ route('admin.users.show', $u) }}'"
-                        class="hover:bg-[#fbf9f5] cursor-pointer transition-colors group">
+                        class="hover:bg-[#f4f2ed] cursor-pointer transition-colors group">
                         <td class="py-3 px-4">
                             <a href="{{ route('admin.users.show', $u) }}" class="font-medium text-[#1b1c18] group-hover:underline text-[13px] block">
                                 {{ $displayName }}

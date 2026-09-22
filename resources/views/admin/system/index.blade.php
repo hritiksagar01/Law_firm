@@ -229,7 +229,7 @@
                     <!-- Light Backdrop (Mimics Header & Cards) -->
                     <div>
                         <span class="text-[11px] font-medium text-[#6b7280] uppercase tracking-wider block mb-1.5">Light Canvas Backdrop</span>
-                        <div class="bg-[#fbf9f5] p-5 rounded-lg border border-[#e5e7eb] flex items-center justify-center min-h-[90px]">
+                        <div class="bg-[#f4f2ed] p-5 rounded-lg border border-[#e5e7eb] flex items-center justify-center min-h-[90px]">
                             <img :src="logoPreview ? logoPreview : '{{ $settings['platform_logo_url'] }}'" 
                                  alt="Platform Logo" 
                                  class="h-10 w-auto object-contain max-w-[180px] transition-all">
@@ -763,7 +763,7 @@
         </div>
 
         <!-- Global Save Action Bar (Sticky at Bottom) -->
-        <div class="mt-8 pt-4 border-t border-[#e5e7eb] flex items-center justify-between bg-[#fbf9f5]">
+        <div class="mt-8 pt-4 border-t border-[#e5e7eb] flex items-center justify-between bg-[#f4f2ed]">
             <div class="text-[12px] text-[#6b7280]">
                 Changes saved here take immediate effect across the multi-tenant legal platform.
             </div>

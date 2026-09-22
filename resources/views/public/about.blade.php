@@ -31,7 +31,7 @@
 
         <!-- Trust & Pillars Feature Grid -->
         <div class="pt-6 border-t border-[#f3f4f6] grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="p-4 rounded-lg bg-[#fbf9f5] border border-[#e5e7eb]">
+            <div class="p-4 rounded-lg bg-[#f4f2ed] border border-[#e5e7eb]">
                 <div class="w-8 h-8 rounded-full bg-[#093225]/10 text-[#093225] flex items-center justify-center mb-2.5">
                     <span class="material-symbols-outlined text-[19px]">gavel</span>
                 </div>
@@ -39,7 +39,7 @@
                 <p class="text-[12px] text-[#6b7280] mt-1">Multi-stage case trajectory tracking from initial notice through Supreme Court appeals.</p>
             </div>
 
-            <div class="p-4 rounded-lg bg-[#fbf9f5] border border-[#e5e7eb]">
+            <div class="p-4 rounded-lg bg-[#f4f2ed] border border-[#e5e7eb]">
                 <div class="w-8 h-8 rounded-full bg-[#093225]/10 text-[#093225] flex items-center justify-center mb-2.5">
                     <span class="material-symbols-outlined text-[19px]">verified_user</span>
                 </div>
@@ -47,7 +47,7 @@
                 <p class="text-[12px] text-[#6b7280] mt-1">Bound by Indian Evidence Act §§ 126–129 and strict multi-tenant encrypted segregation.</p>
             </div>
 
-            <div class="p-4 rounded-lg bg-[#fbf9f5] border border-[#e5e7eb]">
+            <div class="p-4 rounded-lg bg-[#f4f2ed] border border-[#e5e7eb]">
                 <div class="w-8 h-8 rounded-full bg-[#093225]/10 text-[#093225] flex items-center justify-center mb-2.5">
                     <span class="material-symbols-outlined text-[19px]">cloud_done</span>
                 </div>

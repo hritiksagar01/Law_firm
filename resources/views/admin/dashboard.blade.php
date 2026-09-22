@@ -111,7 +111,7 @@
                     <div class="py-3.5 first:pt-3 last:pb-0 flex items-start justify-between gap-4 group">
                         <div class="flex items-start gap-3 min-w-0">
                             <!-- Checkbox icon indicator -->
-                            <div class="w-4 h-4 mt-0.5 rounded-[3px] border border-[#cfcbc0] bg-[#faf9f5] flex items-center justify-center shrink-0"></div>
+                            <div class="w-4 h-4 mt-0.5 rounded-[3px] border border-[#cfcbc0] bg-[#f4f2ed] flex items-center justify-center shrink-0"></div>
                             
                             <div class="min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">
@@ -488,7 +488,7 @@
             </div>
 
             <!-- Card 5: Security Session Audit (Matching screenshot's "Last sign-in" note) -->
-            <div class="p-3.5 bg-[#faf8f5] border border-[#e5e3dc] rounded-md text-[11.5px] text-[#646864] leading-relaxed">
+            <div class="p-3.5 bg-[#f4f2ed] border border-[#e5e3dc] rounded-md text-[11.5px] text-[#646864] leading-relaxed">
                 Last sign-in {{ $resolvedLastSignIn ? $resolvedLastSignIn->created_at->format('M j, Y, g:i A T') : Carbon\Carbon::now()->format('M j, Y, g:i A T') }}. 
                 Not you? 
                 <a href="{{ route('admin.sign-ins.index') }}" class="underline font-medium hover:text-[#1a1a1a]">Review your sessions</a>.

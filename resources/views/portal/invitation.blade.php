@@ -12,7 +12,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #fbf9f5;
+            background-color: #f4f2ed;
             color: #1a1a1a;
             min-height: 100vh;
             display: flex;

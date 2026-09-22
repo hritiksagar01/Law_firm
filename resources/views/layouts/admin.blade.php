@@ -26,7 +26,7 @@
         }
     </style>
 </head>
-<body class="bg-[#fbf9f5] font-sans text-[#1b1c18] antialiased min-h-screen"
+<body class="bg-[#f4f2ed] font-sans text-[#1b1c18] antialiased min-h-screen"
       x-data="{ 
           sidebarOpen: false, 
           userMenuOpen: false, 
@@ -165,7 +165,7 @@
     </aside>
 
     <!-- Main Wrapper with Left Margin on Desktop -->
-    <div class="lg:pl-64 flex flex-col min-h-screen bg-[#fbf9f5]">
+    <div class="lg:pl-64 flex flex-col min-h-screen bg-[#f4f2ed]">
         
         <!-- Desktop & Mobile Top Header Bar with Notifications, Settings & Profile -->
         <header class="h-14 bg-white border-b border-[#e5e3dc] px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30 shadow-xs">
@@ -300,7 +300,7 @@
         </header>
 
         <!-- Top Demo Environment Notice Banner -->
-        <div class="w-full text-center py-2 text-[12px] text-[#8a8e89] font-sans border-b border-[#f0eee8]/60 bg-[#faf8f5]">
+        <div class="w-full text-center py-2 text-[12px] text-[#8a8e89] font-sans border-b border-[#f0eee8]/60 bg-[#f4f2ed]">
             Demo environment &middot; fictional firms, people and documents
         </div>
 

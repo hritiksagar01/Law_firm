@@ -21,7 +21,7 @@
 </head>
 
 <body
-    class="bg-[#F8F6F0] text-[#1A1E1C] font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4 relative selection:bg-[#23493A]/10 selection:text-[#23493A]"
+    class="bg-[#f4f2ed] text-[#1A1E1C] font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4 relative selection:bg-[#23493A]/10 selection:text-[#23493A]"
     x-data="{
         tab: 'firm',
         email: '{{ old('email', 'rajesh@sharmalegal.in') }}',

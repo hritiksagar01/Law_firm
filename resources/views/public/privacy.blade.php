@@ -30,7 +30,7 @@
         <div class="text-[13.5px] text-[#374151] leading-relaxed space-y-6">
             @foreach(explode("\n\n", $data['privacy_content'] ?? '') as $section)
                 @if(trim($section) !== '')
-                    <div class="p-4 rounded-lg bg-[#fbf9f5] border border-[#e5e7eb]/80">
+                    <div class="p-4 rounded-lg bg-[#f4f2ed] border border-[#e5e7eb]/80">
                         <p class="whitespace-pre-line">{{ trim($section) }}</p>
                     </div>
                 @endif

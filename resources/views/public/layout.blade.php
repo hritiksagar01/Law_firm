@@ -22,7 +22,7 @@
         }
     </style>
 </head>
-<body class="bg-[#fbf9f5] text-[#1b1c18] antialiased min-h-screen flex flex-col justify-between">
+<body class="bg-[#f4f2ed] text-[#1b1c18] antialiased min-h-screen flex flex-col justify-between">
 
     <!-- Top Navigation Header -->
     <header class="bg-white border-b border-[#e5e7eb] sticky top-0 z-30 shadow-2xs">
