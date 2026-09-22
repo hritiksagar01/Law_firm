@@ -19,8 +19,8 @@
     class="bg-[#f4f2ed] text-[#1A1E1C] font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4 relative selection:bg-[#23493A]/10 selection:text-[#23493A]"
     x-data="{
         tab: 'firm',
-        email: '{{ old('email', 'rajesh@sharmalegal.in') }}',
-        password: 'password123',
+        email: '{{ old('email', 'hritiksagar.tech@gmail.com') }}',
+        password: '12345678',
         showPassword: false,
         setCredential(role, mail, pass) {
             this.tab = role;
@@ -73,14 +73,14 @@
 
             <!-- Persona Selector Tabs -->
             <div class="grid grid-cols-3 p-1 bg-[#F6F4EE] rounded-[6px] mb-5 border border-[#E7E4DC]">
-                <button type="button" @click="setCredential('firm', 'rajesh@sharmalegal.in', 'password123')"
+                <button type="button" @click="setCredential('firm', 'hritiksagar.tech@gmail.com', '12345678')"
                     :class="tab === 'firm' ? 'bg-white text-[#23493A] shadow-xs font-semibold border border-[#E7E4DC]' : 'text-[#646864] hover:text-[#1A1E1C] font-medium border border-transparent'"
                     class="py-2 px-1.5 rounded-[4px] text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer">
                     <span class="material-symbols-outlined text-[15px]"
                         :class="tab === 'firm' ? 'text-[#23493A]' : 'text-[#646864]'">balance</span>
                     <span>Advocate</span>
                 </button>
-                <button type="button" @click="setCredential('client', 'hritiksagar.tech@gmail.com', 'password111')"
+                <button type="button" @click="setCredential('client', 'vikram@malhotragroup.in', 'password123')"
                     :class="tab === 'client' ? 'bg-white text-[#23493A] shadow-xs font-semibold border border-[#E7E4DC]' : 'text-[#646864] hover:text-[#1A1E1C] font-medium border border-transparent'"
                     class="py-2 px-1.5 rounded-[4px] text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer">
                     <span class="material-symbols-outlined text-[15px]"
@@ -171,13 +171,13 @@
             <div class="mt-4 pt-3 border-t border-[#E7E4DC] flex flex-col gap-2">
                 <span class="text-[11px] font-medium text-[#8A8E89] uppercase tracking-wider">Quick Fill Demo Accounts</span>
                 <div class="flex flex-wrap gap-1.5">
-                    <button type="button" @click="setCredential('firm', 'rajesh@sharmalegal.in', 'password123')"
+                    <button type="button" @click="setCredential('firm', 'hritiksagar.tech@gmail.com', '12345678')"
                         class="px-2 py-1 rounded-[4px] bg-[#F6F4EE] hover:bg-[#eae8e2] border border-[#E7E4DC] text-[11px] text-[#1A1E1C] transition-colors cursor-pointer">
                         Adv. Rajesh
                     </button>
-                    <button type="button" @click="setCredential('client', 'hritiksagar.tech@gmail.com', 'password111')"
+                    <button type="button" @click="setCredential('client', 'vikram@malhotragroup.in', 'password123')"
                         class="px-2 py-1 rounded-[4px] bg-[#F6F4EE] hover:bg-[#eae8e2] border border-[#E7E4DC] text-[11px] text-[#1A1E1C] transition-colors cursor-pointer">
-                        Client Hritik
+                        Client Vikram
                     </button>
                     <button type="button" @click="setCredential('admin', 'admin@sharmalegal.in', 'password123')"
                         class="px-2 py-1 rounded-[4px] bg-[#F6F4EE] hover:bg-[#eae8e2] border border-[#E7E4DC] text-[11px] text-[#1A1E1C] transition-colors cursor-pointer font-medium text-[#23493A]">
