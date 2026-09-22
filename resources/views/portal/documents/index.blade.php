@@ -1,17 +1,18 @@
 @extends('portal.layout')
 
-@section('title', 'Case Documents')
+@section('title', 'Case Documents Vault')
+@section('header_title', 'Documents Vault')
 
 @section('content')
-<div class="flex flex-col gap-6" x-data="{ uploadDocModalOpen: false }">
+<div class="flex flex-col w-full text-[#1a1a1a] gap-6" x-data="{ uploadDocModalOpen: false }">
     
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-serif font-bold text-[#222222]">Case Documents Vault</h1>
-            <p class="text-xs text-[#766A5E] mt-1">Court orders, written pleadings, filings, and evidence documents shared with your organization.</p>
+            <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Case Documents Vault</h1>
+            <p class="text-[13px] text-[#646864] mt-1">Court orders, written pleadings, filings, and evidence documents shared with your organization.</p>
         </div>
-        <button type="button" @click="uploadDocModalOpen = true" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm transition-colors self-start sm:self-auto">
+        <button type="button" @click="uploadDocModalOpen = true" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-[#23493a] text-white text-xs font-medium hover:bg-[#1a382b] shadow-xs transition-colors self-start sm:self-auto cursor-pointer">
             <span class="material-symbols-outlined text-base">upload</span>
             <span>Upload Document to Case</span>
         </button>
@@ -21,42 +22,42 @@
     @php
         $currentCat = request('category', 'all');
     @endphp
-    <div class="flex items-center gap-2 border-b border-[#EFECE6] pb-2 text-xs overflow-x-auto">
-        <a href="{{ route('portal.documents.index') }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'all' ? 'bg-[#9F8349] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
+    <div class="flex items-center gap-2 border-b border-[#e5e3dc] pb-2 text-xs overflow-x-auto">
+        <a href="{{ route('portal.documents.index') }}" class="px-3 py-1.5 rounded-md font-medium transition-colors {{ $currentCat === 'all' ? 'bg-[#23493a] text-white shadow-xs' : 'text-[#646864] hover:text-[#1a1a1a] hover:bg-white' }}">
             All Filings ({{ $documents->count() }})
         </a>
-        <a href="{{ route('portal.documents.index', ['category' => 'Pleadings']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Pleadings' ? 'bg-[#9F8349] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
+        <a href="{{ route('portal.documents.index', ['category' => 'Pleadings']) }}" class="px-3 py-1.5 rounded-md font-medium transition-colors {{ $currentCat === 'Pleadings' ? 'bg-[#23493a] text-white shadow-xs' : 'text-[#646864] hover:text-[#1a1a1a] hover:bg-white' }}">
             Pleadings
         </a>
-        <a href="{{ route('portal.documents.index', ['category' => 'Court Orders']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Court Orders' ? 'bg-[#9F8349] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
+        <a href="{{ route('portal.documents.index', ['category' => 'Court Orders']) }}" class="px-3 py-1.5 rounded-md font-medium transition-colors {{ $currentCat === 'Court Orders' ? 'bg-[#23493a] text-white shadow-xs' : 'text-[#646864] hover:text-[#1a1a1a] hover:bg-white' }}">
             Court Orders
         </a>
-        <a href="{{ route('portal.documents.index', ['category' => 'Contracts']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Contracts' ? 'bg-[#9F8349] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
+        <a href="{{ route('portal.documents.index', ['category' => 'Contracts']) }}" class="px-3 py-1.5 rounded-md font-medium transition-colors {{ $currentCat === 'Contracts' ? 'bg-[#23493a] text-white shadow-xs' : 'text-[#646864] hover:text-[#1a1a1a] hover:bg-white' }}">
             Contracts &amp; Agreements
         </a>
-        <a href="{{ route('portal.documents.index', ['category' => 'Evidence']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Evidence' ? 'bg-[#9F8349] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
+        <a href="{{ route('portal.documents.index', ['category' => 'Evidence']) }}" class="px-3 py-1.5 rounded-md font-medium transition-colors {{ $currentCat === 'Evidence' ? 'bg-[#23493a] text-white shadow-xs' : 'text-[#646864] hover:text-[#1a1a1a] hover:bg-white' }}">
             Evidence
         </a>
-        <a href="{{ route('portal.documents.index', ['category' => 'Client Submissions']) }}" class="px-3 py-1.5 rounded-lg font-medium transition-colors {{ $currentCat === 'Client Submissions' ? 'bg-[#9F8349] text-white' : 'text-[#766A5E] hover:text-[#222222] hover:bg-white' }}">
+        <a href="{{ route('portal.documents.index', ['category' => 'Client Submissions']) }}" class="px-3 py-1.5 rounded-md font-medium transition-colors {{ $currentCat === 'Client Submissions' ? 'bg-[#23493a] text-white shadow-xs' : 'text-[#646864] hover:text-[#1a1a1a] hover:bg-white' }}">
             Client Submissions
         </a>
     </div>
 
     <!-- Documents Table -->
-    <div class="bg-white rounded-xl border border-[#EFECE6] shadow-sm overflow-hidden">
+    <div class="bg-white rounded-md border border-[#e5e3dc] shadow-xs overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead>
-                    <tr class="bg-[#FAF8F5] border-b border-[#EFECE6] text-[#766A5E] font-mono text-[10px] uppercase">
-                        <th class="py-3.5 px-4 font-semibold">Document Title</th>
-                        <th class="py-3.5 px-4 font-semibold">Matter Docket</th>
-                        <th class="py-3.5 px-4 font-semibold">Category</th>
-                        <th class="py-3.5 px-4 font-semibold">File Details</th>
-                        <th class="py-3.5 px-4 font-semibold">Uploaded Date</th>
-                        <th class="py-3.5 px-4 font-semibold text-right">Action</th>
+                    <tr class="bg-[#faf9f5] border-b border-[#e5e3dc] text-[#8a8a8a] font-mono text-[10.5px] uppercase">
+                        <th class="py-3.5 px-4 font-medium">Document Title</th>
+                        <th class="py-3.5 px-4 font-medium">Matter Docket</th>
+                        <th class="py-3.5 px-4 font-medium">Category</th>
+                        <th class="py-3.5 px-4 font-medium">File Details</th>
+                        <th class="py-3.5 px-4 font-medium">Uploaded Date</th>
+                        <th class="py-3.5 px-4 font-medium text-right">Action</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-[#FAF8F5]">
+                <tbody class="divide-y divide-[#f0eee8]">
                     @php
                         $filteredDocs = $documents;
                         if ($currentCat !== 'all') {
@@ -64,51 +65,50 @@
                         }
                     @endphp
                     @forelse($filteredDocs as $doc)
-                    <tr class="hover:bg-[#FAF8F5]/60 transition-colors">
+                    <tr class="hover:bg-[#faf9f5]/70 transition-colors">
                         <td class="py-3.5 px-4">
                             <div class="flex items-center gap-3">
                                 <span class="material-symbols-outlined text-2xl text-red-600 shrink-0">picture_as_pdf</span>
                                 <div class="flex flex-col">
-                                    <span class="font-bold text-[#222222] text-sm">{{ $doc->title }}</span>
-                                    <span class="text-[10px] font-mono text-[#766A5E]">{{ $doc->filename }}</span>
+                                    <span class="font-semibold text-[#1a1a1a] text-sm">{{ $doc->title }}</span>
+                                    <span class="text-[10.5px] font-mono text-[#8a8a8a]">{{ $doc->filename }}</span>
                                 </div>
                             </div>
                         </td>
 
-                        <td class="py-3.5 px-4 text-[#554D45]">
+                        <td class="py-3.5 px-4 text-[#646864]">
                             <div class="flex flex-col">
-                                <span class="font-semibold text-[#222222] truncate max-w-[200px]">{{ $doc->matter->title ?? 'General' }}</span>
-                                <span class="font-mono text-[10px] text-[#766A5E]">{{ $doc->matter->case_number ?? '' }}</span>
+                                <span class="font-medium text-[#1a1a1a] truncate max-w-[200px]">{{ $doc->matter->title ?? 'General' }}</span>
+                                <span class="font-mono text-[10.5px] text-[#8a8a8a]">{{ $doc->matter->case_number ?? '' }}</span>
                             </div>
                         </td>
 
                         <td class="py-3.5 px-4">
-                            <span class="px-2 py-0.5 rounded bg-[#FAF8F5] text-[#554D45] font-mono text-[10px]">
+                            <span class="px-2 py-0.5 rounded bg-[#faf9f5] border border-[#e5e3dc] text-[#1a1a1a] font-mono text-[10.5px]">
                                 {{ $doc->category }}
                             </span>
                         </td>
 
-                        <td class="py-3.5 px-4 font-mono text-[11px] text-[#766A5E]">
+                        <td class="py-3.5 px-4 font-mono text-[11.5px] text-[#646864]">
                             <span>{{ number_format($doc->file_size / 1048576, 2) }} MB</span>
-                            <span class="block text-[9px] text-[#8C7F72]">SHA-256 Auth</span>
+                            <span class="block text-[9.5px] text-[#065f46]">SHA-256 Verified</span>
                         </td>
 
-                        <td class="py-3.5 px-4 font-mono text-[11px] text-[#766A5E]">
+                        <td class="py-3.5 px-4 font-mono text-[11.5px] text-[#646864]">
                             {{ \Carbon\Carbon::parse($doc->created_at)->format('d M Y') }}
                         </td>
 
                         <td class="py-3.5 px-4 text-right">
-                            <a href="{{ route('portal.documents.download', $doc->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#FAF8F5] hover:bg-[#EFECE6] text-[#222222] text-xs font-semibold transition-colors">
-                                <span class="material-symbols-outlined text-sm text-[#9F8349]">download</span>
+                            <a href="{{ route('portal.documents.download', $doc->id) }}" class="inline-flex items-center gap-1 text-xs text-[#23493a] hover:underline font-medium">
+                                <span class="material-symbols-outlined text-[14px]">download</span>
                                 <span>Download</span>
                             </a>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="py-12 text-center text-[#766A5E]">
-                            <span class="material-symbols-outlined text-3xl mb-2 text-[#EAE4DC]">folder_open</span>
-                            <p class="text-xs">No documents found matching this category.</p>
+                        <td colspan="6" class="py-10 text-center text-xs text-[#8a8a8a]">
+                            No documents found in this vault category.
                         </td>
                     </tr>
                     @endforelse
@@ -117,60 +117,80 @@
         </div>
     </div>
 
-    <!-- Client Direct Upload Modal -->
-    <div x-show="uploadDocModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" @click.self="uploadDocModalOpen = false">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-[#EFECE6] flex flex-col gap-5 relative">
-            <div class="flex items-start justify-between">
-                <div class="flex flex-col">
-                    <span class="font-mono text-[10px] uppercase tracking-wider text-[#9F8349] font-semibold">Direct File Upload</span>
-                    <h3 class="text-base font-bold text-[#222222] mt-0.5">Upload Document to Case File</h3>
+    <!-- Upload Document Modal -->
+    <div x-show="uploadDocModalOpen" 
+         x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+        <div @click.outside="uploadDocModalOpen = false"
+             class="bg-white border border-[#e5e3dc] rounded-lg max-w-lg w-full p-6 shadow-xl">
+            
+            <div class="flex items-center justify-between pb-3.5 border-b border-[#f0eee8]">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-md bg-[#23493a]/10 text-[#23493a] flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[18px]">upload</span>
+                    </div>
+                    <div>
+                        <h3 class="text-[15px] font-semibold text-[#1a1a1a]">Upload Case Document</h3>
+                        <p class="text-[11.5px] text-[#8a8a8a]">Add filings or records to your active matter folder</p>
+                    </div>
                 </div>
-                <button type="button" @click="uploadDocModalOpen = false" class="text-[#766A5E] hover:text-[#222222]">
+                <button type="button" @click="uploadDocModalOpen = false" class="text-[#8e8e8e] hover:text-[#1a1a1a] cursor-pointer">
                     <span class="material-symbols-outlined text-xl">close</span>
                 </button>
             </div>
 
-            <form action="{{ route('portal.documents.upload') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-4">
+            <form action="{{ route('portal.documents.upload') }}" method="POST" enctype="multipart/form-data" class="mt-4 flex flex-col gap-4">
                 @csrf
 
+                <!-- Select Case -->
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-xs font-semibold text-[#222222]">Select Associated Case</label>
-                    <select name="matter_id" required class="w-full p-2.5 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:bg-white focus:border-[#9F8349]">
+                    <label class="text-xs font-semibold text-[#1a1a1a]">Associated Matter Docket</label>
+                    <select name="matter_id" required class="h-10 px-3 rounded-md border border-[#e5e3dc] bg-white text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
                         @foreach($matters as $m)
                         <option value="{{ $m->id }}">{{ $m->case_number }} — {{ $m->title }}</option>
                         @endforeach
                     </select>
                 </div>
 
+                <!-- Title -->
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-xs font-semibold text-[#222222]">Document Title / Description</label>
-                    <input type="text" name="title" required placeholder="e.g. Scanned Agreement dated 12.04.2023" class="w-full p-2.5 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:bg-white focus:border-[#9F8349]"/>
+                    <label class="text-xs font-semibold text-[#1a1a1a]">Document Title</label>
+                    <input type="text" name="title" required placeholder="e.g. Certified Copy of Power of Attorney" class="h-10 px-3 rounded-md border border-[#e5e3dc] bg-white text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
                 </div>
 
+                <!-- Category -->
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-xs font-semibold text-[#222222]">Category</label>
-                    <select name="category" class="w-full p-2.5 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC] text-xs text-[#222222] outline-none focus:bg-white focus:border-[#9F8349]">
+                    <label class="text-xs font-semibold text-[#1a1a1a]">Category</label>
+                    <select name="category" required class="h-10 px-3 rounded-md border border-[#e5e3dc] bg-white text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
                         <option value="Client Submissions">Client Submissions</option>
+                        <option value="Evidence">Evidence</option>
                         <option value="Contracts">Contracts &amp; Agreements</option>
-                        <option value="Evidence">Evidence &amp; Records</option>
-                        <option value="Pleadings">Pleadings &amp; Affidavits</option>
+                        <option value="Pleadings">Pleadings</option>
                     </select>
                 </div>
 
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-xs font-semibold text-[#222222]">Choose File (PDF, DOCX, Images)</label>
-                    <input type="file" name="file" required class="w-full text-xs file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#9F8349] file:text-white hover:file:bg-[#856C36] file:cursor-pointer p-2 rounded-lg bg-[#FAF8F5] border border-[#EAE4DC]"/>
+                <!-- Dropzone Box -->
+                <div class="border-2 border-dashed border-[#e5e3dc] hover:border-[#23493a] rounded-md p-6 text-center transition-colors bg-[#faf9f5]">
+                    <span class="material-symbols-outlined text-3xl text-[#23493a] mb-2">drive_folder_upload</span>
+                    <label class="block text-xs font-semibold text-[#1a1a1a] cursor-pointer">
+                        <span>Click to browse file</span>
+                        <input type="file" name="file" required accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="sr-only" onchange="document.getElementById('vault-file-display').innerText = this.files[0]?.name || '';"/>
+                    </label>
+                    <p class="text-[11px] text-[#8a8a8a] mt-1">PDF, DOCX, JPG, PNG up to 50MB</p>
+                    <p id="vault-file-display" class="text-xs font-mono font-bold text-[#23493a] mt-2"></p>
                 </div>
 
-                <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#FAF8F5]">
-                    <button type="button" @click="uploadDocModalOpen = false" class="px-4 py-2 rounded-lg text-xs font-medium text-[#766A5E] hover:bg-[#FAF8F5]">
+                <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-[#f0eee8]">
+                    <button type="button" @click="uploadDocModalOpen = false" class="bg-white border border-[#e5e3dc] text-[#1a1a1a] hover:bg-[#faf9f5] px-3.5 py-2 text-xs font-medium rounded-md shadow-xs cursor-pointer">
                         Cancel
                     </button>
-                    <button type="submit" class="px-5 py-2 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm">
-                        Upload to Case File
+                    <button type="submit" class="bg-[#23493a] text-white hover:bg-[#1a382b] px-4 py-2 text-xs font-medium rounded-md shadow-xs cursor-pointer flex items-center gap-1">
+                        <span class="material-symbols-outlined text-base">upload</span>
+                        <span>Upload Document</span>
                     </button>
                 </div>
             </form>
+
         </div>
     </div>
 

@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Set New Password — {{ config('legal.app_name', 'Vennamraj Associates') }}</title>
-    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}"/>
+    <title>Set New Password — {{ \App\Models\PlatformSetting::platformName() }}</title>
+    <link rel="icon" type="image/png" href="{{ \App\Models\PlatformSetting::logoUrl() }}"/>
 
     <!-- Industry Standard Readable Typography: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>

@@ -7,6 +7,8 @@ use App\Models\PlatformSetting;
 use App\Models\Role;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class AdminRolesAndSystemSettingsTest extends TestCase
@@ -179,5 +181,201 @@ class AdminRolesAndSystemSettingsTest extends TestCase
         $systemResponse = $this->actingAs($regularUser)
             ->get(route('admin.system.index'));
         $systemResponse->assertRedirect();
+    }
+
+    /**
+     * Test super admin can upload a new platform logo and reset to default.
+     */
+    public function test_super_admin_can_upload_and_reset_platform_logo(): void
+    {
+        $superAdmin = User::where('email', 'admin@sharmalegal.in')->firstOrFail();
+
+        $fakeLogo = UploadedFile::fake()->image('custom_firm_logo.png', 300, 100);
+
+        $response = $this->actingAs($superAdmin)
+            ->withSession(['is_super_admin' => true])
+            ->post(route('admin.system.update'), [
+                'platform_name' => 'Apex Legal Chambers',
+                'support_email' => 'support@apexlegal.in',
+                'idle_timeout' => 12,
+                'logo' => $fakeLogo,
+            ]);
+
+        $response->assertRedirect(route('admin.system.index'));
+        $response->assertSessionHas('success');
+
+        $storedLogo = PlatformSetting::get('platform_logo');
+        $this->assertNotNull($storedLogo);
+        $this->assertStringContainsString('uploads/branding/logo_', $storedLogo);
+        $this->assertFileExists(public_path($storedLogo));
+        $this->assertStringContainsString($storedLogo, PlatformSetting::logoUrl());
+
+        // Reset logo back to default
+        $resetResponse = $this->actingAs($superAdmin)
+            ->withSession(['is_super_admin' => true])
+            ->post(route('admin.system.reset-logo'));
+
+        $resetResponse->assertRedirect(route('admin.system.index'));
+        $resetResponse->assertSessionHas('success');
+
+        $this->assertNull(PlatformSetting::get('platform_logo'));
+        $this->assertEquals(asset('logo.png'), PlatformSetting::logoUrl());
+    }
+
+    /**
+     * Test super admin can configure Amazon S3 / R2 storage settings.
+     */
+    public function test_super_admin_can_update_s3_storage_settings(): void
+    {
+        $superAdmin = User::where('email', 'admin@sharmalegal.in')->firstOrFail();
+
+        $response = $this->actingAs($superAdmin)
+            ->withSession(['is_super_admin' => true])
+            ->post(route('admin.system.update'), [
+                'platform_name' => 'Apex Legal Chambers',
+                'support_email' => 'support@apexlegal.in',
+                'idle_timeout' => 12,
+                'storage_driver' => 's3',
+                'aws_access_key_id' => 'AKIAIOSFODNN7EXAMPLE',
+                'aws_secret_access_key' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+                'aws_default_region' => 'ap-south-1',
+                'aws_bucket' => 'apex-litigation-vault',
+                'aws_endpoint' => 'https://custom.s3.cloudflarestorage.com',
+                'aws_use_path_style_endpoint' => 1,
+            ]);
+
+        $response->assertRedirect(route('admin.system.index'));
+
+        $this->assertEquals('s3', PlatformSetting::get('storage_driver'));
+        $this->assertEquals('AKIAIOSFODNN7EXAMPLE', PlatformSetting::get('aws_access_key_id'));
+        $this->assertEquals('wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY', PlatformSetting::get('aws_secret_access_key'));
+        $this->assertEquals('ap-south-1', PlatformSetting::get('aws_default_region'));
+        $this->assertEquals('apex-litigation-vault', PlatformSetting::get('aws_bucket'));
+        $this->assertEquals('https://custom.s3.cloudflarestorage.com', PlatformSetting::get('aws_endpoint'));
+        $this->assertTrue(PlatformSetting::get('aws_use_path_style_endpoint'));
+
+        // Re-saving with masked secret must NOT overwrite the stored secret
+        $this->actingAs($superAdmin)
+            ->withSession(['is_super_admin' => true])
+            ->post(route('admin.system.update'), [
+                'platform_name' => 'Apex Legal Chambers',
+                'support_email' => 'support@apexlegal.in',
+                'idle_timeout' => 12,
+                'aws_secret_access_key' => '••••••••••••••••',
+            ]);
+
+        $this->assertEquals('wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY', PlatformSetting::get('aws_secret_access_key'));
+    }
+
+    /**
+     * Test S3 connection test endpoint.
+     */
+    public function test_s3_connection_test_endpoint(): void
+    {
+        $superAdmin = User::where('email', 'admin@sharmalegal.in')->firstOrFail();
+
+        // 1. Missing credentials -> returns 422 JSON
+        $invalidResponse = $this->actingAs($superAdmin)
+            ->withSession(['is_super_admin' => true])
+            ->postJson(route('admin.system.test-s3'), [
+                'aws_access_key_id' => '',
+                'aws_secret_access_key' => '',
+                'aws_bucket' => '',
+            ]);
+
+        $invalidResponse->assertStatus(422);
+        $invalidResponse->assertJson(['success' => false]);
+
+        // 2. Successful mock response
+        Http::fake([
+            '*' => Http::response('<LocationConstraint>ap-south-1</LocationConstraint>', 200),
+        ]);
+
+        $successResponse = $this->actingAs($superAdmin)
+            ->withSession(['is_super_admin' => true])
+            ->postJson(route('admin.system.test-s3'), [
+                'aws_access_key_id' => 'AKIAIOSFODNN7EXAMPLE',
+                'aws_secret_access_key' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+                'aws_default_region' => 'ap-south-1',
+                'aws_bucket' => 'test-vault',
+            ]);
+
+        $successResponse->assertStatus(200);
+        $successResponse->assertJson(['success' => true]);
+        $this->assertStringContainsString('Successfully connected', $successResponse->json('message'));
+    }
+
+    /**
+     * Test super admin can update public footer and legal CMS content.
+     */
+    public function test_super_admin_can_update_public_and_footer_content(): void
+    {
+        $superAdmin = User::where('email', 'admin@sharmalegal.in')->firstOrFail();
+
+        $response = $this->actingAs($superAdmin)
+            ->withSession(['is_super_admin' => true])
+            ->post(route('admin.system.update'), [
+                'platform_name' => 'Apex Legal Chambers',
+                'support_email' => 'support@apexlegal.in',
+                'idle_timeout' => 12,
+                'footer_headline' => 'Advocacy · Integrity · Counsel',
+                'footer_description' => 'Serving High Court and Supreme Court appellate jurisdictions.',
+                'footer_copyright' => '© 2026 Apex Legal Chambers. All rights reserved.',
+                'about_headline' => 'About Apex Legal Chambers',
+                'about_content' => 'Apex Legal Chambers is a premier litigation practice based in New Delhi.',
+                'contact_headline' => 'Chambers Registry & Inquiries',
+                'contact_email' => 'registry@apexlegal.in',
+                'contact_phone' => '+91 11 9876 5432',
+                'privacy_headline' => 'Privilege & Confidentiality Policy',
+                'terms_headline' => 'Client Engagement Terms',
+            ]);
+
+        $response->assertRedirect(route('admin.system.index'));
+
+        $this->assertEquals('Advocacy · Integrity · Counsel', PlatformSetting::get('footer_headline'));
+        $this->assertEquals('About Apex Legal Chambers', PlatformSetting::get('about_headline'));
+        $this->assertEquals('+91 11 9876 5432', PlatformSetting::get('contact_phone'));
+        $this->assertEquals('Privilege & Confidentiality Policy', PlatformSetting::get('privacy_headline'));
+        $this->assertEquals('Client Engagement Terms', PlatformSetting::get('terms_headline'));
+    }
+
+    /**
+     * Test public pages render configured content.
+     */
+    public function test_public_pages_render_configured_content(): void
+    {
+        PlatformSetting::set('platform_name', 'Vennamraj Judicial Chambers');
+        PlatformSetting::set('about_headline', 'Excellence in Appellate Advocacy');
+        PlatformSetting::set('contact_phone', '+91 11 4455 6677');
+        PlatformSetting::set('privacy_headline', 'Advocate Privilege Guarantee Under Indian Law');
+        PlatformSetting::set('terms_headline', 'Chambers Standard Retainer Terms');
+
+        // 1. About Page
+        $aboutResponse = $this->get(route('public.about'));
+        $aboutResponse->assertStatus(200);
+        $aboutResponse->assertSee('Excellence in Appellate Advocacy');
+        $aboutResponse->assertSee('Vennamraj Judicial Chambers');
+
+        // 2. Contact Page
+        $contactResponse = $this->get(route('public.contact'));
+        $contactResponse->assertStatus(200);
+        $contactResponse->assertSee('+91 11 4455 6677');
+
+        // 3. Privacy Page
+        $privacyResponse = $this->get(route('public.privacy'));
+        $privacyResponse->assertStatus(200);
+        $privacyResponse->assertSee('Advocate Privilege Guarantee Under Indian Law');
+
+        // 4. Terms Page
+        $termsResponse = $this->get(route('public.terms'));
+        $termsResponse->assertStatus(200);
+        $termsResponse->assertSee('Chambers Standard Retainer Terms');
+
+        // 5. Login Page footer
+        $loginResponse = $this->get(route('login'));
+        $loginResponse->assertStatus(200);
+        $loginResponse->assertSee('Vennamraj Judicial Chambers');
+        $loginResponse->assertSee(route('public.about'));
+        $loginResponse->assertSee(route('public.privacy'));
     }
 }

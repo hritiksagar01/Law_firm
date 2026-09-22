@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
     <title>@yield('title', $title ?? (config('legal.app_name', 'Sharma Legal Chambers') . ' — Chambers Practice Console'))</title>
-    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}"/>
+    <link rel="icon" type="image/png" href="{{ \App\Models\PlatformSetting::logoUrl() }}"/>
     
     <!-- Google Fonts: Newsreader & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -49,7 +49,7 @@
             <!-- Brand & Chambers Header -->
             <div class="px-6 py-5 border-b border-white/[.08] flex items-center justify-between">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
-                    <img src="{{ asset('logo.png') }}" alt="{{ auth()->user()->firm->name ?? config('legal.app_name', 'Sharma Legal Chambers') }}" class="h-10 w-auto object-contain rounded"/>
+                    <img src="{{ \App\Models\PlatformSetting::logoUrl() }}" alt="{{ auth()->user()->firm->name ?? \App\Models\PlatformSetting::platformName() }}" class="h-10 w-auto object-contain rounded"/>
                     <div class="flex flex-col min-w-0">
                         <span class="text-[13.5px] font-semibold text-white tracking-wide block leading-tight truncate max-w-[140px]" title="{{ auth()->user()->firm->name ?? config('legal.app_name', 'Sharma Legal Chambers') }}">
                             {{ auth()->user()->firm->name ?? config('legal.app_name', 'Sharma Legal Chambers') }}

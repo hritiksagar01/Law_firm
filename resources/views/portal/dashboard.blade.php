@@ -1,405 +1,376 @@
 @extends('portal.layout')
 
-@section('title', 'Litigation Dossier & Advisory')
+@section('title', 'Litigation Overview')
+@section('header_title', 'Litigation Dossier')
 
 @section('content')
-<div class="flex flex-col w-full gap-space-lg text-text-primary">
+<div class="flex flex-col w-full text-[#1a1a1a]">
     
-    <!-- Hero Client Dossier Header -->
-    <section class="relative w-full rounded-lg bg-surface-card border border-border-hairline shadow-sm p-space-lg lg:p-space-xl overflow-hidden">
-        <div class="absolute -right-20 -top-24 w-96 h-96 rounded-full bg-pine-primary/5 blur-3xl pointer-events-none"></div>
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-space-lg relative z-10">
-            <div class="flex flex-col gap-space-xs">
-                <div class="flex items-center gap-space-sm flex-wrap">
-                    <span class="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded bg-pine-primary/10 border border-pine-primary/20 text-pine-primary font-label-sm text-label-sm font-medium">
-                        <span class="w-1.5 h-1.5 rounded-full bg-pine-primary animate-pulse"></span>
-                        <span>Retainer Active · FY 2025-26</span>
-                    </span>
-                    <span class="text-text-muted font-caption text-caption uppercase tracking-wider">Ref: SLC-APX-8820-ENT</span>
-                </div>
-                <h1 class="font-headline-xl text-headline-xl text-primary font-serif font-medium tracking-tight">
-                    Welcome, {{ $client->name ?? auth()->user()->name }}
-                </h1>
-                <p class="font-body-md text-body-md text-text-secondary max-w-3xl">
-                    Privileged dossier dashboard for litigation operations, advisory notes, and scheduled appearances before the High Court and Appellate Tribunals.
-                </p>
-            </div>
-
-            <!-- Supervising Counsel Pill -->
-            <div class="flex items-center gap-space-md bg-surface-subtle p-space-md rounded-lg self-start lg:self-auto border border-border-hairline">
-                <div class="w-12 h-12 rounded-full bg-pine-primary text-[#c2ecd7] flex items-center justify-center font-serif text-lg font-medium shrink-0 shadow-xs">
-                    AS
-                </div>
-                <div class="flex flex-col">
-                    <span class="font-caption text-caption text-text-muted uppercase tracking-wider">Supervising Counsel</span>
-                    <span class="font-title-md text-title-md text-text-primary font-semibold">Adv. A. Sharma</span>
-                    <span class="font-body-sm text-body-sm text-pine-primary font-medium">Senior Managing Partner</span>
-                </div>
-                <button class="ml-2 w-10 h-10 rounded-md bg-pine-primary hover:bg-pine-hover text-on-primary flex items-center justify-center transition-colors shadow-xs cursor-pointer" onclick="document.getElementById('counsel-thread').scrollIntoView({behavior: 'smooth'})" title="Message Chambers" type="button">
-                    <span class="material-symbols-outlined text-[18px]">chat</span>
-                </button>
-            </div>
+    <!-- Page Header -->
+    <div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Litigation Overview</h1>
+            <p class="text-[13px] text-[#646864] mt-1">Privileged counsel communications &amp; court proceedings &middot; Times in IST</p>
         </div>
-
-        <!-- 4 Metrics Ledger Row -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-space-md mt-space-lg pt-space-md bg-surface-subtle/80 rounded-md p-space-md border border-border-hairline">
-            <div class="flex flex-col">
-                <span class="font-caption text-caption text-text-muted uppercase tracking-wider">Active Cases</span>
-                <div class="flex items-baseline gap-space-xs mt-0.5">
-                    <span class="font-headline-md text-headline-md text-primary font-serif tabular-nums">{{ str_pad($matters->count(), 2, '0', STR_PAD_LEFT) }}</span>
-                    <span class="font-label-sm text-label-sm text-pine-primary font-medium">Matters listed</span>
-                </div>
-            </div>
-            <div class="flex flex-col">
-                <span class="font-caption text-caption text-text-muted uppercase tracking-wider">Vault Documents</span>
-                <div class="flex items-baseline gap-space-xs mt-0.5">
-                    <span class="font-headline-md text-headline-md text-primary font-serif tabular-nums">{{ str_pad($documentsCount ?? $documentRequests->count(), 2, '0', STR_PAD_LEFT) }}</span>
-                    <span class="font-label-sm text-label-sm text-text-secondary">Secured &amp; verified</span>
-                </div>
-            </div>
-            <div class="flex flex-col">
-                <span class="font-caption text-caption text-text-muted uppercase tracking-wider">Next Retainer Cycle</span>
-                <div class="flex items-baseline gap-space-xs mt-0.5">
-                    <span class="font-headline-md text-headline-md text-primary font-serif tabular-nums">₹4,50,000</span>
-                    <span class="font-label-sm text-label-sm text-text-secondary">Due Next Month</span>
-                </div>
-            </div>
-            <div class="flex flex-col">
-                <span class="font-caption text-caption text-text-muted uppercase tracking-wider">Filings Compliance</span>
-                <div class="flex items-baseline gap-space-xs mt-0.5">
-                    <span class="font-headline-md text-headline-md text-pine-primary font-serif tabular-nums">100%</span>
-                    <span class="font-label-sm text-label-sm text-text-secondary">Zero defaults</span>
-                </div>
-            </div>
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#646864] shadow-xs">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#23493a]"></span>
+                <span>Ref: {{ $client->formatted_id ?? 'CL-'.$client->id }}</span>
+            </span>
         </div>
-    </section>
+    </div>
 
-    <!-- Two Column Grid for Matters & Counsel/Hearings -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+    <!-- Urgent Action Alert Banner (Dynamic) -->
+    @php
+        $pendingActionCount = $documentRequests->whereIn('status', ['pending', 'rejected'])->count();
+        $unpaidInvoicesCount = $invoices->where('status', '!=', 'paid')->count();
+    @endphp
+    @if($pendingActionCount > 0 || $unpaidInvoicesCount > 0)
+    <div class="bg-[#fbf3db] border border-[#f0dfaa] rounded-md px-4 py-3 text-[13px] text-[#634812] mb-6 leading-relaxed flex items-center justify-between shadow-xs">
+        <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-amber-700 text-lg">notification_important</span>
+            <span>
+                @if($pendingActionCount > 0)
+                    <strong>Action required:</strong> You have {{ $pendingActionCount }} document filing {{ \Illuminate\Support\Str::plural('request', $pendingActionCount) }} awaiting your upload or correction.
+                @else
+                    <strong>Billing Notice:</strong> You have {{ $unpaidInvoicesCount }} fee {{ \Illuminate\Support\Str::plural('bill', $unpaidInvoicesCount) }} awaiting settlement.
+                @endif
+            </span>
+        </div>
+        <a href="{{ $pendingActionCount > 0 ? route('portal.requests.index') : route('portal.invoices.index') }}" class="underline font-medium hover:text-[#382606] ml-2 shrink-0">
+            Review items &rarr;
+        </a>
+    </div>
+    @endif
+
+    <!-- Top 4 Connected Metric Ribbon (Super Admin Standard) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border border-[#e5e3dc] bg-white rounded-md divide-y sm:divide-y-0 sm:divide-x divide-[#e5e3dc] shadow-xs mb-8">
+        <!-- Active matters -->
+        <a href="{{ route('portal.matters.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
+            <div class="text-[12.5px] text-[#646864]">Active matters</div>
+            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ str_pad($matters->count(), 2, '0', STR_PAD_LEFT) }}</div>
+            <div class="text-[12px] text-[#8a8a8a] mt-1">Listed before High Court &amp; Tribunals</div>
+        </a>
+
+        <!-- Vault Documents -->
+        <a href="{{ route('portal.documents.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
+            <div class="text-[12.5px] text-[#646864]">Vault documents</div>
+            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ str_pad($documentsCount ?? 0, 2, '0', STR_PAD_LEFT) }}</div>
+            <div class="text-[12px] text-[#8a8a8a] mt-1">Certified filings &amp; court orders</div>
+        </a>
+
+        <!-- Pending requests -->
+        <a href="{{ route('portal.requests.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
+            <div class="text-[12.5px] text-[#646864]">Action items</div>
+            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1 flex items-center gap-2">
+                <span>{{ str_pad($pendingActionCount, 2, '0', STR_PAD_LEFT) }}</span>
+                @if($pendingActionCount > 0)
+                    <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#fef2f2] text-[#991b1b] border border-[#fecaca]">Pending</span>
+                @endif
+            </div>
+            <div class="text-[12px] text-[#8a8a8a] mt-1">Document requests from counsel</div>
+        </a>
+
+        <!-- Retainer trust balance -->
+        <a href="{{ route('portal.invoices.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
+            <div class="text-[12.5px] text-[#646864]">Advance retainer</div>
+            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ config('legal.currency.symbol', '₹') }}{{ number_format($client->trust_balance, 2) }}</div>
+            <div class="text-[12px] text-[#8a8a8a] mt-1">Available trust ledger balance</div>
+        </a>
+    </div>
+
+    <!-- Main 2-Column Grid (Left ~66%, Right ~34%) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        <!-- Main Left Column (8 cols) -->
-        <div class="lg:col-span-8 flex flex-col gap-space-lg">
+        <!-- Left Column (8 cols) -->
+        <div class="lg:col-span-8 flex flex-col gap-6">
             
-            <!-- Active Matters Section -->
-            <section class="flex flex-col gap-space-md">
-                <div class="flex items-center justify-between pb-1 border-b border-border-hairline/60">
-                    <div class="flex items-center gap-space-xs">
-                        <span class="font-caption text-caption uppercase tracking-wider text-pine-primary font-semibold">Litigation Trajectory</span>
-                        <span class="text-text-muted">·</span>
-                        <h2 class="font-headline-md text-headline-md text-primary font-serif font-medium">Active Matters &amp; Hearing Status</h2>
+            <!-- Card 1: Active Cases & 7-Stage Procedural Trajectory -->
+            <div class="border border-[#e5e3dc] bg-white rounded-md p-5 sm:p-6 shadow-xs flex flex-col gap-5">
+                <div class="flex items-center justify-between pb-3 border-b border-[#f0eee8]">
+                    <div>
+                        <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Active Matters &amp; Hearing Status</h2>
+                        <p class="text-[12px] text-[#8a8a8a] mt-0.5 font-sans">Litigation dockets synchronized with High Court registries</p>
                     </div>
-                    <span class="font-caption text-caption text-text-muted">Real-Time Registry Feed</span>
+                    <a href="{{ route('portal.matters.index') }}" class="text-[12px] text-[#23493a] hover:underline font-medium">View all dockets &rarr;</a>
                 </div>
 
                 @forelse($matters as $matter)
-                <!-- Matter Card -->
-                <div class="bg-surface-card border border-border-hairline rounded-lg p-space-lg shadow-sm flex flex-col gap-space-md">
-                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-space-sm">
+                @php
+                    $stageList = [
+                        ['name' => 'Notice & Pleadings', 'desc' => 'Vakalatnama & Written Statements'],
+                        ['name' => 'Interim Relief', 'desc' => 'Injunction & Stay Applications'],
+                        ['name' => 'Discovery & Evidence', 'desc' => 'Affidavits & Cross-Examination'],
+                        ['name' => 'Framing of Issues', 'desc' => 'Settlement of Issues by Bench'],
+                        ['name' => 'Oral Arguments', 'desc' => 'Senior Counsel Submissions'],
+                        ['name' => 'Final Hearing', 'desc' => 'Case Law Compilations'],
+                        ['name' => 'Judgment & Decree', 'desc' => 'Pronouncement & Execution'],
+                    ];
+                    
+                    $sLower = strtolower($matter->stage ?? '');
+                    $currentStageIdx = 0;
+                    if (str_contains($sLower, 'interim') || str_contains($sLower, 'injunction')) $currentStageIdx = 1;
+                    elseif (str_contains($sLower, 'evidence') || str_contains($sLower, 'discovery')) $currentStageIdx = 2;
+                    elseif (str_contains($sLower, 'issues') || str_contains($sLower, 'framing')) $currentStageIdx = 3;
+                    elseif (str_contains($sLower, 'argument') || str_contains($sLower, 'hearing') && !str_contains($sLower, 'final')) $currentStageIdx = 4;
+                    elseif (str_contains($sLower, 'final')) $currentStageIdx = 5;
+                    elseif (str_contains($sLower, 'judgment') || str_contains($sLower, 'decree') || str_contains($sLower, 'settled') || str_contains($sLower, 'closed')) $currentStageIdx = 6;
+                @endphp
+
+                <div class="border border-[#e5e3dc] bg-[#faf9f5] rounded-md p-4 sm:p-5 flex flex-col gap-4">
+                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                         <div class="flex flex-col">
-                            <div class="flex items-center gap-space-xs">
-                                <span class="px-2 py-0.5 bg-pine-primary/10 text-pine-primary border border-pine-primary/20 font-label-sm text-label-sm rounded font-medium">
-                                    {{ $matter->practice_area ?? 'Commercial Litigation' }}
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="px-2 py-0.5 rounded bg-white border border-[#e5e3dc] text-[11px] font-mono text-[#23493a] font-medium">
+                                    {{ $matter->case_number }}
                                 </span>
-                                <span class="text-text-muted font-caption text-caption font-mono">CNR: {{ $matter->case_number }}</span>
+                                <span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0]">
+                                    {{ $matter->stage }}
+                                </span>
+                                <span class="text-[11.5px] text-[#646864]">{{ $matter->practice_area }}</span>
                             </div>
-                            <h3 class="font-headline-sm text-headline-sm text-text-primary mt-1 font-semibold">
+                            <h3 class="text-[15px] font-semibold text-[#1a1a1a] mt-1.5 leading-snug">
                                 {{ $matter->title }}
                             </h3>
-                            <span class="font-body-sm text-body-sm text-text-secondary">
-                                {{ $matter->court_name ?? 'High Court of Delhi' }} · {{ $matter->judge_name ?? "Hon'ble Presiding Bench" }}
+                            <span class="text-[12px] text-[#646864] mt-0.5">
+                                {{ $matter->court_name ?? 'High Court of Delhi' }} &middot; {{ $matter->judge_name ?? "Hon'ble Presiding Bench" }}
                             </span>
                         </div>
-                        <div class="flex flex-col items-end shrink-0">
-                            <span class="font-caption text-caption uppercase text-text-muted tracking-wider">Next Date of Hearing</span>
-                            <span class="font-title-md text-title-md text-pine-primary font-semibold">Scheduled Term Q2</span>
-                            <span class="font-caption text-caption text-red-700 font-medium">Final Hearing · Item #22</span>
+                        <div class="flex sm:flex-col sm:items-end shrink-0 gap-1 text-xs">
+                            <span class="text-[11px] text-[#8a8a8a] uppercase tracking-wider">Next Date</span>
+                            <span class="font-medium text-[#ba1a1a] font-mono">
+                                @if($matter->events->isNotEmpty())
+                                    {{ \Carbon\Carbon::parse($matter->events->first()->start_time)->format('d M Y · h:i A') }}
+                                @else
+                                    Scheduled Term Q2
+                                @endif
+                            </span>
                         </div>
                     </div>
 
-                    <!-- Procedural Trajectory -->
-                    <div class="bg-surface-subtle border border-border-hairline p-space-md rounded-md">
-                        <div class="flex items-center justify-between mb-space-sm">
-                            <span class="font-caption text-caption uppercase tracking-wider text-text-muted font-semibold">Procedural Trajectory</span>
-                            <span class="font-caption text-caption text-pine-primary font-medium">Current Stage: {{ $matter->stage }}</span>
+                    <!-- 7-Stage Procedural Trajectory -->
+                    <div class="bg-white border border-[#e5e3dc] rounded-md p-3.5 flex flex-col gap-2">
+                        <div class="flex items-center justify-between text-[11.5px]">
+                            <span class="font-medium text-[#1a1a1a] uppercase tracking-wider text-[11px]">Procedural Trajectory (7-Stage Cycle)</span>
+                            <span class="text-[#23493a] font-medium">Stage {{ $currentStageIdx + 1 }} of 7: {{ $matter->stage }}</span>
                         </div>
-                        <div class="grid grid-cols-5 gap-2 relative">
-                            <div class="flex flex-col items-center text-center gap-1">
-                                <div class="w-6 h-6 rounded-full bg-pine-primary text-on-primary flex items-center justify-center font-caption text-caption shadow-xs">
-                                    <span class="material-symbols-outlined text-[13px]">check</span>
+                        
+                        <!-- Progress Steps Grid -->
+                        <div class="grid grid-cols-7 gap-1 pt-1">
+                            @foreach($stageList as $idx => $stg)
+                            <div class="flex flex-col items-center text-center gap-1 group relative">
+                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10.5px] font-mono transition-all {{ $idx < $currentStageIdx ? 'bg-[#23493a] text-white' : ($idx === $currentStageIdx ? 'bg-[#23493a] text-white ring-2 ring-[#23493a]/30 font-bold' : 'bg-[#faf9f5] border border-[#e5e3dc] text-[#8a8a8a]') }}">
+                                    @if($idx < $currentStageIdx)
+                                        <span class="material-symbols-outlined text-[13px]">check</span>
+                                    @else
+                                        {{ $idx + 1 }}
+                                    @endif
                                 </div>
-                                <span class="font-caption text-caption text-text-primary font-medium">Petition Filed</span>
-                                <span class="font-caption text-caption text-text-muted scale-90">Completed</span>
+                                <span class="text-[10px] truncate max-w-full block leading-tight {{ $idx === $currentStageIdx ? 'font-semibold text-[#23493a]' : ($idx < $currentStageIdx ? 'text-[#1a1a1a]' : 'text-[#8a8a8a]') }}">
+                                    {{ explode(' ', $stg['name'])[0] }}
+                                </span>
                             </div>
-                            <div class="flex flex-col items-center text-center gap-1">
-                                <div class="w-6 h-6 rounded-full bg-pine-primary text-on-primary flex items-center justify-center font-caption text-caption shadow-xs">
-                                    <span class="material-symbols-outlined text-[13px]">check</span>
-                                </div>
-                                <span class="font-caption text-caption text-text-primary font-medium">Notice Issued</span>
-                                <span class="font-caption text-caption text-text-muted scale-90">Completed</span>
-                            </div>
-                            <div class="flex flex-col items-center text-center gap-1">
-                                <div class="w-6 h-6 rounded-full bg-pine-primary text-on-primary flex items-center justify-center font-caption text-caption shadow-xs">
-                                    <span class="material-symbols-outlined text-[13px]">check</span>
-                                </div>
-                                <span class="font-caption text-caption text-text-primary font-medium">Counter Filed</span>
-                                <span class="font-caption text-caption text-text-muted scale-90">Completed</span>
-                            </div>
-                            <div class="flex flex-col items-center text-center gap-1">
-                                <div class="w-6 h-6 rounded-full bg-pine-primary text-on-primary ring-4 ring-tertiary-fixed/60 flex items-center justify-center font-caption text-caption font-bold shadow-xs">
-                                    4
-                                </div>
-                                <span class="font-caption text-caption text-pine-primary font-semibold">{{ $matter->stage }}</span>
-                                <span class="font-caption text-caption text-pine-primary scale-90 font-medium">Active Stage</span>
-                            </div>
-                            <div class="flex flex-col items-center text-center gap-1 opacity-50">
-                                <div class="w-6 h-6 rounded-full bg-surface-card border border-border-hairline text-text-muted flex items-center justify-center font-caption text-caption">
-                                    5
-                                </div>
-                                <span class="font-caption text-caption text-text-secondary">Disposition</span>
-                                <span class="font-caption text-caption text-text-muted scale-90">Awaited</span>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between flex-wrap gap-space-sm pt-space-xs border-t border-border-hairline">
-                        <div class="flex items-center gap-space-sm text-text-secondary font-body-sm text-body-sm">
-                            <span class="material-symbols-outlined text-[18px] text-pine-primary">record_voice_over</span>
-                            <span>Lead Arguing Counsel: <strong class="text-text-primary font-semibold">{{ $matter->leadAttorney?->name ?? 'Adv. A. Sharma' }}</strong></span>
+                    <div class="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-[#e5e3dc]/70 text-xs">
+                        <div class="flex items-center gap-1.5 text-[#646864]">
+                            <span class="material-symbols-outlined text-base text-[#23493a]">person</span>
+                            <span>Lead Arguing Counsel: <strong class="text-[#1a1a1a] font-medium">{{ $matter->leadAttorney?->name ?? 'Adv. A. Sharma' }}</strong></span>
                         </div>
-                        <a href="{{ route('portal.matters.show', $matter->id) }}" class="btn-secondary h-8 px-3 text-xs flex items-center gap-1 group">
-                            <span>View Certified Order Sheets</span>
-                            <span class="material-symbols-outlined text-[15px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+                        <a href="{{ route('portal.matters.show', $matter->id) }}" class="bg-white border border-[#e5e3dc] text-[#1a1a1a] hover:bg-[#faf9f5] px-3 py-1.5 text-xs font-medium rounded-md shadow-xs transition-colors flex items-center gap-1">
+                            <span>View Case File</span>
+                            <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
                         </a>
                     </div>
                 </div>
                 @empty
-                <div class="p-8 bg-surface-card rounded-lg border border-border-hairline text-center text-xs text-text-muted">
+                <div class="py-10 text-center text-xs text-[#8a8a8a]">
                     No active litigation dockets currently linked to your enterprise client account.
                 </div>
                 @endforelse
-            </section>
+            </div>
 
-            <!-- Case Opinions & Legal Memos Section -->
-            <section class="flex flex-col gap-space-md">
-                <div class="flex items-center justify-between pb-1 border-b border-border-hairline/60">
-                    <div class="flex items-center gap-space-xs">
-                        <span class="font-caption text-caption uppercase tracking-wider text-pine-primary font-semibold">Chambers Opinions</span>
-                        <span class="text-text-muted">·</span>
-                        <h2 class="font-headline-md text-headline-md text-primary font-serif font-medium">Recent Case Opinions &amp; Advisory Memos</h2>
+            <!-- Card 2: Legal Opinions & Advisory Memos -->
+            <div class="border border-[#e5e3dc] bg-white rounded-md p-5 sm:p-6 shadow-xs">
+                <div class="flex items-center justify-between pb-3 border-b border-[#f0eee8] mb-4">
+                    <div>
+                        <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Recent Case Opinions &amp; Advisory Memos</h2>
+                        <p class="text-[12px] text-[#8a8a8a] mt-0.5 font-sans">Digital counsel signature authenticated &middot; Privileged under Section 126 Evidence Act</p>
                     </div>
-                    <span class="font-caption text-caption text-text-muted">Digital Counsel Signature Authenticated</span>
+                    <a href="{{ route('portal.documents.index') }}" class="text-[12px] text-[#23493a] hover:underline font-medium">All opinions &rarr;</a>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <!-- Memo 1 -->
-                    <div class="bg-surface-card border border-border-hairline p-space-lg rounded-lg shadow-sm flex flex-col justify-between">
+                    <div class="border border-[#e5e3dc] bg-[#faf9f5] rounded-md p-4 flex flex-col justify-between">
                         <div>
-                            <div class="flex items-center justify-between mb-space-sm">
-                                <span class="px-2 py-0.5 bg-surface-subtle text-text-secondary font-label-sm text-label-sm rounded font-medium border border-border-hairline">Memo #OP-2025-089</span>
-                                <span class="font-caption text-caption text-text-muted">Privileged Brief</span>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="px-2 py-0.5 rounded bg-white border border-[#e5e3dc] font-mono text-[10.5px] text-[#646864]">Memo #OP-2026-089</span>
+                                <span class="text-[11px] text-[#065f46] font-medium bg-[#ecfdf5] px-2 py-0.5 rounded border border-[#a7f3d0]">Privileged</span>
                             </div>
-                            <h3 class="font-title-md text-title-md text-text-primary mb-space-xs font-semibold">Precedent Analysis: Carriage of Goods &amp; Statutory Demurrage Waivers</h3>
-                            <p class="font-body-sm text-body-sm text-text-secondary mb-space-md">
+                            <h3 class="text-[13.5px] font-semibold text-[#1a1a1a] leading-snug">
+                                Precedent Analysis: Carriage of Goods &amp; Statutory Demurrage Waivers
+                            </h3>
+                            <p class="text-[12px] text-[#646864] mt-1.5 leading-relaxed">
                                 Detailed counsel advisory on section 43 with case law synthesis of the recent division bench appellate ruling.
                             </p>
                         </div>
-                        <div class="flex items-center gap-space-sm pt-space-md border-t border-border-hairline">
-                            <a href="{{ route('portal.documents.index') }}" class="btn-primary flex-1 h-9 text-xs flex items-center justify-center gap-1.5">
-                                <span class="material-symbols-outlined text-[16px]">download</span>
-                                <span>PDF Memorandum (4.2 MB)</span>
+                        <div class="pt-3 mt-3 border-t border-[#e5e3dc] flex items-center justify-between">
+                            <span class="text-[11px] font-mono text-[#8a8a8a]">4.2 MB PDF</span>
+                            <a href="{{ route('portal.documents.index') }}" class="text-[12px] text-[#23493a] font-medium hover:underline flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[15px]">download</span>
+                                <span>Download Memo</span>
                             </a>
-                            <button class="w-9 h-9 rounded-md bg-surface-subtle hover:bg-surface-container-high text-primary transition-colors border border-border-hairline shadow-xs flex items-center justify-center" title="View Citations" type="button">
-                                <span class="material-symbols-outlined text-[16px]">format_quote</span>
-                            </button>
                         </div>
                     </div>
 
                     <!-- Memo 2 -->
-                    <div class="bg-surface-card border border-border-hairline p-space-lg rounded-lg shadow-sm flex flex-col justify-between">
+                    <div class="border border-[#e5e3dc] bg-[#faf9f5] rounded-md p-4 flex flex-col justify-between">
                         <div>
-                            <div class="flex items-center justify-between mb-space-sm">
-                                <span class="px-2 py-0.5 bg-surface-subtle text-text-secondary font-label-sm text-label-sm rounded font-medium border border-border-hairline">Memo #OP-2025-074</span>
-                                <span class="font-caption text-caption text-text-muted">Advisory Note</span>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="px-2 py-0.5 rounded bg-white border border-[#e5e3dc] font-mono text-[10.5px] text-[#646864]">Memo #OP-2026-074</span>
+                                <span class="text-[11px] text-[#065f46] font-medium bg-[#ecfdf5] px-2 py-0.5 rounded border border-[#a7f3d0]">Privileged</span>
                             </div>
-                            <h3 class="font-title-md text-title-md text-text-primary mb-space-xs font-semibold">Risk Matrix: Proposed Joint Venture Agreement for Multi-Modal Hub</h3>
-                            <p class="font-body-sm text-body-sm text-text-secondary mb-space-md">
-                                Privileged review of dispute resolution clauses, seat designation risks, and indemnification caps with partner commentary.
+                            <h3 class="text-[13.5px] font-semibold text-[#1a1a1a] leading-snug">
+                                Risk Matrix: Proposed Joint Venture Agreement &amp; Indemnity Caps
+                            </h3>
+                            <p class="text-[12px] text-[#646864] mt-1.5 leading-relaxed">
+                                Counsel review of dispute resolution clauses, seat designation risks, and indemnification caps with partner commentary.
                             </p>
                         </div>
-                        <div class="flex items-center gap-space-sm pt-space-md border-t border-border-hairline">
-                            <a href="{{ route('portal.documents.index') }}" class="btn-primary flex-1 h-9 text-xs flex items-center justify-center gap-1.5">
-                                <span class="material-symbols-outlined text-[16px]">download</span>
-                                <span>PDF Memorandum (2.8 MB)</span>
+                        <div class="pt-3 mt-3 border-t border-[#e5e3dc] flex items-center justify-between">
+                            <span class="text-[11px] font-mono text-[#8a8a8a]">2.8 MB PDF</span>
+                            <a href="{{ route('portal.documents.index') }}" class="text-[12px] text-[#23493a] font-medium hover:underline flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[15px]">download</span>
+                                <span>Download Memo</span>
                             </a>
-                            <button class="w-9 h-9 rounded-md bg-surface-subtle hover:bg-surface-container-high text-primary transition-colors border border-border-hairline shadow-xs flex items-center justify-center" title="View Citations" type="button">
-                                <span class="material-symbols-outlined text-[16px]">format_quote</span>
-                            </button>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
         </div>
 
-        <!-- Right Column: Court Dates, Counsel Channel, Retainer Ledger (4 cols) -->
-        <div class="lg:col-span-4 flex flex-col gap-space-lg">
+        <!-- Right Column (4 cols) -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
             
-            <!-- Upcoming Court Dates Section -->
-            <section class="bg-surface-card border border-border-hairline rounded-lg p-space-lg shadow-sm flex flex-col gap-space-md">
-                <div class="flex items-center justify-between pb-space-xs border-b border-border-hairline">
-                    <div class="flex items-center gap-space-xs">
-                        <span class="material-symbols-outlined text-pine-primary text-[20px]">event_upcoming</span>
-                        <h2 class="font-headline-sm text-headline-sm text-primary font-serif font-medium">Upcoming Court Dates</h2>
+            <!-- Card 1: Upcoming Hearings & Cause List Appearances -->
+            <div class="border border-[#e5e3dc] bg-white rounded-md p-5 sm:p-6 shadow-xs flex flex-col gap-4">
+                <div class="flex items-center justify-between pb-3 border-b border-[#f0eee8]">
+                    <div>
+                        <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Scheduled Court Dates</h2>
+                        <p class="text-[12px] text-[#8a8a8a] mt-0.5 font-sans">High Court cause list sync</p>
                     </div>
-                    <span class="px-2 py-0.5 rounded bg-pine-primary/10 text-pine-primary border border-pine-primary/20 font-caption text-caption font-semibold uppercase">LISTED</span>
+                    <a href="{{ route('portal.calendar.index') }}" class="text-[12px] text-[#23493a] hover:underline font-medium">Calendar &rarr;</a>
                 </div>
 
-                <div class="flex flex-col gap-space-md">
-                    @forelse($events->take(2) as $event)
-                    <div class="bg-surface-subtle border border-border-hairline p-space-md rounded-md flex flex-col gap-space-xs">
+                <div class="flex flex-col gap-3">
+                    @forelse($events->take(3) as $event)
+                    <div class="border border-[#e5e3dc] bg-[#faf9f5] rounded-md p-3.5 flex flex-col gap-1.5">
                         <div class="flex items-center justify-between">
-                            <span class="font-label-sm text-label-sm text-red-700 font-semibold tabular-nums">{{ $event->start_time->format('D, d M · g:i A') }}</span>
-                            <span class="font-caption text-caption text-text-muted">Court #14</span>
+                            <span class="text-[11.5px] font-semibold text-[#ba1a1a] font-mono tabular-nums">
+                                {{ \Carbon\Carbon::parse($event->start_time)->format('D, d M · g:i A') }}
+                            </span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-[#e5e3dc] text-[10px] font-mono text-[#646864]">
+                                {{ $event->event_type ?? 'Court Hearing' }}
+                            </span>
                         </div>
-                        <span class="font-title-sm text-title-sm text-text-primary font-semibold">{{ $event->title }}</span>
-                        <p class="font-body-sm text-body-sm text-text-secondary">
-                            <strong>Expected:</strong> Senior Counsel will lead oral arguments. Client in virtual attendance.
-                        </p>
-                        <div class="flex items-center justify-between mt-space-xs pt-space-xs border-t border-border-hairline">
-                            <span class="font-caption text-caption text-pine-primary font-medium">Counsel: Adv. A. Sharma</span>
-                            <span class="inline-flex items-center gap-1 font-caption text-caption text-text-secondary">
-                                <span class="w-1.5 h-1.5 rounded-full bg-pine-primary"></span> VC Link Active
+                        <span class="text-[13px] font-semibold text-[#1a1a1a] leading-snug">{{ $event->title }}</span>
+                        @if($event->matter)
+                        <span class="text-[11.5px] text-[#646864] truncate">Case: {{ $event->matter->case_number }} &middot; {{ $event->matter->title }}</span>
+                        @endif
+                        <div class="flex items-center justify-between mt-1 pt-1.5 border-t border-[#e5e3dc] text-[11px] text-[#646864]">
+                            <span>{{ $event->location ?? 'Courtroom #14, Main Bench' }}</span>
+                            <span class="inline-flex items-center gap-1 text-[#065f46]">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span> VC Link
                             </span>
                         </div>
                     </div>
                     @empty
-                    <div class="bg-surface-subtle border border-border-hairline p-space-md rounded-md text-center text-xs text-text-muted">
-                        No upcoming trial hearings scheduled for this week.
+                    <div class="py-6 text-center text-xs text-[#8a8a8a]">
+                        No upcoming trial hearings listed for this week.
                     </div>
                     @endforelse
                 </div>
+            </div>
 
-                <!-- High Court Registry Banner -->
-                <div class="rounded-md overflow-hidden relative border border-border-hairline bg-surface-subtle p-3.5 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-pine-primary text-2xl">account_balance</span>
-                        <div class="flex flex-col">
-                            <span class="font-title-sm text-title-sm text-text-primary font-semibold">Judicial Registry Status</span>
-                            <span class="font-caption text-caption text-text-muted">Electronic cause lists synchronized</span>
-                        </div>
+            <!-- Card 2: Direct Counsel Channel Box -->
+            <div class="border border-[#e5e3dc] bg-white rounded-md p-5 sm:p-6 shadow-xs flex flex-col gap-3" id="counsel-thread">
+                <div class="flex items-center justify-between pb-2 border-b border-[#f0eee8]">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[19px] text-[#23493a]">forum</span>
+                        <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Counsel Channel</h2>
                     </div>
-                    <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold">Active</span>
-                </div>
-            </section>
-
-            <!-- Counsel Channel Box -->
-            <section class="bg-surface-card border border-border-hairline rounded-lg shadow-sm p-space-lg flex flex-col gap-space-md" id="counsel-thread">
-                <div class="flex items-center justify-between pb-space-xs border-b border-border-hairline">
-                    <div class="flex items-center gap-space-xs">
-                        <span class="material-symbols-outlined text-pine-primary text-[20px]">forum</span>
-                        <h2 class="font-headline-sm text-headline-sm text-primary font-serif font-medium">Counsel Channel</h2>
-                    </div>
-                    <span class="font-caption text-caption text-pine-primary font-medium">Privileged · Encrypted</span>
+                    <span class="text-[11px] font-mono text-[#065f46] bg-[#ecfdf5] px-2 py-0.5 rounded border border-[#a7f3d0]">Encrypted</span>
                 </div>
 
-                <div class="flex flex-col gap-space-sm max-h-72 overflow-y-auto pr-1" id="chat-stream">
-                    <div class="flex flex-col bg-surface-subtle border border-border-hairline p-space-sm rounded-md self-start max-w-[90%]">
+                <div class="flex flex-col gap-2.5 max-h-60 overflow-y-auto pr-1 text-xs" id="chat-stream">
+                    <div class="flex flex-col bg-[#faf9f5] border border-[#e5e3dc] p-2.5 rounded-md self-start max-w-[90%]">
                         <div class="flex items-center gap-1.5 mb-1">
-                            <span class="font-label-sm text-label-sm text-pine-primary font-medium">Adv. Priya Mathur</span>
-                            <span class="font-caption text-caption text-text-muted tabular-nums">10:14 AM</span>
+                            <span class="font-semibold text-[#23493a]">Adv. Priya Mathur</span>
+                            <span class="text-[10px] text-[#8a8a8a] font-mono">10:14 AM</span>
                         </div>
-                        <p class="font-body-sm text-body-sm text-text-primary">
-                            We have compiled the supplemental compilation for tomorrow’s High Court list. Please verify the annexed schedule of payments.
+                        <p class="text-[#1a1a1a] leading-relaxed">
+                            We have compiled the supplemental compilation for tomorrow’s High Court cause list. Please verify the annexed schedule.
                         </p>
                     </div>
 
-                    <div class="flex flex-col bg-pine-primary text-white p-space-sm rounded-md self-end max-w-[90%] shadow-xs">
+                    <div class="flex flex-col bg-[#23493a] text-white p-2.5 rounded-md self-end max-w-[90%] shadow-xs">
                         <div class="flex items-center justify-between gap-2 mb-1">
-                            <span class="font-label-sm text-label-sm text-white font-medium">{{ auth()->user()->name }}</span>
-                            <span class="font-caption text-caption text-[#8fb7a4] tabular-nums">11:02 AM</span>
+                            <span class="font-medium text-white">{{ Auth::user()?->name ?? 'Client' }}</span>
+                            <span class="text-[10px] text-[#a7f3d0] font-mono">11:02 AM</span>
                         </div>
-                        <p class="font-body-sm text-body-sm text-white">
+                        <p class="text-white leading-relaxed">
                             Accounts has cross-verified the figures. Signed authorization token uploaded to case folder.
                         </p>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-space-xs mt-space-xs">
-                    <div class="relative">
-                        <textarea class="w-full bg-surface-subtle border border-border-hairline rounded-md p-space-sm font-body-sm text-body-sm text-text-primary placeholder:text-text-muted resize-none focus:outline-none focus:bg-surface-card focus:border-pine-primary focus:shadow-sm transition-all" id="query-input" placeholder="Send privileged message to Chambers associates..." rows="2"></textarea>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <button class="text-text-muted hover:text-text-primary flex items-center gap-1 font-caption text-caption cursor-pointer" type="button">
-                            <span class="material-symbols-outlined text-[16px]">attach_file</span>
-                            <span>Attach Addendum</span>
-                        </button>
-                        <button class="btn-primary h-8 px-3 text-xs flex items-center gap-1" id="send-btn" type="button">
+                <form action="{{ route('portal.messages.store') }}" method="POST" class="flex flex-col gap-2 mt-1">
+                    @csrf
+                    <input type="hidden" name="matter_id" value="{{ $matters->first()?->id ?? 1 }}"/>
+                    <textarea name="body" required rows="2" placeholder="Send privileged message to Chambers associates..." class="w-full bg-[#faf9f5] border border-[#e5e3dc] rounded-md p-2.5 text-xs text-[#1a1a1a] placeholder:text-[#8a8a8a] resize-none focus:outline-none focus:border-[#23493a] focus:bg-white transition-all"></textarea>
+                    <div class="flex items-center justify-between pt-1">
+                        <a href="{{ route('portal.messages.index') }}" class="text-[11.5px] text-[#646864] hover:text-[#1a1a1a] flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[15px]">open_in_new</span>
+                            <span>Full Chat</span>
+                        </a>
+                        <button type="submit" class="bg-[#23493a] text-white hover:bg-[#1a382b] px-3.5 py-1.5 text-xs font-medium rounded-md shadow-xs transition-colors flex items-center gap-1 cursor-pointer">
                             <span>Transmit</span>
-                            <span class="material-symbols-outlined text-[15px]">send</span>
+                            <span class="material-symbols-outlined text-[14px]">send</span>
                         </button>
                     </div>
-                </div>
-            </section>
+                </form>
+            </div>
 
-            <!-- Retainer Ledger Pill -->
-            <section class="bg-surface-card border border-border-hairline p-space-md rounded-lg flex items-center justify-between shadow-sm">
-                <div class="flex items-center gap-space-sm">
-                    <div class="w-10 h-10 rounded-full bg-pine-primary/10 flex items-center justify-center text-pine-primary">
+            <!-- Card 3: Enterprise Retainer Statement -->
+            <div class="border border-[#e5e3dc] bg-white rounded-md p-4 sm:p-5 shadow-xs flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-md bg-[#23493a]/10 text-[#23493a] flex items-center justify-center shrink-0">
                         <span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
                     </div>
                     <div class="flex flex-col">
-                        <span class="font-label-sm text-label-sm text-text-primary font-semibold">Enterprise Retainer Ledger</span>
-                        <span class="font-caption text-caption text-text-muted">Q2 Statement · Approved</span>
+                        <span class="text-[13px] font-semibold text-[#1a1a1a]">Retainer Account Ledger</span>
+                        <span class="text-[11.5px] text-[#8a8a8a]">Q2 Statement &middot; Balance Verified</span>
                     </div>
                 </div>
-                <a href="{{ route('portal.invoices.index') }}" class="font-label-sm text-label-sm text-pine-primary hover:underline font-semibold flex items-center gap-0.5 group">
-                    <span>Download Invoice</span>
-                    <span class="group-hover:translate-x-0.5 transition-transform">→</span>
+                <a href="{{ route('portal.invoices.index') }}" class="text-[12px] text-[#23493a] font-medium hover:underline flex items-center gap-0.5">
+                    <span>Statements &rarr;</span>
                 </a>
-            </section>
+            </div>
 
         </div>
 
     </div>
 
+    <!-- Footer Note -->
+    <div class="mt-8 mb-4 text-center">
+        <p class="text-[12px] text-[#8a8a8a] font-sans">
+            Client Portal &middot; Secured by Section 126 &amp; 129 Indian Evidence Act privileged infrastructure &middot; Docket synchronization active
+        </p>
+    </div>
+
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const sendBtn = document.getElementById('send-btn');
-        const input = document.getElementById('query-input');
-        const chatStream = document.getElementById('chat-stream');
-
-        if (sendBtn && input && chatStream) {
-            sendBtn.addEventListener('click', function() {
-                const text = input.value.trim();
-                if (!text) return;
-
-                const now = new Date();
-                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'flex flex-col bg-pine-primary text-white p-space-sm rounded-md self-end max-w-[90%] transition-all shadow-xs';
-                msgDiv.innerHTML = `
-                    <div class="flex items-center justify-between gap-2 mb-1">
-                        <span class="font-label-sm text-label-sm text-white font-medium">{{ auth()->user()->name }}</span>
-                        <span class="font-caption text-caption text-[#8fb7a4] tabular-nums">${timeStr}</span>
-                    </div>
-                    <p class="font-body-sm text-body-sm text-white">${text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>
-                `;
-
-                chatStream.appendChild(msgDiv);
-                input.value = '';
-                chatStream.scrollTop = chatStream.scrollHeight;
-            });
-
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendBtn.click();
-                }
-            });
-        }
-    });
-</script>
 @endsection

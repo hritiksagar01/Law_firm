@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
     <title>@yield('title', 'Platform Governance Console') — Multi-Tenant Legal Cloud</title>
-    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}"/>
+    <link rel="icon" type="image/png" href="{{ \App\Models\PlatformSetting::logoUrl() }}"/>
     
     <!-- Google Fonts: Newsreader & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -49,7 +49,7 @@
             <!-- Brand & Platform Header -->
             <div class="px-6 py-5 border-b border-white/[.08] flex items-center justify-between">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
-                    <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-10 w-auto object-contain rounded"/>
+                    <img src="{{ \App\Models\PlatformSetting::logoUrl() }}" alt="{{ \App\Models\PlatformSetting::platformName() }}" class="h-10 w-auto object-contain rounded"/>
                     <div class="flex flex-col min-w-0">
                         <span class="text-[13.5px] font-semibold text-white tracking-wide block leading-tight">Super Admin</span>
                         <span class="text-[11px] text-[#8e8e8e] block mt-0.5 font-sans">Platform Console</span>

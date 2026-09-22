@@ -4,8 +4,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign In — {{ config('legal.app_name', 'Vennamraj Associates') }}</title>
-    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}" />
+    <title>Sign In — {{ \App\Models\PlatformSetting::platformName() }}</title>
+    <link rel="icon" type="image/png" href="{{ \App\Models\PlatformSetting::logoUrl() }}" />
 
     <!-- Google Fonts: Newsreader (Editorial Serif) & Inter (Clean UI Sans) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -39,7 +39,7 @@
         <!-- Brand Emblem -->
         <div class="flex flex-col items-center text-center mb-6">
             <div class="p-3 bg-white rounded-xl border border-[#E7E4DC] shadow-[0_4px_20px_-2px_rgba(26,30,28,0.06)]">
-                <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}"
+                <img src="{{ \App\Models\PlatformSetting::logoUrl() }}" alt="{{ \App\Models\PlatformSetting::platformName() }}"
                     class="h-12 w-auto object-contain" />
             </div>
         </div>
@@ -209,6 +209,21 @@
         </div>
 
     </div>
+
+    <!-- Public Footer with Dynamic Headline and CMS Links -->
+    <footer class="w-full max-w-[500px] text-center my-4 text-[12px] text-[#646864] space-y-2">
+        <p class="font-medium text-[#1A1E1C]">{{ \App\Models\PlatformSetting::get('footer_headline', 'Enterprise Legal Chambers Practice Management Platform') }}</p>
+        <div class="flex items-center justify-center gap-3 text-[11.5px] text-[#646864]">
+            <a href="{{ route('public.about') }}" target="_blank" class="hover:text-[#23493A] transition-colors">About</a>
+            <span>·</span>
+            <a href="{{ route('public.contact') }}" target="_blank" class="hover:text-[#23493A] transition-colors">Contact Registry</a>
+            <span>·</span>
+            <a href="{{ route('public.privacy') }}" target="_blank" class="hover:text-[#23493A] transition-colors">Privilege &amp; Privacy</a>
+            <span>·</span>
+            <a href="{{ route('public.terms') }}" target="_blank" class="hover:text-[#23493A] transition-colors">Terms</a>
+        </div>
+        <p class="text-[11px] text-[#8A8E89]">{{ \App\Models\PlatformSetting::get('footer_copyright', '© ' . date('Y') . ' ' . \App\Models\PlatformSetting::platformName() . '. All rights reserved.') }}</p>
+    </footer>
 
 </body>
 

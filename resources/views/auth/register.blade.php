@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Register Law Practice — {{ config('legal.app_name', 'Vennamraj Associates') }}</title>
-    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}"/>
+    <title>Register Law Practice — {{ \App\Models\PlatformSetting::platformName() }}</title>
+    <link rel="icon" type="image/png" href="{{ \App\Models\PlatformSetting::logoUrl() }}"/>
 
     <!-- Industry Standard Readable Typography: Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -39,7 +39,7 @@
         
         <!-- Brand Emblem & Official Logo -->
         <div class="flex flex-col items-center text-center mb-6">
-            <img src="{{ asset('logo.png') }}" alt="{{ config('legal.app_name', 'Vennamraj Associates') }}" class="h-16 w-auto object-contain rounded-xl shadow-md mb-3 border border-[#E8DAC8]/60 bg-white p-2"/>
+            <img src="{{ \App\Models\PlatformSetting::logoUrl() }}" alt="{{ \App\Models\PlatformSetting::platformName() }}" class="h-16 w-auto object-contain rounded-xl shadow-md mb-3 border border-[#E8DAC8]/60 bg-white p-2"/>
             <h1 class="text-2xl font-serif font-bold text-[#222222] tracking-tight">Establish Your Practice</h1>
             <p class="text-[11px] font-mono uppercase tracking-widest text-[#766A5E] font-medium mt-1">
                 Multi-Advocate Chambers · Court Dockets · Client Portal
@@ -181,6 +181,21 @@
         </div>
 
     </div>
+
+    <!-- Public Footer with Dynamic Headline and CMS Links -->
+    <footer class="w-full max-w-xl text-center my-6 text-[12px] text-[#766A5E] space-y-2">
+        <p class="font-medium text-[#222222]">{{ \App\Models\PlatformSetting::get('footer_headline', 'Enterprise Legal Chambers Practice Management Platform') }}</p>
+        <div class="flex items-center justify-center gap-3 text-[11.5px] text-[#766A5E]">
+            <a href="{{ route('public.about') }}" target="_blank" class="hover:text-[#9F8349] transition-colors">About</a>
+            <span>·</span>
+            <a href="{{ route('public.contact') }}" target="_blank" class="hover:text-[#9F8349] transition-colors">Contact Registry</a>
+            <span>·</span>
+            <a href="{{ route('public.privacy') }}" target="_blank" class="hover:text-[#9F8349] transition-colors">Privilege &amp; Privacy</a>
+            <span>·</span>
+            <a href="{{ route('public.terms') }}" target="_blank" class="hover:text-[#9F8349] transition-colors">Terms</a>
+        </div>
+        <p class="text-[11px] text-[#9A8F84]">{{ \App\Models\PlatformSetting::get('footer_copyright', '© ' . date('Y') . ' ' . \App\Models\PlatformSetting::platformName() . '. All rights reserved.') }}</p>
+    </footer>
 
 </body>
 </html>

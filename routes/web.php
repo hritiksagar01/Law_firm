@@ -20,7 +20,9 @@ use App\Http\Controllers\NoteController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpinionController;
 use App\Http\Controllers\Portal\InvitationController;
+use App\Http\Controllers\Portal\PortalController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicContentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TodoController;
@@ -69,6 +71,12 @@ Route::middleware('guest')->group(function () {
 // Client Portal Invitation Acceptance (Guest / Public)
 Route::get('/portal/accept-invitation/{token}', [InvitationController::class, 'accept'])->name('portal.invitation.accept');
 Route::post('/portal/accept-invitation/{token}', [InvitationController::class, 'complete'])->name('portal.invitation.complete');
+
+// Public Legal & Practice Pages (Dynamic Content via PlatformSettings)
+Route::get('/about', [PublicContentController::class, 'about'])->name('public.about');
+Route::get('/contact', [PublicContentController::class, 'contact'])->name('public.contact');
+Route::get('/privacy', [PublicContentController::class, 'privacy'])->name('public.privacy');
+Route::get('/terms', [PublicContentController::class, 'terms'])->name('public.terms');
 
 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -869,302 +877,38 @@ Route::middleware('auth')->group(function () {
 
     // Client Portal Suite (F-08 & F-07)
     Route::middleware(['portal.client'])->prefix('portal')->name('portal.')->group(function () {
-
-        $getClient = function () {
-            $user = Auth::user();
-            $client = Client::where('user_id', $user->id)->first()
-                ?? Client::where('email', $user->email)->first();
-
-            if (! $client) {
-                abort(403, 'No client representation record is linked to this user account.');
-            }
-
-            return $client;
-        };
-
-        Route::get('/', function () {
-            return redirect()->route('portal.dashboard');
-        })->name('index');
+        Route::get('/', fn () => redirect()->route('portal.dashboard'))->name('index');
 
         // Portal Dashboard Overview
-        Route::get('/dashboard', function () use ($getClient) {
-            $client = $getClient();
-
-            $matters = Matter::where('client_id', $client->id)->with(['documents', 'leadAttorney', 'documentRequests'])->get();
-            $documentRequests = DocumentRequest::where('client_id', $client->id)->with('matter')->latest()->get();
-            $invoices = Invoice::where('client_id', $client->id)->latest()->get();
-            $events = Event::whereIn('matter_id', $matters->pluck('id'))->orderBy('start_time')->get();
-            $documentsCount = Document::whereIn('matter_id', $matters->pluck('id'))->where('is_client_visible', true)->count();
-
-            return view('portal.dashboard', compact('client', 'matters', 'documentRequests', 'invoices', 'events', 'documentsCount'));
-        })->name('dashboard');
+        Route::get('/dashboard', [PortalController::class, 'dashboard'])->name('dashboard');
 
         // My Cases / Matters
-        Route::get('/matters', function () use ($getClient) {
-            $client = $getClient();
-
-            $matters = Matter::where('client_id', $client->id)->with(['documents', 'leadAttorney', 'documentRequests'])->latest()->get();
-
-            return view('portal.matters.index', compact('client', 'matters'));
-        })->name('matters.index');
-
-        Route::get('/matters/{matter}', function (Matter $matter) use ($getClient) {
-            $client = $getClient();
-
-            if ($matter->client_id !== $client->id) {
-                abort(403, 'Unauthorized case dossier.');
-            }
-
-            $matter->load([
-                'documents' => fn ($q) => $q->where('is_client_visible', true),
-                'leadAttorney',
-                'documentRequests',
-                'events',
-                'messages.sender',
-            ]);
-
-            return view('portal.matters.show', compact('client', 'matter'));
-        })->name('matters.show');
+        Route::get('/matters', [PortalController::class, 'matters'])->name('matters.index');
+        Route::get('/matters/{matter}', [PortalController::class, 'matterShow'])->name('matters.show');
 
         // Document Requests Workflow (F-07)
-        Route::get('/requests', function () use ($getClient) {
-            $client = $getClient();
-
-            $requests = DocumentRequest::where('client_id', $client->id)->with(['matter', 'requestedBy'])->latest()->get();
-
-            return view('portal.requests.index', compact('client', 'requests'));
-        })->name('requests.index');
-
-        Route::post('/requests/{request}/upload', function (Request $httpRequest, DocumentRequest $request) use ($getClient) {
-            $user = Auth::user();
-            $client = $getClient();
-
-            if ($request->client_id !== $client->id) {
-                abort(403, 'Unauthorized document request.');
-            }
-
-            $httpRequest->validate([
-                'file' => 'required|file|max:51200', // 50MB
-                'client_notes' => 'nullable|string|max:1000',
-            ]);
-
-            $file = $httpRequest->file('file');
-            $sha256 = hash_file('sha256', $file->getRealPath());
-            $disk = config('filesystems.default', 'local');
-            $path = $file->store('documents/client_uploads', $disk);
-
-            $doc = Document::create([
-                'firm_id' => $request->firm_id,
-                'matter_id' => $request->matter_id,
-                'user_id' => $user->id,
-                'title' => $request->title.' (Client Submission)',
-                'filename' => $file->getClientOriginalName(),
-                'file_path' => $path,
-                'file_size' => $file->getSize(),
-                'mime_type' => $file->getClientMimeType() ?: 'application/pdf',
-                'sha256' => $sha256,
-                'category' => 'Client Submissions',
-                'privilege' => 'Confidential',
-                'is_client_visible' => true,
-                'version' => 1,
-            ]);
-
-            $request->update([
-                'status' => 'submitted',
-                'submitted_at' => now(),
-                'document_id' => $doc->id,
-                'client_notes' => $httpRequest->client_notes,
-            ]);
-
-            return back()->with('success', "Document '{$doc->filename}' submitted to legal counsel.");
-        })->name('requests.upload');
+        Route::get('/requests', [PortalController::class, 'requests'])->name('requests.index');
+        Route::post('/requests/{request}/upload', [PortalController::class, 'uploadRequest'])->name('requests.upload');
 
         // Case Documents Repository
-        Route::get('/documents', function () use ($getClient) {
-            $client = $getClient();
-
-            $matterIds = Matter::where('client_id', $client->id)->pluck('id');
-            $documents = Document::whereIn('matter_id', $matterIds)
-                ->where('is_client_visible', true)
-                ->with('matter')->latest()->get();
-            $matters = Matter::where('client_id', $client->id)->get();
-
-            return view('portal.documents.index', compact('client', 'documents', 'matters'));
-        })->name('documents.index');
-
-        Route::post('/documents/upload', function (Request $request) use ($getClient) {
-            $user = Auth::user();
-            $client = $getClient();
-
-            // Detect PHP-level upload errors before Laravel validation
-            if ($request->hasFile('file') && ! $request->file('file')->isValid()) {
-                $errorCode = $request->file('file')->getError();
-                $maxUpload = ini_get('upload_max_filesize');
-                $msg = match ($errorCode) {
-                    UPLOAD_ERR_INI_SIZE => "Uploaded file exceeds server limit ({$maxUpload}). Please select a file smaller than {$maxUpload}.",
-                    default => "File upload failed with error code {$errorCode}."
-                };
-
-                return back()->withInput()->with('error', $msg);
-            }
-
-            $request->validate([
-                'matter_id' => 'required|exists:matters,id',
-                'title' => 'required|string|max:255',
-                'category' => 'required|string',
-                'file' => 'required|file|max:51200',
-            ]);
-
-            $matter = Matter::where('id', $request->matter_id)->where('client_id', $client->id)->firstOrFail();
-
-            $file = $request->file('file');
-            $sha256 = hash_file('sha256', $file->getRealPath());
-            $disk = config('filesystems.default', 'local');
-            $path = $file->store('documents/client_uploads', $disk);
-
-            Document::create([
-                'firm_id' => $matter->firm_id,
-                'matter_id' => $matter->id,
-                'user_id' => $user->id,
-                'title' => $request->title,
-                'filename' => $file->getClientOriginalName(),
-                'file_path' => $path,
-                'file_size' => $file->getSize(),
-                'mime_type' => $file->getClientMimeType() ?: 'application/pdf',
-                'sha256' => $sha256,
-                'category' => $request->category ?? 'Client Submissions',
-                'privilege' => 'Confidential',
-                'is_client_visible' => true,
-                'version' => 1,
-            ]);
-
-            return back()->with('success', 'Document uploaded to case file.');
-        })->name('documents.upload');
-
-        Route::get('/documents/{document}/download', function (Document $document) use ($getClient) {
-            $client = $getClient();
-
-            // STRICT DATA ISOLATION: The document must belong to a matter owned by this client
-            $matter = Matter::where('id', $document->matter_id)->where('client_id', $client->id)->first();
-            if (! $matter) {
-                abort(403, 'Unauthorized document access: This filing does not belong to your case dossiers.');
-            }
-
-            // Document must be designated client-visible
-            if ($document->is_client_visible === false) {
-                abort(403, 'Unauthorized: This filing is restricted to internal chambers work product.');
-            }
-
-            $defaultDisk = config('filesystems.default', 'local');
-            if ($document->file_path) {
-                try {
-                    if (Storage::disk($defaultDisk)->exists($document->file_path)) {
-                        return Storage::disk($defaultDisk)->download($document->file_path, $document->filename, [
-                            'Content-Type' => $document->mime_type ?: 'application/pdf',
-                        ]);
-                    }
-                } catch (Throwable $e) {
-                }
-
-                try {
-                    if ($defaultDisk !== 'local' && Storage::disk('local')->exists($document->file_path)) {
-                        return Storage::disk('local')->download($document->file_path, $document->filename, [
-                            'Content-Type' => $document->mime_type ?: 'application/pdf',
-                        ]);
-                    }
-                } catch (Throwable $e) {
-                }
-
-                try {
-                    if ($defaultDisk !== 's3' && class_exists(AwsS3V3Adapter::class) && Storage::disk('s3')->exists($document->file_path)) {
-                        return Storage::disk('s3')->download($document->file_path, $document->filename, [
-                            'Content-Type' => $document->mime_type ?: 'application/pdf',
-                        ]);
-                    }
-                } catch (Throwable $e) {
-                }
-            }
-
-            // Dynamic, compliant PDF stream fallback (Guaranteed to open cleanly in Adobe Reader / browsers)
-            $pdfContent = LegalPdfGenerator::forDocument($document);
-
-            return response($pdfContent, 200, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => "attachment; filename=\"{$document->filename}\"",
-                'Content-Length' => strlen($pdfContent),
-            ]);
-        })->name('documents.download');
+        Route::get('/documents', [PortalController::class, 'documents'])->name('documents.index');
+        Route::post('/documents/upload', [PortalController::class, 'uploadDocument'])->name('documents.upload');
+        Route::get('/documents/{document}/download', [PortalController::class, 'downloadDocument'])->name('documents.download');
 
         // Counsel Communications / Messages
-        Route::get('/messages', function (Request $request) use ($getClient) {
-            $client = $getClient();
-
-            $matters = Matter::where('client_id', $client->id)->with(['leadAttorney', 'messages.sender'])->get();
-            $selectedMatterId = $request->input('matter_id', $matters->first()->id ?? null);
-            $selectedMatter = $matters->firstWhere('id', $selectedMatterId);
-
-            return view('portal.messages.index', compact('client', 'matters', 'selectedMatter'));
-        })->name('messages.index');
-
-        Route::post('/messages', function (Request $request) use ($getClient) {
-            $user = Auth::user();
-            $client = $getClient();
-
-            $request->validate([
-                'matter_id' => 'required|exists:matters,id',
-                'body' => 'required|string|max:1000',
-            ]);
-
-            $matter = Matter::where('id', $request->matter_id)->where('client_id', $client->id)->firstOrFail();
-
-            Message::create([
-                'firm_id' => $matter->firm_id,
-                'matter_id' => $matter->id,
-                'sender_id' => $user->id,
-                'body' => $request->body,
-                'is_privileged' => true,
-            ]);
-
-            return back()->with('success', 'Message dispatched to legal counsel.');
-        })->name('messages.store');
+        Route::get('/messages', [PortalController::class, 'messages'])->name('messages.index');
+        Route::post('/messages', [PortalController::class, 'storeMessage'])->name('messages.store');
 
         // Hearings & Calendar
-        Route::get('/calendar', function () use ($getClient) {
-            $client = $getClient();
-
-            $matterIds = Matter::where('client_id', $client->id)->pluck('id');
-            $events = Event::whereIn('matter_id', $matterIds)->with('matter')->orderBy('start_time')->get();
-
-            return view('portal.calendar.index', compact('client', 'events'));
-        })->name('calendar.index');
+        Route::get('/calendar', [PortalController::class, 'calendar'])->name('calendar.index');
 
         // Client Invoices & Retainer Ledger
-        Route::get('/invoices', function () use ($getClient) {
-            $client = $getClient();
+        Route::get('/invoices', [PortalController::class, 'invoices'])->name('invoices.index');
+        Route::post('/invoices/{invoice}/pay', [PortalController::class, 'payInvoice'])->name('invoices.pay');
 
-            $invoices = Invoice::where('client_id', $client->id)->with('matter')->latest()->get();
-
-            return view('portal.invoices.index', compact('client', 'invoices'));
-        })->name('invoices.index');
-
-        Route::post('/invoices/{invoice}/pay', function (Request $request, Invoice $invoice) use ($getClient) {
-            $client = $getClient();
-
-            if ($invoice->client_id !== $client->id) {
-                abort(403, 'Unauthorized invoice.');
-            }
-
-            if ($request->payment_method === 'retainer') {
-                $client->decrement('trust_balance', $invoice->total_amount);
-            }
-
-            $invoice->update([
-                'status' => 'paid',
-                'amount_paid' => $invoice->total_amount,
-            ]);
-
-            return back()->with('success', "Fee Bill {$invoice->invoice_number} settled successfully.");
-        })->name('invoices.pay');
+        // Client Account & Settings
+        Route::get('/settings', [PortalController::class, 'settings'])->name('settings');
+        Route::post('/settings', [PortalController::class, 'updateSettings'])->name('settings.update');
     });
 });
 
@@ -1240,6 +984,8 @@ Route::middleware(['admin.super'])->prefix('admin')->name('admin.')->group(funct
     // ── Platform System Settings ─────────────────────────────
     Route::get('/system', [SystemSettingsController::class, 'index'])->name('system.index');
     Route::post('/system', [SystemSettingsController::class, 'update'])->name('system.update');
+    Route::post('/system/reset-logo', [SystemSettingsController::class, 'resetLogo'])->name('system.reset-logo');
+    Route::post('/system/test-s3', [SystemSettingsController::class, 'testS3'])->name('system.test-s3');
     Route::get('/settings/system', fn () => redirect()->route('admin.system.index'));
     Route::get('/settings', fn () => redirect()->route('admin.system.index'));
     Route::post('/settings/system', [SystemSettingsController::class, 'update']);
