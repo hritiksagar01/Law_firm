@@ -234,7 +234,7 @@ class SystemSettingsController extends Controller
         try {
             $service = 's3';
             $method = 'GET';
-            $queryString = 'location';
+            $queryString = 'max-keys=1';
 
             // Determine host and path
             if ($endpoint) {
@@ -246,11 +246,11 @@ class SystemSettingsController extends Controller
                 $url = "{$scheme}://{$host}{$port}{$canonicalUri}?{$queryString}";
             } else {
                 $scheme = 'https';
-                if ($usePathStyle || $region === 'us-east-1') {
-                    $host = $region === 'us-east-1' ? "{$bucket}.s3.amazonaws.com" : "{$bucket}.s3.{$region}.amazonaws.com";
-                    $canonicalUri = '/';
+                if ($usePathStyle) {
+                    $host = $region === 'us-east-1' ? 's3.amazonaws.com' : "s3.{$region}.amazonaws.com";
+                    $canonicalUri = '/'.trim($bucket, '/').'/';
                 } else {
-                    $host = "{$bucket}.s3.{$region}.amazonaws.com";
+                    $host = $region === 'us-east-1' ? "{$bucket}.s3.amazonaws.com" : "{$bucket}.s3.{$region}.amazonaws.com";
                     $canonicalUri = '/';
                 }
                 $url = "{$scheme}://{$host}{$canonicalUri}?{$queryString}";
@@ -299,7 +299,7 @@ class SystemSettingsController extends Controller
 
             $authorizationHeader = "{$algorithm} Credential={$key}/{$credentialScope}, SignedHeaders={$signedHeaders}, Signature={$signature}";
 
-            $response = Http::withHeaders([
+            $response = Http::withoutVerifying()->withHeaders([
                 'Host' => $host,
                 'x-amz-date' => $amzDate,
                 'x-amz-content-sha256' => $payloadHash,
@@ -308,6 +308,21 @@ class SystemSettingsController extends Controller
 
             $latencyMs = (int) round((microtime(true) - $startTime) * 1000);
             $status = $response->status();
+            $body = $response->body();
+
+            $errorCode = '';
+            $errorMessage = '';
+            if (! empty($body)) {
+                try {
+                    $xml = @simplexml_load_string($body);
+                    if ($xml !== false) {
+                        $errorCode = (string) ($xml->Code ?? '');
+                        $errorMessage = (string) ($xml->Message ?? '');
+                    }
+                } catch (\Throwable) {
+                    // ignore XML parsing errors
+                }
+            }
 
             if ($response->successful()) {
                 return [
@@ -319,9 +334,28 @@ class SystemSettingsController extends Controller
             }
 
             if ($status === 403) {
+                $detail = $errorMessage ? " ({$errorMessage})" : '';
+                if ($errorCode === 'SignatureDoesNotMatch') {
+                    return [
+                        'success' => false,
+                        'message' => "Signature Mismatch (HTTP 403). Check that your AWS Secret Access Key and Region are correct.{$detail}",
+                        'latency_ms' => $latencyMs,
+                        'status' => $status,
+                    ];
+                }
+
+                if ($errorCode === 'AccessDenied') {
+                    return [
+                        'success' => false,
+                        'message' => "Access Denied (HTTP 403). Credentials are valid, but the IAM policy lacks 's3:ListBucket' permission on bucket '{$bucket}'.{$detail}",
+                        'latency_ms' => $latencyMs,
+                        'status' => $status,
+                    ];
+                }
+
                 return [
                     'success' => false,
-                    'message' => 'Authentication Failed (HTTP 403 Access Denied). Check that your AWS Access Key ID, Secret Key, and IAM bucket permissions are valid.',
+                    'message' => "Authentication Failed (HTTP 403 Access Denied). Check that your AWS Access Key ID, Secret Key, and IAM bucket permissions are valid.{$detail}",
                     'latency_ms' => $latencyMs,
                     'status' => $status,
                 ];
@@ -337,9 +371,12 @@ class SystemSettingsController extends Controller
             }
 
             if ($status === 301) {
+                $actualRegion = $response->header('x-amz-bucket-region');
+                $hint = $actualRegion ? " Bucket resides in region '{$actualRegion}'." : '';
+
                 return [
                     'success' => false,
-                    'message' => "Region Mismatch (HTTP 301 Permanent Redirect). The bucket '{$bucket}' appears to reside in a different AWS region.",
+                    'message' => "Region Mismatch (HTTP 301 Permanent Redirect).{$hint}",
                     'latency_ms' => $latencyMs,
                     'status' => $status,
                 ];
@@ -347,7 +384,7 @@ class SystemSettingsController extends Controller
 
             return [
                 'success' => false,
-                'message' => "S3 Response HTTP {$status}: ".Str::limit(strip_tags($response->body()), 160),
+                'message' => "S3 Response HTTP {$status}".($errorCode ? " [{$errorCode}]" : '').': '.Str::limit(strip_tags($errorMessage ?: $body), 160),
                 'latency_ms' => $latencyMs,
                 'status' => $status,
             ];
