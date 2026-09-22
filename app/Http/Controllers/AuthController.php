@@ -42,14 +42,24 @@ class AuthController extends Controller
             /** @var User $user */
             $user = Auth::user();
 
+            $intended = session()->get('url.intended');
+
             if ($user->isSuperAdmin()) {
-                return redirect()->intended(route('admin.dashboard'))
+                session()->forget('url.intended');
+
+                return redirect()->route('admin.dashboard')
                     ->with('success', "Welcome to Platform Super Administrator Console, {$user->name}.");
             }
 
             if ($user->isClient()) {
-                return redirect()->intended(route('portal.dashboard'))
+                session()->forget('url.intended');
+
+                return redirect()->route('portal.dashboard')
                     ->with('success', "Welcome to your Client Portal, {$user->name}.");
+            }
+
+            if ($intended && (str_contains($intended, '/portal') || str_contains($intended, '/admin'))) {
+                session()->forget('url.intended');
             }
 
             return redirect()->intended(route('dashboard'))

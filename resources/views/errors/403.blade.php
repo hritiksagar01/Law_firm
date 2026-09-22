@@ -22,13 +22,36 @@
             You do not have the necessary security clearance or tenancy permissions to access this case dossier, client file, or administrative module.
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a href="{{ url('/') }}" class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-[#9F8349] text-white text-xs font-semibold hover:bg-[#856C36] shadow-sm transition-all flex items-center justify-center gap-2">
-                <span class="material-symbols-outlined text-base">arrow_back</span>
-                <span>Return to Workspace</span>
-            </a>
-            <button onclick="window.history.back()" class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-white border border-[#EAE4DC] text-[#554D45] text-xs font-semibold hover:bg-[#F4EFEA] transition-all">
-                Previous Page
-            </button>
+            @auth
+                @if(auth()->user()->isClient())
+                    <a href="{{ route('portal.dashboard') }}" class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-[#23493A] text-white text-xs font-semibold hover:bg-[#1B3B2F] shadow-sm transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-base">arrow_back</span>
+                        <span>Return to Client Portal</span>
+                    </a>
+                @elseif(auth()->user()->isSuperAdmin())
+                    <a href="{{ route('admin.dashboard') }}" class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-[#23493A] text-white text-xs font-semibold hover:bg-[#1B3B2F] shadow-sm transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-base">arrow_back</span>
+                        <span>Return to Admin Console</span>
+                    </a>
+                @else
+                    <a href="{{ route('dashboard') }}" class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-[#23493A] text-white text-xs font-semibold hover:bg-[#1B3B2F] shadow-sm transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-base">arrow_back</span>
+                        <span>Return to Chambers</span>
+                    </a>
+                @endif
+                <form action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-white border border-[#EAE4DC] text-red-600 text-xs font-semibold hover:bg-red-50 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                        <span class="material-symbols-outlined text-sm">logout</span>
+                        <span>Sign Out / Switch Account</span>
+                    </button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-[#23493A] text-white text-xs font-semibold hover:bg-[#1B3B2F] shadow-sm transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-base">login</span>
+                    <span>Sign In</span>
+                </a>
+            @endauth
         </div>
     </div>
 </body>

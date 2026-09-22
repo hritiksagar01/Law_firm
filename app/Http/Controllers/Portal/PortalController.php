@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Document;
 use App\Models\DocumentRequest;
 use App\Models\Event;
+use App\Models\Firm;
 use App\Models\Invoice;
 use App\Models\Matter;
 use App\Models\Message;
@@ -28,7 +29,21 @@ class PortalController extends Controller
             ?? Client::where('email', $user->email)->first();
 
         if (! $client) {
-            abort(403, 'No client representation record is linked to this user account.');
+            $firmId = $user->firm_id ?: (Firm::first()?->id ?: 1);
+            $client = Client::create([
+                'firm_id' => $firmId,
+                'user_id' => $user->id,
+                'name' => $user->name ?: 'Client Representation',
+                'contact_person' => $user->name ?: 'Client Representative',
+                'email' => $user->email,
+                'phone' => $user->phone ?? '+91 98200 11928',
+                'category' => 'corporate',
+                'type' => 'corporate',
+                'onboarding_mode' => 'portal_online',
+                'portal_status' => 'active',
+                'status' => 'active',
+                'trust_balance' => 0.00,
+            ]);
         }
 
         return $client;
