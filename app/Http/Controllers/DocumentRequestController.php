@@ -147,7 +147,16 @@ class DocumentRequestController extends Controller
         $file = $request->file('file');
         $sha256 = hash_file('sha256', $file->getRealPath());
         $disk = config('filesystems.default', 'local');
-        $path = $file->store('documents/assisted_intake', $disk);
+        try {
+            $path = $file->store('documents/assisted_intake', $disk);
+        } catch (Throwable $e) {
+            if ($disk !== 'local') {
+                $disk = 'local';
+                $path = $file->store('documents/assisted_intake', 'local');
+            } else {
+                throw $e;
+            }
+        }
 
         $doc = Document::create([
             'firm_id' => $firmId,

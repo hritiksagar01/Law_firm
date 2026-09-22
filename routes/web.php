@@ -552,7 +552,16 @@ Route::middleware('auth')->group(function () {
             $file = $request->file('file');
             $sha256 = hash_file('sha256', $file->getRealPath());
             $disk = config('filesystems.default', 'local');
-            $path = $file->store('documents', $disk);
+            try {
+                $path = $file->store('documents', $disk);
+            } catch (Throwable $e) {
+                if ($disk !== 'local') {
+                    $disk = 'local';
+                    $path = $file->store('documents', 'local');
+                } else {
+                    throw $e;
+                }
+            }
 
             // Determine client visibility
             $isClientVisible = $request->has('is_client_visible')
@@ -601,7 +610,16 @@ Route::middleware('auth')->group(function () {
             $file = $request->file('file');
             $sha256 = hash_file('sha256', $file->getRealPath());
             $disk = config('filesystems.default', 'local');
-            $path = $file->store('documents', $disk);
+            try {
+                $path = $file->store('documents', $disk);
+            } catch (Throwable $e) {
+                if ($disk !== 'local') {
+                    $disk = 'local';
+                    $path = $file->store('documents', 'local');
+                } else {
+                    throw $e;
+                }
+            }
 
             $newVersionNumber = ($document->version ?? 1) + 1;
 

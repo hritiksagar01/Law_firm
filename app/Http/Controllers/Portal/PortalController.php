@@ -141,7 +141,16 @@ class PortalController extends Controller
         $file = $httpRequest->file('file');
         $sha256 = hash_file('sha256', $file->getRealPath());
         $disk = config('filesystems.default', 'local');
-        $path = $file->store('documents/client_uploads', $disk);
+        try {
+            $path = $file->store('documents/client_uploads', $disk);
+        } catch (Throwable $e) {
+            if ($disk !== 'local') {
+                $disk = 'local';
+                $path = $file->store('documents/client_uploads', 'local');
+            } else {
+                throw $e;
+            }
+        }
 
         $doc = Document::create([
             'firm_id' => $request->firm_id,
@@ -218,7 +227,16 @@ class PortalController extends Controller
         $file = $request->file('file');
         $sha256 = hash_file('sha256', $file->getRealPath());
         $disk = config('filesystems.default', 'local');
-        $path = $file->store('documents/client_uploads', $disk);
+        try {
+            $path = $file->store('documents/client_uploads', $disk);
+        } catch (Throwable $e) {
+            if ($disk !== 'local') {
+                $disk = 'local';
+                $path = $file->store('documents/client_uploads', 'local');
+            } else {
+                throw $e;
+            }
+        }
 
         Document::create([
             'firm_id' => $matter->firm_id,
