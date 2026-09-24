@@ -23,96 +23,139 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Create Firm (Indian Law Firm / Chambers)
-        $firm = Firm::create([
-            'name' => 'Vennamraj Associates, Advocates & Legal Consultants',
-            'slug' => 'vennamraj-associates',
-            'email' => 'contact@vennamraj.com',
-            'phone' => '+91 (11) 4920-8100',
-            'address' => 'Chamber No. 412, Lawyers Chambers Block, High Court of Delhi, New Delhi 110003',
-            'practice_areas' => [
-                'Commercial Litigation & Arbitration',
-                'Corporate & Insolvency (IBC / NCLT)',
-                'Criminal Defense & Bail Matters',
-                'Banking, Cheque Bounce (Sec 138 NI Act) & DRT',
-            ],
-            'currency' => 'INR',
-            'default_hourly_rate' => 7500.00,
-        ]);
+        $firm = Firm::firstOrCreate(
+            ['slug' => 'vennamraj-associates'],
+            [
+                'name' => 'Vennamraj Associates, Advocates & Legal Consultants',
+                'email' => 'contact@vennamraj.com',
+                'phone' => '+91 (11) 4920-8100',
+                'address' => 'Chamber No. 412, Lawyers Chambers Block, High Court of Delhi, New Delhi 110003',
+                'practice_areas' => [
+                    'Commercial Litigation & Arbitration',
+                    'Corporate & Insolvency (IBC / NCLT)',
+                    'Criminal Defense & Bail Matters',
+                    'Banking, Cheque Bounce (Sec 138 NI Act) & DRT',
+                ],
+                'currency' => 'INR',
+                'default_hourly_rate' => 7500.00,
+            ]
+        );
 
         // 2. Create Users (Super Admin, Advocates, Clerks, and Client Portal)
-        $superAdmin = User::create([
-            'firm_id' => $firm->id,
-            'name' => 'Platform Super Admin',
-            'email' => 'admin@sharmalegal.in',
-            'password' => Hash::make('password123'),
-            'role' => 'superadmin',
-            'title' => 'Chief Platform & Infrastructure Administrator',
-            'hourly_rate' => 0.00,
-            'phone' => '+91 99999 00001',
-            'avatar_url' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-        ]);
+        $superAdmin = User::updateOrCreate(
+            ['email' => 'admin@sharmalegal.in'],
+            [
+                'firm_id' => $firm->id,
+                'name' => 'Platform Super Admin',
+                'password' => Hash::make('password123'),
+                'role' => 'superadmin',
+                'title' => 'Chief Platform & Infrastructure Administrator',
+                'hourly_rate' => 0.00,
+                'phone' => '+91 99999 00001',
+                'avatar_url' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+            ]
+        );
 
-        $rajesh = User::create([
-            'firm_id' => $firm->id,
-            'name' => 'Adv. Rajesh Sharma',
-            'email' => 'rajesh@sharmalegal.in',
-            'password' => Hash::make('password123'),
-            'role' => 'partner',
-            'title' => 'Senior Advocate & Managing Partner',
-            'hourly_rate' => 12000.00,
-            'phone' => '+91 98110 23411',
-            'avatar_url' => 'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=150&auto=format&fit=crop&q=80',
-        ]);
+        $rajesh = User::updateOrCreate(
+            ['email' => 'hritiksagar.tech@gmail.com'],
+            [
+                'firm_id' => $firm->id,
+                'name' => 'Adv. Rajesh Sharma',
+                'password' => Hash::make('12345678'),
+                'role' => 'partner',
+                'title' => 'Senior Advocate & Managing Partner',
+                'hourly_rate' => 12000.00,
+                'phone' => '+91 98110 23411',
+                'avatar_url' => 'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=150&auto=format&fit=crop&q=80',
+            ]
+        );
 
-        $priya = User::create([
-            'firm_id' => $firm->id,
-            'name' => 'Adv. Priya Nair',
-            'email' => 'priya@sharmalegal.in',
-            'password' => Hash::make('password123'),
-            'role' => 'associate',
-            'title' => 'Senior Associate Counsel',
-            'hourly_rate' => 5500.00,
-            'phone' => '+91 98712 55432',
-            'avatar_url' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
-        ]);
+        // Legacy Rajesh account
+        User::updateOrCreate(
+            ['email' => 'rajesh@sharmalegal.in'],
+            [
+                'firm_id' => $firm->id,
+                'name' => 'Adv. Rajesh Sharma',
+                'password' => Hash::make('password123'),
+                'role' => 'partner',
+                'title' => 'Senior Advocate & Managing Partner',
+                'hourly_rate' => 12000.00,
+                'phone' => '+91 98110 23411',
+                'avatar_url' => 'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=150&auto=format&fit=crop&q=80',
+            ]
+        );
 
-        $amit = User::create([
-            'firm_id' => $firm->id,
-            'name' => 'Amit Verma',
-            'email' => 'amit@sharmalegal.in',
-            'password' => Hash::make('password123'),
-            'role' => 'paralegal',
-            'title' => 'Law Clerk & Court Munshi',
-            'hourly_rate' => 1500.00,
-            'phone' => '+91 99100 88721',
-            'avatar_url' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-        ]);
+        $priya = User::updateOrCreate(
+            ['email' => 'priya@sharmalegal.in'],
+            [
+                'firm_id' => $firm->id,
+                'name' => 'Adv. Priya Nair',
+                'password' => Hash::make('password123'),
+                'role' => 'associate',
+                'title' => 'Senior Associate Counsel',
+                'hourly_rate' => 5500.00,
+                'phone' => '+91 98712 55432',
+                'avatar_url' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+            ]
+        );
 
-        $vikramClient = User::create([
-            'firm_id' => $firm->id,
-            'name' => 'Vikram Malhotra',
-            'email' => 'vikram@malhotragroup.in',
-            'password' => Hash::make('password123'),
-            'role' => 'client',
-            'title' => 'Managing Director, Malhotra Enterprises Pvt Ltd',
-            'phone' => '+91 98200 11928',
-            'avatar_url' => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-        ]);
+        $amit = User::updateOrCreate(
+            ['email' => 'amit@sharmalegal.in'],
+            [
+                'firm_id' => $firm->id,
+                'name' => 'Amit Verma',
+                'password' => Hash::make('password123'),
+                'role' => 'paralegal',
+                'title' => 'Law Clerk & Court Munshi',
+                'hourly_rate' => 1500.00,
+                'phone' => '+91 99100 88721',
+                'avatar_url' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+            ]
+        );
+
+        $vikramClient = User::updateOrCreate(
+            ['email' => 'hritik.srivastava28@gmail.com'],
+            [
+                'firm_id' => $firm->id,
+                'name' => 'Vikram Malhotra',
+                'password' => Hash::make('12345678'),
+                'role' => 'client',
+                'title' => 'Managing Director, Malhotra Enterprises Pvt Ltd',
+                'phone' => '+91 98200 11928',
+                'avatar_url' => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+            ]
+        );
+
+        // Legacy Vikram account
+        User::updateOrCreate(
+            ['email' => 'vikram@malhotragroup.in'],
+            [
+                'firm_id' => $firm->id,
+                'name' => 'Vikram Malhotra',
+                'password' => Hash::make('password123'),
+                'role' => 'client',
+                'title' => 'Managing Director, Malhotra Enterprises Pvt Ltd',
+                'phone' => '+91 98200 11928',
+                'avatar_url' => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+            ]
+        );
 
         // 3. Create Clients
-        $clientMalhotra = Client::create([
-            'firm_id' => $firm->id,
-            'user_id' => $vikramClient->id,
-            'type' => 'corporate',
-            'name' => 'Malhotra Enterprises Pvt Ltd',
-            'contact_person' => 'Vikram Malhotra',
-            'email' => 'vikram@malhotragroup.in',
-            'phone' => '+91 98200 11928',
-            'tax_id' => '07AAACM1234F1Z5',
-            'address' => 'Plot 48, Okhla Industrial Area Phase III, New Delhi 110020',
-            'trust_balance' => 250000.00,
-            'status' => 'active',
-        ]);
+        $clientMalhotra = Client::updateOrCreate(
+            ['email' => 'hritik.srivastava28@gmail.com'],
+            [
+                'firm_id' => $firm->id,
+                'user_id' => $vikramClient->id,
+                'type' => 'corporate',
+                'name' => 'Malhotra Enterprises Pvt Ltd',
+                'contact_person' => 'Vikram Malhotra',
+                'phone' => '+91 98200 11928',
+                'tax_id' => '07AAACM1234F1Z5',
+                'address' => 'Plot 48, Okhla Industrial Area Phase III, New Delhi 110020',
+                'trust_balance' => 250000.00,
+                'status' => 'active',
+            ]
+        );
 
         $clientKavita = Client::create([
             'firm_id' => $firm->id,

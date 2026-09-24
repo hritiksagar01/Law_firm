@@ -115,7 +115,7 @@ php artisan cache:clear || true
 
 echo "=== [6/6] Running Migrations and Seeding on Local PostgreSQL ==="
 php artisan migrate --force
-php artisan db:seed --class=QuireDemoSeeder --force || echo "Seeding completed or already present."
+php artisan db:seed --force || echo "Seeding completed or already present."
 
 # Cache production routes and config
 php artisan config:cache || true
