@@ -12,7 +12,7 @@ set -e
 
 DB_NAME="${1:-lawfirm}"
 DB_USER="${2:-lawfirm_user}"
-DB_PASS="${3:-LawFirmSecure2026!#}"
+DB_PASS="${3:-LawFirmSecure2026Pass}"
 APP_DIR="/var/www/lawfirm"
 
 echo "=========================================================="
@@ -30,11 +30,22 @@ echo "=== [2/6] Ensuring PostgreSQL Service is Running & Enabled ==="
 sudo systemctl enable postgresql
 sudo systemctl start postgresql
 
-echo "=== [3/6] Provisioning Local Database and User ==="
+echo "=== [3/6] Configuring Authentication & User Permissions ==="
+# Ensure pg_hba.conf allows local password authentication for lawfirm_user
+PG_HBA=$(find /etc/postgresql/ -name "pg_hba.conf" 2>/dev/null | head -n 1)
+if [ -n "$PG_HBA" ] && [ -f "$PG_HBA" ]; then
+    if ! grep -q "lawfirm_user" "$PG_HBA"; then
+        sudo sed -i "1i host    all             $DB_USER     127.0.0.1/32            md5" "$PG_HBA"
+        sudo sed -i "1i host    all             $DB_USER     ::1/128                 md5" "$PG_HBA"
+        sudo sed -i "1i local   all             $DB_USER                             md5" "$PG_HBA"
+        sudo systemctl reload postgresql
+    fi
+fi
+
+# Create user if it doesn't exist, and update password
 sudo -u postgres psql -tc "SELECT 1 FROM pg_user WHERE usename = '$DB_USER'" | grep -q 1 || \
 sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';"
 
-# Update password if user already exists
 sudo -u postgres psql -c "ALTER USER $DB_USER WITH PASSWORD '$DB_PASS';"
 
 # Create database if it does not exist
@@ -45,6 +56,11 @@ sudo -u postgres psql -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
 sudo -u postgres psql -d "$DB_NAME" -c "GRANT ALL ON SCHEMA public TO $DB_USER;"
 sudo -u postgres psql -d "$DB_NAME" -c "ALTER SCHEMA public OWNER TO $DB_USER;"
+
+# Verify PostgreSQL connection directly
+echo "Verifying local PostgreSQL connectivity..."
+PGPASSWORD="$DB_PASS" psql -h 127.0.0.1 -U "$DB_USER" -d "$DB_NAME" -c "SELECT 1;" > /dev/null
+echo "PostgreSQL authentication verified successfully!"
 
 echo "=== [4/6] Updating Application .env File ==="
 ENV_FILE="$APP_DIR/.env"
@@ -71,11 +87,9 @@ if [ -f "$ENV_FILE" ]; then
     set_env_var "DB_PORT" "5432" "$ENV_FILE"
     set_env_var "DB_DATABASE" "$DB_NAME" "$ENV_FILE"
     set_env_var "DB_USERNAME" "$DB_USER" "$ENV_FILE"
-    set_env_var "DB_PASSWORD" "$DB_PASS" "$ENV_FILE"
+    set_env_var "DB_PASSWORD" "\"$DB_PASS\"" "$ENV_FILE"
 
     echo "Application .env configured for local PostgreSQL."
-else
-    echo "Warning: $ENV_FILE not found. Skipping auto-edit of .env."
 fi
 
 echo "=== [5/6] Running Migrations and Seeding on Local PostgreSQL ==="
@@ -94,5 +108,7 @@ sudo systemctl reload "$PHP_FPM_SERVICE" || sudo systemctl restart "$PHP_FPM_SER
 
 echo "=========================================================="
 echo " SUCCESS: Local EC2 PostgreSQL is now active and in use!"
-echo " URL: http://127.0.0.1:5432/$DB_NAME"
+echo " Host:     127.0.0.1:5432"
+echo " Database: $DB_NAME"
+echo " User:     $DB_USER"
 echo "=========================================================="
