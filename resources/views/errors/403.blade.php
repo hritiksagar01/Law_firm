@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#FAF8F5] font-sans text-[#222222] min-h-screen flex items-center justify-center p-6">
+<body class="bg-[#f4f2ed] font-sans text-[#222222] min-h-screen flex items-center justify-center p-6">
     <div class="max-w-md w-full bg-white rounded-2xl border border-[#EFECE6] p-8 shadow-sm text-center">
         <div class="w-16 h-16 rounded-2xl bg-red-50 text-red-700 flex items-center justify-center mx-auto mb-5">
             <span class="material-symbols-outlined text-3xl">lock</span>

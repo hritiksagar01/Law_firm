@@ -84,7 +84,7 @@
                         @php
                             $st = strtolower($matter->status ?? 'open');
                         @endphp
-                        <tr class="hover:bg-[#fbf9f5] transition-colors">
+                        <tr class="hover:bg-[#f4f2ed] transition-colors">
                             <td class="py-3.5 px-4">
                                 <span class="font-mono text-[13px] font-medium text-[#1b1c18]">
                                     {{ $matter->case_number }}
