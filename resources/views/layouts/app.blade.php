@@ -369,11 +369,6 @@
             </div>
         </header>
 
-        <!-- Top Demo Environment Notice Banner -->
-        <div class="w-full text-center py-2 text-[12px] text-[#8a8e89] font-sans border-b border-[#f0eee8]/60 bg-[#f4f2ed]">
-            Demo environment &middot; fictional firms, people and documents
-        </div>
-
         <!-- Dynamic Main Content -->
         <main class="flex-1 w-full max-w-[1240px] mx-auto px-6 sm:px-10 py-6 lg:py-8">
             <!-- Flash Message Alerts -->
