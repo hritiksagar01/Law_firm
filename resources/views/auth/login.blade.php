@@ -18,24 +18,69 @@
 <body
     class="bg-[#f4f2ed] text-[#1A1E1C] font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4 relative selection:bg-[#23493A]/10 selection:text-[#23493A]"
     x-data="{
-        tab: 'firm',
-        email: '{{ old('email', 'hritiksagar.tech@gmail.com') }}',
-        password: '12345678',
-        showPassword: false,
+        tab: 'client',
+        email: '{{ old('email', 'hritik.srivastava28@gmail.com') }}',
+        passcode: ['1', '2', '3', '4', '5', '6'],
+        showPasscode: false,
+        fullPassword: '12345678',
         setCredential(role, mail, pass) {
             this.tab = role;
             this.email = mail;
-            this.password = pass;
+            this.fullPassword = pass;
+            const chars = (pass || '').split('').slice(0, 6);
+            this.passcode = [
+                chars[0] || '',
+                chars[1] || '',
+                chars[2] || '',
+                chars[3] || '',
+                chars[4] || '',
+                chars[5] || ''
+            ];
+        },
+        handleInput(e, index) {
+            const val = e.target.value;
+            if (val.length > 1) {
+                const pasted = val.split('').slice(0, 6);
+                pasted.forEach((ch, i) => {
+                    if (i < 6) this.passcode[i] = ch;
+                });
+                this.fullPassword = this.passcode.join('');
+                const nextIdx = Math.min(5, pasted.length);
+                this.$refs['box' + nextIdx]?.focus();
+                return;
+            }
+            this.passcode[index] = val;
+            this.fullPassword = this.passcode.join('');
+            if (val && index < 5) {
+                this.$refs['box' + (index + 1)]?.focus();
+            }
+        },
+        handleKeyDown(e, index) {
+            if (e.key === 'Backspace' && !this.passcode[index] && index > 0) {
+                this.$refs['box' + (index - 1)]?.focus();
+            }
+        },
+        handlePaste(e) {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text').trim();
+            if (!text) return;
+            const chars = text.split('').slice(0, 6);
+            chars.forEach((ch, i) => {
+                if (i < 6) this.passcode[i] = ch;
+            });
+            this.fullPassword = text;
+            const focusIdx = Math.min(5, chars.length);
+            this.$refs['box' + focusIdx]?.focus();
         }
     }">
 
-    <div class="w-full max-w-[440px] flex flex-col items-center my-6">
+    <div class="w-full max-w-[480px] flex flex-col items-center my-6">
 
-        <!-- Brand Emblem -->
+        <!-- Brand Emblem (Increased Logo Size) -->
         <div class="flex flex-col items-center text-center mb-6">
-            <div class="p-3 bg-white rounded-xl border border-[#E7E4DC] shadow-[0_4px_20px_-2px_rgba(26,30,28,0.06)]">
+            <div class="p-4 bg-white rounded-2xl border border-[#E7E4DC] shadow-[0_4px_24px_-2px_rgba(26,30,28,0.08)] flex items-center justify-center">
                 <img src="{{ \App\Models\PlatformSetting::logoUrl() }}" alt="{{ \App\Models\PlatformSetting::platformName() }}"
-                    class="h-12 w-auto object-contain" />
+                    class="h-20 sm:h-24 w-auto max-w-[280px] object-contain" />
             </div>
         </div>
 
@@ -69,50 +114,82 @@
         @endif
 
         <!-- Card Container with Archival Tonal Stack -->
-        <div class="w-full bg-white rounded-lg border border-[#E7E4DC] shadow-[0_4px_20px_-2px_rgba(26,30,28,0.06),0_0_0_1px_#E7E4DC] p-6 sm:p-7 flex flex-col relative">
+        <div class="w-full bg-white rounded-xl border border-[#E7E4DC] shadow-[0_4px_24px_-2px_rgba(26,30,28,0.06),0_0_0_1px_#E7E4DC] p-6 sm:p-7 flex flex-col relative">
 
-            <!-- Persona Selector Tabs -->
-            <div class="grid grid-cols-3 p-1 bg-[#F6F4EE] rounded-[6px] mb-5 border border-[#E7E4DC]">
-                <button type="button" @click="setCredential('firm', 'hritiksagar.tech@gmail.com', '12345678')"
-                    :class="tab === 'firm' ? 'bg-white text-[#23493A] shadow-xs font-semibold border border-[#E7E4DC]' : 'text-[#646864] hover:text-[#1A1E1C] font-medium border border-transparent'"
-                    class="py-2 px-1.5 rounded-[4px] text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer">
-                    <span class="material-symbols-outlined text-[15px]"
-                        :class="tab === 'firm' ? 'text-[#23493A]' : 'text-[#646864]'">balance</span>
-                    <span>Advocate</span>
-                </button>
-                <button type="button" @click="setCredential('client', 'hritik.srivastava28@gmail.com', '12345678')"
-                    :class="tab === 'client' ? 'bg-white text-[#23493A] shadow-xs font-semibold border border-[#E7E4DC]' : 'text-[#646864] hover:text-[#1A1E1C] font-medium border border-transparent'"
-                    class="py-2 px-1.5 rounded-[4px] text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer">
-                    <span class="material-symbols-outlined text-[15px]"
-                        :class="tab === 'client' ? 'text-[#23493A]' : 'text-[#646864]'">domain</span>
-                    <span>Client</span>
-                </button>
-                <button type="button" @click="setCredential('admin', 'admin@sharmalegal.in', 'password123')"
-                    :class="tab === 'admin' ? 'bg-white text-[#23493A] shadow-xs font-semibold border border-[#E7E4DC]' : 'text-[#646864] hover:text-[#1A1E1C] font-medium border border-transparent'"
-                    class="py-2 px-1.5 rounded-[4px] text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer">
-                    <span class="material-symbols-outlined text-[15px]"
-                        :class="tab === 'admin' ? 'text-[#23493A]' : 'text-[#646864]'">admin_panel_settings</span>
-                    <span>Super Admin</span>
-                </button>
+            <!-- Persona Selector Minimalistic & Modern Radio Buttons -->
+            <div class="flex flex-col gap-2 mb-5">
+                <!-- 1. Client Portal -->
+                <label @click="setCredential('client', 'hritik.srivastava28@gmail.com', '12345678')"
+                    class="flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer select-none"
+                    :class="tab === 'client' ? 'bg-[#F9F8F5] border-[#23493A] shadow-xs' : 'bg-white border-[#E7E4DC] hover:border-[#cfcbc0]'">
+                    <div class="flex items-center gap-3">
+                        <span class="w-4 h-4 rounded-full border flex items-center justify-center transition-all"
+                            :class="tab === 'client' ? 'border-[#23493A] bg-[#23493A]' : 'border-[#cfcbc0] bg-white'">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white" x-show="tab === 'client'"></span>
+                        </span>
+                        <div class="flex flex-col">
+                            <span class="text-[13px] font-semibold text-[#1A1E1C]">Client Portal</span>
+                            <span class="text-[11px] text-[#646864]">Direct access for clients &amp; retainers</span>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-[18px]"
+                        :class="tab === 'client' ? 'text-[#23493A]' : 'text-[#8A8E89]'">domain</span>
+                </label>
+
+                <!-- 2. LawFirm and Advocate Login -->
+                <label @click="setCredential('firm', 'hritiksagar.tech@gmail.com', '12345678')"
+                    class="flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer select-none"
+                    :class="tab === 'firm' ? 'bg-[#F9F8F5] border-[#23493A] shadow-xs' : 'bg-white border-[#E7E4DC] hover:border-[#cfcbc0]'">
+                    <div class="flex items-center gap-3">
+                        <span class="w-4 h-4 rounded-full border flex items-center justify-center transition-all"
+                            :class="tab === 'firm' ? 'border-[#23493A] bg-[#23493A]' : 'border-[#cfcbc0] bg-white'">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white" x-show="tab === 'firm'"></span>
+                        </span>
+                        <div class="flex flex-col">
+                            <span class="text-[13px] font-semibold text-[#1A1E1C]">LawFirm &amp; Advocate Login</span>
+                            <span class="text-[11px] text-[#646864]">Chambers, law firms &amp; counsel practice</span>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-[18px]"
+                        :class="tab === 'firm' ? 'text-[#23493A]' : 'text-[#8A8E89]'">balance</span>
+                </label>
+
+                <!-- 3. Super Admin -->
+                <label @click="setCredential('admin', 'admin@sharmalegal.in', 'password123')"
+                    class="flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer select-none"
+                    :class="tab === 'admin' ? 'bg-[#F9F8F5] border-[#23493A] shadow-xs' : 'bg-white border-[#E7E4DC] hover:border-[#cfcbc0]'">
+                    <div class="flex items-center gap-3">
+                        <span class="w-4 h-4 rounded-full border flex items-center justify-center transition-all"
+                            :class="tab === 'admin' ? 'border-[#23493A] bg-[#23493A]' : 'border-[#cfcbc0] bg-white'">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white" x-show="tab === 'admin'"></span>
+                        </span>
+                        <div class="flex flex-col">
+                            <span class="text-[13px] font-semibold text-[#1A1E1C]">Super Admin</span>
+                            <span class="text-[11px] text-[#646864]">Platform governance &amp; tenant console</span>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-[18px]"
+                        :class="tab === 'admin' ? 'text-[#23493A]' : 'text-[#8A8E89]'">admin_panel_settings</span>
+                </label>
             </div>
 
-            <!-- Dynamic Tab Header with Newsreader Editorial Typography -->
-            <div class="mb-5">
-                <template x-if="tab === 'firm'">
-                    <div>
-                        <h2 class="font-headline text-[22px] font-medium text-[#1A1E1C] tracking-tight">Chambers &amp; Partner Sign In</h2>
-                        <p class="text-xs text-[#646864] mt-0.5 font-sans">Practice credentials for active litigation dockets, filings, and trust ledger.</p>
-                    </div>
-                </template>
+            <!-- Dynamic Tab Header -->
+            <div class="mb-5 pb-3 border-b border-[#F0EEE8]">
                 <template x-if="tab === 'client'">
                     <div>
-                        <h2 class="font-headline text-[22px] font-medium text-[#1A1E1C] tracking-tight">Client Litigation Portal</h2>
+                        <h2 class="font-headline text-[22px] font-medium text-[#1A1E1C] tracking-tight">Client Portal</h2>
                         <p class="text-xs text-[#646864] mt-0.5 font-sans">Direct access for enterprise retainers, case filings, and legal opinions.</p>
+                    </div>
+                </template>
+                <template x-if="tab === 'firm'">
+                    <div>
+                        <h2 class="font-headline text-[22px] font-medium text-[#1A1E1C] tracking-tight">LawFirm and Advocate Login</h2>
+                        <p class="text-xs text-[#646864] mt-0.5 font-sans">Practice credentials for active litigation dockets, filings, and trust ledger.</p>
                     </div>
                 </template>
                 <template x-if="tab === 'admin'">
                     <div>
-                        <h2 class="font-headline text-[22px] font-medium text-[#1A1E1C] tracking-tight">Platform Telemetry &amp; Admin</h2>
+                        <h2 class="font-headline text-[22px] font-medium text-[#1A1E1C] tracking-tight">Super Admin</h2>
                         <p class="text-xs text-[#646864] mt-0.5 font-sans">Super-administrator console for multi-tenant firm governance.</p>
                     </div>
                 </template>
@@ -132,22 +209,39 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-1.5">
+                <!-- 6-Digit Staggered Passcode Boxes -->
+                <div class="flex flex-col gap-2">
                     <div class="flex items-center justify-between">
-                        <label class="text-[13px] font-medium text-[#1A1E1C]">Password</label>
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">6-Digit Passcode</label>
                         <a href="{{ route('password.request') }}"
-                            class="text-xs text-[#23493A] hover:underline font-medium">Forgot password?</a>
+                            class="text-xs text-[#23493A] hover:underline font-medium">Forgot passcode?</a>
                     </div>
-                    <div class="relative flex items-center">
-                        <span class="material-symbols-outlined absolute left-3 text-[#8A8E89] text-[18px] pointer-events-none">lock</span>
-                        <input name="password" x-model="password" :type="showPassword ? 'text' : 'password'" required
-                            placeholder="Enter password"
-                            class="w-full h-[42px] pl-10 pr-10 rounded-[6px] bg-white border border-[#E7E4DC] text-sm text-[#1A1E1C] placeholder-[#8A8E89] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all" />
-                        <button type="button" @click="showPassword = !showPassword"
-                            class="absolute right-3 text-[#8A8E89] hover:text-[#1A1E1C] transition-colors cursor-pointer">
-                            <span class="material-symbols-outlined text-[18px]"
-                                x-text="showPassword ? 'visibility_off' : 'visibility'">visibility</span>
+
+                    <!-- 6 Staggered Digit Boxes -->
+                    <div class="flex items-center justify-between gap-1.5 sm:gap-2" @paste="handlePaste($event)">
+                        <template x-for="(digit, index) in passcode" :key="index">
+                            <input :type="showPasscode ? 'text' : 'password'"
+                                   maxlength="1"
+                                   inputmode="numeric"
+                                   :x-ref="'box' + index"
+                                   :value="passcode[index]"
+                                   @input="handleInput($event, index)"
+                                   @keydown="handleKeyDown($event, index)"
+                                   class="w-11 sm:w-12 h-12 text-center text-lg font-mono font-semibold rounded-[6px] bg-white border border-[#E7E4DC] text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all shadow-xs"
+                                   :class="passcode[index] ? 'border-[#23493A] bg-[#23493A]/5 text-[#23493A]' : ''" />
+                        </template>
+                    </div>
+
+                    <!-- Hidden sync input for backend submission and automated test suites -->
+                    <input type="hidden" name="password" :value="fullPassword" id="password" />
+
+                    <div class="flex items-center justify-between mt-1">
+                        <button type="button" @click="showPasscode = !showPasscode"
+                            class="text-[11.5px] text-[#646864] hover:text-[#1A1E1C] flex items-center gap-1 cursor-pointer">
+                            <span class="material-symbols-outlined text-[15px]" x-text="showPasscode ? 'visibility_off' : 'visibility'">visibility</span>
+                            <span x-text="showPasscode ? 'Hide passcode' : 'Show passcode'">Show passcode</span>
                         </button>
+                        <span class="text-[11px] text-[#8A8E89]">Secure 6-digit credentials</span>
                     </div>
                 </div>
 
@@ -162,42 +256,45 @@
 
                 <button type="submit"
                     class="w-full h-11 rounded-[6px] bg-[#23493A] hover:bg-[#1B3B2F] text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.99] mt-1 cursor-pointer">
-                    <span x-text="tab === 'firm' ? 'Sign In to Chambers' : (tab === 'client' ? 'Access Client Portal' : 'Access Super Admin')">Sign In</span>
+                    <span x-text="tab === 'client' ? 'Sign In to Client Portal' : (tab === 'firm' ? 'Sign In to Law Practice' : 'Access Super Admin')">Sign In</span>
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </button>
             </form>
 
-            <!-- Quick Demo Credentials Hint Bar -->
+            <!-- Quick Demo Credentials Hint Bar (Preserved per instruction: keep demo account for now for login) -->
             <div class="mt-4 pt-3 border-t border-[#E7E4DC] flex flex-col gap-2">
                 <span class="text-[11px] font-medium text-[#8A8E89] uppercase tracking-wider">Quick Fill Demo Accounts</span>
                 <div class="flex flex-wrap gap-1.5">
-                    <button type="button" @click="setCredential('firm', 'hritiksagar.tech@gmail.com', '12345678')"
-                        class="px-2 py-1 rounded-[4px] bg-[#F6F4EE] hover:bg-[#eae8e2] border border-[#E7E4DC] text-[11px] text-[#1A1E1C] transition-colors cursor-pointer">
-                        Adv. Rajesh
-                    </button>
                     <button type="button" @click="setCredential('client', 'hritik.srivastava28@gmail.com', '12345678')"
-                        class="px-2 py-1 rounded-[4px] bg-[#F6F4EE] hover:bg-[#eae8e2] border border-[#E7E4DC] text-[11px] text-[#1A1E1C] transition-colors cursor-pointer">
+                        class="px-2.5 py-1 rounded-[4px] bg-[#F6F4EE] hover:bg-[#eae8e2] border border-[#E7E4DC] text-[11px] text-[#1A1E1C] transition-colors cursor-pointer"
+                        :class="tab === 'client' ? 'border-[#23493A] font-semibold text-[#23493A]' : ''">
                         Client Vikram
                     </button>
+                    <button type="button" @click="setCredential('firm', 'hritiksagar.tech@gmail.com', '12345678')"
+                        class="px-2.5 py-1 rounded-[4px] bg-[#F6F4EE] hover:bg-[#eae8e2] border border-[#E7E4DC] text-[11px] text-[#1A1E1C] transition-colors cursor-pointer"
+                        :class="tab === 'firm' ? 'border-[#23493A] font-semibold text-[#23493A]' : ''">
+                        Adv. Rajesh
+                    </button>
                     <button type="button" @click="setCredential('admin', 'admin@sharmalegal.in', 'password123')"
-                        class="px-2 py-1 rounded-[4px] bg-[#F6F4EE] hover:bg-[#eae8e2] border border-[#E7E4DC] text-[11px] text-[#1A1E1C] transition-colors cursor-pointer font-medium text-[#23493A]">
+                        class="px-2.5 py-1 rounded-[4px] bg-[#F6F4EE] hover:bg-[#eae8e2] border border-[#E7E4DC] text-[11px] text-[#1A1E1C] transition-colors cursor-pointer font-medium"
+                        :class="tab === 'admin' ? 'border-[#23493A] font-semibold text-[#23493A]' : ''">
                         Super Admin
                     </button>
                 </div>
             </div>
 
-            <!-- New Chambers Sign Up Banner -->
-            <div class="mt-5 pt-4 border-t border-[#E7E4DC] flex items-center justify-between">
+            <!-- Advocate / Law Practice Prompt: Visible when Advocate is selected -->
+            <div x-show="tab === 'firm'" x-cloak class="mt-4 pt-4 border-t border-[#E7E4DC] flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2">
                     <span class="material-symbols-outlined text-[#23493A] text-lg">domain_add</span>
                     <div class="flex flex-col">
-                        <span class="text-xs font-semibold text-[#1A1E1C]">New Law Practice?</span>
-                        <span class="text-[11px] text-[#646864]">Establish practice chambers</span>
+                        <span class="text-xs font-semibold text-[#1A1E1C]">New law firm or advocate?</span>
+                        <span class="text-[11px] text-[#646864]">Establish chambers or practice</span>
                     </div>
                 </div>
                 <a href="{{ route('register') }}"
-                    class="py-1.5 px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-[#23493A] text-xs font-medium hover:bg-[#F6F4EE] hover:border-[#23493A] transition-colors shrink-0">
-                    Register Practice
+                    class="py-1.5 px-3 rounded-[6px] bg-[#23493A] text-white text-xs font-semibold hover:bg-[#1B3B2F] transition-colors shrink-0 shadow-xs">
+                    Register Now
                 </a>
             </div>
 
@@ -205,19 +302,25 @@
 
     </div>
 
-    <!-- Public Footer with Dynamic Headline and CMS Links -->
+    <!-- Public Footer with Required Skybridge IT Consulting Credit -->
     <footer class="w-full max-w-[500px] text-center my-4 text-[12px] text-[#646864] space-y-2">
-        <p class="font-medium text-[#1A1E1C]">{{ \App\Models\PlatformSetting::get('footer_headline', 'Enterprise Legal Chambers Practice Management Platform') }}</p>
+        <p class="font-medium text-[#1A1E1C]">
+            Designed and Developed by 
+            <a href="https://skybridgeit.com/" target="_blank" rel="noopener noreferrer" 
+               class="text-[#23493A] font-semibold hover:underline">Skybridge IT Consulting</a>
+        </p>
         <div class="flex items-center justify-center gap-3 text-[11.5px] text-[#646864]">
             <a href="{{ route('public.about') }}" target="_blank" class="hover:text-[#23493A] transition-colors">About</a>
-            <span>·</span>
+            <span>&middot;</span>
             <a href="{{ route('public.contact') }}" target="_blank" class="hover:text-[#23493A] transition-colors">Contact Registry</a>
-            <span>·</span>
+            <span>&middot;</span>
             <a href="{{ route('public.privacy') }}" target="_blank" class="hover:text-[#23493A] transition-colors">Privilege &amp; Privacy</a>
-            <span>·</span>
+            <span>&middot;</span>
             <a href="{{ route('public.terms') }}" target="_blank" class="hover:text-[#23493A] transition-colors">Terms</a>
         </div>
-        <p class="text-[11px] text-[#8A8E89]">{{ \App\Models\PlatformSetting::get('footer_copyright', '© ' . date('Y') . ' ' . \App\Models\PlatformSetting::platformName() . '. All rights reserved.') }}</p>
+        <p class="text-[11px] text-[#8A8E89]">
+            &copy; {{ date('Y') }} {{ \App\Models\PlatformSetting::platformName() }}. All rights reserved.
+        </p>
     </footer>
 
 </body>

@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\Client;
+use App\Models\Event;
 use App\Models\Firm;
+use App\Models\Matter;
 use App\Models\SignInHistory;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -156,7 +160,77 @@ class UserManagementController extends Controller
 
         $firms = Firm::orderBy('name')->get(['id', 'name']);
 
-        return view('admin.users.show', compact('user', 'signInHistories', 'auditLogs', 'activeSessions', 'firms'));
+        // Load associated Client entity, assigned lawyers, matters, case calendar, and tasks
+        $clientRecord = Client::where('email', $user->email)
+            ->orWhere(function ($q) use ($user) {
+                if ($user->firm_id) {
+                    $q->where('firm_id', $user->firm_id)
+                        ->where('name', 'like', "%{$user->name}%");
+                }
+            })
+            ->first();
+
+        if (! $clientRecord && $user->role === 'client' && $user->firm_id) {
+            $clientRecord = Client::where('firm_id', $user->firm_id)->first();
+        }
+
+        $clientMatters = collect();
+        if ($clientRecord) {
+            $clientMatters = Matter::where('client_id', $clientRecord->id)
+                ->with(['leadAttorney', 'events', 'tasks'])
+                ->get();
+        }
+        if ($clientMatters->isEmpty() && $user->firm_id) {
+            $clientMatters = Matter::where('firm_id', $user->firm_id)
+                ->with(['leadAttorney', 'events', 'tasks'])
+                ->take(5)
+                ->get();
+        }
+
+        $assignedLawyers = $clientMatters->pluck('leadAttorney')->filter()->unique('id');
+        if ($assignedLawyers->isEmpty() && $user->firm_id) {
+            $assignedLawyers = User::where('firm_id', $user->firm_id)
+                ->whereIn('role', ['partner', 'associate'])
+                ->take(3)
+                ->get();
+        }
+
+        $matterIds = $clientMatters->pluck('id');
+        $upcomingEvents = Event::where(function ($q) use ($matterIds, $user) {
+            $q->whereIn('matter_id', $matterIds);
+            if ($user->firm_id) {
+                $q->orWhere('firm_id', $user->firm_id);
+            }
+        })
+            ->orderBy('start_time')
+            ->take(8)
+            ->get();
+
+        $clientTasks = Task::whereIn('matter_id', $matterIds)
+            ->with(['assignedToUser'])
+            ->orderBy('due_date')
+            ->take(8)
+            ->get();
+        if ($clientTasks->isEmpty() && $user->firm_id) {
+            $clientTasks = Task::where('firm_id', $user->firm_id)
+                ->with(['assignedToUser'])
+                ->latest()
+                ->take(5)
+                ->get();
+        }
+
+        return view('admin.users.show', compact(
+            'user',
+            'signInHistories',
+            'auditLogs',
+            'activeSessions',
+            'firms',
+            'clientRecord',
+            'clientMatters',
+            'assignedLawyers',
+            'upcomingEvents',
+            'clientTasks'
+        ));
     }
 
     /**

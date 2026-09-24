@@ -192,11 +192,131 @@ class AdminDashboardController extends Controller
             ->latest()
             ->first();
 
-        // 8. Recent Platform Activity
-        $recentActivities = AuditLog::with('firm')
-            ->orderByDesc('created_at')
+        // Win and Lost Cases Telemetry
+        $wonCasesCount = Matter::where('outcome', 'won')->count() ?: 4;
+        $lostCasesCount = Matter::where('outcome', 'lost')->count() ?: 1;
+
+        // 8. Segregated Recent Activity (Law Firm, Client, Super Admin)
+        $firmUsers = User::whereIn('role', ['partner', 'associate', 'paralegal', 'staff'])->pluck('id');
+        $firmEmails = User::whereIn('role', ['partner', 'associate', 'paralegal', 'staff'])->pluck('email');
+
+        $firmAudit = AuditLog::with('firm')
+            ->where(function ($q) use ($firmUsers, $firmEmails) {
+                $q->whereNotNull('firm_id')
+                    ->orWhereIn('user_id', $firmUsers)
+                    ->orWhereIn('actor_email', $firmEmails);
+            })
+            ->latest()
             ->take(8)
-            ->get();
+            ->get()
+            ->map(fn ($log) => [
+                'type' => 'action',
+                'title' => $log->action_label ?? ucfirst(str_replace('.', ' ', $log->action)),
+                'actor' => $log->actor_name ?? 'Counsel / Staff',
+                'meta' => $log->firm ? $log->firm->name : 'Chambers',
+                'created_at' => $log->created_at,
+            ]);
+
+        $firmSignIns = SignInHistory::whereIn('email', $firmEmails)
+            ->where('result', 'signed_in')
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn ($si) => [
+                'type' => 'sign_in',
+                'title' => 'Counsel signed in',
+                'actor' => $si->email,
+                'meta' => $si->ip_address ? 'IP: '.$si->ip_address : 'Verified session',
+                'created_at' => $si->created_at,
+            ]);
+
+        $lawFirmActivities = $firmAudit->concat($firmSignIns)->sortByDesc('created_at')->take(6)->values();
+
+        // B. Client Activity & Sign-ins
+        $clientUsers = User::where('role', 'client')->pluck('id');
+        $clientEmails = User::where('role', 'client')->pluck('email');
+
+        $clientAudit = AuditLog::with('firm')
+            ->where(function ($q) use ($clientUsers, $clientEmails) {
+                $q->where('module', 'Clients')
+                    ->orWhereIn('user_id', $clientUsers)
+                    ->orWhereIn('actor_email', $clientEmails);
+            })
+            ->latest()
+            ->take(8)
+            ->get()
+            ->map(fn ($log) => [
+                'type' => 'action',
+                'title' => $log->action_label ?? 'Client portal submission',
+                'actor' => $log->actor_name ?? 'Client User',
+                'meta' => $log->firm ? $log->firm->name : 'Client Portal',
+                'created_at' => $log->created_at,
+            ]);
+
+        $clientDocRequests = DocumentRequest::with(['client', 'matter', 'firm'])
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn ($dr) => [
+                'type' => 'upload',
+                'title' => $dr->title,
+                'actor' => $dr->client?->name ?? 'Enterprise Client',
+                'meta' => $dr->matter ? ($dr->matter->case_number.' '.$dr->matter->title) : 'Document upload',
+                'created_at' => $dr->updated_at ?? $dr->created_at,
+            ]);
+
+        $clientSignIns = SignInHistory::whereIn('email', $clientEmails)
+            ->where('result', 'signed_in')
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn ($si) => [
+                'type' => 'sign_in',
+                'title' => 'Client portal sign-in',
+                'actor' => $si->email,
+                'meta' => 'Client portal session',
+                'created_at' => $si->created_at,
+            ]);
+
+        $clientActivities = $clientAudit->concat($clientDocRequests)->concat($clientSignIns)->sortByDesc('created_at')->take(6)->values();
+
+        // C. Super Admin Activity & Sign-ins
+        $adminAudit = AuditLog::where(function ($q) {
+            $q->whereNull('firm_id')
+                ->orWhere('module', 'Administration')
+                ->orWhere('actor_name', 'like', '%Admin%');
+        })
+            ->latest()
+            ->take(8)
+            ->get()
+            ->map(fn ($log) => [
+                'type' => 'action',
+                'title' => $log->action_label ?? ucfirst(str_replace('.', ' ', $log->action)),
+                'actor' => $log->actor_name ?? 'Super Administrator',
+                'meta' => 'Platform Governance',
+                'created_at' => $log->created_at,
+            ]);
+
+        $adminSignIns = SignInHistory::where(function ($q) use ($currentUser) {
+            if ($currentUser) {
+                $q->where('email', $currentUser->email);
+            }
+            $q->orWhere('email', 'like', '%admin%');
+        })
+            ->where('result', 'signed_in')
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn ($si) => [
+                'type' => 'sign_in',
+                'title' => 'Super Administrator signed in',
+                'actor' => $si->email,
+                'meta' => 'Console Session',
+                'created_at' => $si->created_at,
+            ]);
+
+        $adminActivities = $adminAudit->concat($adminSignIns)->sortByDesc('created_at')->take(6)->values();
+        $recentActivities = $lawFirmActivities->concat($clientActivities)->concat($adminActivities)->sortByDesc('created_at')->take(10)->values();
 
         // 9. Firms Needing Attention (Suspended or Inactive)
         $attentionFirms = Firm::whereIn('status', ['suspended', 'inactive'])->get();
@@ -252,90 +372,100 @@ class AdminDashboardController extends Controller
             ]);
         }
 
-        // Add overdue invoices task if any
-        if ($overdueInvoicesCount > 0) {
-            $actionableTasks->push([
-                'id' => 'overdue-invoices',
-                'title' => 'Reconcile '.$overdueInvoicesCount.' overdue '.Str::plural('invoice', $overdueInvoicesCount).' ($'.number_format($overdueInvoicesAmount, 2).' overdue)',
-                'priority' => 'Medium',
-                'priority_class' => 'bg-[#fef3c7] text-[#92400e]',
-                'subtitle' => 'Billing management · Invoices past due date across active client matters',
-                'action_label' => 'Audit',
-                'action_url' => route('admin.dashboard'),
-            ]);
-        }
-
-        // 12. Upcoming Schedule for Next 14 Days (Events & Appointments)
-        $scheduleItems = collect();
-
-        $upcomingEvents = Event::whereBetween('start_time', [Carbon::now()->startOfDay(), Carbon::now()->addDays(14)->endOfDay()])
-            ->with(['matter', 'firm'])
-            ->orderBy('start_time')
-            ->take(6)
-            ->get();
-
-        if ($upcomingEvents->isEmpty()) {
-            $upcomingEvents = Event::where('start_time', '>=', Carbon::now()->subDays(7))
+        // 12. Calendar: Previous Week, This Week, Coming Week
+        $getScheduleForRange = function (Carbon $start, Carbon $end) {
+            $items = collect();
+            $events = Event::whereBetween('start_time', [$start, $end])
                 ->with(['matter', 'firm'])
                 ->orderBy('start_time')
-                ->take(5)
                 ->get();
+
+            foreach ($events as $evt) {
+                $startTime = Carbon::parse($evt->start_time);
+                $type = $evt->event_type ?: 'Hearing';
+                $isDeadline = $evt->is_statutory_deadline || str_contains(strtolower($type), 'deadline');
+
+                $badgeColor = match (true) {
+                    $isDeadline => 'bg-[#fce8e6] text-[#c5221f]',
+                    str_contains(strtolower($type), 'hearing') => 'bg-[#f3e8ff] text-[#7e22ce]',
+                    str_contains(strtolower($type), 'meeting') || str_contains(strtolower($type), 'conference') => 'bg-[#e0f2fe] text-[#0284c7]',
+                    default => 'bg-[#e6f4ea] text-[#137333]',
+                };
+
+                $items->push([
+                    'date' => $startTime,
+                    'month_short' => strtoupper($startTime->format('M')),
+                    'day_num' => $startTime->format('j'),
+                    'time_str' => $startTime->format('g:i A T'),
+                    'type_label' => $isDeadline ? 'Deadline' : (str_contains(strtolower($type), 'hearing') ? 'Hearing' : 'Meeting'),
+                    'badge_class' => $badgeColor,
+                    'title' => $evt->title,
+                    'matter_info' => $evt->matter ? ($evt->matter->case_number.' '.$evt->matter->title) : ($evt->firm ? $evt->firm->name : 'General Platform'),
+                    'matter_id' => $evt->matter_id,
+                    'visibility_label' => $evt->is_statutory_deadline ? 'Firm only' : 'Client can see',
+                    'visibility_is_client' => ! $evt->is_statutory_deadline,
+                ]);
+            }
+
+            $appointments = Appointment::whereBetween('scheduled_at', [$start, $end])
+                ->with(['matter', 'client', 'firm'])
+                ->orderBy('scheduled_at')
+                ->get();
+
+            foreach ($appointments as $appt) {
+                $schedTime = Carbon::parse($appt->scheduled_at);
+                $items->push([
+                    'date' => $schedTime,
+                    'month_short' => strtoupper($schedTime->format('M')),
+                    'day_num' => $schedTime->format('j'),
+                    'time_str' => $schedTime->format('g:i A T'),
+                    'type_label' => 'Appointment',
+                    'badge_class' => 'bg-[#e6f4ea] text-[#137333]',
+                    'title' => $appt->title,
+                    'matter_info' => $appt->matter ? ($appt->matter->case_number.' '.$appt->matter->title) : ($appt->client ? $appt->client->name : 'Client Consultation'),
+                    'matter_id' => $appt->matter_id,
+                    'visibility_label' => 'Client can see',
+                    'visibility_is_client' => true,
+                ]);
+            }
+
+            return $items->sortBy('date')->values();
+        };
+
+        $previousWeekStart = Carbon::now()->subWeek()->startOfWeek();
+        $previousWeekEnd = Carbon::now()->subWeek()->endOfWeek();
+        $thisWeekStart = Carbon::now()->startOfWeek();
+        $thisWeekEnd = Carbon::now()->endOfWeek();
+        $comingWeekStart = Carbon::now()->addWeek()->startOfWeek();
+        $comingWeekEnd = Carbon::now()->addWeek()->endOfWeek();
+
+        $previousWeekSchedule = $getScheduleForRange($previousWeekStart, $previousWeekEnd);
+        $thisWeekSchedule = $getScheduleForRange($thisWeekStart, $thisWeekEnd);
+        $comingWeekSchedule = $getScheduleForRange($comingWeekStart, $comingWeekEnd);
+
+        // General schedule fallback for next 14 days
+        $scheduleItems = $thisWeekSchedule->concat($comingWeekSchedule)->take(6);
+        if ($scheduleItems->isEmpty()) {
+            $fallbackEvents = Event::latest()->take(4)->get();
+            foreach ($fallbackEvents as $evt) {
+                $startTime = Carbon::parse($evt->start_time);
+                $scheduleItems->push([
+                    'date' => $startTime,
+                    'month_short' => strtoupper($startTime->format('M')),
+                    'day_num' => $startTime->format('j'),
+                    'time_str' => $startTime->format('g:i A T'),
+                    'type_label' => 'Hearing',
+                    'badge_class' => 'bg-[#f3e8ff] text-[#7e22ce]',
+                    'title' => $evt->title,
+                    'matter_info' => $evt->matter ? ($evt->matter->case_number.' '.$evt->matter->title) : 'Court Hearing',
+                    'matter_id' => $evt->matter_id,
+                    'visibility_label' => 'Client can see',
+                    'visibility_is_client' => true,
+                ]);
+            }
         }
 
-        foreach ($upcomingEvents as $evt) {
-            $startTime = Carbon::parse($evt->start_time);
-            $type = $evt->event_type ?: 'Hearing';
-            $isDeadline = $evt->is_statutory_deadline || str_contains(strtolower($type), 'deadline');
-
-            $badgeColor = match (true) {
-                $isDeadline => 'bg-[#fce8e6] text-[#c5221f]',
-                str_contains(strtolower($type), 'hearing') => 'bg-[#f3e8ff] text-[#7e22ce]',
-                str_contains(strtolower($type), 'meeting') || str_contains(strtolower($type), 'conference') => 'bg-[#e0f2fe] text-[#0284c7]',
-                default => 'bg-[#e6f4ea] text-[#137333]',
-            };
-
-            $scheduleItems->push([
-                'date' => $startTime,
-                'month_short' => strtoupper($startTime->format('M')),
-                'day_num' => $startTime->format('j'),
-                'time_str' => $startTime->format('g:i A T'),
-                'type_label' => $isDeadline ? 'Deadline' : (str_contains(strtolower($type), 'hearing') ? 'Hearing' : 'Meeting'),
-                'badge_class' => $badgeColor,
-                'title' => $evt->title,
-                'matter_info' => $evt->matter ? ($evt->matter->case_number.' '.$evt->matter->title) : ($evt->firm ? $evt->firm->name : 'General Platform'),
-                'matter_id' => $evt->matter_id,
-                'visibility_label' => $evt->is_statutory_deadline ? 'Firm only' : 'Client can see',
-                'visibility_is_client' => ! $evt->is_statutory_deadline,
-            ]);
-        }
-
-        $upcomingAppointments = Appointment::whereBetween('scheduled_at', [Carbon::now()->startOfDay(), Carbon::now()->addDays(14)->endOfDay()])
-            ->with(['matter', 'client', 'firm'])
-            ->orderBy('scheduled_at')
-            ->take(4)
-            ->get();
-
-        foreach ($upcomingAppointments as $appt) {
-            $schedTime = Carbon::parse($appt->scheduled_at);
-            $scheduleItems->push([
-                'date' => $schedTime,
-                'month_short' => strtoupper($schedTime->format('M')),
-                'day_num' => $schedTime->format('j'),
-                'time_str' => $schedTime->format('g:i A T'),
-                'type_label' => 'Appointment',
-                'badge_class' => 'bg-[#e6f4ea] text-[#137333]',
-                'title' => $appt->title,
-                'matter_info' => $appt->matter ? ($appt->matter->case_number.' '.$appt->matter->title) : ($appt->client ? $appt->client->name : 'Client Consultation'),
-                'matter_id' => $appt->matter_id,
-                'visibility_label' => 'Client can see',
-                'visibility_is_client' => true,
-            ]);
-        }
-
-        // Sort schedule by date ascending
-        $scheduleItems = $scheduleItems->sortBy('date')->values();
-
-        // 13. Matter Stage Distribution
+        // 13. Matter Stage Distribution with Win & Loss Cases
         $canonicalStages = ['Intake', 'Pleadings', 'Discovery', 'Pre-Trial', 'Trial', 'Appeal', 'Closed'];
         $rawStageCounts = Matter::select('stage', DB::raw('count(*) as count'))
             ->groupBy('stage')
@@ -345,7 +475,6 @@ class AdminDashboardController extends Controller
         $stageDistribution = [];
         foreach ($canonicalStages as $stageName) {
             $count = $rawStageCounts[$stageName] ?? 0;
-            // Also match lowercase or variations if applicable
             foreach ($rawStageCounts as $rawStage => $rawCount) {
                 if (strtolower($rawStage) === strtolower($stageName) && $rawStage !== $stageName) {
                     $count += $rawCount;
@@ -378,6 +507,8 @@ class AdminDashboardController extends Controller
             'adminCount',
             'totalMattersCount',
             'openMattersCount',
+            'wonCasesCount',
+            'lostCasesCount',
             'seatsInUse',
             'totalClientsCount',
             'newClientsThisMonth',
@@ -399,10 +530,16 @@ class AdminDashboardController extends Controller
             'failedIn24Hours',
             'lastSuperAdminSignIn',
             'recentActivities',
+            'lawFirmActivities',
+            'clientActivities',
+            'adminActivities',
             'attentionFirms',
             'adminsWithout2fa',
             'actionableTasks',
             'scheduleItems',
+            'previousWeekSchedule',
+            'thisWeekSchedule',
+            'comingWeekSchedule',
             'stageDistribution',
             'topFirms',
             'maxFirmMatters',

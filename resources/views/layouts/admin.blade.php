@@ -322,6 +322,11 @@
 
             @yield('content')
         </main>
+
+        <!-- Global Footer -->
+        <footer class="mt-auto py-4 border-t border-[#e5e3dc] text-center text-xs text-[#646864] bg-white/50">
+            Designed and Developed by <a href="https://skybridgeit.com/" target="_blank" rel="noopener noreferrer" class="text-[#23493a] font-semibold hover:underline">Skybridge IT Consulting</a>
+        </footer>
     </div>
 
     <!-- Modals (Change Password & Avatar) -->

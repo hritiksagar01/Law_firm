@@ -80,12 +80,16 @@ class FirmManagementController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'practice_type' => 'nullable|string|in:firm,individual',
             'display_name' => 'nullable|string|max:255',
             'contact_name' => 'nullable|string|max:255',
+            'owner_name' => 'nullable|string|max:255',
+            'owner_email' => 'nullable|email|max:255',
+            'registration_number' => 'nullable|string|max:100',
             'slug' => 'nullable|string|max:100|unique:firms,slug',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
-            'website' => 'nullable|url|max:255',
+            'website' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:500',
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:100',
@@ -106,6 +110,11 @@ class FirmManagementController extends Controller
             ? Str::slug($validated['slug'])
             : Str::slug($validated['name']);
 
+        // Fallback for non-ascii names
+        if (empty($slug)) {
+            $slug = 'firm-'.rand(100, 999);
+        }
+
         // Ensure unique slug
         $originalSlug = $slug;
         $count = 1;
@@ -114,45 +123,56 @@ class FirmManagementController extends Controller
             $count++;
         }
 
-        DB::transaction(function () use ($validated, $slug, $request) {
+        $contactName = $validated['owner_name'] ?? ($validated['contact_name'] ?? null);
+        $officialEmail = $validated['email'] ?? ($validated['owner_email'] ?? ($validated['admin_email'] ?? null));
+
+        DB::transaction(function () use ($validated, $slug, $contactName, $officialEmail, $request) {
             $firm = Firm::create([
                 'name' => $validated['name'],
-                'display_name' => $validated['display_name'] ?? null,
-                'contact_name' => $validated['contact_name'] ?? null,
+                'practice_type' => $validated['practice_type'] ?? 'firm',
+                'display_name' => $validated['display_name'] ?? $validated['name'],
+                'contact_name' => $contactName,
+                'registration_number' => $validated['registration_number'] ?? null,
                 'slug' => $slug,
-                'email' => $validated['email'] ?? null,
+                'email' => $officialEmail,
                 'phone' => $validated['phone'] ?? null,
                 'website' => $validated['website'] ?? null,
                 'address' => $validated['address'] ?? null,
-                'city' => $validated['city'] ?? null,
-                'state' => $validated['state'] ?? null,
-                'country' => $validated['country'] ?? 'United States',
+                'city' => $validated['city'] ?? 'New Delhi',
+                'state' => $validated['state'] ?? 'Delhi',
+                'country' => $validated['country'] ?? 'India',
                 'postal_code' => $validated['postal_code'] ?? null,
-                'currency' => $validated['currency'] ?? 'USD',
-                'timezone' => $validated['timezone'] ?? 'America/New_York',
+                'currency' => $validated['currency'] ?? 'INR',
+                'timezone' => $validated['timezone'] ?? 'Asia/Kolkata',
                 'accent_color' => '#24503f',
                 'allow_client_signup' => true,
-                'default_hourly_rate' => $validated['default_hourly_rate'] ?? 450,
-                'practice_areas' => $validated['practice_areas'] ?? [],
+                'default_hourly_rate' => $validated['default_hourly_rate'] ?? 7500,
+                'practice_areas' => $validated['practice_areas'] ?? ['Civil Litigation', 'Commercial & Corporate Law'],
                 'status' => 'active',
                 'notes' => $validated['notes'] ?? null,
             ]);
 
-            // If initial admin details provided, create the managing partner user
-            if ($request->filled('admin_email')) {
+            // If initial admin or owner details provided, create the managing partner/administrator user
+            $adminEmail = $validated['admin_email'] ?? ($validated['owner_email'] ?? null);
+            $adminName = $validated['admin_name'] ?? ($validated['owner_name'] ?? 'Managing Counsel');
+
+            if ($adminEmail) {
                 User::create([
                     'firm_id' => $firm->id,
-                    'name' => $validated['admin_name'] ?: 'Firm Administrator',
-                    'email' => $validated['admin_email'],
-                    'password' => Hash::make($request->input('admin_password', Str::random(16))),
+                    'name' => $adminName,
+                    'email' => $adminEmail,
+                    'phone' => $validated['phone'] ?? null,
+                    'password' => Hash::make($request->input('admin_password', '12345678')),
                     'role' => 'partner',
-                    'title' => 'Managing Partner / Firm Administrator',
+                    'title' => ($validated['practice_type'] ?? 'firm') === 'individual' ? 'Advocate / Sole Practitioner' : 'Senior Advocate & Managing Partner',
                 ]);
             }
         });
 
+        $typeLabel = ($validated['practice_type'] ?? 'firm') === 'individual' ? 'Advocate Practice' : 'Law firm';
+
         return redirect()->route('admin.firms.index')
-            ->with('success', "Law firm '{$validated['name']}' was successfully provisioned.");
+            ->with('success', "{$typeLabel} '{$validated['name']}' was successfully provisioned.");
     }
 
     /**
@@ -163,7 +183,8 @@ class FirmManagementController extends Controller
         $firm->loadCount(['users', 'matters', 'documents', 'clients', 'invoices', 'transactions']);
         $openMattersCount = $firm->matters()->where('status', '!=', 'closed')->count();
         $users = $firm->users()->latest()->get();
-        $matters = $firm->matters()->with('client')->latest()->take(10)->get();
+        $lawyers = $firm->users()->whereIn('role', ['partner', 'associate'])->latest()->get();
+        $matters = $firm->matters()->with('client', 'leadAttorney')->latest()->take(10)->get();
         $clients = $firm->clients()->latest()->take(10)->get();
 
         // Count staff vs client portal accounts
@@ -179,6 +200,7 @@ class FirmManagementController extends Controller
         return view('admin.firms.show', compact(
             'firm',
             'users',
+            'lawyers',
             'matters',
             'clients',
             'openMattersCount',
