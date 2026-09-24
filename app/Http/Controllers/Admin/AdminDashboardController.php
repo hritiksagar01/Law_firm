@@ -479,7 +479,7 @@ class AdminDashboardController extends Controller
         }
 
         // 13. Matter Stage Distribution with Win & Loss Cases
-        $canonicalStages = ['Intake', 'Pleadings', 'Discovery', 'Pre-Trial', 'Trial', 'Appeal', 'Closed'];
+        $canonicalStages = ['Intake', 'Pleadings', 'Discovery', 'Pre-Trial', 'Trial', 'Appeal', 'Closed', 'Won', 'Lost'];
         $rawStageCounts = Matter::select('stage', DB::raw('count(*) as count'))
             ->groupBy('stage')
             ->pluck('count', 'stage')
@@ -487,10 +487,16 @@ class AdminDashboardController extends Controller
 
         $stageDistribution = [];
         foreach ($canonicalStages as $stageName) {
-            $count = $rawStageCounts[$stageName] ?? 0;
-            foreach ($rawStageCounts as $rawStage => $rawCount) {
-                if (strtolower($rawStage) === strtolower($stageName) && $rawStage !== $stageName) {
-                    $count += $rawCount;
+            if ($stageName === 'Won') {
+                $count = $wonCasesCount;
+            } elseif ($stageName === 'Lost') {
+                $count = $lostCasesCount;
+            } else {
+                $count = $rawStageCounts[$stageName] ?? 0;
+                foreach ($rawStageCounts as $rawStage => $rawCount) {
+                    if (strtolower($rawStage) === strtolower($stageName) && $rawStage !== $stageName) {
+                        $count += $rawCount;
+                    }
                 }
             }
             $percent = $totalMattersCount > 0 ? round(($count / $totalMattersCount) * 100) : 0;

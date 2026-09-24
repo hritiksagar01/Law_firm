@@ -43,7 +43,7 @@ class SuperAdminUserManagementAndAuditTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Clients');
-        $response->assertSee('Firm staff and client portal accounts, sorted by firm then name');
+        $response->assertSee('Client Portal & Firm Personnel');
         $response->assertSee('Invite a staff member');
         $response->assertSee('Mobile Phone');
         $response->assertSee('Username');

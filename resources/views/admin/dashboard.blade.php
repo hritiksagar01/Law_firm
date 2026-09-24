@@ -595,10 +595,16 @@
 
                 <div class="space-y-2.5">
                     @foreach($resolvedStageDistribution as $stage)
+                    @php
+                        $isWon = ($stage['stage'] === 'Won');
+                        $isLost = ($stage['stage'] === 'Lost');
+                        $barColor = $isWon ? 'bg-emerald-600' : ($isLost ? 'bg-red-600' : 'bg-[#23493a]');
+                        $textColor = $isWon ? 'text-[#166534] font-semibold' : ($isLost ? 'text-[#991b1b] font-semibold' : 'text-[#383a37] font-medium');
+                    @endphp
                     <div class="flex items-center justify-between text-[12px]">
-                        <span class="text-[#383a37] font-medium w-24 truncate">{{ $stage['stage'] }}</span>
+                        <span class="{{ $textColor }} w-24 truncate">{{ $stage['stage'] }}</span>
                         <div class="flex-1 mx-3 bg-[#f0eee8] h-1.5 rounded-full overflow-hidden">
-                            <div class="bg-[#23493a] h-full rounded-full" style="width: {{ $stage['percent'] }}%;"></div>
+                            <div class="{{ $barColor }} h-full rounded-full transition-all" style="width: {{ $stage['percent'] }}%;"></div>
                         </div>
                         <span class="text-[#8a8a8a] font-mono text-[11px] w-12 text-right">
                             {{ $stage['count'] }} ({{ $stage['percent'] }}%)

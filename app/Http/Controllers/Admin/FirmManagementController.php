@@ -49,7 +49,9 @@ class FirmManagementController extends Controller
             'total_users' => User::whereNotNull('firm_id')->count(),
         ];
 
-        return view('admin.firms.index', compact('firms', 'stats'));
+        $platformAdmins = User::where('role', 'superadmin')->latest()->get();
+
+        return view('admin.firms.index', compact('firms', 'stats', 'platformAdmins'));
     }
 
     /**

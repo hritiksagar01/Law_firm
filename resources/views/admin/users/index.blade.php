@@ -28,9 +28,6 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Clients &amp; Directory</h1>
-            <p class="text-[13px] text-[#646864] mt-1">
-                Firm staff and client portal accounts, sorted by firm then name
-            </p>
         </div>
     </div>
 

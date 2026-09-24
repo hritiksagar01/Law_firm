@@ -6,6 +6,7 @@
 <div class="space-y-6" x-data="{ 
     copied: false,
     showSuspendConfirmModal: false,
+    showDeleteConfirmModal: false,
     copyLink() {
         const copyText = document.getElementById('signupLink');
         copyText.select();
@@ -53,8 +54,8 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">{{ $firm->name }}</h1>
             
-            <!-- Quick Status Badge -->
-            <div class="flex items-center gap-2">
+            <!-- Quick Actions on Top Right -->
+            <div class="flex flex-wrap items-center gap-2.5">
                 @if($firm->status === 'active')
                 <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-[#dcfce7] text-[#166534] border border-[#bbf7d0]">
                     <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -66,6 +67,23 @@
                     Suspended
                 </span>
                 @endif
+
+                <!-- Suspend / Reactivate Action Button -->
+                <button type="button" 
+                        @click="showSuspendConfirmModal = true"
+                        class="h-8 px-3 rounded-md text-xs font-medium border flex items-center gap-1.5 transition-colors cursor-pointer {{ $firm->status === 'active' ? 'border-[#ba1a1a]/40 text-[#ba1a1a] bg-white hover:bg-red-50' : 'bg-[#23493a] text-white hover:bg-[#1a382c]' }}">
+                    <span class="material-symbols-outlined text-[15px]">{{ $firm->status === 'active' ? 'block' : 'check_circle' }}</span>
+                    <span>{{ $firm->status === 'active' ? 'Suspend Firm' : 'Reactivate Firm' }}</span>
+                </button>
+
+                <!-- Delete Law Firm & Advocates Button -->
+                <button type="button" 
+                        @click="showDeleteConfirmModal = true"
+                        class="h-8 px-3 rounded-md text-xs font-medium border border-red-200 text-[#ba1a1a] bg-white hover:bg-red-50 flex items-center gap-1.5 transition-colors cursor-pointer"
+                        title="Delete firm and its advocates">
+                    <span class="material-symbols-outlined text-[15px]">delete</span>
+                    <span>Remove Firm</span>
+                </button>
             </div>
         </div>
 
@@ -308,7 +326,8 @@
                                 <th class="pb-2 px-3 font-normal">Name</th>
                                 <th class="pb-2 px-3 font-normal">Role</th>
                                 <th class="pb-2 px-3 font-normal">Status</th>
-                                <th class="pb-2 px-3 font-normal text-right">Last Updated</th>
+                                <th class="pb-2 px-3 font-normal">Last Updated</th>
+                                <th class="pb-2 px-3 font-normal text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#f0eee8]">
@@ -325,9 +344,9 @@
                             @endphp
                             <tr class="hover:bg-[#fbf9f5] transition-colors">
                                 <td class="py-2.5 px-3">
-                                    <span class="font-medium text-[#1b1c18] block">
+                                    <a href="{{ route('admin.users.show', $u) }}" class="font-medium text-[#1b1c18] hover:text-[#23493a] hover:underline block">
                                         {{ $isClient ? 'Client portal user' : $u->name }}
-                                    </span>
+                                    </a>
                                     <span class="text-[11px] text-[#5e625e] font-mono block">
                                         {{ $isClient ? substr($u->email, 0, 1) . '***@' . explode('@', $u->email)[1] : $u->email }}
                                     </span>
@@ -340,13 +359,18 @@
                                         Active
                                     </span>
                                 </td>
-                                <td class="py-2.5 px-3 text-[#5e625e] font-sans text-right">
+                                <td class="py-2.5 px-3 text-[#5e625e] font-sans">
                                     {{ $u->updated_at ? $u->updated_at->diffForHumans(null, true) : 'Never' }}
+                                </td>
+                                <td class="py-2.5 px-3 text-right">
+                                    <a href="{{ route('admin.users.show', $u) }}" class="text-[11.5px] text-[#23493a] hover:underline font-medium">
+                                        Manage &rarr;
+                                    </a>
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="4" class="py-6 px-3 text-center text-xs text-[#5e625e]">
+                                <td colspan="5" class="py-6 px-3 text-center text-xs text-[#5e625e]">
                                     No personnel assigned to this firm yet.
                                 </td>
                             </tr>
@@ -472,6 +496,41 @@
                 <button type="submit"
                         class="px-4 py-2 rounded-md text-xs font-semibold text-white transition-colors cursor-pointer {{ $firm->status === 'active' ? 'bg-[#ba1a1a] hover:bg-[#991b1b]' : 'bg-[#23493a] hover:bg-[#1a382c]' }}">
                     {{ $firm->status === 'active' ? 'Yes, Suspend Firm' : 'Yes, Reactivate Firm' }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal for Delete Firm -->
+    <div x-show="showDeleteConfirmModal" 
+         x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+        <div @click.outside="showDeleteConfirmModal = false"
+             class="bg-white border border-[#e5e3dc] rounded-xl max-w-md w-full p-6 shadow-2xl">
+            <div class="flex items-center gap-3 pb-3 border-b border-[#f0eee8]">
+                <span class="p-2 rounded-full bg-red-100 text-red-700">
+                    <span class="material-symbols-outlined text-[20px]">delete_forever</span>
+                </span>
+                <div>
+                    <h3 class="text-[15px] font-semibold text-[#1a1a1a]">Delete Law Firm &amp; Advocates?</h3>
+                    <p class="text-xs text-red-600 font-medium">Permanent action cannot be undone</p>
+                </div>
+            </div>
+
+            <p class="text-xs text-[#414844] mt-4 leading-relaxed">
+                Are you sure you want to permanently delete <strong>{{ $firm->name }}</strong>? This will remove the firm, all {{ $staffCount }} advocate accounts, {{ $clientPortalCount }} client dossiers, and associated case files from the platform.
+            </p>
+
+            <form method="POST" action="{{ route('admin.firms.destroy', $firm) }}" class="mt-6 flex items-center justify-end gap-3">
+                @csrf
+                @method('DELETE')
+                <button type="button" @click="showDeleteConfirmModal = false"
+                        class="px-4 py-2 border border-[#dcdad4] text-xs font-medium text-[#1b1c18] hover:bg-[#f5f3ed] rounded-md transition-colors cursor-pointer">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 rounded-md text-xs font-semibold text-white bg-[#ba1a1a] hover:bg-[#991b1b] transition-colors cursor-pointer">
+                    Yes, Delete Firm &amp; Advocates
                 </button>
             </form>
         </div>

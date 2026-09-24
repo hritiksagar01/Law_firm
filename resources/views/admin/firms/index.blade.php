@@ -119,6 +119,72 @@
                 </tbody>
             </table>
         </div>
+
+        @if($firms->hasPages())
+        <div class="p-3 border-t border-[#e5e3dc] bg-white">
+            {{ $firms->links() }}
+        </div>
+        @endif
+    </div>
+
+    <!-- Platform Administrators Card -->
+    <div class="bg-white border border-[#e5e3dc] rounded-lg shadow-none overflow-hidden">
+        <div class="p-4 border-b border-[#e5e3dc] bg-white">
+            <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Platform Administrators</h2>
+            <p class="text-xs text-[#5e625e] mt-0.5">Super administrators overseeing multi-tenant platform infrastructure</p>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                    <tr class="border-b border-[#e5e3dc] text-[11px] font-sans text-[#5e625e] bg-white font-medium">
+                        <th class="py-2.5 px-4 font-medium">Name</th>
+                        <th class="py-2.5 px-4 font-medium">Role</th>
+                        <th class="py-2.5 px-4 font-medium">Status</th>
+                        <th class="py-2.5 px-4 font-medium text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#f0eee8]">
+                    @forelse($platformAdmins ?? [] as $admin)
+                    <tr onclick="window.location='{{ route('admin.users.show', $admin) }}'"
+                        class="hover:bg-[#fbf9f5] cursor-pointer transition-colors group">
+                        <td class="py-3 px-4">
+                            <a href="{{ route('admin.users.show', $admin) }}" class="font-medium text-[#1b1c18] group-hover:text-[#23493a] group-hover:underline text-[13px] block">
+                                {{ $admin->full_display_name ?? $admin->name }}
+                            </a>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="text-[11px] text-[#5e625e] font-mono">{{ $admin->email }}</span>
+                                @if($admin->username)
+                                <span class="text-[11px] text-[#8e8e8e] font-mono">&#64;{{ $admin->username }}</span>
+                                @endif
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-[#1b1c18] font-sans">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-medium bg-[#f5f3ed] text-[#23493a] border border-[#E7E4DC]">
+                                Super Admin
+                            </span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#dcfce7] text-[#166534] border border-[#bbf7d0]">
+                                Active
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <a href="{{ route('admin.users.show', $admin) }}" class="text-[12px] text-[#23493a] hover:underline font-medium">
+                                Manage &rarr;
+                            </a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="py-6 px-4 text-center text-xs text-[#5e625e]">
+                            No platform administrators registered.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Add Firm Overlay Modal -->
