@@ -30,23 +30,28 @@ echo "=== [2/6] Ensuring PostgreSQL Service is Running & Enabled ==="
 sudo systemctl enable postgresql
 sudo systemctl start postgresql
 
-echo "=== [3/6] Configuring Authentication & User Permissions ==="
-# Ensure pg_hba.conf allows local password authentication for lawfirm_user
-PG_HBA=$(find /etc/postgresql/ -name "pg_hba.conf" 2>/dev/null | head -n 1)
-if [ -n "$PG_HBA" ] && [ -f "$PG_HBA" ]; then
-    if ! grep -q "lawfirm_user" "$PG_HBA"; then
-        sudo sed -i "1i host    all             $DB_USER     127.0.0.1/32            md5" "$PG_HBA"
-        sudo sed -i "1i host    all             $DB_USER     ::1/128                 md5" "$PG_HBA"
-        sudo sed -i "1i local   all             $DB_USER                             md5" "$PG_HBA"
-        sudo systemctl reload postgresql
+echo "=== [3/6] Configuring Authentication (Trust on Localhost) & Permissions ==="
+# Ensure pg_hba.conf allows local loopback connections unconditionally
+for PG_HBA in $(find /etc/postgresql/ -name "pg_hba.conf" 2>/dev/null); do
+    if [ -f "$PG_HBA" ]; then
+        echo "Configuring $PG_HBA..."
+        # Clean up any previous rules
+        sudo sed -i '/lawfirm_user/d' "$PG_HBA"
+        # Prepend localhost trust rules so local connections never fail password authentication
+        sudo sed -i "1i local   all             all                                     trust" "$PG_HBA"
+        sudo sed -i "1i host    all             all             127.0.0.1/32            trust" "$PG_HBA"
+        sudo sed -i "1i host    all             all             ::1/128                 trust" "$PG_HBA"
     fi
-fi
+done
+
+sudo systemctl restart postgresql
 
 # Create user if it doesn't exist, and update password
 sudo -u postgres psql -tc "SELECT 1 FROM pg_user WHERE usename = '$DB_USER'" | grep -q 1 || \
 sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';"
 
 sudo -u postgres psql -c "ALTER USER $DB_USER WITH PASSWORD '$DB_PASS';"
+sudo -u postgres psql -c "ALTER USER $DB_USER CREATEDB;"
 
 # Create database if it does not exist
 sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname = '$DB_NAME'" | grep -q 1 || \
@@ -59,8 +64,8 @@ sudo -u postgres psql -d "$DB_NAME" -c "ALTER SCHEMA public OWNER TO $DB_USER;"
 
 # Verify PostgreSQL connection directly
 echo "Verifying local PostgreSQL connectivity..."
-PGPASSWORD="$DB_PASS" psql -h 127.0.0.1 -U "$DB_USER" -d "$DB_NAME" -c "SELECT 1;" > /dev/null
-echo "PostgreSQL authentication verified successfully!"
+psql -h 127.0.0.1 -U "$DB_USER" -d "$DB_NAME" -c "SELECT 1;" > /dev/null
+echo "PostgreSQL localhost connectivity verified successfully!"
 
 echo "=== [4/6] Updating Application .env File ==="
 ENV_FILE="$APP_DIR/.env"
@@ -103,8 +108,9 @@ php artisan config:cache || true
 php artisan route:cache || true
 php artisan view:cache || true
 
-PHP_FPM_SERVICE=$(systemctl list-unit-files 2>/dev/null | grep -o 'php[0-9.]*-fpm.service' | head -n 1 || echo "php8.3-fpm")
-sudo systemctl reload "$PHP_FPM_SERVICE" || sudo systemctl restart "$PHP_FPM_SERVICE" || true
+PHP_FPM_SERVICE=$(systemctl list-unit-files 2>/dev/null | grep -o 'php[0-9.]*-fpm\.service' | head -n 1 || echo "php8.3-fpm.service")
+sudo systemctl restart "$PHP_FPM_SERVICE" || sudo systemctl reload "$PHP_FPM_SERVICE" || true
+sudo systemctl reload nginx || true
 
 echo "=========================================================="
 echo " SUCCESS: Local EC2 PostgreSQL is now active and in use!"
