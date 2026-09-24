@@ -299,7 +299,7 @@
                 </thead>
                 <tbody class="divide-y divide-[#f0eee8]">
                     @forelse($deliveryLogs as $log)
-                    <tr class="hover:bg-[#f4f2ed] transition-colors">
+                    <tr class="hover:bg-[#fbf9f5] transition-colors">
                         <td class="py-3 px-4 text-[#5e625e] font-sans">
                             {{ $log->created_at->format('M j, Y, g:i A') }} UTC
                         </td>

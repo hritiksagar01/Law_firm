@@ -162,7 +162,7 @@
                     @php
                         $hasDiff = !empty($log->description) || !empty($log->previous_value) || !empty($log->new_value) || !empty($log->user_agent);
                     @endphp
-                    <tr class="hover:bg-[#f4f2ed] transition-colors" x-data="{ expanded: false }">
+                    <tr class="hover:bg-[#fbf9f5] transition-colors" x-data="{ expanded: false }">
                         <td class="py-3 px-4 font-mono text-[11px] text-[#5e625e]">
                             #{{ $log->id }}
                         </td>

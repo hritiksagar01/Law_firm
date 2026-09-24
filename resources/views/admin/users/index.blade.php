@@ -44,7 +44,7 @@
         </div>
 
         <!-- Filter Bar -->
-        <div class="p-3 bg-[#f4f2ed] border-b border-[#e5e3dc]">
+        <div class="p-3 bg-[#fbf9f5] border-b border-[#e5e3dc]">
             <form method="GET" action="{{ route('admin.users.index') }}" class="flex flex-wrap items-center gap-3">
                 <div class="flex-1 min-w-[240px]">
                     <input type="text" name="q" value="{{ request('q') }}"
@@ -136,7 +136,7 @@
                         $isClient = ($u->role === 'client');
                     @endphp
                     <tr onclick="window.location='{{ route('admin.users.show', $u) }}'"
-                        class="hover:bg-[#f4f2ed] cursor-pointer transition-colors group">
+                        class="hover:bg-[#fbf9f5] cursor-pointer transition-colors group">
                         <td class="py-3 px-4">
                             <a href="{{ route('admin.users.show', $u) }}" class="font-medium text-[#1b1c18] group-hover:text-[#23493a] group-hover:underline text-[13px] block">
                                 {{ $u->full_display_name }}
@@ -224,7 +224,7 @@
                 <tbody class="divide-y divide-[#f0eee8]">
                     @forelse($platformAdmins as $admin)
                     <tr onclick="window.location='{{ route('admin.users.show', $admin) }}'"
-                        class="hover:bg-[#f4f2ed] cursor-pointer transition-colors group">
+                        class="hover:bg-[#fbf9f5] cursor-pointer transition-colors group">
                         <td class="py-3 px-4">
                             <a href="{{ route('admin.users.show', $admin) }}" class="font-medium text-[#1b1c18] group-hover:text-[#23493a] group-hover:underline text-[13px] block">
                                 {{ $admin->full_display_name }}

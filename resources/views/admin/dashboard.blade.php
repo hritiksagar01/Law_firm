@@ -151,7 +151,7 @@
                     <div class="py-3.5 first:pt-3 last:pb-0 flex items-start justify-between gap-4 group">
                         <div class="flex items-start gap-3 min-w-0">
                             <!-- Checkbox icon indicator -->
-                            <div class="w-4 h-4 mt-0.5 rounded-[3px] border border-[#cfcbc0] bg-[#f4f2ed] flex items-center justify-center shrink-0"></div>
+                            <div class="w-4 h-4 mt-0.5 rounded-[3px] border border-[#cfcbc0] bg-[#faf9f5] flex items-center justify-center shrink-0"></div>
                             
                             <div class="min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">

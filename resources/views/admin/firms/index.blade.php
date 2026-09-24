@@ -64,7 +64,7 @@
                         $isIndividual = ($firm->practice_type === 'individual');
                     @endphp
                     <tr onclick="window.location='{{ route('admin.firms.show', $firm) }}'" 
-                        class="hover:bg-[#f4f2ed] cursor-pointer transition-colors group">
+                        class="hover:bg-[#fbf9f5] cursor-pointer transition-colors group">
                         <td class="py-3.5 px-4">
                             <a href="{{ route('admin.firms.show', $firm) }}" class="font-medium text-[#1b1c18] group-hover:text-[#23493a] group-hover:underline text-[13px] block">
                                 {{ $firm->name }}
