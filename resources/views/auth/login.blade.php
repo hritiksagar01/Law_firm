@@ -116,56 +116,54 @@
         <!-- Card Container with Archival Tonal Stack -->
         <div class="w-full bg-white rounded-xl border border-[#E7E4DC] shadow-[0_4px_24px_-2px_rgba(26,30,28,0.06),0_0_0_1px_#E7E4DC] p-6 sm:p-7 flex flex-col relative">
 
-            <!-- Persona Selector: Horizontal Layout for Primary Roles -->
+            <!-- Persona Selector: Horizontal Layout with Small Left Radio Buttons -->
             <div class="mb-5">
-                <!-- Primary Role Cards: Client Portal & LawFirm side by side -->
-                <div class="grid grid-cols-2 gap-2.5 mb-2">
+                <!-- Primary Roles: Client Portal & LawFirm side by side like the old horizontal bar -->
+                <div class="grid grid-cols-2 p-1 bg-[#F6F4EE] rounded-lg border border-[#E7E4DC] gap-1 mb-2.5">
                     <!-- Client Portal -->
-                    <label @click="setCredential('client', 'hritik.srivastava28@gmail.com', '12345678')"
-                        class="relative flex flex-col items-center text-center p-4 rounded-xl border-2 transition-all cursor-pointer select-none group overflow-hidden"
+                    <button type="button" @click="setCredential('client', 'hritik.srivastava28@gmail.com', '12345678')"
+                        class="py-2 px-2 sm:px-3 rounded-[6px] text-xs flex items-center justify-center gap-2 transition-all cursor-pointer select-none"
                         :class="tab === 'client'
-                            ? 'bg-gradient-to-b from-[#23493A]/[0.06] to-[#23493A]/[0.02] border-[#23493A] shadow-[0_2px_12px_-2px_rgba(35,73,58,0.18)]'
-                            : 'bg-white border-[#E7E4DC] hover:border-[#23493A]/40 hover:shadow-sm'">
-                        <!-- Active indicator bar -->
-                        <div class="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl transition-all duration-300"
-                            :class="tab === 'client' ? 'bg-[#23493A]' : 'bg-transparent group-hover:bg-[#23493A]/20'"></div>
-                        <span class="material-symbols-outlined text-[26px] mb-2 transition-colors"
-                            :class="tab === 'client' ? 'text-[#23493A]' : 'text-[#8A8E89] group-hover:text-[#23493A]/60'">domain</span>
-                        <span class="text-[13px] font-semibold text-[#1A1E1C] leading-tight">Client Portal</span>
-                        <span class="text-[10.5px] text-[#646864] mt-1 leading-snug">Retainers & case access</span>
-                        <!-- Selection dot -->
-                        <span class="w-2 h-2 rounded-full mt-2.5 transition-all"
-                            :class="tab === 'client' ? 'bg-[#23493A] scale-100' : 'bg-[#E7E4DC] scale-75'"></span>
-                    </label>
+                            ? 'bg-white text-[#23493A] shadow-xs font-semibold border border-[#E7E4DC]'
+                            : 'text-[#646864] hover:text-[#1A1E1C] font-medium border border-transparent'">
+                        <!-- Small radio button on left -->
+                        <span class="w-3.5 h-3.5 rounded-full border flex items-center justify-center transition-all shrink-0"
+                            :class="tab === 'client' ? 'border-[#23493A] bg-[#23493A]' : 'border-[#cfcbc0] bg-white'">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white" x-show="tab === 'client'"></span>
+                        </span>
+                        <span class="material-symbols-outlined text-[15px] shrink-0"
+                            :class="tab === 'client' ? 'text-[#23493A]' : 'text-[#8A8E89]'">domain</span>
+                        <span class="truncate">Client Portal</span>
+                    </button>
 
                     <!-- LawFirm & Advocate Login -->
-                    <label @click="setCredential('firm', 'hritiksagar.tech@gmail.com', '12345678')"
-                        class="relative flex flex-col items-center text-center p-4 rounded-xl border-2 transition-all cursor-pointer select-none group overflow-hidden"
+                    <button type="button" @click="setCredential('firm', 'hritiksagar.tech@gmail.com', '12345678')"
+                        class="py-2 px-2 sm:px-3 rounded-[6px] text-xs flex items-center justify-center gap-2 transition-all cursor-pointer select-none"
                         :class="tab === 'firm'
-                            ? 'bg-gradient-to-b from-[#23493A]/[0.06] to-[#23493A]/[0.02] border-[#23493A] shadow-[0_2px_12px_-2px_rgba(35,73,58,0.18)]'
-                            : 'bg-white border-[#E7E4DC] hover:border-[#23493A]/40 hover:shadow-sm'">
-                        <!-- Active indicator bar -->
-                        <div class="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl transition-all duration-300"
-                            :class="tab === 'firm' ? 'bg-[#23493A]' : 'bg-transparent group-hover:bg-[#23493A]/20'"></div>
-                        <span class="material-symbols-outlined text-[26px] mb-2 transition-colors"
-                            :class="tab === 'firm' ? 'text-[#23493A]' : 'text-[#8A8E89] group-hover:text-[#23493A]/60'">balance</span>
-                        <span class="text-[13px] font-semibold text-[#1A1E1C] leading-tight">LawFirm & Advocate</span>
-                        <span class="text-[10.5px] text-[#646864] mt-1 leading-snug">Chambers & counsel practice</span>
-                        <!-- Selection dot -->
-                        <span class="w-2 h-2 rounded-full mt-2.5 transition-all"
-                            :class="tab === 'firm' ? 'bg-[#23493A] scale-100' : 'bg-[#E7E4DC] scale-75'"></span>
-                    </label>
+                            ? 'bg-white text-[#23493A] shadow-xs font-semibold border border-[#E7E4DC]'
+                            : 'text-[#646864] hover:text-[#1A1E1C] font-medium border border-transparent'">
+                        <!-- Small radio button on left -->
+                        <span class="w-3.5 h-3.5 rounded-full border flex items-center justify-center transition-all shrink-0"
+                            :class="tab === 'firm' ? 'border-[#23493A] bg-[#23493A]' : 'border-[#cfcbc0] bg-white'">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white" x-show="tab === 'firm'"></span>
+                        </span>
+                        <span class="material-symbols-outlined text-[15px] shrink-0"
+                            :class="tab === 'firm' ? 'text-[#23493A]' : 'text-[#8A8E89]'">balance</span>
+                        <span class="truncate">LawFirm & Advocate</span>
+                    </button>
                 </div>
 
-                <!-- Super Admin: Subtle, minimal link at the bottom -->
+                <!-- Super Admin: Subtle, minimal option at bottom with small radio button -->
                 <div class="flex items-center justify-center">
                     <button type="button" @click="setCredential('admin', 'admin@sharmalegal.in', 'password123')"
-                        class="text-[11px] text-[#8A8E89] hover:text-[#23493A] transition-colors cursor-pointer flex items-center gap-1 py-1 font-medium"
-                        :class="tab === 'admin' ? 'text-[#23493A] font-semibold' : ''">
+                        class="text-[11.5px] text-[#8A8E89] hover:text-[#23493A] transition-colors cursor-pointer inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full hover:bg-[#F6F4EE]"
+                        :class="tab === 'admin' ? 'text-[#23493A] font-semibold bg-[#F6F4EE]' : ''">
+                        <span class="w-3 h-3 rounded-full border flex items-center justify-center transition-all shrink-0"
+                            :class="tab === 'admin' ? 'border-[#23493A] bg-[#23493A]' : 'border-[#cfcbc0] bg-white'">
+                            <span class="w-1 h-1 rounded-full bg-white" x-show="tab === 'admin'"></span>
+                        </span>
                         <span class="material-symbols-outlined text-[14px]">admin_panel_settings</span>
                         <span>Super Admin Access</span>
-                        <span class="w-1.5 h-1.5 rounded-full transition-all"
-                            :class="tab === 'admin' ? 'bg-[#23493A]' : 'bg-transparent'"></span>
                     </button>
                 </div>
             </div>
