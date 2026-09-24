@@ -23,7 +23,8 @@ fi
 echo "=== [2/8] Updating System & Installing Essentials ==="
 sudo apt-get update -y
 sudo apt-get upgrade -y
-sudo apt-get install -y curl git unzip zip software-properties-common ca-certificates lsb-release certbot python3-certbot-nginx sqlite3
+sudo apt-get install -y curl git unzip zip software-properties-common ca-certificates lsb-release certbot python3-certbot-nginx sqlite3 postgresql postgresql-contrib
+sudo systemctl enable postgresql && sudo systemctl start postgresql
 
 echo "=== [3/8] Installing PHP 8.3 & Required Extensions ==="
 sudo add-apt-repository ppa:ondrej/php -y

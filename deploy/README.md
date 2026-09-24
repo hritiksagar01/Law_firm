@@ -58,21 +58,19 @@ chmod +x deploy/setup-ec2.sh
 sudo ./deploy/setup-ec2.sh
 ```
 
-### C. Configure Environment & Database
+### C. Configure Local PostgreSQL Database (Recommended)
+To run a high-performance local PostgreSQL database on your EC2 instance (zero latency, zero cloud costs):
 ```bash
 cd /var/www/lawfirm
-cp .env.example .env
-php artisan key:generate
-
-# Initialize initial SQLite database (or configure MySQL/Postgres in .env)
-touch database/database.sqlite
-php artisan migrate --seed --force
-
-# Set correct ownership for web server
-sudo chown -R ubuntu:www-data /var/www/lawfirm
-sudo chmod -R 775 /var/www/lawfirm/storage /var/www/lawfirm/bootstrap/cache /var/www/lawfirm/database
-sudo chmod 664 /var/www/lawfirm/.env
+chmod +x deploy/setup-local-postgres.sh
+sudo ./deploy/setup-local-postgres.sh
 ```
+This automatically:
+- Installs and activates PostgreSQL server locally on the EC2 machine.
+- Creates the `lawfirm` database and `lawfirm_user`.
+- Sets `.env` to `DB_CONNECTION=pgsql`, `DB_HOST=127.0.0.1`, `DB_PORT=5432`.
+- Runs migrations (`php artisan migrate --force`) and seeds the demo data.
+- Caches configuration for production performance.
 
 ### D. Configure Nginx & SSL
 ```bash
