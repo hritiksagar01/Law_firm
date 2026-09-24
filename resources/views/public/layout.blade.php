@@ -96,8 +96,9 @@
 
             <!-- Bottom Copyright Bar -->
             <div class="pt-6 border-t border-[#f3f4f6] flex flex-col sm:flex-row items-center justify-between gap-3 text-[11.5px] text-[#6b7280]">
-                <div>
-                    {{ $data['footer_copyright'] ?? ('© ' . date('Y') . ' ' . ($platformName ?? 'Vennamraj Associates') . '. All rights reserved.') }}
+                <div class="space-y-0.5">
+                    <p>{{ $data['footer_copyright'] ?? ('© ' . date('Y') . ' ' . ($platformName ?? 'Vennamraj Associates') . '. All rights reserved.') }}</p>
+                    <p class="text-[11px] text-[#6b7280]">Designed and Developed by <a href="https://skybridgeit.com/" target="_blank" rel="noopener noreferrer" class="text-[#6b7280] hover:text-[#111827] underline">Skybridge IT Consulting</a></p>
                 </div>
                 <div class="flex items-center gap-4">
                     <span>Multi-Chambers Legal Infrastructure</span>

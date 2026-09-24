@@ -396,8 +396,9 @@
         </main>
 
         <!-- Global Footer -->
-        <footer class="mt-auto py-4 border-t border-[#e5e3dc] text-center text-xs text-[#646864] bg-white/50">
-            Designed and Developed by <a href="https://skybridgeit.com/" target="_blank" rel="noopener noreferrer" class="text-[#23493a] font-semibold hover:underline">Skybridge IT Consulting</a>
+        <footer class="mt-auto py-3.5 border-t border-[#e5e3dc] text-center text-xs text-[#8A8E89] bg-white/50 space-y-1">
+            <p>{{ \App\Models\PlatformSetting::get('footer_copyright', '© ' . date('Y') . ' ' . \App\Models\PlatformSetting::platformName() . '. All rights reserved.') }}</p>
+            <p class="text-[11px]">Designed and Developed by <a href="https://skybridgeit.com/" target="_blank" rel="noopener noreferrer" class="text-[#8A8E89] hover:text-[#1A1E1C] underline">Skybridge IT Consulting</a></p>
         </footer>
     </div>
 

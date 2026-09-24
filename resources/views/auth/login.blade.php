@@ -297,13 +297,8 @@
 
     </div>
 
-    <!-- Public Footer with Required Skybridge IT Consulting Credit -->
-    <footer class="w-full max-w-[500px] text-center my-4 text-[12px] text-[#646864] space-y-2">
-        <p class="font-medium text-[#1A1E1C]">
-            Designed and Developed by 
-            <a href="https://skybridgeit.com/" target="_blank" rel="noopener noreferrer" 
-               class="text-[#23493A] font-semibold hover:underline">Skybridge IT Consulting</a>
-        </p>
+    <!-- Public Footer -->
+    <footer class="w-full max-w-[500px] text-center my-4 text-[12px] space-y-1.5">
         <div class="flex items-center justify-center gap-3 text-[11.5px] text-[#646864]">
             <a href="{{ route('public.about') }}" target="_blank" class="hover:text-[#23493A] transition-colors">About</a>
             <span>&middot;</span>
@@ -315,6 +310,11 @@
         </div>
         <p class="text-[11px] text-[#8A8E89]">
             &copy; {{ date('Y') }} {{ \App\Models\PlatformSetting::platformName() }}. All rights reserved.
+        </p>
+        <p class="text-[11px] text-[#8A8E89]">
+            Designed and Developed by 
+            <a href="https://skybridgeit.com/" target="_blank" rel="noopener noreferrer" 
+               class="text-[#8A8E89] hover:text-[#1A1E1C] underline">Skybridge IT Consulting</a>
         </p>
     </footer>
 

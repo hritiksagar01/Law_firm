@@ -195,6 +195,7 @@
             <a href="{{ route('public.terms') }}" target="_blank" class="hover:text-[#9F8349] transition-colors">Terms</a>
         </div>
         <p class="text-[11px] text-[#9A8F84]">{{ \App\Models\PlatformSetting::get('footer_copyright', '© ' . date('Y') . ' ' . \App\Models\PlatformSetting::platformName() . '. All rights reserved.') }}</p>
+        <p class="text-[11px] text-[#9A8F84]">Designed and Developed by <a href="https://skybridgeit.com/" target="_blank" rel="noopener noreferrer" class="text-[#9A8F84] hover:text-[#222222] underline">Skybridge IT Consulting</a></p>
     </footer>
 
 </body>

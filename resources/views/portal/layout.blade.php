@@ -339,10 +339,9 @@
 
         <!-- Portal Footer with Dynamic Legal Links -->
         <footer class="w-full max-w-[1240px] mx-auto px-6 sm:px-10 py-6 border-t border-[#f0eee8] text-[12px] text-[#6b7280] flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div>
-                {{ \App\Models\PlatformSetting::get('footer_copyright', '© ' . date('Y') . ' ' . \App\Models\PlatformSetting::platformName() . '. All rights reserved.') }}
-                <span class="mx-1.5 hidden sm:inline">·</span>
-                <span class="block sm:inline mt-1 sm:mt-0">Designed and Developed by <a href="https://skybridgeit.com/" target="_blank" rel="noopener noreferrer" class="text-[#23493a] font-semibold hover:underline">Skybridge IT Consulting</a></span>
+            <div class="space-y-0.5 text-center sm:text-left">
+                <p>{{ \App\Models\PlatformSetting::get('footer_copyright', '© ' . date('Y') . ' ' . \App\Models\PlatformSetting::platformName() . '. All rights reserved.') }}</p>
+                <p class="text-[11px] text-[#6b7280]">Designed and Developed by <a href="https://skybridgeit.com/" target="_blank" rel="noopener noreferrer" class="text-[#6b7280] hover:text-[#111827] underline">Skybridge IT Consulting</a></p>
             </div>
             <div class="flex items-center gap-4 text-[12px]">
                 <a href="{{ route('public.about') }}" target="_blank" class="hover:text-[#093225] transition-colors">About Chambers</a>
