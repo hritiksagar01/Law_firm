@@ -21,14 +21,66 @@
         contactPerson: 'Vikram Malhotra',
         email: 'vikram.client@gmail.com',
         phone: '+91 98765 43210',
-        fillDemo() {
-            this.category = 'corporate';
-            this.name = 'Malhotra Enterprises Pvt Ltd';
-            this.contactPerson = 'Vikram Malhotra (Director)';
-            this.email = 'vikram.enterprise@gmail.com';
-            this.phone = '+91 98765 12345';
-            $refs.passwordInput.value = 'Client123456';
-            $refs.passwordConfirmInput.value = 'Client123456';
+        passcode: ['1', '2', '3', '4', '5', '6'],
+        showPasscode: false,
+        fullPassword: '123456',
+        fillDemo(type) {
+            if (type === 'joint') {
+                this.category = 'joint';
+                this.name = 'Vikram & Rajesh (Joint Litigants)';
+                this.contactPerson = 'Vikram Malhotra';
+                this.email = 'joint.litigants@gmail.com';
+                this.phone = '+91 98110 99887';
+            } else if (type === 'corporate') {
+                this.category = 'corporate';
+                this.name = 'Malhotra Enterprises Pvt Ltd';
+                this.contactPerson = 'Vikram Malhotra (Director)';
+                this.email = 'vikram.enterprise@gmail.com';
+                this.phone = '+91 98765 12345';
+            } else {
+                this.category = 'individual';
+                this.name = 'Vikram Malhotra';
+                this.contactPerson = 'Vikram Malhotra';
+                this.email = 'vikram.client@gmail.com';
+                this.phone = '+91 98765 43210';
+            }
+            this.passcode = ['1', '2', '3', '4', '5', '6'];
+            this.fullPassword = '123456';
+        },
+        handleInput(e, index) {
+            const val = e.target.value;
+            if (val.length > 1) {
+                const pasted = val.split('').slice(0, 6);
+                pasted.forEach((ch, i) => {
+                    if (i < 6) this.passcode[i] = ch;
+                });
+                this.fullPassword = this.passcode.join('');
+                const nextIdx = Math.min(5, pasted.length);
+                this.$refs['box' + nextIdx]?.focus();
+                return;
+            }
+            this.passcode[index] = val;
+            this.fullPassword = this.passcode.join('');
+            if (val && index < 5) {
+                this.$refs['box' + (index + 1)]?.focus();
+            }
+        },
+        handleKeyDown(e, index) {
+            if (e.key === 'Backspace' && !this.passcode[index] && index > 0) {
+                this.$refs['box' + (index - 1)]?.focus();
+            }
+        },
+        handlePaste(e) {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text').trim();
+            if (!text) return;
+            const chars = text.split('').slice(0, 6);
+            chars.forEach((ch, i) => {
+                if (i < 6) this.passcode[i] = ch;
+            });
+            this.fullPassword = text;
+            const focusIdx = Math.min(5, chars.length);
+            this.$refs['box' + focusIdx]?.focus();
         }
     }">
 
@@ -61,42 +113,36 @@
                     <span class="material-symbols-outlined text-[#23493A] text-xl">how_to_reg</span>
                     <h2 class="font-headline text-lg font-medium text-[#1A1E1C]">Onboard as Client</h2>
                 </div>
-                <button type="button" @click="fillDemo()" class="text-xs text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2.5 py-1 rounded-[6px] font-medium border border-[#23493A]/15 cursor-pointer">
-                    <span class="material-symbols-outlined text-sm">bolt</span>
-                    <span>1-Click Demo Fill</span>
-                </button>
+                <div class="flex items-center gap-1">
+                    <button type="button" @click="fillDemo('individual')" class="text-[11px] text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2 py-0.5 rounded-[4px] font-medium border border-[#23493A]/15 cursor-pointer">
+                        <span>Demo Fill</span>
+                    </button>
+                    <button type="button" @click="fillDemo('joint')" class="text-[11px] text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2 py-0.5 rounded-[4px] font-medium border border-[#23493A]/15 cursor-pointer">
+                        <span>Joint Client</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Client Registration Form -->
             <form action="{{ route('register.client') }}" method="POST" class="flex flex-col gap-4">
                 @csrf
+                <input type="hidden" name="firm_id" :value="firmId"/>
 
-                <!-- Step 1: Client Category & Law Firm Selection -->
+                <!-- Step 1: Client Category -->
                 <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
                     <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-sm text-[#23493A]">business_center</span>
-                        <span>01 · Account Category &amp; Law Firm Association</span>
+                        <span>01 · Account Category</span>
                     </span>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[13px] font-medium text-[#1A1E1C]">Client Entity Type</label>
-                            <select name="category" x-model="category" required class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all">
-                                <option value="individual">Individual Client</option>
-                                <option value="corporate">Corporate Entity / Company</option>
-                                <option value="institution">Institution / Trust / Society</option>
-                                <option value="joint">Joint / Co-Clients</option>
-                            </select>
-                        </div>
-
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[13px] font-medium text-[#1A1E1C]">Select Law Firm / Practice</label>
-                            <select name="firm_id" x-model="firmId" required class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all">
-                                @foreach($firms as $firm)
-                                    <option value="{{ $firm->id }}">{{ $firm->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Client Entity Type</label>
+                        <select name="category" x-model="category" required class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all">
+                            <option value="individual">Individual Client</option>
+                            <option value="joint">Joint / Co-Clients</option>
+                            <option value="corporate">Corporate Entity / Company</option>
+                            <option value="institution">Institution / Trust / Society</option>
+                        </select>
                     </div>
                 </div>
 
@@ -104,7 +150,7 @@
                 <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
                     <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-sm text-[#23493A]">person</span>
-                        <span>02 · Basic Information</span>
+                        <span>02 · Basic Particulars</span>
                     </span>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -132,21 +178,42 @@
                     </div>
                 </div>
 
-                <!-- Step 3: Security Credentials -->
+                <!-- Step 3: Security 6-Digit Passcode -->
                 <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
                     <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-sm text-[#23493A]">lock</span>
-                        <span>03 · Account Security Password</span>
+                        <span>03 · Set 6-Digit Passcode</span>
                     </span>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[13px] font-medium text-[#1A1E1C]">Password</label>
-                            <input name="password" x-ref="passwordInput" value="Client123456" type="password" required placeholder="Minimum 8 characters" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">6-Digit Passcode</label>
+                        
+                        <!-- 6 Staggered Digit Boxes -->
+                        <div class="flex items-center justify-between gap-1.5 sm:gap-2" @paste="handlePaste($event)">
+                            <template x-for="(digit, index) in passcode" :key="index">
+                                <input :type="showPasscode ? 'text' : 'password'"
+                                       maxlength="1"
+                                       inputmode="numeric"
+                                       :x-ref="'box' + index"
+                                       :value="passcode[index]"
+                                       @input="handleInput($event, index)"
+                                       @keydown="handleKeyDown($event, index)"
+                                       class="w-11 sm:w-12 h-12 text-center text-lg font-mono font-semibold rounded-[6px] bg-white border border-[#E7E4DC] text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all shadow-xs"
+                                       :class="passcode[index] ? 'border-[#23493A] bg-[#23493A]/5 text-[#23493A]' : ''" />
+                            </template>
                         </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[13px] font-medium text-[#1A1E1C]">Confirm Password</label>
-                            <input name="password_confirmation" x-ref="passwordConfirmInput" value="Client123456" type="password" required placeholder="Re-enter password" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+
+                        <!-- Hidden sync inputs for backend form submission -->
+                        <input type="hidden" name="password" :value="fullPassword" id="password" />
+                        <input type="hidden" name="password_confirmation" :value="fullPassword" id="password_confirmation" />
+
+                        <div class="flex items-center justify-between mt-1">
+                            <button type="button" @click="showPasscode = !showPasscode"
+                                class="text-[11.5px] text-[#646864] hover:text-[#1A1E1C] flex items-center gap-1 cursor-pointer">
+                                <span class="material-symbols-outlined text-[15px]" x-text="showPasscode ? 'visibility_off' : 'visibility'">visibility</span>
+                                <span x-text="showPasscode ? 'Hide passcode' : 'Show passcode'">Show passcode</span>
+                            </button>
+                            <span class="text-[11px] text-[#8A8E89]">Secure 6-digit credentials</span>
                         </div>
                     </div>
                 </div>

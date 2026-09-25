@@ -39,8 +39,8 @@ class ClientRegistrationTest extends TestCase
             'contact_person' => 'Vikram Malhotra',
             'email' => 'vikram.test@gmail.com',
             'phone' => '+91 98765 43210',
-            'password' => 'ClientPass123',
-            'password_confirmation' => 'ClientPass123',
+            'password' => '123456',
+            'password_confirmation' => '123456',
         ]);
 
         $response->assertRedirect('/portal/dashboard');

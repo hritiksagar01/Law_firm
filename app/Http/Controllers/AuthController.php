@@ -113,15 +113,18 @@ class AuthController extends Controller
 
     public function registerClient(Request $request)
     {
+        $firmId = $request->input('firm_id') ?: (Firm::first()?->id ?? 1);
+
         $validated = $request->validate([
             'category' => 'required|in:individual,joint,corporate,institution,partnership,proprietorship',
-            'firm_id' => 'required|exists:firms,id',
             'name' => 'required|string|max:255',
             'contact_person' => 'nullable|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|string|max:50',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:6|confirmed',
         ]);
+
+        $validated['firm_id'] = $firmId;
 
         $user = User::create([
             'firm_id' => $validated['firm_id'],
