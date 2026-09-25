@@ -288,8 +288,8 @@
                 <div class="flex items-center gap-2.5">
                     <span class="material-symbols-outlined text-2xl text-[#23493a]">person_add</span>
                     <div>
-                        <h3 class="text-[16px] font-semibold text-[#1a1a1a]">Indian Legal Client Representation Intake</h3>
-                        <p class="text-[12px] text-[#646864]">Single/joint litigants, corporate retainers, Indian KYC, and assisted offline onboarding</p>
+                        <h3 class="text-[16px] font-semibold text-[#1a1a1a]">Client Representation Intake</h3>
+                        <p class="text-[12px] text-[#646864]">Single/joint litigants, corporate retainers, identity KYC, and assisted offline onboarding</p>
                     </div>
                 </div>
                 <button type="button" @click="openCreateModal = false" class="text-[#8a8a8a] hover:text-[#1a1a1a] cursor-pointer">
@@ -440,11 +440,11 @@
                     </div>
                 </div>
 
-                <!-- Step 4: Indian Statutory KYC -->
+                <!-- Step 4: Statutory Identity & KYC -->
                 <div class="pt-2 border-t border-[#f0eee8]">
                     <h4 class="font-semibold text-[#1a1a1a] mb-2 flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-[16px] text-[#23493a]">badge</span>
-                        <span>Indian Statutory KYC &amp; Identification</span>
+                        <span>Statutory Identity &amp; KYC</span>
                     </h4>
 
                     <!-- Individual KYC: Age, Gender, Occupation, PAN & Masked Aadhaar -->

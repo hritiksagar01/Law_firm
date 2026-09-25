@@ -13,7 +13,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#f4f2ed] text-[#1A1E1C] font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4 relative"
+<body class="bg-black/65 backdrop-blur-xs text-[#1A1E1C] font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4 sm:p-6 relative selection:bg-[#23493A]/10 selection:text-[#23493A]"
     x-data="{
         category: 'individual',
         onboardingMode: 'portal_online',
@@ -116,27 +116,8 @@
         }
     }">
 
-    <div class="w-full max-w-xl flex flex-col items-center my-6">
-        
-        <!-- Top Action Navigation Bar: Back to Sign In -->
-        <div class="w-full flex items-center justify-between mb-4">
-            <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#23493A] hover:underline bg-white px-3 py-1.5 rounded-full border border-[#E7E4DC] shadow-2xs transition-all cursor-pointer">
-                <span class="material-symbols-outlined text-sm">arrow_back</span>
-                <span>Back to Sign In</span>
-            </a>
-            <span class="text-[11px] font-mono text-[#8A8E89]">Client Self-Registration Protocol</span>
-        </div>
-
-        <!-- Brand Emblem -->
-        <div class="flex flex-col items-center text-center mb-5">
-            <div class="p-3.5 bg-white rounded-2xl border border-[#E7E4DC] shadow-[0_4px_24px_-2px_rgba(26,30,28,0.08)] flex items-center justify-center mb-3">
-                <img src="{{ \App\Models\PlatformSetting::logoUrl() }}" alt="{{ \App\Models\PlatformSetting::platformName() }}" class="h-16 sm:h-20 w-auto object-contain"/>
-            </div>
-            <h1 class="font-headline text-2xl font-semibold text-[#1A1E1C] tracking-tight">Client Portal Registration</h1>
-            <p class="text-xs text-[#646864] mt-1">
-                Direct Client Access for Case Tracking, Document Repository &amp; Legal Opinions
-            </p>
-        </div>
+    <!-- Modal Overlay Container -->
+    <div class="w-full max-w-3xl flex flex-col items-center my-4">
 
         <!-- Flash Notifications -->
         @if($errors->any())
@@ -146,24 +127,35 @@
         </div>
         @endif
 
-        <!-- Card Container -->
-        <div class="w-full bg-white rounded-xl border border-[#E7E4DC] shadow-[0_4px_24px_-2px_rgba(26,30,28,0.06),0_0_0_1px_#E7E4DC] p-6 sm:p-7 flex flex-col relative">
+        <!-- Card Container (Modal Overlay Window) -->
+        <div class="w-full bg-white rounded-2xl border border-[#E7E4DC] shadow-2xl p-6 sm:p-8 flex flex-col relative max-h-[92vh] overflow-y-auto">
             
+            <!-- Modal Header -->
             <div class="flex items-center justify-between pb-4 border-b border-[#F0EEE8] mb-5">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[#23493A] text-xl">how_to_reg</span>
-                    <h2 class="font-headline text-lg font-medium text-[#1A1E1C]">Onboard as Client</h2>
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-[#23493A]/10 text-[#23493A] rounded-xl flex items-center justify-center">
+                        <span class="material-symbols-outlined text-2xl">person_add</span>
+                    </div>
+                    <div>
+                        <h1 class="font-headline text-xl font-semibold text-[#1A1E1C]">Client Representation Intake</h1>
+                        <p class="text-xs text-[#646864] mt-0.5">
+                            Single/joint litigants, corporate retainers, identity KYC, and assisted offline onboarding
+                        </p>
+                    </div>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <button type="button" @click="fillDemo('individual')" class="text-[11px] text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2 py-0.5 rounded-[4px] font-medium border border-[#23493A]/15 cursor-pointer">
-                        <span>Individual Demo</span>
-                    </button>
-                    <button type="button" @click="fillDemo('joint')" class="text-[11px] text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2 py-0.5 rounded-[4px] font-medium border border-[#23493A]/15 cursor-pointer">
-                        <span>⚡ Joint Co-Clients</span>
-                    </button>
-                    <button type="button" @click="fillDemo('assisted')" class="text-[11px] text-[#92400e] hover:underline flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-[4px] font-medium border border-amber-200 cursor-pointer">
-                        <span>💬 WhatsApp Intake</span>
-                    </button>
+
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-1.5">
+                        <button type="button" @click="fillDemo('individual')" class="text-[11px] text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2.5 py-1 rounded-[4px] font-medium border border-[#23493A]/15 cursor-pointer">
+                            <span>Individual Demo</span>
+                        </button>
+                        <button type="button" @click="fillDemo('joint')" class="text-[11px] text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2.5 py-1 rounded-[4px] font-medium border border-[#23493A]/15 cursor-pointer">
+                            <span>⚡ Joint Co-Clients</span>
+                        </button>
+                    </div>
+                    <a href="{{ route('login') }}" class="p-1.5 text-[#8A8E89] hover:text-[#1A1E1C] hover:bg-[#F4F2ED] rounded-full transition-all cursor-pointer" title="Return to Sign In">
+                        <span class="material-symbols-outlined text-2xl">close</span>
+                    </a>
                 </div>
             </div>
 
@@ -173,45 +165,73 @@
                 <input type="hidden" name="firm_id" :value="firmId"/>
                 <input type="hidden" name="phone" :value="countryCode + ' ' + phoneRaw"/>
 
-                <!-- Step 1: Client Category & Communication Preference -->
-                <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
-                    <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-sm text-[#23493A]">business_center</span>
-                        <span>01 · Account Category &amp; Communication Preferences</span>
-                    </span>
+                <!-- 1. Client Legal Entity Classification * -->
+                <div>
+                    <label class="font-semibold text-[#1A1E1C] block mb-2 text-xs">1. Client Legal Entity Classification *</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <label class="border p-3 rounded-lg flex flex-col cursor-pointer transition-all"
+                               :class="category === 'individual' ? 'border-[#23493A] bg-[#23493A]/5 font-semibold text-[#23493A] shadow-2xs' : 'border-[#E7E4DC] bg-white text-[#646864] hover:bg-[#FBFBF9]'">
+                            <input type="radio" name="category" value="individual" x-model="category" class="sr-only"/>
+                            <div class="flex items-center gap-1.5 text-xs font-semibold">
+                                <span class="material-symbols-outlined text-lg">person</span>
+                                <span>Individual (1 Person)</span>
+                            </div>
+                            <span class="text-[10.5px] text-[#646864] mt-1 font-normal">Single litigant or petitioner</span>
+                        </label>
 
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[13px] font-medium text-[#1A1E1C]">Client Entity Type</label>
-                        <select name="category" x-model="category" @change="if(category === 'joint' && members.length === 0) addMember()" required class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all">
-                            <option value="individual">Individual Client (Single)</option>
-                            <option value="joint">Joint / Co-Clients (Multiple Litigants)</option>
-                            <option value="corporate">Corporate Entity / Company</option>
-                            <option value="institution">Institution / Trust / Society</option>
-                        </select>
+                        <label class="border p-3 rounded-lg flex flex-col cursor-pointer transition-all"
+                               :class="category === 'joint' ? 'border-[#23493A] bg-[#23493A]/5 font-semibold text-[#23493A] shadow-2xs' : 'border-[#E7E4DC] bg-white text-[#646864] hover:bg-[#FBFBF9]'">
+                            <input type="radio" name="category" value="joint" x-model="category" @change="if(members.length === 0) addMember()" class="sr-only"/>
+                            <div class="flex items-center gap-1.5 text-xs font-semibold">
+                                <span class="material-symbols-outlined text-lg">group</span>
+                                <span>Joint (2+ Litigants)</span>
+                            </div>
+                            <span class="text-[10.5px] text-[#646864] mt-1 font-normal">Co-petitioners / Family members</span>
+                        </label>
+
+                        <label class="border p-3 rounded-lg flex flex-col cursor-pointer transition-all"
+                               :class="category === 'corporate' ? 'border-[#23493A] bg-[#23493A]/5 font-semibold text-[#23493A] shadow-2xs' : 'border-[#E7E4DC] bg-white text-[#646864] hover:bg-[#FBFBF9]'">
+                            <input type="radio" name="category" value="corporate" x-model="category" class="sr-only"/>
+                            <div class="flex items-center gap-1.5 text-xs font-semibold">
+                                <span class="material-symbols-outlined text-lg">apartment</span>
+                                <span>Company / LLP</span>
+                            </div>
+                            <span class="text-[10.5px] text-[#646864] mt-1 font-normal">Pvt Ltd, Public Ltd, LLP, OPC</span>
+                        </label>
+
+                        <label class="border p-3 rounded-lg flex flex-col cursor-pointer transition-all"
+                               :class="category === 'institution' ? 'border-[#23493A] bg-[#23493A]/5 font-semibold text-[#23493A] shadow-2xs' : 'border-[#E7E4DC] bg-white text-[#646864] hover:bg-[#FBFBF9]'">
+                            <input type="radio" name="category" value="institution" x-model="category" class="sr-only"/>
+                            <div class="flex items-center gap-1.5 text-xs font-semibold">
+                                <span class="material-symbols-outlined text-lg">account_balance</span>
+                                <span>Trust / Society</span>
+                            </div>
+                            <span class="text-[10.5px] text-[#646864] mt-1 font-normal">NGO, Society, Partnership, Firm</span>
+                        </label>
                     </div>
+                </div>
 
-                    <!-- Client Digital Literacy & Communication Mode -->
-                    <div class="flex flex-col gap-1.5 mt-1">
-                        <label class="text-[13px] font-medium text-[#1A1E1C]">Digital Literacy &amp; Onboarding Mode</label>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                            <label class="border p-2.5 rounded-md flex flex-col cursor-pointer transition-all"
-                                   :class="onboardingMode === 'portal_online' ? 'border-[#23493A] bg-white font-semibold text-[#23493A] shadow-xs' : 'border-[#E7E4DC] bg-white/60 text-[#646864] hover:bg-white'">
-                                <div class="flex items-center gap-2">
-                                    <input type="radio" name="onboarding_mode" value="portal_online" x-model="onboardingMode" class="text-[#23493A] focus:ring-[#23493A] cursor-pointer"/>
-                                    <span class="text-xs font-semibold text-[#1A1E1C]">Standard Digital Portal</span>
-                                </div>
-                                <span class="text-[11px] text-[#646864] mt-1">Direct online portal access for case files, PDFs &amp; billing</span>
-                            </label>
+                <!-- 2. Client Digital Literacy & Onboarding Mode * -->
+                <div class="p-3.5 rounded-lg bg-[#F6F4EE] border border-[#E7E4DC]">
+                    <label class="font-semibold text-[#1A1E1C] block mb-1.5 text-xs">2. Client Digital Literacy &amp; Onboarding Mode *</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <label class="p-3 rounded-md border flex items-start gap-2.5 cursor-pointer transition-all"
+                               :class="onboardingMode === 'portal_online' ? 'border-[#23493A] bg-white font-semibold text-[#23493A] shadow-2xs' : 'border-[#E7E4DC] bg-white/70 text-[#646864] hover:bg-white'">
+                            <input type="radio" name="onboarding_mode" value="portal_online" x-model="onboardingMode" class="mt-0.5 text-[#23493A] focus:ring-[#23493A] cursor-pointer"/>
+                            <div>
+                                <span class="font-semibold text-[#1A1E1C] block">Online Client Portal</span>
+                                <span class="text-[11px] text-[#646864] block mt-0.5">Client has email &amp; smartphone. Receives invitation token link to set password.</span>
+                            </div>
+                        </label>
 
-                            <label class="border p-2.5 rounded-md flex flex-col cursor-pointer transition-all"
-                                   :class="onboardingMode === 'assisted_offline' ? 'border-[#92400e] bg-amber-50/50 font-semibold text-[#92400e] shadow-xs' : 'border-[#E7E4DC] bg-white/60 text-[#646864] hover:bg-white'">
-                                <div class="flex items-center gap-2">
-                                    <input type="radio" name="onboarding_mode" value="assisted_offline" x-model="onboardingMode" class="text-[#92400e] focus:ring-[#92400e] cursor-pointer"/>
-                                    <span class="text-xs font-semibold text-[#92400e]">Assisted / WhatsApp Support</span>
-                                </div>
-                                <span class="text-[11px] text-[#646864] mt-1">Phone/WhatsApp hearing alerts &amp; low literacy assistance</span>
-                            </label>
-                        </div>
+                        <label class="p-3 rounded-md border flex items-start gap-2.5 cursor-pointer transition-all"
+                               :class="onboardingMode === 'assisted_offline' ? 'border-[#92400e] bg-amber-50/70 font-semibold text-[#92400e] shadow-2xs' : 'border-[#E7E4DC] bg-white/70 text-[#646864] hover:bg-white'">
+                            <input type="radio" name="onboarding_mode" value="assisted_offline" x-model="onboardingMode" class="mt-0.5 text-[#92400e] focus:ring-[#92400e] cursor-pointer"/>
+                            <div>
+                                <span class="font-semibold text-[#92400e] block">Assisted Offline (No Email / Illiterate / POA)</span>
+                                <span class="text-[11px] text-[#646864] block mt-0.5">Direct chamber visits, phone/WhatsApp notifications, physical intake slip.</span>
+                            </div>
+                        </label>
                     </div>
                 </div>
 

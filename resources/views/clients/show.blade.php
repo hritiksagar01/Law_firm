@@ -123,7 +123,7 @@
                 class="px-4 py-2.5 border-b-2 transition-colors flex items-center gap-1.5 whitespace-nowrap"
                 :class="activeTab === 'overview' ? 'border-[#23493a] text-[#23493a] font-semibold' : 'border-transparent text-[#646864] hover:text-[#1a1a1a]'">
             <span class="material-symbols-outlined text-[16px]">info</span>
-            <span>Overview &amp; Indian KYC</span>
+            <span>Overview &amp; Statutory KYC</span>
         </button>
 
         <button @click="activeTab = 'matters'"
@@ -160,7 +160,7 @@
     </div>
 
     <!-- ===================================================================== -->
-    <!-- TAB 1: OVERVIEW & INDIAN KYC                                          -->
+    <!-- TAB 1: OVERVIEW & STATUTORY KYC                                       -->
     <!-- ===================================================================== -->
     <div x-show="activeTab === 'overview'" class="space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -171,7 +171,7 @@
                 <div class="border border-[#e5e3dc] bg-white rounded-md p-5 sm:p-6 shadow-xs">
                     <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#f0eee8]">
                         <div>
-                            <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Indian Court Memo Identification</h2>
+                            <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Court Memo Identification</h2>
                             <p class="text-[12px] text-[#8a8a8a] mt-0.5 font-sans">Statutory party details for memo of parties, affidavits &amp; court filings</p>
                         </div>
                         <span class="font-mono text-xs px-2 py-0.5 rounded bg-[#f5f3ed] text-[#23493a] border border-[#e5e3dc] font-semibold">
