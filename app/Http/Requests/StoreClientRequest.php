@@ -14,6 +14,7 @@ class StoreClientRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
+            'firm_id' => 'nullable|exists:firms,id',
             'category' => 'required|in:individual,joint,corporate,institution,partnership,proprietorship',
             'name' => 'required|string|max:255',
             'onboarding_mode' => 'required|in:portal_online,assisted_offline',

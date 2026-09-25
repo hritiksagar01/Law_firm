@@ -24,6 +24,81 @@
             font-family: 'JetBrains Mono', monospace !important;
         }
     </style>
+
+    <script>
+        function clientOnboardingState(defaultFirmId = 1, defaultAttorneyId = '') {
+            return {
+                openCreateModal: false,
+                isSubmitting: false,
+                firmId: defaultFirmId,
+                category: 'individual',
+                onboardingMode: 'portal_online',
+                salutation: 'Mr.',
+                name: '',
+                contactPerson: '',
+                fatherHusbandName: '',
+                email: '',
+                countryCode: '+91',
+                phoneRaw: '',
+                age: '',
+                gender: 'male',
+                occupation: '',
+                primaryAttorneyId: defaultAttorneyId,
+                initialStatus: 'lead',
+                internalIntakeNotes: '',
+                members: [],
+                addMember() {
+                    this.members.push({ name: '', relationship: 'Co-petitioner', phone: '', email: '' });
+                },
+                removeMember(index) {
+                    this.members.splice(index, 1);
+                },
+                fillDemo(type) {
+                    if (type === 'joint') {
+                        this.category = 'joint';
+                        this.name = 'Vikram & Rajesh (Joint Litigants)';
+                        this.contactPerson = 'Vikram Malhotra';
+                        this.fatherHusbandName = 'S/o Late Shri Jagdish Malhotra';
+                        this.email = 'joint.litigants@gmail.com';
+                        this.countryCode = '+91';
+                        this.phoneRaw = '9811099887';
+                        this.age = 41;
+                        this.gender = 'male';
+                        this.occupation = 'Property Owner & Business';
+                        this.members = [
+                            { name: 'Rajesh Sharma', relationship: 'Co-petitioner / Co-owner', phone: '+91 98765 11223', email: 'rajesh.sharma@gmail.com' }
+                        ];
+                    } else if (type === 'assisted') {
+                        this.category = 'individual';
+                        this.onboardingMode = 'assisted_offline';
+                        this.name = 'Chandra Sekhar (Assisted Intake)';
+                        this.contactPerson = 'Chandra Sekhar';
+                        this.fatherHusbandName = 'S/o Late Shri Rameshwaram';
+                        this.email = 'chandra.assisted@gmail.com';
+                        this.countryCode = '+91';
+                        this.phoneRaw = '9810077665';
+                        this.age = 56;
+                        this.gender = 'male';
+                        this.occupation = 'Agriculture / Self-Employed';
+                        this.members = [];
+                    } else {
+                        this.category = 'individual';
+                        this.onboardingMode = 'portal_online';
+                        this.name = 'Vikram Malhotra';
+                        this.contactPerson = 'Vikram Malhotra';
+                        this.fatherHusbandName = 'S/o Late Shri Jagdish Malhotra';
+                        this.email = 'vikram.client@gmail.com';
+                        this.countryCode = '+91';
+                        this.phoneRaw = '9876543210';
+                        this.age = 38;
+                        this.gender = 'male';
+                        this.occupation = 'Business & Commercial';
+                        this.members = [];
+                    }
+                }
+            };
+        }
+    </script>
 </head>
 <body class="bg-[#f4f2ed] font-sans text-[#1b1c18] antialiased min-h-screen"
       x-data="{ 

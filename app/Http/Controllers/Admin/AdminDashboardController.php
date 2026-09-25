@@ -515,9 +515,11 @@ class AdminDashboardController extends Controller
         $greetingDate = Carbon::now()->isoFormat('dddd, MMMM D');
         $platformName = PlatformSetting::platformName();
         $currentAdminName = $currentUser?->name ?? 'Platform Administrator';
+        $attorneys = User::whereIn('role', ['partner', 'associate', 'attorney'])->select(['id', 'name', 'role', 'firm_id'])->get();
 
         return view('admin.dashboard', compact(
             'firms',
+            'attorneys',
             'totalFirmsCount',
             'activeFirmsCount',
             'totalUsersCount',

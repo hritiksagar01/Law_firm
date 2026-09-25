@@ -30,23 +30,37 @@
     $resolvedWonCases = $wonCasesCount ?? 4;
     $resolvedLostCases = $lostCasesCount ?? 1;
     $resolvedFailedIn24Hours = $failedIn24Hours ?? 0;
+    $firms = $firms ?? collect();
+    $attorneys = $attorneys ?? collect();
 @endphp
 
-<div class="flex flex-col w-full text-[#1a1a1a]">
+<div x-data="clientOnboardingState({{ $firms->first()?->id ?? 1 }}, '')" class="flex flex-col w-full text-[#1a1a1a]">
     
-    <!-- Top Context & Date Greeting -->
-    <div class="mb-6">
-        <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
-            <h1 class="text-[30px] sm:text-[36px] font-serif font-normal text-[#1a1a1a] tracking-tight leading-tight">
-                {{ $resolvedGreetingDate }}
-            </h1>
-            <span class="text-[12px] text-[#8a8a8a] font-sans">
-                Platform overview &middot; {{ $resolvedActiveFirms }} active of {{ $resolvedTotalFirms }} firms &middot; Practice Governance
-            </span>
+    <!-- Top Context & Date Greeting with Quick Action Ribbon -->
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <div class="flex flex-col sm:flex-row sm:items-baseline gap-2">
+                <h1 class="text-[30px] sm:text-[36px] font-serif font-normal text-[#1a1a1a] tracking-tight leading-tight">
+                    {{ $resolvedGreetingDate }}
+                </h1>
+                <span class="text-[12px] text-[#8a8a8a] font-sans">
+                    Platform overview &middot; {{ $resolvedActiveFirms }} active of {{ $resolvedTotalFirms }} firms &middot; Practice Governance
+                </span>
+            </div>
+            <p class="text-[13px] text-[#646864] mt-0.5 font-sans">
+                {{ $resolvedPlatformName }} &middot; {{ $resolvedAdminName }} &middot; Platform Governance
+            </p>
         </div>
-        <p class="text-[13px] text-[#646864] mt-0.5 font-sans">
-            {{ $resolvedPlatformName }} &middot; {{ $resolvedAdminName }} &middot; Platform Governance
-        </p>
+        <div class="flex items-center gap-2.5 shrink-0">
+            <button type="button" @click="openCreateModal = true" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-[#23493a] text-white hover:bg-[#1a382c] text-xs font-semibold transition-colors shadow-xs cursor-pointer">
+                <span class="material-symbols-outlined text-[17px]">person_add</span>
+                <span>Add Client</span>
+            </button>
+            <a href="{{ route('admin.firms.index') }}" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-white border border-[#e5e3dc] text-[#1a1a1a] hover:bg-[#faf9f5] text-xs font-medium transition-colors shadow-xs">
+                <span class="material-symbols-outlined text-[16px] text-[#646864]">corporate_fare</span>
+                <span>Manage Firms</span>
+            </a>
+        </div>
     </div>
 
     <!-- 4 Core Metric Boxes (Exact boxes: 3 active firms, open matters, win cases, lost cases) -->
@@ -683,6 +697,12 @@
         <span>trust balance</span>
         <span>outstanding</span>
     </div>
+
+    @include('clients.partials.onboarding-modal', [
+        'firms' => $firms,
+        'attorneys' => $attorneys,
+        'redirectTo' => 'admin',
+    ])
 
 </div>
 @endsection

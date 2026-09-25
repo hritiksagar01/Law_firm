@@ -4,7 +4,11 @@
 @section('header_title', 'Clients')
 
 @section('content')
-<div class="space-y-6">
+@php
+    $firms = $firms ?? collect();
+    $attorneys = $attorneys ?? collect();
+@endphp
+<div x-data="clientOnboardingState({{ $firms->first()?->id ?? 1 }}, '')" class="space-y-6">
 
     <!-- Flash Notifications -->
     @if(session('success'))
@@ -28,6 +32,13 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">Clients &amp; Directory</h1>
+            <p class="text-xs text-[#5e625e] mt-1">Platform client registry and personnel directory</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <button type="button" @click="openCreateModal = true" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-[#23493a] text-white text-xs font-semibold hover:bg-[#1a382c] transition-colors shadow-xs cursor-pointer">
+                <span class="material-symbols-outlined text-[17px]">person_add</span>
+                <span>Add Client</span>
+            </button>
         </div>
     </div>
 
@@ -343,6 +354,12 @@
             </div>
         </form>
     </div>
+
+    @include('clients.partials.onboarding-modal', [
+        'firms' => $firms,
+        'attorneys' => $attorneys,
+        'redirectTo' => 'admin',
+    ])
 
 </div>
 @endsection

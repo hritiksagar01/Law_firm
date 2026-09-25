@@ -171,8 +171,8 @@ class ClientController extends Controller
     public function store(StoreClientRequest $request): RedirectResponse
     {
         $validated = $request->validated();
-        $firmId = Auth::user()->firm_id ?? 1;
-        $attorneyId = $validated['primary_attorney_id'] ?? Auth::id();
+        $firmId = $validated['firm_id'] ?? (Auth::user()->firm_id ?? 1);
+        $attorneyId = $validated['primary_attorney_id'] ?? (Auth::user()->firm_id ? Auth::id() : (User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate'])->value('id') ?? Auth::id()));
 
         // Determine client type legacy column
         $legacyType = in_array($validated['category'], ['corporate', 'institution', 'partnership'])
@@ -289,6 +289,12 @@ class ClientController extends Controller
                 Log::warning('Could not send portal invitation email: '.$e->getMessage());
             }
 
+            if ($request->input('redirect_to') === 'admin' || (Auth::check() && Auth::user()->isSuperAdmin() && ! $request->routeIs('clients.*'))) {
+                return redirect()->back()->with('success',
+                    "Client '{$client->name}' onboarded. Portal invitation dispatched to {$client->email}."
+                );
+            }
+
             return redirect()->route('clients.show', $client->id)->with('success',
                 "Client '{$client->name}' onboarded. Portal invitation dispatched to {$client->email}."
             );
@@ -296,6 +302,12 @@ class ClientController extends Controller
 
         // Assisted Offline Mode
         $client->update(['portal_status' => 'offline_only']);
+
+        if ($request->input('redirect_to') === 'admin' || (Auth::check() && Auth::user()->isSuperAdmin() && ! $request->routeIs('clients.*'))) {
+            return redirect()->back()->with('success',
+                "Client '{$client->name}' onboarded via Assisted Offline Intake. Chamber docket slip ready for printing."
+            );
+        }
 
         return redirect()->route('clients.show', $client->id)->with('success',
             "Client '{$client->name}' onboarded via Assisted Offline Intake. Chamber docket slip ready for printing."

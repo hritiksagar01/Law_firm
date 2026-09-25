@@ -78,8 +78,9 @@ class UserManagementController extends Controller
             ->withQueryString();
 
         $firms = Firm::orderBy('name')->get(['id', 'name', 'slug']);
+        $attorneys = User::whereIn('role', ['partner', 'associate', 'attorney'])->select(['id', 'name', 'role', 'firm_id'])->get();
 
-        return view('admin.users.index', compact('platformAdmins', 'firmAccounts', 'firms'));
+        return view('admin.users.index', compact('platformAdmins', 'firmAccounts', 'firms', 'attorneys'));
     }
 
     /**
