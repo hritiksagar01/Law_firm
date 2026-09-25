@@ -244,9 +244,9 @@
                         <span x-text="category === 'joint' ? '02 · Primary Litigant Particulars' : '02 · Basic Particulars'"></span>
                     </span>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
                         <div class="flex flex-col gap-1.5">
-                            <label class="text-[13px] font-medium text-[#1A1E1C]" x-text="category === 'corporate' || category === 'institution' ? 'Official Entity / Company Name' : (category === 'joint' ? 'Primary Litigant / Client Name' : 'Full Name')"></label>
+                            <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center" x-text="category === 'corporate' || category === 'institution' ? 'Official Entity / Company Name *' : (category === 'joint' ? 'Title & Primary Litigant Name *' : 'Title & Full Name *')"></label>
                             <div class="flex items-center gap-1.5">
                                 <select name="salutation" x-model="salutation" class="h-[40px] px-2 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] shrink-0 cursor-pointer">
                                     <option value="Mr.">Mr.</option>
@@ -264,12 +264,12 @@
 
                         <!-- Parentage for Individual & Joint OR Contact Person for Corporate -->
                         <div class="flex flex-col gap-1.5" x-show="category === 'individual' || category === 'joint'">
-                            <label class="text-[13px] font-medium text-[#1A1E1C]">Father's / Mother's / Husband's Name (Parentage / Spouse)</label>
+                            <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">Father's / Spouse's Name (S/o, D/o, W/o)</label>
                             <input name="father_husband_name" x-model="fatherHusbandName" type="text" placeholder="e.g. S/o Late Shri Jagdish Malhotra or W/o Rajesh Sharma" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                         </div>
 
                         <div class="flex flex-col gap-1.5" x-show="category === 'corporate' || category === 'institution'">
-                            <label class="text-[13px] font-medium text-[#1A1E1C]">Authorized Signatory / Contact Person Name</label>
+                            <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">Authorized Contact Person Name</label>
                             <input name="contact_person" x-model="contactPerson" type="text" placeholder="e.g. Vikram Malhotra (Managing Director)" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                         </div>
                     </div>

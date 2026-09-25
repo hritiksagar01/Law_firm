@@ -404,9 +404,9 @@
                 </div>
 
                 <!-- Step 3: Entity Primary Name & Contact -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-start">
                     <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]" x-text="entityType === 'corporate' || entityType === 'institution' ? 'Entity / Organization Legal Name *' : 'Primary Litigant Full Name *'"></label>
+                        <label class="font-semibold text-[#1a1a1a] min-h-[20px] flex items-center" x-text="entityType === 'corporate' || entityType === 'institution' ? 'Entity / Organization Legal Name *' : 'Title & Primary Litigant Name *'"></label>
                         <div class="flex items-center gap-1.5">
                             <select name="salutation" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none shrink-0 cursor-pointer">
                                 <option value="Mr.">Mr.</option>
@@ -423,16 +423,16 @@
                         </div>
                     </div>
 
-                    <!-- Individual Parentage: Father/Husband Name (Court Memo Standard) -->
+                    <!-- Individual Parentage: Father/Mother/Husband Name -->
                     <div class="flex flex-col gap-1" x-show="entityType === 'individual' || entityType === 'joint'">
-                        <label class="font-semibold text-[#1a1a1a]">Father's / Husband's / Mother's Name (Court Standard)</label>
-                        <input name="father_husband_name" type="text" placeholder="e.g. S/o Late Shri Jagdish Sharma"
+                        <label class="font-semibold text-[#1a1a1a] min-h-[20px] flex items-center">Father's / Spouse's Name (S/o, D/o, W/o)</label>
+                        <input name="father_husband_name" type="text" placeholder="e.g. S/o Late Shri Jagdish Sharma or W/o Rajesh Sharma"
                                class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
                     </div>
 
                     <!-- Corporate Authorized Signatory Contact -->
                     <div class="flex flex-col gap-1" x-show="entityType === 'corporate' || entityType === 'institution'">
-                        <label class="font-semibold text-[#1a1a1a]">Authorized Signatory / Contact Person *</label>
+                        <label class="font-semibold text-[#1a1a1a] min-h-[20px] flex items-center">Authorized Signatory / Contact Person *</label>
                         <input name="contact_person" type="text" placeholder="e.g. Vikram Malhotra, Managing Director"
                                class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
                     </div>
