@@ -98,6 +98,62 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
+    public function showClientRegisterForm()
+    {
+        if (Auth::check()) {
+            return Auth::user()->isClient()
+                ? redirect()->route('portal.dashboard')
+                : redirect()->route('dashboard');
+        }
+
+        $firms = Firm::select('id', 'name')->orderBy('name')->get();
+
+        return view('auth.register-client', compact('firms'));
+    }
+
+    public function registerClient(Request $request)
+    {
+        $validated = $request->validate([
+            'category' => 'required|in:individual,joint,corporate,institution,partnership,proprietorship',
+            'firm_id' => 'required|exists:firms,id',
+            'name' => 'required|string|max:255',
+            'contact_person' => 'nullable|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'phone' => 'required|string|max:50',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::create([
+            'firm_id' => $validated['firm_id'],
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => 'client',
+            'title' => in_array($validated['category'], ['corporate', 'institution']) ? 'Authorized Corporate Representative' : 'Individual Retainer Client',
+            'phone' => $validated['phone'],
+            'avatar_url' => 'https://ui-avatars.com/api/?name='.urlencode($validated['name']).'&background=23493A&color=fff',
+        ]);
+
+        Client::create([
+            'firm_id' => $validated['firm_id'],
+            'user_id' => $user->id,
+            'category' => $validated['category'],
+            'type' => in_array($validated['category'], ['corporate', 'institution']) ? 'corporate' : 'individual',
+            'name' => $validated['name'],
+            'contact_person' => $validated['contact_person'] ?? $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'onboarding_mode' => 'portal_online',
+            'portal_status' => 'active',
+            'status' => 'active',
+        ]);
+
+        Auth::login($user);
+
+        return redirect()->route('portal.dashboard')
+            ->with('success', "Welcome to your Client Portal, {$user->name}. Your account has been registered successfully.");
+    }
+
     public function register(Request $request)
     {
         $validated = $request->validate([

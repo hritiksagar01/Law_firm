@@ -265,18 +265,35 @@
                 </div>
             </div>
 
-            <!-- Advocate / Law Practice Prompt: Visible when Advocate is selected -->
-            <div x-show="tab === 'firm'" x-cloak class="mt-4 pt-4 border-t border-[#E7E4DC] flex items-center justify-between gap-3">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[#23493A] text-lg">domain_add</span>
+            <!-- Law Firm & Advocate Registration Prompt -->
+            <div x-show="tab === 'firm'" class="mt-4 pt-3.5 border-t border-[#E7E4DC] flex items-center justify-between gap-3 bg-[#23493A]/5 p-3.5 rounded-lg border border-[#23493A]/15">
+                <div class="flex items-center gap-2.5">
+                    <span class="material-symbols-outlined text-[#23493A] text-xl">domain_add</span>
                     <div class="flex flex-col">
                         <span class="text-xs font-semibold text-[#1A1E1C]">New law firm or advocate?</span>
-                        <span class="text-[11px] text-[#646864]">Establish chambers or practice</span>
+                        <span class="text-[11px] text-[#646864]">Establish chambers &amp; practice</span>
                     </div>
                 </div>
                 <a href="{{ route('register') }}"
-                    class="py-1.5 px-3 rounded-[6px] bg-[#23493A] text-white text-xs font-semibold hover:bg-[#1B3B2F] transition-colors shrink-0 shadow-xs">
-                    Register Now
+                    class="py-1.5 px-3 rounded-[6px] bg-[#23493A] hover:bg-[#1B3B2F] text-white text-xs font-semibold transition-all shrink-0 shadow-xs flex items-center gap-1 cursor-pointer">
+                    <span>Register Now</span>
+                    <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                </a>
+            </div>
+
+            <!-- Client Portal Registration Prompt -->
+            <div x-show="tab === 'client'" class="mt-4 pt-3.5 border-t border-[#E7E4DC] flex items-center justify-between gap-3 bg-[#23493A]/5 p-3.5 rounded-lg border border-[#23493A]/15">
+                <div class="flex items-center gap-2.5">
+                    <span class="material-symbols-outlined text-[#23493A] text-xl">person_add</span>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-semibold text-[#1A1E1C]">New client?</span>
+                        <span class="text-[11px] text-[#646864]">Register for client portal access</span>
+                    </div>
+                </div>
+                <a href="{{ route('register.client') }}"
+                    class="py-1.5 px-3 rounded-[6px] bg-[#23493A] hover:bg-[#1B3B2F] text-white text-xs font-semibold transition-all shrink-0 shadow-xs flex items-center gap-1 cursor-pointer">
+                    <span>Register Now</span>
+                    <span class="material-symbols-outlined text-xs">arrow_forward</span>
                 </a>
             </div>
 

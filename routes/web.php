@@ -62,6 +62,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+    Route::get('/register/client', [AuthController::class, 'showClientRegisterForm'])->name('register.client');
+    Route::post('/register/client', [AuthController::class, 'registerClient']);
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
     Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
     Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
