@@ -107,7 +107,7 @@ class ClientRegistrationTest extends TestCase
         ]);
     }
 
-    public function test_client_registration_supports_age_and_country_code(): void
+    public function test_client_registration_supports_demographics_and_digital_literacy(): void
     {
         $firm = Firm::create([
             'name' => 'Sharma & Associates',
@@ -117,12 +117,15 @@ class ClientRegistrationTest extends TestCase
 
         $response = $this->post('/register/client', [
             'category' => 'individual',
+            'onboarding_mode' => 'assisted_offline',
             'firm_id' => $firm->id,
             'name' => 'John Smith',
             'contact_person' => 'John Smith',
             'email' => 'john.us@example.com',
             'phone' => '+1 2025550143',
             'age' => 36,
+            'gender' => 'male',
+            'occupation' => 'Architect',
             'password' => '123456',
             'password_confirmation' => '123456',
         ]);
@@ -135,6 +138,9 @@ class ClientRegistrationTest extends TestCase
             'name' => 'John Smith',
             'phone' => '+1 2025550143',
             'age' => 36,
+            'gender' => 'male',
+            'occupation' => 'Architect',
+            'onboarding_mode' => 'assisted_offline',
         ]);
     }
 }

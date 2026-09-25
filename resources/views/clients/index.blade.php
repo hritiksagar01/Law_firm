@@ -447,20 +447,25 @@
                         <span>Indian Statutory KYC &amp; Identification</span>
                     </h4>
 
-                    <!-- Individual KYC: Age, Gender, PAN & Masked Aadhaar -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3" x-show="entityType === 'individual' || entityType === 'joint'">
+                    <!-- Individual KYC: Age, Gender, Occupation, PAN & Masked Aadhaar -->
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-3" x-show="entityType === 'individual' || entityType === 'joint'">
                         <div class="flex flex-col gap-1">
                             <label class="font-semibold text-[#1a1a1a]">Age / Gender</label>
                             <div class="grid grid-cols-2 gap-1.5">
                                 <input name="age" type="number" min="0" max="120" placeholder="Age"
                                        class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                                <select name="gender" class="h-9 px-1.5 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                                <select name="gender" class="h-9 px-1 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
                                     <option value="">Gender</option>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
                                     <option value="other">Other</option>
                                 </select>
                             </div>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="font-semibold text-[#1a1a1a]">Occupation / Vocation</label>
+                            <input name="occupation" type="text" placeholder="e.g. Business / Service"
+                                   class="h-9 px-2.5 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="font-semibold text-[#1a1a1a]">PAN (10 Chars)</label>

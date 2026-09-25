@@ -1026,11 +1026,27 @@
                     </div>
                 </div>
 
-                <!-- Client Age -->
-                <div class="flex flex-col gap-1">
-                    <label class="font-semibold text-[#1a1a1a]">Age (Years)</label>
-                    <input name="age" value="{{ $client->age }}" type="number" min="0" max="120" placeholder="e.g. 35"
-                           class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#1a1a1a]"/>
+                <!-- Client Demographics: Age, Gender, Occupation -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Age (Years)</label>
+                        <input name="age" value="{{ $client->age }}" type="number" min="0" max="120" placeholder="e.g. 35"
+                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#1a1a1a]"/>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Gender</label>
+                        <select name="gender" class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]">
+                            <option value="">Select Gender</option>
+                            <option value="male" {{ $client->gender === 'male' ? 'selected' : '' }}>Male</option>
+                            <option value="female" {{ $client->gender === 'female' ? 'selected' : '' }}>Female</option>
+                            <option value="other" {{ $client->gender === 'other' ? 'selected' : '' }}>Other</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Occupation / Profession</label>
+                        <input name="occupation" value="{{ $client->occupation }}" type="text" placeholder="e.g. Business / Salaried"
+                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">

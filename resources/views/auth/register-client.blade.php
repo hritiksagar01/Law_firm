@@ -24,6 +24,8 @@
         countryCode: '+91',
         phoneRaw: '9876543210',
         age: 38,
+        gender: 'male',
+        occupation: 'Business & Commercial',
         members: [],
         addMember() {
             this.members.push({ name: '', relationship: 'Co-petitioner', phone: '', email: '' });
@@ -43,6 +45,8 @@
                 this.countryCode = '+91';
                 this.phoneRaw = '9811099887';
                 this.age = 41;
+                this.gender = 'male';
+                this.occupation = 'Property Owner & Business';
                 this.members = [
                     { name: 'Rajesh Sharma', relationship: 'Co-petitioner / Co-owner', phone: '+91 98765 11223', email: 'rajesh.sharma@gmail.com' },
                     { name: 'Sanjay Malhotra', relationship: 'Co-litigant / Relative', phone: '+91 98100 44556', email: 'sanjay.m@gmail.com' }
@@ -56,6 +60,8 @@
                 this.countryCode = '+91';
                 this.phoneRaw = '9810077665';
                 this.age = 56;
+                this.gender = 'male';
+                this.occupation = 'Agriculture / Self-Employed';
                 this.members = [];
             } else {
                 this.category = 'individual';
@@ -66,6 +72,8 @@
                 this.countryCode = '+91';
                 this.phoneRaw = '9876543210';
                 this.age = 38;
+                this.gender = 'male';
+                this.occupation = 'Business & Commercial';
                 this.members = [];
             }
             this.passcode = ['1', '2', '3', '4', '5', '6'];
@@ -260,10 +268,26 @@
                         </div>
                     </div>
 
-                    <!-- Client Age (Years) -->
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[13px] font-medium text-[#1A1E1C]">Age (Years)</label>
-                        <input name="age" x-model="age" type="number" min="0" max="130" placeholder="e.g. 35" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs font-mono text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                    <!-- Demographics: Age, Gender & Occupation -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-medium text-[#1A1E1C]">Age (Years)</label>
+                            <input name="age" x-model="age" type="number" min="0" max="130" placeholder="e.g. 35" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs font-mono text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                        </div>
+
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-medium text-[#1A1E1C]">Gender</label>
+                            <select name="gender" x-model="gender" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-medium text-[#1A1E1C]">Occupation / Vocation</label>
+                            <input name="occupation" x-model="occupation" type="text" placeholder="e.g. Business / Salaried" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                        </div>
                     </div>
                 </div>
 
