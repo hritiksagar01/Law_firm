@@ -54,7 +54,6 @@
                     <th class="py-3 px-4 font-medium">Client</th>
                     <th class="py-3 px-4 font-medium">Stage</th>
                     <th class="py-3 px-4 font-medium">Lead Attorney</th>
-                    <th class="py-3 px-4 font-medium text-right">Budget &amp; Billed</th>
                     <th class="py-3 px-4 font-medium text-center">Action</th>
                 </tr>
             </thead>
@@ -97,12 +96,6 @@
                             <span class="text-xs text-[#1a1a1a]">{{ $matter->leadAttorney?->name ?? 'Unassigned' }}</span>
                         </div>
                     </td>
-                    <td class="py-3.5 px-4 text-right">
-                        <div class="flex flex-col items-end">
-                            <span class="font-mono text-xs font-semibold text-[#1a1a1a]">{{ config('legal.currency_symbol', '₹') }}{{ number_format($matter->totalBilledAmount(), 2) }}</span>
-                            <span class="font-mono text-[11px] text-[#8a8a8a]">of {{ config('legal.currency_symbol', '₹') }}{{ number_format($matter->budget, 0) }}</span>
-                        </div>
-                    </td>
                     <td class="py-3.5 px-4 text-center">
                         <a href="{{ route('matters.show', $matter->id) }}" class="inline-flex items-center gap-1 text-[12px] font-medium text-[#23493a] hover:underline">
                             <span>Open</span>
@@ -112,7 +105,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="py-8 text-center text-[#8a8a8a] text-xs">
+                    <td colspan="6" class="py-8 text-center text-[#8a8a8a] text-xs">
                         No matter dossiers found matching query.
                     </td>
                 </tr>
