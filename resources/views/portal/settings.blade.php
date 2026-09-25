@@ -131,9 +131,51 @@
                 <form action="{{ route('portal.settings.update') }}" method="POST" class="flex flex-col gap-4 text-xs">
                     @csrf
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="flex flex-col gap-1.5">
+                        <div class="flex flex-col gap-1.5" x-data="{
+                            countryCode: '+91',
+                            phoneRaw: '',
+                            init() {
+                                const full = '{{ old('phone', $client->phone) }}'.trim();
+                                const codes = ['+971', '+880', '+977', '+966', '+965', '+968', '+973', '+94', '+91', '+44', '+61', '+65', '+49', '+33', '+81', '+1'];
+                                let found = false;
+                                for (const c of codes) {
+                                    if (full.startsWith(c)) {
+                                        this.countryCode = c;
+                                        this.phoneRaw = full.substring(c.length).trim();
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if (!found) {
+                                    this.phoneRaw = full;
+                                }
+                            },
+                            get fullPhone() { return (this.countryCode + ' ' + this.phoneRaw).trim(); }
+                        }">
                             <label class="font-semibold text-[#1a1a1a]">Primary Telephone / Mobile</label>
-                            <input type="text" name="phone" value="{{ old('phone', $client->phone) }}" class="h-10 px-3 rounded-md border border-[#e5e3dc] bg-white text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                            <input type="hidden" name="phone" :value="fullPhone"/>
+                            <div class="flex items-center gap-1.5">
+                                <select x-model="countryCode" class="h-10 px-2 rounded-md border border-[#e5e3dc] bg-white font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                                    <option value="+91">🇮🇳 +91</option>
+                                    <option value="+1">🇺🇸 +1</option>
+                                    <option value="+44">🇬🇧 +44</option>
+                                    <option value="+971">🇦🇪 +971</option>
+                                    <option value="+61">🇦🇺 +61</option>
+                                    <option value="+65">🇸🇬 +65</option>
+                                    <option value="+49">🇩🇪 +49</option>
+                                    <option value="+33">🇫🇷 +33</option>
+                                    <option value="+81">🇯🇵 +81</option>
+                                    <option value="+966">🇸🇦 +966</option>
+                                    <option value="+974">🇶🇦 +974</option>
+                                    <option value="+965">🇰🇼 +965</option>
+                                    <option value="+968">🇴🇲 +968</option>
+                                    <option value="+973">🇧🇭 +973</option>
+                                    <option value="+880">🇧🇩 +880</option>
+                                    <option value="+977">🇳🇵 +977</option>
+                                    <option value="+94">🇱🇰 +94</option>
+                                </select>
+                                <input type="text" x-model="phoneRaw" placeholder="98100 12345" class="w-full h-10 px-3 rounded-md border border-[#e5e3dc] bg-white font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                            </div>
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <label class="font-semibold text-[#1a1a1a]">Registered Email (Authentication)</label>

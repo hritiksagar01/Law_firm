@@ -977,10 +977,78 @@
                         <input name="email" value="{{ $client->email }}" type="email"
                                class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
                     </div>
-                    <div class="flex flex-col gap-1">
+                    <div class="flex flex-col gap-1" x-data="{
+                        countryCode: '+91',
+                        phoneRaw: '',
+                        init() {
+                            const full = '{{ $client->phone }}'.trim();
+                            const codes = ['+971', '+880', '+977', '+966', '+965', '+968', '+973', '+94', '+91', '+44', '+61', '+65', '+49', '+33', '+81', '+1'];
+                            let found = false;
+                            for (const c of codes) {
+                                if (full.startsWith(c)) {
+                                    this.countryCode = c;
+                                    this.phoneRaw = full.substring(c.length).trim();
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                this.phoneRaw = full;
+                            }
+                        },
+                        get fullPhone() { return (this.countryCode + ' ' + this.phoneRaw).trim(); }
+                    }">
                         <label class="font-semibold text-[#1a1a1a]">Mobile / WhatsApp Phone</label>
-                        <input name="phone" value="{{ $client->phone }}" type="text"
+                        <input type="hidden" name="phone" :value="fullPhone"/>
+                        <div class="flex items-center gap-1.5">
+                            <select x-model="countryCode" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                                <option value="+91">🇮🇳 +91</option>
+                                <option value="+1">🇺🇸 +1</option>
+                                <option value="+44">🇬🇧 +44</option>
+                                <option value="+971">🇦🇪 +971</option>
+                                <option value="+61">🇦🇺 +61</option>
+                                <option value="+65">🇸🇬 +65</option>
+                                <option value="+49">🇩🇪 +49</option>
+                                <option value="+33">🇫🇷 +33</option>
+                                <option value="+81">🇯🇵 +81</option>
+                                <option value="+966">🇸🇦 +966</option>
+                                <option value="+974">🇶🇦 +974</option>
+                                <option value="+965">🇰🇼 +965</option>
+                                <option value="+968">🇴🇲 +968</option>
+                                <option value="+973">🇧🇭 +973</option>
+                                <option value="+880">🇧🇩 +880</option>
+                                <option value="+977">🇳🇵 +977</option>
+                                <option value="+94">🇱🇰 +94</option>
+                            </select>
+                            <input x-model="phoneRaw" type="text" placeholder="98100 12345"
+                                   class="w-full h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date of Birth & Age Row -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" x-data="{
+                    dob: '{{ $client->date_of_birth ? $client->date_of_birth->format('Y-m-d') : '' }}',
+                    age: '{{ $client->age ?? '' }}',
+                    calcAge() {
+                        if (!this.dob) return;
+                        const birth = new Date(this.dob);
+                        const today = new Date();
+                        let diff = today.getFullYear() - birth.getFullYear();
+                        const m = today.getMonth() - birth.getMonth();
+                        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) diff--;
+                        this.age = Math.max(0, diff);
+                    }
+                }">
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Date of Birth</label>
+                        <input name="date_of_birth" x-model="dob" @change="calcAge()" type="date"
                                class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Age (Years)</label>
+                        <input name="age" x-model="age" type="number" min="0" max="120" placeholder="e.g. 35"
+                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#1a1a1a]"/>
                     </div>
                 </div>
 

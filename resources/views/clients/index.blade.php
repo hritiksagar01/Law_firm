@@ -405,12 +405,38 @@
                                class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
                     </div>
 
-                    <div class="flex flex-col gap-1">
+                    <div class="flex flex-col gap-1" x-data="{
+                        countryCode: '+91',
+                        phoneRaw: '',
+                        get fullPhone() { return (this.countryCode + ' ' + this.phoneRaw).trim(); }
+                    }">
                         <label class="font-semibold text-[#1a1a1a]">
                             Mobile / WhatsApp Phone Number <span x-show="onboardingMode === 'assisted_offline'" class="text-red-500">*</span>
                         </label>
-                        <input name="phone" :required="onboardingMode === 'assisted_offline'" type="text" placeholder="+91 98100 12345"
-                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                        <input type="hidden" name="phone" :value="fullPhone"/>
+                        <div class="flex items-center gap-1.5">
+                            <select x-model="countryCode" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                                <option value="+91">🇮🇳 +91</option>
+                                <option value="+1">🇺🇸 +1</option>
+                                <option value="+44">🇬🇧 +44</option>
+                                <option value="+971">🇦🇪 +971</option>
+                                <option value="+61">🇦🇺 +61</option>
+                                <option value="+65">🇸🇬 +65</option>
+                                <option value="+49">🇩🇪 +49</option>
+                                <option value="+33">🇫🇷 +33</option>
+                                <option value="+81">🇯🇵 +81</option>
+                                <option value="+966">🇸🇦 +966</option>
+                                <option value="+974">🇶🇦 +974</option>
+                                <option value="+965">🇰🇼 +965</option>
+                                <option value="+968">🇴🇲 +968</option>
+                                <option value="+973">🇧🇭 +973</option>
+                                <option value="+880">🇧🇩 +880</option>
+                                <option value="+977">🇳🇵 +977</option>
+                                <option value="+94">🇱🇰 +94</option>
+                            </select>
+                            <input x-model="phoneRaw" :required="onboardingMode === 'assisted_offline'" type="text" placeholder="98100 12345"
+                                   class="w-full h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                        </div>
                     </div>
                 </div>
 
@@ -421,30 +447,48 @@
                         <span>Indian Statutory KYC &amp; Identification</span>
                     </h4>
 
-                    <!-- Individual KYC: PAN & Masked Aadhaar -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mb-3" x-show="entityType === 'individual' || entityType === 'joint'">
+                    <!-- Individual KYC: DOB, Age, Gender, PAN & Masked Aadhaar -->
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-3" x-show="entityType === 'individual' || entityType === 'joint'"
+                         x-data="{
+                             dob: '',
+                             age: '',
+                             calcAge() {
+                                 if (!this.dob) return;
+                                 const birth = new Date(this.dob);
+                                 const today = new Date();
+                                 let diff = today.getFullYear() - birth.getFullYear();
+                                 const m = today.getMonth() - birth.getMonth();
+                                 if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) diff--;
+                                 this.age = Math.max(0, diff);
+                             }
+                         }">
                         <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#1a1a1a]">PAN (10 Characters)</label>
-                            <input name="pan" type="text" maxlength="10" placeholder="ABCDE1234F" style="text-transform: uppercase;"
-                                   class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#1a1a1a]">Aadhaar Last 4 Digits (UIDAI Norms)</label>
-                            <input name="aadhaar_last_four" type="text" maxlength="4" placeholder="4321"
-                                   class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                            <label class="font-semibold text-[#1a1a1a]">Date of Birth</label>
+                            <input name="date_of_birth" x-model="dob" @change="calcAge()" type="date"
+                                   class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="font-semibold text-[#1a1a1a]">Age / Gender</label>
-                            <div class="grid grid-cols-2 gap-1.5">
-                                <input name="age" type="number" min="1" max="120" placeholder="Age"
-                                       class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                                <select name="gender" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                            <div class="grid grid-cols-2 gap-1">
+                                <input name="age" x-model="age" type="number" min="0" max="120" placeholder="Age"
+                                       class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                                <select name="gender" class="h-9 px-1.5 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
                                     <option value="">Gender</option>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
                                     <option value="other">Other</option>
                                 </select>
                             </div>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="font-semibold text-[#1a1a1a]">PAN (10 Chars)</label>
+                            <input name="pan" type="text" maxlength="10" placeholder="ABCDE1234F" style="text-transform: uppercase;"
+                                   class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="font-semibold text-[#1a1a1a]">Aadhaar Last 4</label>
+                            <input name="aadhaar_last_four" type="text" maxlength="4" placeholder="4321"
+                                   class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
                         </div>
                     </div>
 

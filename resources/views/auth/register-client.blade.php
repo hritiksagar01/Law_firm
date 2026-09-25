@@ -21,7 +21,21 @@
         name: 'Vikram Malhotra',
         contactPerson: 'Vikram Malhotra',
         email: 'vikram.client@gmail.com',
-        phone: '+91 98765 43210',
+        countryCode: '+91',
+        phoneRaw: '9876543210',
+        dob: '1988-06-15',
+        age: 38,
+        calculateAge() {
+            if (!this.dob) return;
+            const birthDate = new Date(this.dob);
+            const today = new Date();
+            let calculatedAge = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                calculatedAge--;
+            }
+            this.age = Math.max(0, calculatedAge);
+        },
         members: [],
         addMember() {
             this.members.push({ name: '', relationship: 'Co-petitioner', phone: '', email: '' });
@@ -38,7 +52,10 @@
                 this.name = 'Vikram & Rajesh (Joint Litigants)';
                 this.contactPerson = 'Vikram Malhotra (Primary Litigant)';
                 this.email = 'joint.litigants@gmail.com';
-                this.phone = '+91 98110 99887';
+                this.countryCode = '+91';
+                this.phoneRaw = '9811099887';
+                this.dob = '1985-08-20';
+                this.calculateAge();
                 this.members = [
                     { name: 'Rajesh Sharma', relationship: 'Co-petitioner / Co-owner', phone: '+91 98765 11223', email: 'rajesh.sharma@gmail.com' },
                     { name: 'Sanjay Malhotra', relationship: 'Co-litigant / Relative', phone: '+91 98100 44556', email: 'sanjay.m@gmail.com' }
@@ -49,7 +66,10 @@
                 this.name = 'Chandra Sekhar (Assisted Intake)';
                 this.contactPerson = 'Chandra Sekhar';
                 this.email = 'chandra.assisted@gmail.com';
-                this.phone = '+91 98100 77665';
+                this.countryCode = '+91';
+                this.phoneRaw = '9810077665';
+                this.dob = '1970-03-12';
+                this.calculateAge();
                 this.members = [];
             } else {
                 this.category = 'individual';
@@ -57,7 +77,10 @@
                 this.name = 'Vikram Malhotra';
                 this.contactPerson = 'Vikram Malhotra';
                 this.email = 'vikram.client@gmail.com';
-                this.phone = '+91 98765 43210';
+                this.countryCode = '+91';
+                this.phoneRaw = '9876543210';
+                this.dob = '1988-06-15';
+                this.calculateAge();
                 this.members = [];
             }
             this.passcode = ['1', '2', '3', '4', '5', '6'];
@@ -155,6 +178,7 @@
             <form action="{{ route('register.client') }}" method="POST" class="flex flex-col gap-4">
                 @csrf
                 <input type="hidden" name="firm_id" :value="firmId"/>
+                <input type="hidden" name="phone" :value="countryCode + ' ' + phoneRaw"/>
 
                 <!-- Step 1: Client Category & Communication Preference -->
                 <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
@@ -198,7 +222,7 @@
                     </div>
                 </div>
 
-                <!-- Step 2: Primary Client Information -->
+                <!-- Step 2: Primary Client Information (Includes Country Code, DOB & Age) -->
                 <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
                     <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-sm text-[#23493A]">person</span>
@@ -223,9 +247,44 @@
                             <input name="email" x-model="email" type="email" required placeholder="name@domain.com" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                         </div>
 
+                        <!-- Country Code & Phone Input -->
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[13px] font-medium text-[#1A1E1C]">Mobile Contact Number</label>
-                            <input name="phone" x-model="phone" type="text" required placeholder="+91 98765 43210" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                            <div class="flex items-center gap-1.5">
+                                <select x-model="countryCode" class="h-[40px] px-2 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] font-mono outline-none focus:border-[#23493A]">
+                                    <option value="+91">🇮🇳 +91 (IN)</option>
+                                    <option value="+1">🇺🇸 +1 (US/CA)</option>
+                                    <option value="+44">🇬🇧 +44 (UK)</option>
+                                    <option value="+971">🇦🇪 +971 (UAE)</option>
+                                    <option value="+61">🇦🇺 +61 (AU)</option>
+                                    <option value="+65">🇸🇬 +65 (SG)</option>
+                                    <option value="+49">🇩🇪 +49 (DE)</option>
+                                    <option value="+33">🇫🇷 +33 (FR)</option>
+                                    <option value="+81">🇯🇵 +81 (JP)</option>
+                                    <option value="+966">🇸🇦 +966 (SA)</option>
+                                    <option value="+974">🇶🇦 +974 (QA)</option>
+                                    <option value="+965">🇰🇼 +965 (KW)</option>
+                                    <option value="+968">🇴🇲 +968 (OM)</option>
+                                    <option value="+973">🇧🇭 +973 (BH)</option>
+                                    <option value="+880">🇧🇩 +880 (BD)</option>
+                                    <option value="+977">🇳🇵 +977 (NP)</option>
+                                    <option value="+94">🇱🇰 +94 (LK)</option>
+                                </select>
+                                <input x-model="phoneRaw" type="text" required placeholder="9876543210" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs font-mono text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Date of Birth & Age Row -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-medium text-[#1A1E1C]">Date of Birth</label>
+                            <input name="date_of_birth" x-model="dob" @change="calculateAge()" type="date" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                        </div>
+
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-medium text-[#1A1E1C]">Age (Years)</label>
+                            <input name="age" x-model="age" type="number" min="0" max="130" placeholder="e.g. 35" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs font-mono text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                         </div>
                     </div>
                 </div>

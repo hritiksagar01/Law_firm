@@ -106,4 +106,37 @@ class ClientRegistrationTest extends TestCase
             'relationship' => 'Co-litigant',
         ]);
     }
+
+    public function test_client_registration_supports_dob_age_and_country_code(): void
+    {
+        $firm = Firm::create([
+            'name' => 'Sharma & Associates',
+            'slug' => 'sharma-associates-4',
+            'email' => 'info4@sharmalegal.in',
+        ]);
+
+        $response = $this->post('/register/client', [
+            'category' => 'individual',
+            'firm_id' => $firm->id,
+            'name' => 'John Smith',
+            'contact_person' => 'John Smith',
+            'email' => 'john.us@example.com',
+            'phone' => '+1 2025550143',
+            'date_of_birth' => '1990-05-15',
+            'age' => 36,
+            'password' => '123456',
+            'password_confirmation' => '123456',
+        ]);
+
+        $response->assertRedirect('/portal/dashboard');
+        $this->assertAuthenticated();
+
+        $this->assertDatabaseHas('clients', [
+            'email' => 'john.us@example.com',
+            'name' => 'John Smith',
+            'phone' => '+1 2025550143',
+            'date_of_birth' => '1990-05-15 00:00:00',
+            'age' => 36,
+        ]);
+    }
 }
