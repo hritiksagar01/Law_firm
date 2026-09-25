@@ -423,10 +423,10 @@
                         </div>
                     </div>
 
-                    <!-- Individual Parentage: Father/Mother/Husband Name -->
+                    <!-- Individual Parentage: Father/Mother Name -->
                     <div class="flex flex-col gap-1" x-show="entityType === 'individual' || entityType === 'joint'">
-                        <label class="font-semibold text-[#1a1a1a] min-h-[20px] flex items-center">Father's / Spouse's Name (S/o, D/o, W/o)</label>
-                        <input name="father_husband_name" type="text" placeholder="e.g. S/o Late Shri Jagdish Sharma or W/o Rajesh Sharma"
+                        <label class="font-semibold text-[#1a1a1a] min-h-[20px] flex items-center">Father's / Mother's Name</label>
+                        <input name="father_husband_name" type="text" placeholder="e.g. S/o Late Shri Jagdish Sharma or D/o Smt. Sunita Sharma"
                                class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
                     </div>
 

@@ -264,8 +264,8 @@
 
                         <!-- Parentage for Individual & Joint OR Contact Person for Corporate -->
                         <div class="flex flex-col gap-1.5" x-show="category === 'individual' || category === 'joint'">
-                            <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">Father's / Spouse's Name (S/o, D/o, W/o)</label>
-                            <input name="father_husband_name" x-model="fatherHusbandName" type="text" placeholder="e.g. S/o Late Shri Jagdish Malhotra or W/o Rajesh Sharma" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                            <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">Father's / Mother's Name</label>
+                            <input name="father_husband_name" x-model="fatherHusbandName" type="text" placeholder="e.g. S/o Late Shri Jagdish Malhotra or D/o Smt. Sunita Sharma" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                         </div>
 
                         <div class="flex flex-col gap-1.5" x-show="category === 'corporate' || category === 'institution'">
