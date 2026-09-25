@@ -39,8 +39,8 @@
         </p>
     </div>
 
-    <!-- Top 4 Connected Metric Ribbon (Super Admin Design Standard) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border border-[#e5e3dc] bg-white rounded-md divide-y sm:divide-y-0 sm:divide-x divide-[#e5e3dc] shadow-xs mb-8">
+    <!-- Top 3 Connected Metric Ribbon (Super Admin Design Standard) -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 border border-[#e5e3dc] bg-white rounded-md divide-y sm:divide-y-0 sm:divide-x divide-[#e5e3dc] shadow-xs mb-8">
         <!-- Open matters -->
         <a href="{{ route('matters.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
             <div class="text-[12.5px] text-[#646864]">Open matters</div>
@@ -65,20 +65,6 @@
             <div class="text-[12.5px] text-[#646864]">Uploads to review</div>
             <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ $uploadsToReviewCount }}</div>
             <div class="text-[12px] text-[#8a8a8a] mt-1">Client documents pending</div>
-        </a>
-
-        <!-- Outstanding amount -->
-        <a href="{{ route('billing.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
-            <div class="text-[12.5px] text-[#646864]">Outstanding receivables</div>
-            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1 font-mono">
-                {{ $currencySymbol }}{{ number_format($outstandingAmount, 2) }}
-            </div>
-            <div class="text-[12px] text-[#8a8a8a] mt-1">
-                @if($overdueAmount > 0)
-                    <span class="text-[#ba1a1a] font-medium">{{ $currencySymbol }}{{ number_format($overdueAmount, 2) }} overdue</span> &middot; 
-                @endif
-                outstanding balance awaiting settlement
-            </div>
         </a>
     </div>
 

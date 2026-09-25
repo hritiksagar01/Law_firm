@@ -38,7 +38,7 @@ class LawFirmDashboardTest extends TestCase
         $response->assertSee('Recent activity on your matters');
         $response->assertSee('Next two weeks');
         $response->assertSee('open matter');
-        $response->assertSee('outstanding');
+        $response->assertDontSee('outstanding receivables');
         $response->assertDontSee('Quire Legal Practice');
     }
 

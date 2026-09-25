@@ -13,10 +13,26 @@
     $todayDay = (int) now()->format('j');
     $daysInMonth = now()->daysInMonth;
     $firstDayOfWeek = (int) now()->startOfMonth()->format('w'); // 0 (Sun) to 6 (Sat)
+
+    $startThisWeek = now()->startOfWeek();
+    $endThisWeek = now()->endOfWeek();
+    $startPrevWeek = now()->copy()->subWeek()->startOfWeek();
+    $endPrevWeek = now()->copy()->subWeek()->endOfWeek();
+    $startNextWeek = now()->copy()->addWeek()->startOfWeek();
+    $endNextWeek = now()->copy()->addWeek()->endOfWeek();
+
+    $eventsPrevCount = $events->filter(fn($e) => $e->start_time >= $startPrevWeek && $e->start_time <= $endPrevWeek)->count();
+    $eventsThisCount = $events->filter(fn($e) => $e->start_time >= $startThisWeek && $e->start_time <= $endThisWeek)->count();
+    $eventsNextCount = $events->filter(fn($e) => $e->start_time >= $startNextWeek && $e->start_time <= $endNextWeek)->count();
+
+    $aptsPrevCount = $appointments->filter(fn($a) => $a->scheduled_at >= $startPrevWeek && $a->scheduled_at <= $endPrevWeek)->count();
+    $aptsThisCount = $appointments->filter(fn($a) => $a->scheduled_at >= $startThisWeek && $a->scheduled_at <= $endThisWeek)->count();
+    $aptsNextCount = $appointments->filter(fn($a) => $a->scheduled_at >= $startNextWeek && $a->scheduled_at <= $endNextWeek)->count();
 @endphp
 
 <div x-data="{
     viewMode: 'agenda', // 'agenda' or 'month'
+    weekFilter: (new URLSearchParams(window.location.search)).get('week') || 'this', // 'previous', 'this', 'next', 'all'
     openScheduleModal: false,
     openDetailModal: false,
     selectedEvent: {
@@ -98,6 +114,41 @@
             </div>
         </div>
     </header>
+
+    <!-- Week Navigation Toolbar (Previous Week, This Week, Next Week) -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 px-5 rounded-md border border-[#e5e3dc] shadow-xs">
+        <div class="flex items-center gap-2 text-xs text-[#646864]">
+            <span class="material-symbols-outlined text-base text-[#23493a]">date_range</span>
+            <span class="font-medium">Active Week Horizon:</span>
+            <span class="font-semibold text-[#1a1a1a]" x-text="weekFilter === 'previous' ? 'Previous Week ({{ $startPrevWeek->format('M j') }} – {{ $endPrevWeek->format('M j, Y') }})' : (weekFilter === 'next' ? 'Next Week ({{ $startNextWeek->format('M j') }} – {{ $endNextWeek->format('M j, Y') }})' : (weekFilter === 'this' ? 'This Week ({{ $startThisWeek->format('M j') }} – {{ $endThisWeek->format('M j, Y') }})' : 'All Docket Roster Dates'))"></span>
+        </div>
+
+        <div class="inline-flex p-1 bg-[#faf8f5] border border-[#e5e3dc] rounded-md text-[#646864] text-xs">
+            <button type="button" @click="weekFilter = 'previous'" 
+                    :class="weekFilter === 'previous' ? 'bg-white text-[#23493a] font-semibold shadow-xs border border-[#e5e3dc]' : 'text-[#646864] hover:text-[#1a1a1a]'"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded transition-all cursor-pointer">
+                <span class="material-symbols-outlined text-sm">chevron_left</span>
+                <span>Previous Week</span>
+            </button>
+            <button type="button" @click="weekFilter = 'this'" 
+                    :class="weekFilter === 'this' ? 'bg-white text-[#23493a] font-semibold shadow-xs border border-[#e5e3dc]' : 'text-[#646864] hover:text-[#1a1a1a]'"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded transition-all cursor-pointer">
+                <span class="material-symbols-outlined text-sm">today</span>
+                <span>This Week</span>
+            </button>
+            <button type="button" @click="weekFilter = 'next'" 
+                    :class="weekFilter === 'next' ? 'bg-white text-[#23493a] font-semibold shadow-xs border border-[#e5e3dc]' : 'text-[#646864] hover:text-[#1a1a1a]'"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded transition-all cursor-pointer">
+                <span>Next Week</span>
+                <span class="material-symbols-outlined text-sm">chevron_right</span>
+            </button>
+            <button type="button" @click="weekFilter = 'all'" 
+                    :class="weekFilter === 'all' ? 'bg-white text-[#23493a] font-semibold shadow-xs border border-[#e5e3dc]' : 'text-[#646864] hover:text-[#1a1a1a]'"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded transition-all cursor-pointer">
+                <span>All Listings</span>
+            </button>
+        </div>
+    </div>
 
     <!-- Main Surface: 12-Column Split -->
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
@@ -249,12 +300,22 @@
                         <span class="font-mono text-xs text-[#646864] bg-white px-3 py-1 rounded border border-[#e5e3dc]">
                             {{ $events->count() }} Scheduled Listings
                         </span>
-                    </div>
-
-                    <!-- Session Listing Rows -->
+                                     <!-- Session Listing Rows -->
                     <div class="divide-y divide-[#f0eee8]">
                         @forelse($events as $event)
-                        <div class="p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4 hover:bg-[#faf9f5] transition-colors {{ $event->is_statutory_deadline ? 'border-l-4 border-l-red-600 bg-red-50/20' : '' }}">
+                        @php
+                            $evTime = $event->start_time;
+                            if ($evTime >= $startPrevWeek && $evTime <= $endPrevWeek) {
+                                $eventWeekCat = 'previous';
+                            } elseif ($evTime >= $startThisWeek && $evTime <= $endThisWeek) {
+                                $eventWeekCat = 'this';
+                            } elseif ($evTime >= $startNextWeek && $evTime <= $endNextWeek) {
+                                $eventWeekCat = 'next';
+                            } else {
+                                $eventWeekCat = 'other';
+                            }
+                        @endphp
+                        <div x-show="weekFilter === 'all' || weekFilter === '{{ $eventWeekCat }}'" class="p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4 hover:bg-[#faf9f5] transition-colors {{ $event->is_statutory_deadline ? 'border-l-4 border-l-red-600 bg-red-50/20' : '' }}">
                             <div class="flex items-start gap-4">
                                 <!-- Date Badge -->
                                 <div class="flex flex-col items-center justify-center w-12 h-12 rounded-md bg-[#faf8f5] border border-[#e5e3dc] shrink-0">
@@ -312,6 +373,20 @@
                             <span>No judicial hearings or statutory cutoffs currently on this roster.</span>
                         </div>
                         @endforelse
+
+                        <!-- Week Specific Empty Notices -->
+                        <div x-show="weekFilter === 'previous' && {{ $eventsPrevCount }} === 0" class="p-10 text-center text-xs text-[#8a8a8a] flex flex-col items-center gap-1.5">
+                            <span class="material-symbols-outlined text-2xl text-[#8a8a8a]">history</span>
+                            <span>No court appearances or statutory deadlines scheduled for <strong>Previous Week</strong> ({{ $startPrevWeek->format('M j') }} – {{ $endPrevWeek->format('M j') }}).</span>
+                        </div>
+                        <div x-show="weekFilter === 'this' && {{ $eventsThisCount }} === 0" class="p-10 text-center text-xs text-[#8a8a8a] flex flex-col items-center gap-1.5">
+                            <span class="material-symbols-outlined text-2xl text-[#8a8a8a]">today</span>
+                            <span>No court appearances or statutory deadlines scheduled for <strong>This Week</strong> ({{ $startThisWeek->format('M j') }} – {{ $endThisWeek->format('M j') }}).</span>
+                        </div>
+                        <div x-show="weekFilter === 'next' && {{ $eventsNextCount }} === 0" class="p-10 text-center text-xs text-[#8a8a8a] flex flex-col items-center gap-1.5">
+                            <span class="material-symbols-outlined text-2xl text-[#8a8a8a]">event</span>
+                            <span>No court appearances or statutory deadlines scheduled for <strong>Next Week</strong> ({{ $startNextWeek->format('M j') }} – {{ $endNextWeek->format('M j') }}).</span>
+                        </div>
                     </div>
                 </div>
 
@@ -330,7 +405,19 @@
 
                     <div class="divide-y divide-[#f0eee8]">
                         @forelse($appointments as $apt)
-                        <div class="p-4 sm:p-5 flex items-start justify-between gap-4 hover:bg-[#faf8f5] transition-colors">
+                        @php
+                            $aptTime = $apt->scheduled_at;
+                            if ($aptTime >= $startPrevWeek && $aptTime <= $endPrevWeek) {
+                                $aptWeekCat = 'previous';
+                            } elseif ($aptTime >= $startThisWeek && $aptTime <= $endThisWeek) {
+                                $aptWeekCat = 'this';
+                            } elseif ($aptTime >= $startNextWeek && $aptTime <= $endNextWeek) {
+                                $aptWeekCat = 'next';
+                            } else {
+                                $aptWeekCat = 'other';
+                            }
+                        @endphp
+                        <div x-show="weekFilter === 'all' || weekFilter === '{{ $aptWeekCat }}'" class="p-4 sm:p-5 flex items-start justify-between gap-4 hover:bg-[#faf9f5] transition-colors">
                             <div class="flex items-start gap-3.5">
                                 <div class="w-12 h-12 rounded-md bg-[#faf8f5] border border-[#e5e3dc] flex flex-col items-center justify-center shrink-0">
                                     <span class="font-mono text-[9px] uppercase font-bold text-[#23493a]">{{ $apt->scheduled_at->format('M') }}</span>
@@ -370,7 +457,18 @@
                         @empty
                         <div class="p-8 text-center text-xs text-[#8a8a8a]">No client consultations scheduled on the calendar.</div>
                         @endforelse
-                    </div>
+
+                        <!-- Week Specific Empty Notices for Consultations -->
+                        <div x-show="weekFilter === 'previous' && {{ $aptsPrevCount }} === 0" class="p-8 text-center text-xs text-[#8a8a8a]">
+                            No client consultations scheduled for <strong>Previous Week</strong> ({{ $startPrevWeek->format('M j') }} – {{ $endPrevWeek->format('M j') }}).
+                        </div>
+                        <div x-show="weekFilter === 'this' && {{ $aptsThisCount }} === 0" class="p-8 text-center text-xs text-[#8a8a8a]">
+                            No client consultations scheduled for <strong>This Week</strong> ({{ $startThisWeek->format('M j') }} – {{ $endThisWeek->format('M j') }}).
+                        </div>
+                        <div x-show="weekFilter === 'next' && {{ $aptsNextCount }} === 0" class="p-8 text-center text-xs text-[#8a8a8a]">
+                            No client consultations scheduled for <strong>Next Week</strong> ({{ $startNextWeek->format('M j') }} – {{ $endNextWeek->format('M j') }}).
+                        </div>
+                    </div>     </div>
                 </div>
             </div>
 
