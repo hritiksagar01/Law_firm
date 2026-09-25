@@ -213,7 +213,7 @@ Route::middleware('auth')->group(function () {
                 ->where('sender_id', '!=', $user->id)
                 ->count();
 
-            // Matters requiring attention (Hearings/Deadlines within 48h, overdue tasks, or urgent)
+            // Matters requiring attention (Hearings/Deadlines within 48h, overdue tasks, or urgent tasks)
             $mattersRequiringAttention = Matter::where('firm_id', $firmId)
                 ->whereIn('status', ['active', 'open', 'pending'])
                 ->where(function ($q) use ($firmId) {
@@ -224,9 +224,11 @@ Route::middleware('auth')->group(function () {
                         ->orWhereHas('tasks', function ($tq) use ($firmId) {
                             $tq->where('firm_id', $firmId)
                                 ->where('status', '!=', 'completed')
-                                ->where('due_date', '<', now()->toDateString());
-                        })
-                        ->orWhere('priority', 'urgent');
+                                ->where(function ($sub) {
+                                    $sub->where('due_date', '<', now()->toDateString())
+                                        ->orWhere('priority', 'urgent');
+                                });
+                        });
                 })
                 ->with(['client', 'leadAttorney', 'tasks' => function ($t) use ($firmId) {
                     $t->where('firm_id', $firmId)->where('status', '!=', 'completed')->orderBy('due_date');

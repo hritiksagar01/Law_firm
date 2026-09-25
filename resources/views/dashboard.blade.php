@@ -376,12 +376,47 @@
             <div class="border border-[#e5e3dc] bg-white rounded-md p-5 sm:p-6 shadow-xs" x-data="{ weekTab: 'this' }">
                 <div class="flex items-center justify-between pb-3 border-b border-[#f0eee8] mb-3">
                     <div>
-                        <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Next two weeks</h2>
-                        <p class="text-[12px] text-[#8a8a8a] mt-0.5 font-sans">Upcoming hearings &amp; deadlines</p>
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[18px] text-[#23493a]">calendar_month</span>
+                            <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Next two weeks</h2>
+                        </div>
+                        <p class="text-[12px] text-[#8a8a8a] mt-0.5 font-sans">
+                            {{ now()->format('F Y') }} &middot; {{ $thisWeekEvents->count() }} proceeding{{ $thisWeekEvents->count() === 1 ? '' : 's' }} this week
+                        </p>
                     </div>
-                    <a href="{{ route('calendar.index') }}" class="text-[12px] text-[#23493a] hover:underline font-medium">
-                        Full Calendar &rarr;
+                    <a href="{{ route('calendar.index') }}" class="text-[12px] text-[#23493a] hover:underline font-medium flex items-center gap-0.5">
+                        <span>Full Docket</span>
+                        <span class="material-symbols-outlined text-[13px]">arrow_forward</span>
                     </a>
+                </div>
+
+                <!-- 7-Day Week Overview Mini-Strip (General Idea of Current Week) -->
+                <div class="grid grid-cols-7 gap-1 p-2 bg-[#faf9f5] border border-[#e5e3dc] rounded-md mb-3 text-center">
+                    @php
+                        $startOfWeek = now()->startOfWeek();
+                    @endphp
+                    @for($i = 0; $i < 7; $i++)
+                        @php
+                            $dayDate = $startOfWeek->copy()->addDays($i);
+                            $isToday = $dayDate->isToday();
+                            $dayEventsCount = $thisWeekEvents->filter(function($e) use ($dayDate) {
+                                return \Carbon\Carbon::parse($e->start_time)->isSameDay($dayDate);
+                            })->count();
+                        @endphp
+                        <div class="flex flex-col items-center py-1 rounded {{ $isToday ? 'bg-[#23493a] text-white shadow-xs' : 'text-[#646864]' }}">
+                            <span class="text-[10px] font-mono uppercase {{ $isToday ? 'text-white/80' : 'text-[#8a8a8a]' }}">
+                                {{ $dayDate->format('D') }}
+                            </span>
+                            <span class="text-[13px] font-semibold leading-tight my-0.5 {{ $isToday ? 'text-white' : 'text-[#1a1a1a]' }}">
+                                {{ $dayDate->format('j') }}
+                            </span>
+                            @if($dayEventsCount > 0)
+                                <span class="w-1.5 h-1.5 rounded-full {{ $isToday ? 'bg-amber-300' : 'bg-[#23493a]' }}" title="{{ $dayEventsCount }} event(s)"></span>
+                            @else
+                                <span class="w-1.5 h-1.5"></span>
+                            @endif
+                        </div>
+                    @endfor
                 </div>
 
                 <!-- 3-Week Segmented Filter Controls -->

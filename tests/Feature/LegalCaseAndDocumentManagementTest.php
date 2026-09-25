@@ -61,7 +61,6 @@ class LegalCaseAndDocumentManagementTest extends TestCase
         $response->assertSee('My Todos');
         $response->assertSee('Notes');
         $response->assertSee('Calendar');
-        $response->assertSee('Search');
         $response->assertSee('Analytics');
         $response->assertSee('Notifications');
         $response->assertSee('Activity');

@@ -10,14 +10,70 @@
     assignClient: { id: null, name: '', attorney_id: '', notes: '' },
     isSubmitting: false,
     activeTab: '{{ request('category', 'all') }}',
-    entityType: 'individual',
+    category: 'individual',
     onboardingMode: 'portal_online',
+    salutation: 'Mr.',
+    name: '',
+    contactPerson: '',
+    fatherHusbandName: '',
+    email: '',
+    countryCode: '+91',
+    phoneRaw: '',
+    age: '',
+    gender: 'male',
+    occupation: '',
+    primaryAttorneyId: '{{ Auth::id() }}',
+    initialStatus: 'lead',
+    internalIntakeNotes: '',
     members: [],
     addMember() {
-        this.members.push({ name: '', relationship: 'Co-petitioner', phone: '', email: '', pan: '', aadhaar_last_four: '' });
+        this.members.push({ name: '', relationship: 'Co-petitioner', phone: '', email: '' });
     },
     removeMember(index) {
         this.members.splice(index, 1);
+    },
+    fillDemo(type) {
+        if (type === 'joint') {
+            this.category = 'joint';
+            this.name = 'Vikram & Rajesh (Joint Litigants)';
+            this.contactPerson = 'Vikram Malhotra';
+            this.fatherHusbandName = 'S/o Late Shri Jagdish Malhotra';
+            this.email = 'joint.litigants@gmail.com';
+            this.countryCode = '+91';
+            this.phoneRaw = '9811099887';
+            this.age = 41;
+            this.gender = 'male';
+            this.occupation = 'Property Owner & Business';
+            this.members = [
+                { name: 'Rajesh Sharma', relationship: 'Co-petitioner / Co-owner', phone: '+91 98765 11223', email: 'rajesh.sharma@gmail.com' }
+            ];
+        } else if (type === 'assisted') {
+            this.category = 'individual';
+            this.onboardingMode = 'assisted_offline';
+            this.name = 'Chandra Sekhar';
+            this.contactPerson = 'Chandra Sekhar';
+            this.fatherHusbandName = 'S/o Shri K. Sekhar';
+            this.email = '';
+            this.countryCode = '+91';
+            this.phoneRaw = '9810077665';
+            this.age = 56;
+            this.gender = 'male';
+            this.occupation = 'Agriculture / Self-Employed';
+            this.members = [];
+        } else {
+            this.category = 'individual';
+            this.onboardingMode = 'portal_online';
+            this.name = 'Vikram Malhotra';
+            this.contactPerson = 'Vikram Malhotra';
+            this.fatherHusbandName = 'S/o Late Shri Jagdish Malhotra';
+            this.email = 'vikram.client@gmail.com';
+            this.countryCode = '+91';
+            this.phoneRaw = '9876543210';
+            this.age = 38;
+            this.gender = 'male';
+            this.occupation = 'Business & Commercial';
+            this.members = [];
+        }
     }
 }" class="flex flex-col w-full text-[#1a1a1a]">
 
@@ -225,30 +281,26 @@
                     <p class="text-[11.5px] text-[#646864] mb-1.5">Attn: {{ $client->contact_person }}</p>
                 @endif
 
-                <!-- Statutory Indian KYC Chips -->
+                <!-- Demographics Particulars: Age, Gender & Occupation -->
+                @if($client->age || $client->gender || $client->occupation)
                 <div class="flex flex-wrap items-center gap-1.5 my-2.5">
-                    @if($client->pan)
-                        <span class="inline-flex items-center gap-1 font-mono text-[10.5px] bg-[#faf8f5] text-[#1a1a1a] border border-[#e5e3dc] px-1.5 py-0.5 rounded">
-                            <span class="text-[9px] text-[#8a8a8a] font-sans uppercase">PAN:</span> {{ $client->pan }}
+                    @if($client->age)
+                        <span class="inline-flex items-center gap-1 font-mono text-[10.5px] bg-[#faf8f5] text-[#1a1a1a] border border-[#e5e3dc] px-2 py-0.5 rounded">
+                            <span class="text-[9px] text-[#8a8a8a] font-sans uppercase">Age:</span> {{ $client->age }} yrs
                         </span>
                     @endif
-                    @if($client->aadhaar_last_four)
-                        <span class="inline-flex items-center gap-1 font-mono text-[10.5px] bg-[#faf8f5] text-[#1a1a1a] border border-[#e5e3dc] px-1.5 py-0.5 rounded">
-                            <span class="text-[9px] text-[#8a8a8a] font-sans uppercase">Aadhaar:</span> {{ $client->masked_aadhaar }}
+                    @if($client->gender)
+                        <span class="inline-flex items-center gap-1 text-[10.5px] bg-[#faf8f5] text-[#1a1a1a] border border-[#e5e3dc] px-2 py-0.5 rounded capitalize">
+                            <span class="text-[9px] text-[#8a8a8a] font-sans uppercase">Gender:</span> {{ $client->gender }}
                         </span>
                     @endif
-                    @if($client->cin)
-                        <span class="inline-flex items-center gap-1 font-mono text-[10px] bg-[#faf8f5] text-[#1a1a1a] border border-[#e5e3dc] px-1.5 py-0.5 rounded truncate max-w-[170px]" title="CIN: {{ $client->cin }}">
-                            <span class="text-[9px] text-[#8a8a8a] font-sans uppercase">CIN:</span> {{ $client->cin }}
-                        </span>
-                    @endif
-                    @if($client->police_station)
-                        <span class="inline-flex items-center gap-1 text-[10.5px] bg-[#fdfaf2] text-[#854d0e] border border-[#fef08a] px-1.5 py-0.5 rounded" title="Police Station Jurisdiction">
-                            <span class="material-symbols-outlined text-[12px]">local_police</span>
-                            <span>P.S. {{ $client->police_station }}</span>
+                    @if($client->occupation)
+                        <span class="inline-flex items-center gap-1 text-[10.5px] bg-[#faf8f5] text-[#1a1a1a] border border-[#e5e3dc] px-2 py-0.5 rounded truncate max-w-[180px]" title="{{ $client->occupation }}">
+                            <span class="text-[9px] text-[#8a8a8a] font-sans uppercase">Occ:</span> {{ $client->occupation }}
                         </span>
                     @endif
                 </div>
+                @endif
 
                 <!-- Contact Particulars -->
                 <div class="space-y-1 text-xs text-[#646864] pt-2 border-t border-[#f0eee8]">
@@ -306,27 +358,35 @@
                 </div>
             </div>
 
-            <!-- Card Footer: Cases & Quick Actions -->
-            <div class="mt-4 pt-3 border-t border-[#f0eee8] flex items-center justify-between text-xs">
-                <div>
-                    <span class="text-[10px] text-[#8a8a8a] block uppercase font-mono">Dossiers</span>
-                    <span class="font-mono font-semibold text-[#1a1a1a]">{{ $client->matters->count() }} active cases</span>
+            <!-- Card Footer: Cases & Clean Action Layout -->
+            <div class="mt-4 pt-3 border-t border-[#f0eee8] flex flex-col gap-2">
+                <div class="flex items-center justify-between text-xs">
+                    <div>
+                        <span class="text-[10px] text-[#8a8a8a] block uppercase font-mono">Dossiers</span>
+                        <span class="font-mono font-semibold text-[#1a1a1a]">{{ $client->matters->count() }} active case{{ $client->matters->count() === 1 ? '' : 's' }}</span>
+                    </div>
+
+                    <a href="{{ route('clients.show', $client->id) }}" class="btn-primary h-7 px-3 text-xs inline-flex items-center gap-1 font-medium shadow-2xs">
+                        <span>View Dossier</span>
+                        <span class="material-symbols-outlined text-[13px]">arrow_forward</span>
+                    </a>
                 </div>
 
-                <div class="flex items-center gap-1.5">
+                <!-- Secondary Actions Toolbar -->
+                <div class="flex items-center justify-end gap-1.5 pt-1.5 border-t border-[#f8f7f4] flex-wrap">
                     <!-- Assign Advocate Button for Leads -->
                     @if($client->status === 'lead' || ! $client->primary_attorney_id)
                         <button type="button" @click="assignClient = { id: {{ $client->id }}, name: '{{ addslashes($client->name) }}', attorney_id: '{{ $client->primary_attorney_id ?? Auth::id() }}', notes: '{{ addslashes($client->internal_intake_notes ?? '') }}' }; openAssignModal = true"
-                                class="btn-primary h-7 px-2.5 text-[11px] inline-flex items-center gap-1 bg-amber-700 hover:bg-amber-800 border-amber-800 text-white cursor-pointer" title="Assign Lead Advocate & Complete Intake">
-                            <span class="material-symbols-outlined text-[14px]">how_to_reg</span>
+                                class="h-6.5 px-2 text-[11px] rounded inline-flex items-center gap-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-medium cursor-pointer transition-colors" title="Assign Lead Advocate">
+                            <span class="material-symbols-outlined text-[13px]">how_to_reg</span>
                             <span>Assign Advocate</span>
                         </button>
                     @endif
 
                     <!-- Physical Chamber Slip Link -->
                     <a href="{{ route('clients.intake-slip', $client->id) }}" target="_blank"
-                       class="btn-secondary h-7 px-2 text-[11px] inline-flex items-center gap-1 text-[#646864] hover:text-[#1a1a1a]" title="Print Chamber File Docket Slip (Basta Slip)">
-                        <span class="material-symbols-outlined text-[14px]">receipt_long</span>
+                       class="h-6.5 px-2 text-[11px] rounded inline-flex items-center gap-1 bg-white hover:bg-[#faf9f5] text-[#646864] hover:text-[#1a1a1a] border border-[#e5e3dc] transition-colors" title="Print Chamber Slip">
+                        <span class="material-symbols-outlined text-[13px]">receipt_long</span>
                         <span>Slip</span>
                     </a>
 
@@ -334,26 +394,19 @@
                     @if($client->email && ! $client->isOfflineOnly() && ! $client->user_id)
                         <form action="{{ route('clients.invite', $client->id) }}" method="POST" class="inline">
                             @csrf
-                            <button type="submit" class="btn-primary h-7 px-2.5 text-[11px] inline-flex items-center gap-1" title="Dispatch Portal Activation Link">
-                                <span class="material-symbols-outlined text-[14px]">send</span>
+                            <button type="submit" class="h-6.5 px-2 text-[11px] rounded inline-flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-medium cursor-pointer transition-colors" title="Invite to Portal">
+                                <span class="material-symbols-outlined text-[13px]">send</span>
                                 <span>Invite</span>
                             </button>
                         </form>
                     @endif
 
-                    <!-- View Client Dossier -->
-                    <a href="{{ route('clients.show', $client->id) }}" class="btn-secondary h-7 px-2.5 text-[11px] inline-flex items-center gap-1 font-medium text-[#23493a] border-[#23493a]/30 hover:bg-[#23493a]/10">
-                        <span>Dossier</span>
-                        <span class="material-symbols-outlined text-[13px]">arrow_forward</span>
-                    </a>
-
                     <!-- Delete Client Button -->
                     <form action="{{ route('clients.destroy', $client->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete client {{ addslashes($client->name) }}? This cannot be undone.');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn-secondary h-7 px-2 text-[11px] inline-flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" title="Delete Client">
-                            <span class="material-symbols-outlined text-[13px]">delete</span>
-                            <span class="sr-only sm:not-sr-only">Delete</span>
+                        <button type="submit" class="h-6.5 w-6.5 rounded inline-flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 border border-transparent hover:border-red-200 transition-colors cursor-pointer" title="Delete Client">
+                            <span class="material-symbols-outlined text-[14px]">delete</span>
                         </button>
                     </form>
                 </div>
@@ -371,393 +424,289 @@
             </div>
         </div>
         @endforelse
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- DYNAMIC CLIENT ONBOARDING MODAL (INDIAN LEGAL STANDARDS)                  -->
+    </div>    <!-- ========================================================================= -->
+    <!-- NEW CLIENT ONBOARDING MODAL (IDENTICAL TO CLIENT REGISTRATION)            -->
     <!-- ========================================================================= -->
     <div x-show="openCreateModal"
          x-cloak
          @click.away="openCreateModal = false"
          class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white border border-[#e5e3dc] rounded-md shadow-2xl w-full max-w-3xl my-8 p-6 flex flex-col max-h-[90vh]">
+        <div class="bg-white rounded-2xl border border-[#E7E4DC] shadow-2xl w-full max-w-3xl my-8 p-6 sm:p-8 flex flex-col max-h-[92vh] overflow-y-auto">
 
             <!-- Modal Header -->
-            <div class="flex items-center justify-between pb-4 border-b border-[#f0eee8] mb-4">
-                <div class="flex items-center gap-2.5">
-                    <span class="material-symbols-outlined text-2xl text-[#23493a]">person_add</span>
+            <div class="flex items-center justify-between pb-4 border-b border-[#F0EEE8] mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-[#23493A]/10 text-[#23493A] rounded-xl flex items-center justify-center">
+                        <span class="material-symbols-outlined text-2xl">person_add</span>
+                    </div>
                     <div>
-                        <h3 class="text-[16px] font-semibold text-[#1a1a1a]">Client Representation Intake</h3>
-                        <p class="text-[12px] text-[#646864]">Single/joint litigants, corporate retainers, identity KYC, and assisted offline onboarding</p>
+                        <h3 class="text-xl font-semibold text-[#1A1E1C]">Client Representation Intake</h3>
+                        <p class="text-xs text-[#646864] mt-0.5">
+                            Single/joint litigants, corporate retainers, demographics &amp; counsel assignment
+                        </p>
                     </div>
                 </div>
-                <button type="button" @click="openCreateModal = false" class="text-[#8a8a8a] hover:text-[#1a1a1a] cursor-pointer">
-                    <span class="material-symbols-outlined text-2xl">close</span>
-                </button>
+
+                <div class="flex items-center gap-2">
+                    <div class="hidden sm:flex items-center gap-1.5">
+                        <button type="button" @click="fillDemo('individual')" class="text-[11px] text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2.5 py-1 rounded-[4px] font-medium border border-[#23493A]/15 cursor-pointer">
+                            <span>Individual Demo</span>
+                        </button>
+                        <button type="button" @click="fillDemo('joint')" class="text-[11px] text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2.5 py-1 rounded-[4px] font-medium border border-[#23493A]/15 cursor-pointer">
+                            <span>⚡ Joint Co-Clients</span>
+                        </button>
+                    </div>
+                    <button type="button" @click="openCreateModal = false" class="p-1.5 text-[#8a8a8a] hover:text-[#1a1a1a] hover:bg-[#faf9f5] rounded-full transition-colors cursor-pointer">
+                        <span class="material-symbols-outlined text-2xl">close</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- Modal Form -->
-            <form action="{{ route('clients.store') }}" method="POST" @submit="if(isSubmitting) { $event.preventDefault(); return false; } isSubmitting = true" class="overflow-y-auto pr-1 flex flex-col gap-4 text-xs">
+            <!-- Client Onboarding Form -->
+            <form action="{{ route('clients.store') }}" method="POST" @submit="if(isSubmitting) { $event.preventDefault(); return false; } isSubmitting = true" class="flex flex-col gap-4 text-xs">
                 @csrf
+                <input type="hidden" name="phone" :value="(countryCode + ' ' + phoneRaw).trim()"/>
 
-                <!-- Step 1: Entity Classification Radio Chips -->
+                <!-- 1. Client Legal Entity Classification * -->
                 <div>
-                    <label class="font-semibold text-[#1a1a1a] block mb-1.5">1. Client Legal Entity Classification *</label>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        <label class="border p-2.5 rounded-md flex flex-col cursor-pointer transition-all"
-                               :class="entityType === 'individual' ? 'border-[#23493a] bg-[#23493a]/5 font-semibold text-[#23493a]' : 'border-[#e5e3dc] bg-white text-[#646864] hover:bg-[#faf8f5]'">
-                            <input type="radio" name="category" value="individual" x-model="entityType" class="sr-only"/>
-                            <div class="flex items-center gap-1.5 text-xs">
-                                <span class="material-symbols-outlined text-[17px]">person</span>
+                    <label class="font-semibold text-[#1A1E1C] block mb-2 text-xs">1. Client Legal Entity Classification *</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <label class="border p-3 rounded-lg flex flex-col cursor-pointer transition-all"
+                               :class="category === 'individual' ? 'border-[#23493A] bg-[#23493A]/5 font-semibold text-[#23493A] shadow-2xs' : 'border-[#E7E4DC] bg-white text-[#646864] hover:bg-[#FBFBF9]'">
+                            <input type="radio" name="category" value="individual" x-model="category" class="sr-only"/>
+                            <div class="flex items-center gap-1.5 text-xs font-semibold">
+                                <span class="material-symbols-outlined text-lg">person</span>
                                 <span>Individual (1 Person)</span>
                             </div>
-                            <span class="text-[10px] text-[#8a8a8a] mt-1 font-normal">Single litigant or petitioner</span>
+                            <span class="text-[10.5px] text-[#646864] mt-1 font-normal">Single litigant or petitioner</span>
                         </label>
 
-                        <label class="border p-2.5 rounded-md flex flex-col cursor-pointer transition-all"
-                               :class="entityType === 'joint' ? 'border-[#23493a] bg-[#23493a]/5 font-semibold text-[#23493a]' : 'border-[#e5e3dc] bg-white text-[#646864] hover:bg-[#faf8f5]'">
-                            <input type="radio" name="category" value="joint" x-model="entityType" class="sr-only"/>
-                            <div class="flex items-center gap-1.5 text-xs">
-                                <span class="material-symbols-outlined text-[17px]">group</span>
+                        <label class="border p-3 rounded-lg flex flex-col cursor-pointer transition-all"
+                               :class="category === 'joint' ? 'border-[#23493A] bg-[#23493A]/5 font-semibold text-[#23493A] shadow-2xs' : 'border-[#E7E4DC] bg-white text-[#646864] hover:bg-[#FBFBF9]'">
+                            <input type="radio" name="category" value="joint" x-model="category" @change="if(members.length === 0) addMember()" class="sr-only"/>
+                            <div class="flex items-center gap-1.5 text-xs font-semibold">
+                                <span class="material-symbols-outlined text-lg">group</span>
                                 <span>Joint (2+ Litigants)</span>
                             </div>
-                            <span class="text-[10px] text-[#8a8a8a] mt-1 font-normal">Co-petitioners / Family members</span>
+                            <span class="text-[10.5px] text-[#646864] mt-1 font-normal">Co-petitioners / Family members</span>
                         </label>
 
-                        <label class="border p-2.5 rounded-md flex flex-col cursor-pointer transition-all"
-                               :class="entityType === 'corporate' ? 'border-[#23493a] bg-[#23493a]/5 font-semibold text-[#23493a]' : 'border-[#e5e3dc] bg-white text-[#646864] hover:bg-[#faf8f5]'">
-                            <input type="radio" name="category" value="corporate" x-model="entityType" class="sr-only"/>
-                            <div class="flex items-center gap-1.5 text-xs">
-                                <span class="material-symbols-outlined text-[17px]">apartment</span>
+                        <label class="border p-3 rounded-lg flex flex-col cursor-pointer transition-all"
+                               :class="category === 'corporate' ? 'border-[#23493A] bg-[#23493A]/5 font-semibold text-[#23493A] shadow-2xs' : 'border-[#E7E4DC] bg-white text-[#646864] hover:bg-[#FBFBF9]'">
+                            <input type="radio" name="category" value="corporate" x-model="category" class="sr-only"/>
+                            <div class="flex items-center gap-1.5 text-xs font-semibold">
+                                <span class="material-symbols-outlined text-lg">apartment</span>
                                 <span>Company / LLP</span>
                             </div>
-                            <span class="text-[10px] text-[#8a8a8a] mt-1 font-normal">Pvt Ltd, Public Ltd, LLP, OPC</span>
+                            <span class="text-[10.5px] text-[#646864] mt-1 font-normal">Pvt Ltd, Public Ltd, LLP, OPC</span>
                         </label>
 
-                        <label class="border p-2.5 rounded-md flex flex-col cursor-pointer transition-all"
-                               :class="entityType === 'institution' ? 'border-[#23493a] bg-[#23493a]/5 font-semibold text-[#23493a]' : 'border-[#e5e3dc] bg-white text-[#646864] hover:bg-[#faf8f5]'">
-                            <input type="radio" name="category" value="institution" x-model="entityType" class="sr-only"/>
-                            <div class="flex items-center gap-1.5 text-xs">
-                                <span class="material-symbols-outlined text-[17px]">account_balance</span>
+                        <label class="border p-3 rounded-lg flex flex-col cursor-pointer transition-all"
+                               :class="category === 'institution' ? 'border-[#23493A] bg-[#23493A]/5 font-semibold text-[#23493A] shadow-2xs' : 'border-[#E7E4DC] bg-white text-[#646864] hover:bg-[#FBFBF9]'">
+                            <input type="radio" name="category" value="institution" x-model="category" class="sr-only"/>
+                            <div class="flex items-center gap-1.5 text-xs font-semibold">
+                                <span class="material-symbols-outlined text-lg">account_balance</span>
                                 <span>Trust / Society</span>
                             </div>
-                            <span class="text-[10px] text-[#8a8a8a] mt-1 font-normal">NGO, Society, Partnership, Firm</span>
+                            <span class="text-[10.5px] text-[#646864] mt-1 font-normal">NGO, Society, Partnership, Firm</span>
                         </label>
                     </div>
                 </div>
 
-                <!-- Step 2: Digital Literacy & Onboarding Mode -->
-                <div class="p-3 rounded-md bg-[#faf8f5] border border-[#e5e3dc]">
-                    <label class="font-semibold text-[#1a1a1a] block mb-1">2. Client Digital Literacy &amp; Onboarding Mode *</label>
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-4 text-xs mt-2">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="onboarding_mode" value="portal_online" x-model="onboardingMode"
-                                   class="text-[#23493a] focus:ring-[#23493a]"/>
+                <!-- 2. Client Digital Literacy & Onboarding Mode * -->
+                <div class="p-3.5 rounded-lg bg-[#F6F4EE] border border-[#E7E4DC]">
+                    <label class="font-semibold text-[#1A1E1C] block mb-1.5 text-xs">2. Client Digital Literacy &amp; Onboarding Mode *</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <label class="p-3 rounded-md border flex items-start gap-2.5 cursor-pointer transition-all"
+                               :class="onboardingMode === 'portal_online' ? 'border-[#23493A] bg-white font-semibold text-[#23493A] shadow-2xs' : 'border-[#E7E4DC] bg-white/70 text-[#646864] hover:bg-white'">
+                            <input type="radio" name="onboarding_mode" value="portal_online" x-model="onboardingMode" class="mt-0.5 text-[#23493A] focus:ring-[#23493A] cursor-pointer"/>
                             <div>
-                                <span class="font-medium text-[#1a1a1a]">Online Client Portal</span>
-                                <span class="text-[11px] text-[#646864] block">Client has email &amp; smartphone. Receives invitation token link to set password.</span>
+                                <span class="font-semibold text-[#1A1E1C] block">Online Client Portal</span>
+                                <span class="text-[11px] text-[#646864] block mt-0.5">Client has email &amp; smartphone. Receives invitation token link to set password.</span>
                             </div>
                         </label>
 
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="onboarding_mode" value="assisted_offline" x-model="onboardingMode"
-                                   class="text-[#23493a] focus:ring-[#23493a]"/>
+                        <label class="p-3 rounded-md border flex items-start gap-2.5 cursor-pointer transition-all"
+                               :class="onboardingMode === 'assisted_offline' ? 'border-[#92400e] bg-amber-50/70 font-semibold text-[#92400e] shadow-2xs' : 'border-[#E7E4DC] bg-white/70 text-[#646864] hover:bg-white'">
+                            <input type="radio" name="onboarding_mode" value="assisted_offline" x-model="onboardingMode" class="mt-0.5 text-[#92400e] focus:ring-[#92400e] cursor-pointer"/>
                             <div>
-                                <span class="font-medium text-[#92400e]">Assisted Offline (No Email / Illiterate / POA)</span>
-                                <span class="text-[11px] text-[#646864] block">Direct chamber visits, phone/WhatsApp notifications, physical intake slip.</span>
+                                <span class="font-semibold text-[#92400e] block">Assisted Offline (No Email / Illiterate / POA)</span>
+                                <span class="text-[11px] text-[#646864] block mt-0.5">Direct chamber visits, phone/WhatsApp notifications, physical intake slip.</span>
                             </div>
                         </label>
                     </div>
                 </div>
 
-                <!-- Step 3: Entity Primary Name & Contact -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-start">
-                    <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a] min-h-[20px] flex items-center" x-text="entityType === 'corporate' || entityType === 'institution' ? 'Entity / Organization Legal Name *' : 'Title & Primary Litigant Name *'"></label>
-                        <div class="flex items-center gap-1.5">
-                            <select name="salutation" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none shrink-0 cursor-pointer">
-                                <option value="Mr.">Mr.</option>
-                                <option value="Mrs.">Mrs.</option>
-                                <option value="Ms.">Ms.</option>
-                                <option value="Miss">Miss</option>
-                                <option value="Dr.">Dr.</option>
-                                <option value="Adv.">Adv.</option>
-                                <option value="Shri">Shri</option>
-                                <option value="Smt.">Smt.</option>
-                            </select>
-                            <input name="name" required type="text" placeholder="e.g. Ramesh Chandra Sharma or Sharma Infotech Pvt Ltd"
-                                   class="w-full h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                        </div>
-                    </div>
+                <!-- 3. Primary Client Information -->
+                <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-sm text-[#23493A]">person</span>
+                        <span x-text="category === 'joint' ? '03 · Primary Litigant Particulars' : '03 · Basic Particulars'"></span>
+                    </span>
 
-                    <!-- Individual Parentage: Father/Mother Name -->
-                    <div class="flex flex-col gap-1" x-show="entityType === 'individual' || entityType === 'joint'">
-                        <label class="font-semibold text-[#1a1a1a] min-h-[20px] flex items-center">Father's / Mother's Name</label>
-                        <input name="father_husband_name" type="text" placeholder="e.g. S/o Late Shri Jagdish Sharma or D/o Smt. Sunita Sharma"
-                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                    </div>
-
-                    <!-- Corporate Authorized Signatory Contact -->
-                    <div class="flex flex-col gap-1" x-show="entityType === 'corporate' || entityType === 'institution'">
-                        <label class="font-semibold text-[#1a1a1a] min-h-[20px] flex items-center">Authorized Signatory / Contact Person *</label>
-                        <input name="contact_person" type="text" placeholder="e.g. Vikram Malhotra, Managing Director"
-                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                    </div>
-                </div>
-
-                <!-- Contact Particulars: Email & Phone -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">
-                            Official Email <span x-show="onboardingMode === 'portal_online'" class="text-red-500">*</span>
-                            <span x-show="onboardingMode === 'assisted_offline'" class="text-[11px] text-[#8a8a8a] font-normal">(Optional for Offline)</span>
-                        </label>
-                        <input name="email" :required="onboardingMode === 'portal_online'" type="email" placeholder="client@domain.com"
-                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                    </div>
-
-                    <div class="flex flex-col gap-1" x-data="{
-                        countryCode: '+91',
-                        phoneRaw: '',
-                        get fullPhone() { return (this.countryCode + ' ' + this.phoneRaw).trim(); }
-                    }">
-                        <label class="font-semibold text-[#1a1a1a]">
-                            Mobile / WhatsApp Phone Number <span x-show="onboardingMode === 'assisted_offline'" class="text-red-500">*</span>
-                        </label>
-                        <input type="hidden" name="phone" :value="fullPhone"/>
-                        <div class="flex items-center gap-1.5">
-                            <select x-model="countryCode" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
-                                <option value="+91">🇮🇳 +91</option>
-                                <option value="+1">🇺🇸 +1</option>
-                                <option value="+44">🇬🇧 +44</option>
-                                <option value="+971">🇦🇪 +971</option>
-                                <option value="+61">🇦🇺 +61</option>
-                                <option value="+65">🇸🇬 +65</option>
-                                <option value="+49">🇩🇪 +49</option>
-                                <option value="+33">🇫🇷 +33</option>
-                                <option value="+81">🇯🇵 +81</option>
-                                <option value="+966">🇸🇦 +966</option>
-                                <option value="+974">🇶🇦 +974</option>
-                                <option value="+965">🇰🇼 +965</option>
-                                <option value="+968">🇴🇲 +968</option>
-                                <option value="+973">🇧🇭 +973</option>
-                                <option value="+880">🇧🇩 +880</option>
-                                <option value="+977">🇳🇵 +977</option>
-                                <option value="+94">🇱🇰 +94</option>
-                            </select>
-                            <input x-model="phoneRaw" :required="onboardingMode === 'assisted_offline'" type="text" placeholder="98100 12345"
-                                   class="w-full h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 4: Statutory Identity & KYC -->
-                <div class="pt-2 border-t border-[#f0eee8]">
-                    <h4 class="font-semibold text-[#1a1a1a] mb-2 flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-[16px] text-[#23493a]">badge</span>
-                        <span>Statutory Identity &amp; KYC</span>
-                    </h4>
-
-                    <!-- Individual KYC: Age, Gender, Occupation, PAN & Masked Aadhaar -->
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-3" x-show="entityType === 'individual' || entityType === 'joint'">
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#1a1a1a]">Age / Gender</label>
-                            <div class="grid grid-cols-2 gap-1.5">
-                                <input name="age" type="number" min="0" max="120" placeholder="Age"
-                                       class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                                <select name="gender" class="h-9 px-1 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
-                                    <option value="">Gender</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                    <option value="other">Other</option>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center" x-text="category === 'corporate' || category === 'institution' ? 'Official Entity / Company Name *' : (category === 'joint' ? 'Title & Primary Litigant Name *' : 'Title & Full Name *')"></label>
+                            <div class="flex items-center gap-1.5">
+                                <select name="salutation" x-model="salutation" class="h-[40px] px-2 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] shrink-0 cursor-pointer">
+                                    <option value="Mr.">Mr.</option>
+                                    <option value="Mrs.">Mrs.</option>
+                                    <option value="Ms.">Ms.</option>
+                                    <option value="Miss">Miss</option>
+                                    <option value="Dr.">Dr.</option>
+                                    <option value="Adv.">Adv.</option>
+                                    <option value="Shri">Shri</option>
+                                    <option value="Smt.">Smt.</option>
                                 </select>
+                                <input name="name" x-model="name" type="text" required placeholder="e.g. Vikram Malhotra" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                             </div>
                         </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#1a1a1a]">Occupation / Vocation</label>
-                            <input name="occupation" type="text" placeholder="e.g. Business / Service"
-                                   class="h-9 px-2.5 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+
+                        <!-- Parentage for Individual & Joint OR Contact Person for Corporate -->
+                        <div class="flex flex-col gap-1.5" x-show="category === 'individual' || category === 'joint'">
+                            <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">Father's / Mother's Name</label>
+                            <input name="father_husband_name" x-model="fatherHusbandName" type="text" placeholder="e.g. S/o Late Shri Jagdish Malhotra or D/o Smt. Sunita Sharma" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                         </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#1a1a1a]">PAN (10 Chars)</label>
-                            <input name="pan" type="text" maxlength="10" placeholder="ABCDE1234F" style="text-transform: uppercase;"
-                                   class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#1a1a1a]">Aadhaar Last 4</label>
-                            <input name="aadhaar_last_four" type="text" maxlength="4" placeholder="4321"
-                                   class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+
+                        <div class="flex flex-col gap-1.5" x-show="category === 'corporate' || category === 'institution'">
+                            <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">Authorized Contact Person Name</label>
+                            <input name="contact_person" x-model="contactPerson" type="text" placeholder="e.g. Vikram Malhotra (Managing Director)" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                         </div>
                     </div>
 
-                    <!-- Corporate KYC: CIN, LLPIN, GSTIN -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mb-3" x-show="entityType === 'corporate' || entityType === 'institution'">
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#1a1a1a]">CIN / LLPIN</label>
-                            <input name="cin" type="text" placeholder="U72200DL2020PTC123456" style="text-transform: uppercase;"
-                                   class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#1a1a1a]">Company PAN</label>
-                            <input name="pan" type="text" maxlength="10" placeholder="AAACM1234F" style="text-transform: uppercase;"
-                                   class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#1a1a1a]">GSTIN (15 Characters)</label>
-                            <input name="gstin" type="text" maxlength="15" placeholder="07AAACM1234F1Z5" style="text-transform: uppercase;"
-                                   class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 5: Address for Service & Court Police Station Jurisdiction -->
-                <div class="pt-2 border-t border-[#f0eee8]">
-                    <h4 class="font-semibold text-[#1a1a1a] mb-2 flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-[16px] text-[#23493a]">pin_drop</span>
-                        <span>Service Address &amp; Court Jurisdiction</span>
-                    </h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2.5">
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#1a1a1a]">Address Line 1 (Premises / Mohalla / Street)</label>
-                            <input name="address_line_1" type="text" placeholder="e.g. Flat No. 402, Royal Residency, Sector 15"
-                                   class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#1a1a1a]">Address Line 2 (Village / Post Office / Landmark)</label>
-                            <input name="address_line_2" type="text" placeholder="e.g. Near Old Tehsil Office"
-                                   class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#1a1a1a]">District / City</label>
-                            <input name="district" type="text" placeholder="e.g. South Delhi"
-                                   class="h-9 px-2.5 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#1a1a1a]">State</label>
-                            <input name="state" type="text" value="Delhi"
-                                   class="h-9 px-2.5 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#1a1a1a]">Pincode (6 Digits)</label>
-                            <input name="pincode" type="text" maxlength="6" placeholder="110001"
-                                   class="h-9 px-2.5 rounded-md bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#854d0e] flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[13px]">local_police</span>
-                                <span>Police Station (Thana)</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-medium text-[#1A1E1C]">
+                                Email Address <span x-show="onboardingMode === 'portal_online'" class="text-red-500">*</span>
+                                <span x-show="onboardingMode === 'assisted_offline'" class="text-[11px] text-[#8a8a8a] font-normal">(Optional for Offline)</span>
                             </label>
-                            <input name="police_station" type="text" placeholder="e.g. Hauz Khas"
-                                   class="h-9 px-2.5 rounded-md bg-white border border-amber-300 bg-amber-50/40 text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                            <input name="email" x-model="email" type="email" :required="onboardingMode === 'portal_online'" placeholder="name@domain.com" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                        </div>
+
+                        <!-- Country Code & Phone Input -->
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-medium text-[#1A1E1C]">
+                                Mobile Contact Number <span x-show="onboardingMode === 'assisted_offline'" class="text-red-500">*</span>
+                            </label>
+                            <div class="flex items-center gap-1.5">
+                                <select x-model="countryCode" class="h-[40px] px-2 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] font-mono outline-none focus:border-[#23493A]">
+                                    <option value="+91">🇮🇳 +91 (IN)</option>
+                                    <option value="+1">🇺🇸 +1 (US/CA)</option>
+                                    <option value="+44">🇬🇧 +44 (UK)</option>
+                                    <option value="+971">🇦🇪 +971 (UAE)</option>
+                                    <option value="+61">🇦🇺 +61 (AU)</option>
+                                    <option value="+65">🇸🇬 +65 (SG)</option>
+                                    <option value="+49">🇩🇪 +49 (DE)</option>
+                                    <option value="+33">🇫🇷 +33 (FR)</option>
+                                    <option value="+81">🇯🇵 +81 (JP)</option>
+                                    <option value="+966">🇸🇦 +966 (SA)</option>
+                                    <option value="+974">🇶🇦 +974 (QA)</option>
+                                    <option value="+965">🇰🇼 +965 (KW)</option>
+                                    <option value="+968">🇴🇲 +968 (OM)</option>
+                                    <option value="+973">🇧🇭 +973 (BH)</option>
+                                    <option value="+880">🇧🇩 +880 (BD)</option>
+                                    <option value="+977">🇳🇵 +977 (NP)</option>
+                                    <option value="+94">🇱🇰 +94 (LK)</option>
+                                </select>
+                                <input x-model="phoneRaw" type="text" :required="onboardingMode === 'assisted_offline'" placeholder="9876543210" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs font-mono text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Conditional Section: Power of Attorney (POA) / Representative for Offline Clients -->
-                <div x-show="onboardingMode === 'assisted_offline'" class="p-3.5 rounded-md bg-amber-50/50 border border-amber-200">
-                    <h4 class="font-semibold text-[#92400e] mb-1.5 flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-[16px]">assignment_ind</span>
-                        <span>Power of Attorney (POA) / Legal Representative Particulars</span>
-                    </h4>
-                    <p class="text-[11px] text-[#78350f] mb-3">If the client is illiterate, minor, or represented through a POA holder, next friend, or guardian:</p>
+                    <!-- Demographics: Age, Gender & Occupation (NO AADHAAR, NO PAN) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-medium text-[#1A1E1C]">Age (Years)</label>
+                            <input name="age" x-model="age" type="number" min="0" max="130" placeholder="e.g. 35" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs font-mono text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                        </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-2.5">
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#78350f]">Representation Capacity</label>
-                            <select name="representation_mode" class="h-9 px-2 rounded-md bg-white border border-amber-200 text-xs text-[#1a1a1a]">
-                                <option value="self">Self (Litigant Directly in Chamber)</option>
-                                <option value="poa_holder">Power of Attorney (POA) Holder</option>
-                                <option value="next_friend_guardian">Next Friend / Guardian (CPC Order 32)</option>
-                                <option value="relative">Son / Daughter / Authorized Relative</option>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-medium text-[#1A1E1C]">Gender</label>
+                            <select name="gender" x-model="gender" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all cursor-pointer">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
                             </select>
                         </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#78350f]">Representative Full Name</label>
-                            <input name="representative_name" type="text" placeholder="e.g. Suresh Kumar (Son &amp; POA)"
-                                   class="h-9 px-3 rounded-md bg-white border border-amber-200 text-xs text-[#1a1a1a]"/>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#78350f]">Representative Phone</label>
-                            <input name="representative_phone" type="text" placeholder="+91 98111 22334"
-                                   class="h-9 px-3 rounded-md bg-white border border-amber-200 text-xs text-[#1a1a1a]"/>
-                        </div>
-                    </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#78350f]">POA Reg. Number (if registered)</label>
-                            <input name="poa_registration_number" type="text" placeholder="e.g. IV-1204/2023"
-                                   class="h-9 px-3 rounded-md bg-white border border-amber-200 font-mono text-xs text-[#1a1a1a]"/>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#78350f]">POA Registration Date</label>
-                            <input name="poa_date" type="date"
-                                   class="h-9 px-3 rounded-md bg-white border border-amber-200 text-xs text-[#1a1a1a]"/>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="font-semibold text-[#78350f]">Sub-Registrar Office</label>
-                            <input name="poa_sub_registrar_office" type="text" placeholder="e.g. SR-V Mehrauli, Delhi"
-                                   class="h-9 px-3 rounded-md bg-white border border-amber-200 text-xs text-[#1a1a1a]"/>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[13px] font-medium text-[#1A1E1C]">Occupation / Vocation</label>
+                            <input name="occupation" x-model="occupation" type="text" placeholder="e.g. Business / Salaried / Agriculture" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                         </div>
                     </div>
                 </div>
 
-                <!-- Conditional Section: Joint Co-Litigants Repeater -->
-                <div x-show="entityType === 'joint'" class="p-3.5 rounded-md bg-blue-50/50 border border-blue-200">
-                    <div class="flex items-center justify-between mb-2">
-                        <div>
-                            <h4 class="font-semibold text-[#1e40af] flex items-center gap-1.5">
-                                <span class="material-symbols-outlined text-[16px]">groups</span>
-                                <span>Co-Litigants &amp; Joint Litigant Members</span>
-                            </h4>
-                            <p class="text-[11px] text-[#1e3a8a]">Add all co-plaintiffs, co-petitioners, or joint property owners represented under this file.</p>
-                        </div>
-                        <button type="button" @click="addMember()" class="btn-secondary h-7 px-2.5 text-[11px] inline-flex items-center gap-1 text-[#1e40af] border-blue-300 hover:bg-blue-100">
-                            <span class="material-symbols-outlined text-[14px]">add</span>
-                            <span>Add Co-Litigant</span>
+                <!-- 4. Dynamic Step: Joint / Co-Litigants Repeater Section -->
+                <div x-show="category === 'joint' || members.length > 0" x-cloak class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-[#23493A] flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">group</span>
+                            <span>Co-Litigants &amp; Joint Members</span>
+                        </span>
+                        <button type="button" @click="addMember()" class="text-xs font-semibold text-[#23493A] hover:underline inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-[4px] border border-[#E7E4DC] shadow-2xs cursor-pointer">
+                            <span class="material-symbols-outlined text-sm">group_add</span>
+                            <span>+ Add Co-Client</span>
                         </button>
                     </div>
 
-                    <div class="space-y-2 mt-2">
+                    <p class="text-[11.5px] text-[#646864]">Add co-petitioners, co-owners, or joint party members representing this case dossier:</p>
+
+                    <div class="flex flex-col gap-3">
                         <template x-for="(member, index) in members" :key="index">
-                            <div class="bg-white border border-blue-200 rounded-md p-3 grid grid-cols-1 sm:grid-cols-6 gap-2 items-center">
-                                <div class="sm:col-span-2">
-                                    <input type="text" :name="'members[' + index + '][name]'" x-model="member.name" required placeholder="Co-Litigant Name"
-                                           class="h-8 px-2.5 w-full rounded bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
-                                </div>
-                                <div>
-                                    <input type="text" :name="'members[' + index + '][relationship]'" x-model="member.relationship" placeholder="Relation (e.g. Brother, Co-owner)"
-                                           class="h-8 px-2.5 w-full rounded bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
-                                </div>
-                                <div>
-                                    <input type="text" :name="'members[' + index + '][phone]'" x-model="member.phone" placeholder="Phone"
-                                           class="h-8 px-2.5 w-full rounded bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
-                                </div>
-                                <div>
-                                    <input type="text" :name="'members[' + index + '][pan]'" x-model="member.pan" maxlength="10" placeholder="PAN" style="text-transform: uppercase;"
-                                           class="h-8 px-2.5 w-full rounded bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a]"/>
-                                </div>
-                                <div class="flex items-center justify-end">
-                                    <button type="button" @click="removeMember(index)" class="text-red-500 hover:text-red-700 p-1" title="Remove">
-                                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                            <div class="bg-white p-3 rounded-md border border-[#E7E4DC] flex flex-col gap-2.5 relative">
+                                <div class="flex items-center justify-between pb-1.5 border-b border-[#F0EEE8]">
+                                    <span class="text-xs font-semibold text-[#1A1E1C] flex items-center gap-1">
+                                        <span class="w-4 h-4 rounded-full bg-[#23493A]/10 text-[#23493A] flex items-center justify-center text-[10px] font-bold" x-text="index + 1"></span>
+                                        <span>Joint Co-Client #<span x-text="index + 1"></span></span>
+                                    </span>
+                                    <button type="button" @click="removeMember(index)" class="text-xs text-red-600 hover:text-red-800 flex items-center gap-0.5 cursor-pointer">
+                                        <span class="material-symbols-outlined text-sm">delete</span>
+                                        <span>Remove</span>
                                     </button>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-[11.5px] font-medium text-[#1A1E1C]">Co-Client Full Name</label>
+                                        <input :name="'members[' + index + '][name]'" x-model="member.name" type="text" required placeholder="e.g. Rajesh Sharma" class="w-full h-[36px] px-2.5 rounded-[4px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A]"/>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-[11.5px] font-medium text-[#1A1E1C]">Legal Relationship / Status</label>
+                                        <select :name="'members[' + index + '][relationship]'" x-model="member.relationship" class="w-full h-[36px] px-2.5 rounded-[4px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A]">
+                                            <option value="Co-petitioner">Co-petitioner</option>
+                                            <option value="Co-respondent">Co-respondent</option>
+                                            <option value="Co-owner">Co-owner / Joint Owner</option>
+                                            <option value="Legal Heir">Legal Heir / Next of Kin</option>
+                                            <option value="Partner">Partner / Director</option>
+                                            <option value="Spouse">Spouse / Family Member</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-[11.5px] font-medium text-[#1A1E1C]">Mobile Contact</label>
+                                        <input :name="'members[' + index + '][phone]'" x-model="member.phone" type="text" placeholder="+91 98765 00000" class="w-full h-[36px] px-2.5 rounded-[4px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A]"/>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-[11.5px] font-medium text-[#1A1E1C]">Email Address</label>
+                                        <input :name="'members[' + index + '][email]'" x-model="member.email" type="email" placeholder="coclient@domain.com" class="w-full h-[36px] px-2.5 rounded-[4px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A]"/>
+                                    </div>
                                 </div>
                             </div>
                         </template>
 
-                        <div x-show="members.length === 0" class="text-center py-3 text-[11.5px] text-[#1e3a8a] bg-white/60 border border-dashed border-blue-200 rounded">
-                            No co-litigants added yet. Click <strong>"Add Co-Litigant"</strong> to attach additional petitioners or joint claimants.
+                        <div x-show="members.length === 0" class="p-3 rounded bg-white border border-dashed border-[#cfcbc0] text-center text-xs text-[#646864]">
+                            No co-clients added yet. Click <button type="button" @click="addMember()" class="text-[#23493A] font-semibold underline">"+ Add Co-Client"</button> to add joint litigants.
                         </div>
                     </div>
                 </div>
 
-                <!-- Step 6: Counsel Assignment & Advance Trust Balance -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2 border-t border-[#f0eee8]">
+                <!-- 5. Counsel Assignment & Initial Status -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
                     <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">Lead Consulting Counsel</label>
-                        <select name="primary_attorney_id" class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                        <label class="font-semibold text-[#1A1E1C]">Lead Consulting Counsel</label>
+                        <select name="primary_attorney_id" x-model="primaryAttorneyId" class="h-10 px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] focus:border-[#23493A] focus:outline-none cursor-pointer">
                             @foreach($attorneys as $attorney)
                                 <option value="{{ $attorney->id }}" {{ Auth::id() === $attorney->id ? 'selected' : '' }}>
                                     {{ $attorney->name }} ({{ ucfirst($attorney->role) }})
@@ -767,26 +716,41 @@
                     </div>
 
                     <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">Opening Retainer / Advance Trust (₹)</label>
-                        <input name="trust_balance" type="number" step="0.01" min="0" value="0.00"
-                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] font-mono text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                        <label class="font-semibold text-[#1A1E1C]">Initial Lifecycle Status</label>
+                        <select name="status" x-model="initialStatus" class="h-10 px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] focus:border-[#23493A] focus:outline-none cursor-pointer">
+                            <option value="lead">Lead (Pending Initial Consultation)</option>
+                            <option value="intake">Intake (Document &amp; Case Review)</option>
+                            <option value="conflict_check">Conflict Check (Bar Clearance)</option>
+                            <option value="prospective">Prospective Client</option>
+                            <option value="active">Active (Retained Client)</option>
+                        </select>
                     </div>
                 </div>
 
-                <!-- Internal Chamber Intake Notes -->
-                <div class="flex flex-col gap-1">
-                    <label class="font-semibold text-[#1a1a1a]">Confidential Chamber Intake Notes (Advocate Only)</label>
-                    <textarea name="internal_intake_notes" rows="2" placeholder="Brief facts of dispute, initial counsel impressions, or physical file docket notes..."
-                              class="px-3 py-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"></textarea>
+                <!-- 6. Confidential Case Summary / Representation Notes -->
+                <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm text-[#23493A]">gavel</span>
+                            <span>Confidential Representation Notes</span>
+                        </span>
+                        <span class="text-[10px] text-[#23493A] font-mono bg-[#23493A]/10 px-2 py-0.5 rounded font-medium">Chambers Review</span>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Brief Facts / Dispute Summary (Confidential Counsel Review)</label>
+                        <textarea name="internal_intake_notes" x-model="internalIntakeNotes" rows="2" placeholder="Briefly describe the legal matter, dispute, or representation requirements for advocate review..."
+                                  class="w-full p-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all resize-none"></textarea>
+                    </div>
                 </div>
 
                 <!-- Modal Footer -->
-                <div class="pt-3 border-t border-[#f0eee8] flex items-center justify-end gap-2.5">
-                    <button type="button" @click="openCreateModal = false" :disabled="isSubmitting" class="btn-secondary h-9 px-4 text-xs">Cancel</button>
-                    <button type="submit" :disabled="isSubmitting" :class="isSubmitting ? 'opacity-70 cursor-not-allowed' : ''" class="btn-primary h-9 px-5 text-xs inline-flex items-center gap-1.5">
+                <div class="pt-3 border-t border-[#F0EEE8] flex items-center justify-end gap-2.5">
+                    <button type="button" @click="openCreateModal = false" :disabled="isSubmitting" class="btn-secondary h-10 px-4 text-xs cursor-pointer">Cancel</button>
+                    <button type="submit" :disabled="isSubmitting" :class="isSubmitting ? 'opacity-70 cursor-not-allowed' : ''" class="btn-primary h-10 px-5 text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs">
                         <span class="material-symbols-outlined text-[16px]" x-show="!isSubmitting">how_to_reg</span>
                         <span class="material-symbols-outlined text-[16px] animate-spin" x-show="isSubmitting" style="display: none;">progress_activity</span>
-                        <span x-text="isSubmitting ? 'Registering Client...' : 'Complete Client Intake'"></span>
+                        <span x-text="isSubmitting ? 'Registering Client...' : 'Complete Client Intake &amp; Onboard'"></span>
                     </button>
                 </div>
             </form>

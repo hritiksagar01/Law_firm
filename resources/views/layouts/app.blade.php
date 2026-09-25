@@ -170,14 +170,6 @@
                     <span>Calendar</span>
                 </a>
 
-                <!-- Search -->
-                @if(Route::has('search'))
-                <a href="{{ route('search') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('search') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
-                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('search') ? 'text-white' : 'text-[#9ca3af]' }}">search</span>
-                    <span>Search</span>
-                </a>
-                @endif
 
                 <!-- Analytics -->
                 @if(Route::has('analytics.index'))
@@ -303,12 +295,6 @@
                     Operational
                 </span>
 
-                <!-- Quick Global Search Button / Link -->
-                <a href="{{ route('search') }}" 
-                   class="p-2 text-[#5e625e] hover:text-[#1b1c18] hover:bg-[#f5f3ed] rounded-md transition-colors" 
-                   title="Global Search (⌘K)">
-                    <span class="material-symbols-outlined text-[20px]">search</span>
-                </a>
 
                 <!-- Notification Bell Dropdown -->
                 <div class="relative" x-data="{ notificationsOpen: false }" @click.outside="notificationsOpen = false">
