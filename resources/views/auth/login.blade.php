@@ -136,7 +136,7 @@
                         <span class="truncate">Client Portal</span>
                     </button>
 
-                    <!-- LawFirm & Advocate Login -->
+                    <!-- Law Firm & Advocate Login -->
                     <button type="button" @click="setCredential('firm', 'hritiksagar.tech@gmail.com', '12345678')"
                         class="py-2 px-2 sm:px-3 rounded-[6px] text-xs flex items-center justify-center gap-2 transition-all cursor-pointer select-none"
                         :class="tab === 'firm'
@@ -149,23 +149,10 @@
                         </span>
                         <span class="material-symbols-outlined text-[15px] shrink-0"
                             :class="tab === 'firm' ? 'text-[#23493A]' : 'text-[#8A8E89]'">balance</span>
-                        <span class="truncate">LawFirm & Advocate</span>
+                        <span class="truncate">Law Firm &amp; Advocate</span>
                     </button>
                 </div>
 
-                <!-- Super Admin: Subtle, minimal option at bottom with small radio button -->
-                <div class="flex items-center justify-center">
-                    <button type="button" @click="setCredential('admin', 'admin@sharmalegal.in', 'password123')"
-                        class="text-[11.5px] text-[#8A8E89] hover:text-[#23493A] transition-colors cursor-pointer inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full hover:bg-[#F6F4EE]"
-                        :class="tab === 'admin' ? 'text-[#23493A] font-semibold bg-[#F6F4EE]' : ''">
-                        <span class="w-3 h-3 rounded-full border flex items-center justify-center transition-all shrink-0"
-                            :class="tab === 'admin' ? 'border-[#23493A] bg-[#23493A]' : 'border-[#cfcbc0] bg-white'">
-                            <span class="w-1 h-1 rounded-full bg-white" x-show="tab === 'admin'"></span>
-                        </span>
-                        <span class="material-symbols-outlined text-[14px]">admin_panel_settings</span>
-                        <span>Super Admin Access</span>
-                    </button>
-                </div>
             </div>
 
             <!-- Dynamic Tab Header -->
@@ -178,13 +165,13 @@
                 </template>
                 <template x-if="tab === 'firm'">
                     <div>
-                        <h2 class="font-headline text-[22px] font-medium text-[#1A1E1C] tracking-tight">LawFirm and Advocate Login</h2>
+                        <h2 class="font-headline text-[22px] font-medium text-[#1A1E1C] tracking-tight">Law Firm &amp; Advocate Login</h2>
                         <p class="text-xs text-[#646864] mt-0.5 font-sans">Practice credentials for active litigation dockets, filings, and trust ledger.</p>
                     </div>
                 </template>
                 <template x-if="tab === 'admin'">
                     <div>
-                        <h2 class="font-headline text-[22px] font-medium text-[#1A1E1C] tracking-tight">Super Admin</h2>
+                        <h2 class="font-headline text-[22px] font-medium text-[#1A1E1C] tracking-tight">Super Admin Portal</h2>
                         <p class="text-xs text-[#646864] mt-0.5 font-sans">Super-administrator console for multi-tenant firm governance.</p>
                     </div>
                 </template>
@@ -316,6 +303,20 @@
             <a href="https://skybridgeit.com/" target="_blank" rel="noopener noreferrer" 
                class="text-[#8A8E89] hover:text-[#1A1E1C] underline">Skybridge IT Consulting</a>
         </p>
+
+        <!-- Super Admin Access: Positioned at bottom of page below credits -->
+        <div class="pt-2 flex items-center justify-center">
+            <button type="button" @click="setCredential('admin', 'admin@sharmalegal.in', 'password123'); window.scrollTo({top: 0, behavior: 'smooth'});"
+                class="text-[11.5px] text-[#8A8E89] hover:text-[#23493A] transition-colors cursor-pointer inline-flex items-center gap-1.5 py-1 px-3 rounded-full hover:bg-white/80 border border-transparent hover:border-[#E7E4DC]"
+                :class="tab === 'admin' ? 'text-[#23493A] font-semibold bg-white border-[#E7E4DC] shadow-xs' : ''">
+                <span class="w-3 h-3 rounded-full border flex items-center justify-center transition-all shrink-0"
+                    :class="tab === 'admin' ? 'border-[#23493A] bg-[#23493A]' : 'border-[#cfcbc0] bg-white'">
+                    <span class="w-1 h-1 rounded-full bg-white" x-show="tab === 'admin'"></span>
+                </span>
+                <span class="material-symbols-outlined text-[14px]">admin_panel_settings</span>
+                <span>Super Admin Access</span>
+            </button>
+        </div>
     </footer>
 
 </body>
