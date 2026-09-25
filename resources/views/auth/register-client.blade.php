@@ -16,6 +16,7 @@
 <body class="bg-[#f4f2ed] text-[#1A1E1C] font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4 relative"
     x-data="{
         category: 'individual',
+        onboardingMode: 'portal_online',
         firmId: '{{ $firms->first()?->id ?? 1 }}',
         name: 'Vikram Malhotra',
         contactPerson: 'Vikram Malhotra',
@@ -42,15 +43,17 @@
                     { name: 'Rajesh Sharma', relationship: 'Co-petitioner / Co-owner', phone: '+91 98765 11223', email: 'rajesh.sharma@gmail.com' },
                     { name: 'Sanjay Malhotra', relationship: 'Co-litigant / Relative', phone: '+91 98100 44556', email: 'sanjay.m@gmail.com' }
                 ];
-            } else if (type === 'corporate') {
-                this.category = 'corporate';
-                this.name = 'Malhotra Enterprises Pvt Ltd';
-                this.contactPerson = 'Vikram Malhotra (Director)';
-                this.email = 'vikram.enterprise@gmail.com';
-                this.phone = '+91 98765 12345';
+            } else if (type === 'assisted') {
+                this.category = 'individual';
+                this.onboardingMode = 'assisted_offline';
+                this.name = 'Chandra Sekhar (Assisted Intake)';
+                this.contactPerson = 'Chandra Sekhar';
+                this.email = 'chandra.assisted@gmail.com';
+                this.phone = '+91 98100 77665';
                 this.members = [];
             } else {
                 this.category = 'individual';
+                this.onboardingMode = 'portal_online';
                 this.name = 'Vikram Malhotra';
                 this.contactPerson = 'Vikram Malhotra';
                 this.email = 'vikram.client@gmail.com';
@@ -99,6 +102,15 @@
 
     <div class="w-full max-w-xl flex flex-col items-center my-6">
         
+        <!-- Top Action Navigation Bar: Back to Sign In -->
+        <div class="w-full flex items-center justify-between mb-4">
+            <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#23493A] hover:underline bg-white px-3 py-1.5 rounded-full border border-[#E7E4DC] shadow-2xs transition-all cursor-pointer">
+                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                <span>Back to Sign In</span>
+            </a>
+            <span class="text-[11px] font-mono text-[#8A8E89]">Client Self-Registration Protocol</span>
+        </div>
+
         <!-- Brand Emblem -->
         <div class="flex flex-col items-center text-center mb-5">
             <div class="p-3.5 bg-white rounded-2xl border border-[#E7E4DC] shadow-[0_4px_24px_-2px_rgba(26,30,28,0.08)] flex items-center justify-center mb-3">
@@ -131,7 +143,10 @@
                         <span>Individual Demo</span>
                     </button>
                     <button type="button" @click="fillDemo('joint')" class="text-[11px] text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2 py-0.5 rounded-[4px] font-medium border border-[#23493A]/15 cursor-pointer">
-                        <span>⚡ Joint Co-Clients Demo</span>
+                        <span>⚡ Joint Co-Clients</span>
+                    </button>
+                    <button type="button" @click="fillDemo('assisted')" class="text-[11px] text-[#92400e] hover:underline flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-[4px] font-medium border border-amber-200 cursor-pointer">
+                        <span>💬 WhatsApp Intake</span>
                     </button>
                 </div>
             </div>
@@ -141,11 +156,11 @@
                 @csrf
                 <input type="hidden" name="firm_id" :value="firmId"/>
 
-                <!-- Step 1: Client Category -->
+                <!-- Step 1: Client Category & Communication Preference -->
                 <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
                     <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-sm text-[#23493A]">business_center</span>
-                        <span>01 · Account Category</span>
+                        <span>01 · Account Category &amp; Communication Preferences</span>
                     </span>
 
                     <div class="flex flex-col gap-1.5">
@@ -156,6 +171,30 @@
                             <option value="corporate">Corporate Entity / Company</option>
                             <option value="institution">Institution / Trust / Society</option>
                         </select>
+                    </div>
+
+                    <!-- Client Digital Literacy & Communication Mode -->
+                    <div class="flex flex-col gap-1.5 mt-1">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Digital Literacy &amp; Onboarding Mode</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <label class="border p-2.5 rounded-md flex flex-col cursor-pointer transition-all"
+                                   :class="onboardingMode === 'portal_online' ? 'border-[#23493A] bg-white font-semibold text-[#23493A] shadow-xs' : 'border-[#E7E4DC] bg-white/60 text-[#646864] hover:bg-white'">
+                                <div class="flex items-center gap-2">
+                                    <input type="radio" name="onboarding_mode" value="portal_online" x-model="onboardingMode" class="text-[#23493A] focus:ring-[#23493A] cursor-pointer"/>
+                                    <span class="text-xs font-semibold text-[#1A1E1C]">Standard Digital Portal</span>
+                                </div>
+                                <span class="text-[11px] text-[#646864] mt-1">Direct online portal access for case files, PDFs &amp; billing</span>
+                            </label>
+
+                            <label class="border p-2.5 rounded-md flex flex-col cursor-pointer transition-all"
+                                   :class="onboardingMode === 'assisted_offline' ? 'border-[#92400e] bg-amber-50/50 font-semibold text-[#92400e] shadow-xs' : 'border-[#E7E4DC] bg-white/60 text-[#646864] hover:bg-white'">
+                                <div class="flex items-center gap-2">
+                                    <input type="radio" name="onboarding_mode" value="assisted_offline" x-model="onboardingMode" class="text-[#92400e] focus:ring-[#92400e] cursor-pointer"/>
+                                    <span class="text-xs font-semibold text-[#92400e]">Assisted / WhatsApp Support</span>
+                                </div>
+                                <span class="text-[11px] text-[#646864] mt-1">Phone/WhatsApp hearing alerts &amp; low literacy assistance</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -311,11 +350,11 @@
             </form>
 
             <div class="mt-5 pt-4 border-t border-[#F0EEE8] flex items-center justify-between text-xs">
-                <span class="text-[#646864]">Already registered as a client?</span>
                 <a href="{{ route('login') }}" class="font-semibold text-[#23493A] hover:underline flex items-center gap-1">
-                    <span>Sign In to Portal</span>
-                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    <span class="material-symbols-outlined text-sm">arrow_back</span>
+                    <span>Back to Sign In</span>
                 </a>
+                <span class="text-[#646864]">Already registered as a client?</span>
             </div>
 
         </div>

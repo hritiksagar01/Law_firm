@@ -118,6 +118,7 @@ class AuthController extends Controller
 
         $validated = $request->validate([
             'category' => 'required|in:individual,joint,corporate,institution,partnership,proprietorship',
+            'onboarding_mode' => 'nullable|in:portal_online,assisted_offline',
             'name' => 'required|string|max:255',
             'contact_person' => 'nullable|string|max:255',
             'email' => 'required|email|unique:users,email',
@@ -152,7 +153,7 @@ class AuthController extends Controller
             'contact_person' => $validated['contact_person'] ?? $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
-            'onboarding_mode' => 'portal_online',
+            'onboarding_mode' => $validated['onboarding_mode'] ?? 'portal_online',
             'portal_status' => 'active',
             'status' => 'active',
         ]);
