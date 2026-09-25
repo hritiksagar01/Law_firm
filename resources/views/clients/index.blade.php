@@ -6,6 +6,8 @@
 @section('content')
 <div x-data="{
     openCreateModal: false,
+    openAssignModal: false,
+    assignClient: { id: null, name: '', attorney_id: '', notes: '' },
     isSubmitting: false,
     activeTab: '{{ request('category', 'all') }}',
     entityType: 'individual',
@@ -81,8 +83,15 @@
                class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('category') === 'institution' ? 'bg-[#23493a] text-white' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a]' }}">
                 Institutions &amp; Trusts
             </a>
+            <a href="{{ route('clients.index', ['status' => 'lead']) }}"
+               class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('status') === 'lead' ? 'bg-[#23493a] text-white' : 'text-[#92400e] bg-amber-50 hover:bg-amber-100 border border-amber-200' }}">
+                <span class="inline-flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                    <span>Leads &amp; Unassigned ({{ $unassignedLeadsCount }})</span>
+                </span>
+            </a>
             <a href="{{ route('clients.index', ['mode' => 'assisted_offline']) }}"
-               class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('mode') === 'assisted_offline' ? 'bg-[#23493a] text-white' : 'text-[#92400e] bg-amber-50 hover:bg-amber-100' }}">
+               class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('mode') === 'assisted_offline' ? 'bg-[#23493a] text-white' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a]' }}">
                 <span class="inline-flex items-center gap-1">
                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                     <span>Offline / Low Literacy ({{ $assistedOfflineCount }})</span>
@@ -98,13 +107,16 @@
             @if(request('mode'))
                 <input type="hidden" name="mode" value="{{ request('mode') }}"/>
             @endif
+            @if(request('status'))
+                <input type="hidden" name="status" value="{{ request('status') }}"/>
+            @endif
             <div class="relative w-full md:w-64">
                 <span class="material-symbols-outlined absolute left-2.5 top-2.5 text-[18px] text-[#8a8a8a]">search</span>
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Search name, PAN, CIN, P.S..."
                        class="w-full h-9 pl-9 pr-3 rounded-md bg-[#faf8f5] border border-[#e5e3dc] text-xs text-[#1a1a1a] placeholder-[#8a8a8a] focus:bg-white focus:border-[#23493a] focus:outline-none"/>
             </div>
             @if(request('q'))
-                <a href="{{ route('clients.index', array_filter(['category' => request('category'), 'mode' => request('mode')])) }}" class="text-xs text-[#8a8a8a] hover:text-[#1a1a1a] px-1">Clear</a>
+                <a href="{{ route('clients.index', array_filter(['category' => request('category'), 'mode' => request('mode'), 'status' => request('status')])) }}" class="text-xs text-[#8a8a8a] hover:text-[#1a1a1a] px-1">Clear</a>
             @endif
         </form>
     </div>
@@ -127,8 +139,13 @@
                         @endif
                     </div>
 
-                    <!-- Digital Access Indicator -->
-                    @if($client->isOfflineOnly())
+                    <!-- Digital Access Indicator & Lead Status -->
+                    @if($client->status === 'lead' || ! $client->primary_attorney_id)
+                        <span class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full" title="Self-registered lead awaiting advocate assignment">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse"></span>
+                            <span>Lead / Intake Pending</span>
+                        </span>
+                    @elseif($client->isOfflineOnly())
                         <span class="inline-flex items-center gap-1 text-[11px] font-medium text-[#92400e] bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full" title="Assisted Offline Intake (No portal login / Assisted by Clerk)">
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                             <span>Assisted Offline</span>
@@ -211,7 +228,13 @@
 
                     <div class="flex items-center gap-1.5 text-[11.5px]">
                         <span class="material-symbols-outlined text-[14px] text-[#23493a]">gavel</span>
-                        <span>Counsel: <strong class="text-[#1a1a1a]">{{ $client->primaryAttorney->name ?? 'Chambers Counsel' }}</strong></span>
+                        <span>Counsel: 
+                            @if($client->primaryAttorney)
+                                <strong class="text-[#1a1a1a]">{{ $client->primaryAttorney->name }}</strong>
+                            @else
+                                <strong class="text-amber-800 italic font-medium">Unassigned Lead</strong>
+                            @endif
+                        </span>
                     </div>
                 </div>
             </div>
@@ -224,6 +247,15 @@
                 </div>
 
                 <div class="flex items-center gap-1.5">
+                    <!-- Assign Advocate Button for Leads -->
+                    @if($client->status === 'lead' || ! $client->primary_attorney_id)
+                        <button type="button" @click="assignClient = { id: {{ $client->id }}, name: '{{ addslashes($client->name) }}', attorney_id: '{{ $client->primary_attorney_id ?? Auth::id() }}', notes: '{{ addslashes($client->internal_intake_notes ?? '') }}' }; openAssignModal = true"
+                                class="btn-primary h-7 px-2.5 text-[11px] inline-flex items-center gap-1 bg-amber-700 hover:bg-amber-800 border-amber-800 text-white cursor-pointer" title="Assign Lead Advocate & Complete Intake">
+                            <span class="material-symbols-outlined text-[14px]">how_to_reg</span>
+                            <span>Assign Advocate</span>
+                        </button>
+                    @endif
+
                     <!-- Physical Chamber Slip Link -->
                     <a href="{{ route('clients.intake-slip', $client->id) }}" target="_blank"
                        class="btn-secondary h-7 px-2 text-[11px] inline-flex items-center gap-1 text-[#646864] hover:text-[#1a1a1a]" title="Print Chamber File Docket Slip (Basta Slip)">
@@ -676,6 +708,64 @@
                         <span class="material-symbols-outlined text-[16px]" x-show="!isSubmitting">how_to_reg</span>
                         <span class="material-symbols-outlined text-[16px] animate-spin" x-show="isSubmitting" style="display: none;">progress_activity</span>
                         <span x-text="isSubmitting ? 'Registering Client...' : 'Complete Client Intake'"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- ASSIGN LEAD ADVOCATE & COMPLETE INTAKE MODAL                              -->
+    <!-- ========================================================================= -->
+    <div x-show="openAssignModal"
+         x-cloak
+         @click.away="openAssignModal = false"
+         class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white border border-[#e5e3dc] rounded-md shadow-2xl w-full max-w-lg p-6 flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b border-[#f0eee8] mb-4">
+                <div class="flex items-center gap-2.5">
+                    <span class="material-symbols-outlined text-2xl text-[#23493a]">how_to_reg</span>
+                    <div>
+                        <h3 class="text-base font-semibold text-[#1a1a1a]">Assign Advocate &amp; Complete Intake</h3>
+                        <p class="text-xs text-[#646864]">Assign lead counsel to <strong x-text="assignClient.name"></strong> and mark active</p>
+                    </div>
+                </div>
+                <button type="button" @click="openAssignModal = false" class="text-[#8a8a8a] hover:text-[#1a1a1a]">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+            </div>
+
+            <form :action="'/clients/' + assignClient.id + '/assign-attorney'" method="POST" class="flex flex-col gap-4 text-xs">
+                @csrf
+                <div class="flex flex-col gap-1">
+                    <label class="font-semibold text-[#1a1a1a]">Primary Lead Advocate *</label>
+                    <select name="primary_attorney_id" x-model="assignClient.attorney_id" required class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                        @foreach($attorneys as $attorney)
+                            <option value="{{ $attorney->id }}">{{ $attorney->name }} ({{ ucfirst($attorney->role) }})</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label class="font-semibold text-[#1a1a1a]">Representation Status</label>
+                    <select name="status" class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                        <option value="active" selected>Active (Intake Completed &amp; Active Docket)</option>
+                        <option value="lead">Keep as Lead / Pending Intake</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label class="font-semibold text-[#1a1a1a]">Intake Review &amp; Assignment Notes</label>
+                    <textarea name="internal_intake_notes" x-model="assignClient.notes" rows="3" placeholder="Chamber notes on legal strategy, representation scope, or initial client consultation..."
+                              class="px-3 py-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"></textarea>
+                </div>
+
+                <div class="pt-3 border-t border-[#f0eee8] flex items-center justify-end gap-2">
+                    <button type="button" @click="openAssignModal = false" class="btn-secondary h-8 px-3.5 text-xs">Cancel</button>
+                    <button type="submit" class="btn-primary h-8 px-4 text-xs inline-flex items-center gap-1.5 bg-[#23493a] hover:bg-[#1a382b]">
+                        <span class="material-symbols-outlined text-[15px]">check_circle</span>
+                        <span>Assign Advocate &amp; Activate</span>
                     </button>
                 </div>
             </form>

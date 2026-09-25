@@ -486,6 +486,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/clients/{client}', [ClientController::class, 'update'])->name('clients.update');
         Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
         Route::post('/clients/{client}/invite', [ClientController::class, 'invite'])->name('clients.invite');
+        Route::post('/clients/{client}/assign-attorney', [ClientController::class, 'assignAttorney'])->name('clients.assign-attorney');
         Route::get('/clients/{client}/intake-slip', [ClientController::class, 'generateIntakeSlip'])->name('clients.intake-slip');
 
         // Documents Vault

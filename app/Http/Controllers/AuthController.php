@@ -161,7 +161,8 @@ class AuthController extends Controller
             'occupation' => $validated['occupation'] ?? null,
             'onboarding_mode' => $validated['onboarding_mode'] ?? 'portal_online',
             'portal_status' => 'active',
-            'status' => 'active',
+            'status' => 'lead',
+            'primary_attorney_id' => null,
         ]);
 
         if (! empty($request->input('members'))) {

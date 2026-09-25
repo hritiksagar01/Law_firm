@@ -2,8 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Client;
 use App\Models\Firm;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class ClientRegistrationTest extends TestCase
@@ -57,6 +60,7 @@ class ClientRegistrationTest extends TestCase
             'name' => 'Vikram Malhotra',
             'firm_id' => $firm->id,
             'portal_status' => 'active',
+            'status' => 'lead',
         ]);
     }
 
@@ -141,6 +145,54 @@ class ClientRegistrationTest extends TestCase
             'gender' => 'male',
             'occupation' => 'Architect',
             'onboarding_mode' => 'assisted_offline',
+            'status' => 'lead',
+        ]);
+    }
+
+    public function test_lead_client_can_be_assigned_attorney_by_advocate(): void
+    {
+        $firm = Firm::create([
+            'name' => 'Sharma & Associates',
+            'slug' => 'sharma-associates-5',
+            'email' => 'info5@sharmalegal.in',
+        ]);
+
+        $attorney = User::create([
+            'firm_id' => $firm->id,
+            'name' => 'Adv. Rajesh Sharma',
+            'email' => 'rajesh.attorney@sharmalegal.in',
+            'password' => Hash::make('password'),
+            'role' => 'partner',
+            'title' => 'Senior Advocate',
+        ]);
+
+        $client = Client::create([
+            'firm_id' => $firm->id,
+            'name' => 'Pending Lead Client',
+            'contact_person' => 'Pending Lead Client',
+            'email' => 'lead.client@example.com',
+            'phone' => '+91 98110 00112',
+            'category' => 'individual',
+            'onboarding_mode' => 'portal_online',
+            'portal_status' => 'active',
+            'status' => 'lead',
+            'primary_attorney_id' => null,
+        ]);
+
+        $this->actingAs($attorney);
+
+        $response = $this->post("/clients/{$client->id}/assign-attorney", [
+            'primary_attorney_id' => $attorney->id,
+            'status' => 'active',
+            'internal_intake_notes' => 'Intake completed by Senior Advocate.',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('clients', [
+            'id' => $client->id,
+            'primary_attorney_id' => $attorney->id,
+            'status' => 'active',
+            'internal_intake_notes' => 'Intake completed by Senior Advocate.',
         ]);
     }
 }

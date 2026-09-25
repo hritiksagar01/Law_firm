@@ -55,6 +55,7 @@ class PortalController extends Controller
     public function dashboard()
     {
         $client = $this->getClient();
+        $client->load('primaryAttorney');
 
         $matters = Matter::where('client_id', $client->id)
             ->with(['documents', 'leadAttorney', 'documentRequests', 'events'])

@@ -20,6 +20,22 @@
         </div>
     </div>
 
+    <!-- Lead Intake / Attorney Assignment Pending Alert Banner -->
+    @if($client->status === 'lead' || ! $client->primary_attorney_id)
+    <div class="bg-amber-50 border border-amber-200 rounded-md p-4 mb-6 shadow-xs flex items-start gap-3.5">
+        <div class="w-9 h-9 rounded-md bg-amber-500/10 text-amber-800 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-2xl text-amber-700">manage_accounts</span>
+        </div>
+        <div>
+            <h3 class="text-sm font-semibold text-amber-900">Intake Protocol Pending — Lead Attorney Assignment in Progress</h3>
+            <p class="text-xs text-amber-800 mt-1 leading-relaxed">
+                Welcome to our Client Portal. Your representation request has been logged as an incoming client lead.
+                Our managing partners are currently reviewing your intake profile to assign the optimal Lead Advocate for your matter. Once assigned, your lead counsel profile and active case dossier will update automatically.
+            </p>
+        </div>
+    </div>
+    @endif
+
     <!-- Urgent Action Alert Banner (Dynamic) -->
     @php
         $pendingActionCount = $documentRequests->whereIn('status', ['pending', 'rejected'])->count();
@@ -256,6 +272,35 @@
         <!-- Right Column (4 cols) -->
         <div class="lg:col-span-4 flex flex-col gap-6">
             
+            <!-- Card 0: Assigned Lead Advocate Profile Card -->
+            @if($client->primaryAttorney)
+            <div class="border border-[#e5e3dc] bg-white rounded-md p-4 sm:p-5 shadow-xs flex flex-col gap-3">
+                <div class="flex items-center justify-between pb-2 border-b border-[#f0eee8]">
+                    <span class="text-[11px] text-[#8a8a8a] uppercase font-mono tracking-wider font-semibold">Assigned Lead Advocate</span>
+                    <span class="text-[11px] font-medium text-[#065f46] bg-[#ecfdf5] px-2 py-0.5 rounded border border-[#a7f3d0]">Primary Counsel</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-[#23493a] text-white font-semibold flex items-center justify-center text-sm shrink-0">
+                        {{ strtoupper(substr($client->primaryAttorney->name, 0, 2)) }}
+                    </div>
+                    <div class="flex flex-col min-w-0">
+                        <h4 class="text-sm font-semibold text-[#1a1a1a] truncate">{{ $client->primaryAttorney->name }}</h4>
+                        <span class="text-[11.5px] text-[#646864] truncate">{{ $client->primaryAttorney->title ?? 'Senior Advocate & Practice Counsel' }}</span>
+                    </div>
+                </div>
+                <div class="pt-2 border-t border-[#f0eee8] flex items-center justify-between text-xs">
+                    <span class="text-[#646864] font-mono text-[11px] flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px] text-[#8a8a8a]">call</span>
+                        <span>{{ $client->primaryAttorney->phone ?? 'Chambers Line' }}</span>
+                    </span>
+                    <a href="#counsel-thread" class="text-[#23493a] font-medium hover:underline flex items-center gap-1">
+                        <span>Message Counsel</span>
+                        <span class="material-symbols-outlined text-[13px]">arrow_downward</span>
+                    </a>
+                </div>
+            </div>
+            @endif
+
             <!-- Card 1: Upcoming Hearings & Cause List Appearances -->
             <div class="border border-[#e5e3dc] bg-white rounded-md p-5 sm:p-6 shadow-xs flex flex-col gap-4">
                 <div class="flex items-center justify-between pb-3 border-b border-[#f0eee8]">

@@ -71,6 +71,18 @@ class ClientController extends Controller
             }
         }
 
+        // Filter by Status / Lead
+        if ($status = $request->get('status')) {
+            if ($status === 'lead') {
+                $query->where(function ($q) {
+                    $q->where('status', 'lead')
+                        ->orWhereNull('primary_attorney_id');
+                });
+            } else {
+                $query->where('status', $status);
+            }
+        }
+
         // Search Query
         if ($search = trim($request->get('q', ''))) {
             $query->where(function ($q) use ($search) {
@@ -95,6 +107,9 @@ class ClientController extends Controller
         $assistedOfflineCount = Client::where('firm_id', $firmId)
             ->where(fn ($q) => $q->where('onboarding_mode', 'assisted_offline')->orWhere('portal_status', 'offline_only'))
             ->count();
+        $unassignedLeadsCount = Client::where('firm_id', $firmId)
+            ->where(fn ($q) => $q->where('status', 'lead')->orWhereNull('primary_attorney_id'))
+            ->count();
         $activeMattersCount = Matter::where('firm_id', $firmId)->where('status', 'active')->count();
 
         $attorneys = User::where('firm_id', $firmId)
@@ -108,8 +123,35 @@ class ClientController extends Controller
             'totalClientsCount',
             'portalActiveCount',
             'assistedOfflineCount',
+            'unassignedLeadsCount',
             'activeMattersCount'
         ));
+    }
+
+    public function assignAttorney(Request $request, Client $client): RedirectResponse
+    {
+        $firmId = Auth::user()->firm_id ?? 1;
+        if ($client->firm_id !== $firmId) {
+            abort(403, 'Unauthorized client assignment.');
+        }
+
+        $validated = $request->validate([
+            'primary_attorney_id' => 'required|exists:users,id',
+            'status' => 'nullable|string|in:active,lead,inactive,archived',
+            'internal_intake_notes' => 'nullable|string|max:2000',
+        ]);
+
+        $attorney = User::where('id', $validated['primary_attorney_id'])
+            ->where('firm_id', $firmId)
+            ->firstOrFail();
+
+        $client->update([
+            'primary_attorney_id' => $attorney->id,
+            'status' => $validated['status'] ?? 'active',
+            'internal_intake_notes' => $validated['internal_intake_notes'] ?? $client->internal_intake_notes,
+        ]);
+
+        return back()->with('success', "Advocate {$attorney->name} assigned to client '{$client->name}'. Intake completed and client set to Active.");
     }
 
     public function store(StoreClientRequest $request): RedirectResponse
