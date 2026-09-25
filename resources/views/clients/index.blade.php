@@ -407,8 +407,20 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div class="flex flex-col gap-1">
                         <label class="font-semibold text-[#1a1a1a]" x-text="entityType === 'corporate' || entityType === 'institution' ? 'Entity / Organization Legal Name *' : 'Primary Litigant Full Name *'"></label>
-                        <input name="name" required type="text" placeholder="e.g. Ramesh Chandra Sharma or Sharma Infotech Pvt Ltd"
-                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                        <div class="flex items-center gap-1.5">
+                            <select name="salutation" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none shrink-0 cursor-pointer">
+                                <option value="Mr.">Mr.</option>
+                                <option value="Mrs.">Mrs.</option>
+                                <option value="Ms.">Ms.</option>
+                                <option value="Miss">Miss</option>
+                                <option value="Dr.">Dr.</option>
+                                <option value="Adv.">Adv.</option>
+                                <option value="Shri">Shri</option>
+                                <option value="Smt.">Smt.</option>
+                            </select>
+                            <input name="name" required type="text" placeholder="e.g. Ramesh Chandra Sharma or Sharma Infotech Pvt Ltd"
+                                   class="w-full h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                        </div>
                     </div>
 
                     <!-- Individual Parentage: Father/Husband Name (Court Memo Standard) -->

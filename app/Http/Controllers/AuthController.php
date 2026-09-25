@@ -119,14 +119,17 @@ class AuthController extends Controller
         $validated = $request->validate([
             'category' => 'required|in:individual,joint,corporate,institution,partnership,proprietorship',
             'onboarding_mode' => 'nullable|in:portal_online,assisted_offline',
+            'salutation' => 'nullable|string|max:20',
             'name' => 'required|string|max:255',
             'contact_person' => 'nullable|string|max:255',
+            'father_husband_name' => 'nullable|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|string|max:50',
             'password' => 'required|string|min:6|confirmed',
             'age' => 'nullable|integer|min:0|max:130',
             'gender' => 'nullable|string|in:male,female,other',
             'occupation' => 'nullable|string|max:255',
+            'internal_intake_notes' => 'nullable|string|max:2000',
             'members' => 'nullable|array',
             'members.*.name' => 'nullable|string|max:255',
             'members.*.relationship' => 'nullable|string|max:100',
@@ -136,15 +139,19 @@ class AuthController extends Controller
 
         $validated['firm_id'] = $firmId;
 
+        $displayName = ! empty($validated['salutation'])
+            ? trim($validated['salutation'].' '.$validated['name'])
+            : $validated['name'];
+
         $user = User::create([
             'firm_id' => $validated['firm_id'],
-            'name' => $validated['name'],
+            'name' => $displayName,
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 'client',
             'title' => in_array($validated['category'], ['corporate', 'institution']) ? 'Authorized Corporate Representative' : 'Individual Retainer Client',
             'phone' => $validated['phone'],
-            'avatar_url' => 'https://ui-avatars.com/api/?name='.urlencode($validated['name']).'&background=23493A&color=fff',
+            'avatar_url' => 'https://ui-avatars.com/api/?name='.urlencode($displayName).'&background=23493A&color=fff',
         ]);
 
         $client = Client::create([
@@ -152,14 +159,16 @@ class AuthController extends Controller
             'user_id' => $user->id,
             'category' => $validated['category'],
             'type' => in_array($validated['category'], ['corporate', 'institution']) ? 'corporate' : 'individual',
-            'name' => $validated['name'],
-            'contact_person' => $validated['contact_person'] ?? $validated['name'],
+            'name' => $displayName,
+            'contact_person' => $validated['contact_person'] ?? $displayName,
+            'father_husband_name' => $validated['father_husband_name'] ?? null,
             'email' => $validated['email'],
             'phone' => $validated['phone'],
             'age' => $validated['age'] ?? null,
             'gender' => $validated['gender'] ?? null,
             'occupation' => $validated['occupation'] ?? null,
             'onboarding_mode' => $validated['onboarding_mode'] ?? 'portal_online',
+            'internal_intake_notes' => $validated['internal_intake_notes'] ?? null,
             'portal_status' => 'active',
             'status' => 'lead',
             'primary_attorney_id' => null,

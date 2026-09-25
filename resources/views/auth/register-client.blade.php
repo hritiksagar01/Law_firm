@@ -18,8 +18,10 @@
         category: 'individual',
         onboardingMode: 'portal_online',
         firmId: '{{ $firms->first()?->id ?? 1 }}',
+        salutation: 'Mr.',
         name: 'Vikram Malhotra',
         contactPerson: 'Vikram Malhotra',
+        fatherHusbandName: 'S/o Late Shri Jagdish Malhotra',
         email: 'vikram.client@gmail.com',
         countryCode: '+91',
         phoneRaw: '9876543210',
@@ -245,12 +247,30 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[13px] font-medium text-[#1A1E1C]" x-text="category === 'corporate' || category === 'institution' ? 'Official Entity / Company Name' : (category === 'joint' ? 'Primary Litigant / Client Name' : 'Full Name')"></label>
-                            <input name="name" x-model="name" type="text" required placeholder="e.g. Vikram Malhotra" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                            <div class="flex items-center gap-1.5">
+                                <select name="salutation" x-model="salutation" class="h-[40px] px-2 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] shrink-0 cursor-pointer">
+                                    <option value="Mr.">Mr.</option>
+                                    <option value="Mrs.">Mrs.</option>
+                                    <option value="Ms.">Ms.</option>
+                                    <option value="Miss">Miss</option>
+                                    <option value="Dr.">Dr.</option>
+                                    <option value="Adv.">Adv.</option>
+                                    <option value="Shri">Shri</option>
+                                    <option value="Smt.">Smt.</option>
+                                </select>
+                                <input name="name" x-model="name" type="text" required placeholder="e.g. Vikram Malhotra" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                            </div>
                         </div>
 
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[13px] font-medium text-[#1A1E1C]">Contact Person Name</label>
-                            <input name="contact_person" x-model="contactPerson" type="text" placeholder="e.g. Vikram Malhotra (Primary)" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                        <!-- Parentage for Individual & Joint OR Contact Person for Corporate -->
+                        <div class="flex flex-col gap-1.5" x-show="category === 'individual' || category === 'joint'">
+                            <label class="text-[13px] font-medium text-[#1A1E1C]">Father's / Mother's / Husband's Name (Parentage / Spouse)</label>
+                            <input name="father_husband_name" x-model="fatherHusbandName" type="text" placeholder="e.g. S/o Late Shri Jagdish Malhotra or W/o Rajesh Sharma" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                        </div>
+
+                        <div class="flex flex-col gap-1.5" x-show="category === 'corporate' || category === 'institution'">
+                            <label class="text-[13px] font-medium text-[#1A1E1C]">Authorized Signatory / Contact Person Name</label>
+                            <input name="contact_person" x-model="contactPerson" type="text" placeholder="e.g. Vikram Malhotra (Managing Director)" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                         </div>
                     </div>
 
@@ -377,11 +397,28 @@
                     </div>
                 </div>
 
-                <!-- Step 3: Security 6-Digit Passcode -->
+                <!-- Step 3: Confidential Case Summary / Representation Notes -->
+                <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm text-[#23493A]">gavel</span>
+                            <span>03 · Confidential Representation Notes</span>
+                        </span>
+                        <span class="text-[10px] text-[#23493A] font-mono bg-[#23493A]/10 px-2 py-0.5 rounded font-medium">Advocate Review</span>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Brief Facts / Dispute Summary (Confidential Counsel Review)</label>
+                        <textarea name="internal_intake_notes" rows="2" placeholder="Briefly describe the legal matter, dispute, or representation requirements for advocate review..."
+                                  class="w-full p-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all resize-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- Step 4: Security 6-Digit Passcode -->
                 <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
                     <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-sm text-[#23493A]">lock</span>
-                        <span>03 · Set 6-Digit Passcode</span>
+                        <span>04 · Set 6-Digit Passcode</span>
                     </span>
 
                     <div class="flex flex-col gap-2">
@@ -425,7 +462,8 @@
                 </div>
 
                 <button type="submit" class="w-full h-11 rounded-[6px] bg-[#23493A] hover:bg-[#1B3B2F] text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.99] mt-1 cursor-pointer">
-                    <span>Create Client Account &amp; Access Portal</span>
+                    <span class="material-symbols-outlined text-base">how_to_reg</span>
+                    <span>Submit Client Intake &amp; Access Portal</span>
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </button>
             </form>
