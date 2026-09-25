@@ -19,6 +19,13 @@ class StoreClientRequest extends FormRequest
             'onboarding_mode' => 'required|in:portal_online,assisted_offline',
             'phone' => 'nullable|string|max:50',
             'primary_attorney_id' => 'nullable|exists:users,id',
+            'preferred_attorney_id' => 'nullable|exists:users,id',
+            'assigned_paralegal_id' => 'nullable|exists:users,id',
+            'status' => 'nullable|in:lead,intake,conflict_check,prospective,active,inactive,former,archived,conflict',
+            'intake_status' => 'nullable|in:pending,in_progress,completed,declined',
+            'conflict_check_status' => 'nullable|in:not_checked,pending,clear,potential_conflict,conflict_identified,waiver_required,cleared,rejected',
+            'referral_source' => 'nullable|string|max:100',
+            'client_type' => 'nullable|string|max:100',
             'trust_balance' => 'nullable|numeric|min:0',
 
             // Indian KYC & Personal/Entity Particulars

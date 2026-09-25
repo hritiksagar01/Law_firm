@@ -21,7 +21,13 @@ class UpdateClientRequest extends FormRequest
             'phone' => 'nullable|string|max:50',
             'primary_attorney_id' => 'nullable|exists:users,id',
             'trust_balance' => 'nullable|numeric|min:0',
-            'status' => 'required|in:active,inactive,conflict,archived',
+            'status' => 'required|in:lead,intake,conflict_check,prospective,active,inactive,former,archived,conflict',
+            'intake_status' => 'nullable|in:pending,in_progress,completed,declined',
+            'conflict_check_status' => 'nullable|in:not_checked,pending,clear,potential_conflict,conflict_identified,waiver_required,cleared,rejected',
+            'preferred_attorney_id' => 'nullable|exists:users,id',
+            'assigned_paralegal_id' => 'nullable|exists:users,id',
+            'referral_source' => 'nullable|string|max:100',
+            'client_type' => 'nullable|string|max:100',
 
             // Indian KYC & Personal/Entity Particulars
             'father_husband_name' => 'nullable|string|max:255',

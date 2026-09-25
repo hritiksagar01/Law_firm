@@ -51,6 +51,10 @@
                 <span class="material-symbols-outlined text-base">dashboard</span>
                 <span>Case Overview</span>
             </a>
+            <a href="#team-section" class="px-3.5 py-2 text-xs font-medium text-[#646864] hover:text-[#1a1a1a] flex items-center gap-1.5 transition-colors">
+                <span class="material-symbols-outlined text-base">group</span>
+                <span>Team ({{ $matter->users->count() }})</span>
+            </a>
             <a href="#opinions-section" class="px-3.5 py-2 text-xs font-medium text-[#646864] hover:text-[#1a1a1a] flex items-center gap-1.5 transition-colors">
                 <span class="material-symbols-outlined text-base">draw</span>
                 <span>Opinions ({{ $matter->opinions->count() }})</span>
@@ -70,6 +74,14 @@
             <a href="#notes-section" class="px-3.5 py-2 text-xs font-medium text-[#646864] hover:text-[#1a1a1a] flex items-center gap-1.5 transition-colors">
                 <span class="material-symbols-outlined text-base">sticky_note_2</span>
                 <span>Case Notes ({{ $matter->caseNotes->count() }})</span>
+            </a>
+            <a href="#conflicts-section" class="px-3.5 py-2 text-xs font-medium text-[#646864] hover:text-[#1a1a1a] flex items-center gap-1.5 transition-colors">
+                <span class="material-symbols-outlined text-base">policy</span>
+                <span>Conflict Checks ({{ $matter->conflictChecks->count() }})</span>
+            </a>
+            <a href="#timeline-section" class="px-3.5 py-2 text-xs font-medium text-[#646864] hover:text-[#1a1a1a] flex items-center gap-1.5 transition-colors">
+                <span class="material-symbols-outlined text-base">history</span>
+                <span>Activity Timeline ({{ $matter->activities->count() }})</span>
             </a>
         </div>
     </div>
@@ -377,10 +389,96 @@
                 </div>
             </div>
 
+            <!-- Conflict Checks & Opposing Party Clearances (F-14) -->
+            <div id="conflicts-section" class="border border-[#e5e3dc] bg-white rounded-md shadow-xs overflow-hidden">
+                <div class="p-4 border-b border-[#f0eee8] flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[#23493a] text-xl">policy</span>
+                        <h3 class="text-sm font-semibold text-[#1a1a1a]">Conflict Checks &amp; Ethics Clearance</h3>
+                    </div>
+                    <a href="{{ route('conflict-checks.index', ['matter_id' => $matter->id]) }}" class="text-xs text-[#23493a] hover:underline font-medium flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">add_moderator</span>
+                        <span>New Conflict Check</span>
+                    </a>
+                </div>
+
+                <div class="divide-y divide-[#f0eee8]">
+                    @forelse($matter->conflictChecks as $check)
+                    <div class="p-4 flex items-center justify-between hover:bg-[#faf9f5] transition-colors">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('conflict-checks.show', $check) }}" class="text-xs font-semibold text-[#1a1a1a] hover:text-[#23493a] hover:underline font-mono">
+                                    {{ $check->check_number }}
+                                </a>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase {{ $check->status === 'clear' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($check->status === 'conflict_found' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-amber-50 text-amber-700 border border-amber-200') }}">
+                                    {{ $check->status_label }}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2 mt-1 text-[11px] text-[#646864]">
+                                <span>Checked by {{ $check->checker?->name ?? 'Ethics Officer' }}</span>
+                                <span>&middot;</span>
+                                <span class="font-mono">{{ $check->checked_at?->format('d M Y') ?? 'Recent' }}</span>
+                                @if($check->reviewer)
+                                    <span>&middot;</span>
+                                    <span>Signed by {{ $check->reviewer->name }}</span>
+                                @endif
+                            </div>
+                            @if($check->conflict_description)
+                                <p class="text-xs text-[#8a8a8a] mt-1 line-clamp-1 italic">{{ $check->conflict_description }}</p>
+                            @endif
+                        </div>
+                        <a href="{{ route('conflict-checks.show', $check) }}" class="px-2.5 py-1 rounded text-xs font-medium text-[#23493a] bg-stone-100 hover:bg-stone-200 transition-colors">
+                            Dossier &rarr;
+                        </a>
+                    </div>
+                    @empty
+                    <div class="p-6 text-center text-xs text-[#8a8a8a]">
+                        No formal conflict checks recorded for this matter yet.
+                        <a href="{{ route('conflict-checks.index', ['matter_id' => $matter->id]) }}" class="text-[#23493a] underline ml-1">Run initial ethical check</a>.
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- Matter Activity Timeline (F-15) -->
+            <div id="timeline-section" class="border border-[#e5e3dc] bg-white rounded-md shadow-xs overflow-hidden">
+                <div class="p-4 border-b border-[#f0eee8] flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[#23493a] text-xl">history</span>
+                        <h3 class="text-sm font-semibold text-[#1a1a1a]">Matter Timeline &amp; Activity Log</h3>
+                    </div>
+                    <span class="text-xs text-[#8a8a8a] font-mono">{{ $matter->activities->count() }} Events</span>
+                </div>
+
+                <div class="p-4">
+                    <div class="relative pl-6 space-y-5 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#f0eee8]">
+                        @forelse($matter->activities->sortByDesc('created_at')->take(20) as $activity)
+                        <div class="relative flex items-start gap-3">
+                            <div class="absolute -left-6 top-1 w-4 h-4 rounded-full bg-white border-2 border-[#23493a] flex items-center justify-center">
+                                <div class="w-1.5 h-1.5 rounded-full bg-[#23493a]"></div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap text-xs">
+                                    <span class="font-semibold text-[#1a1a1a]">{{ $activity->user?->name ?? 'System' }}</span>
+                                    <span class="px-1.5 py-0.2 rounded text-[10px] font-mono uppercase bg-stone-100 text-stone-600">
+                                        {{ str_replace('_', ' ', $activity->activity_type) }}
+                                    </span>
+                                    <span class="text-[#8a8a8a] font-mono text-[11px]">{{ $activity->created_at->format('M d, Y h:i A') }}</span>
+                                </div>
+                                <p class="text-xs text-[#646864] mt-0.5 leading-relaxed">{{ $activity->description }}</p>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="text-center py-4 text-xs text-[#8a8a8a]">No chronological activities logged for this matter yet.</div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- Right 1-Column: Judicial Information & Team -->
-        <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6" x-data="{ openAddTeamModal: false }">
 
             <!-- Forum & Judge Card -->
             <div class="border border-[#e5e3dc] bg-white rounded-md p-5 shadow-xs">
@@ -423,23 +521,153 @@
                 </div>
             </div>
 
-            <!-- Assigned Legal Team -->
+            <!-- Conflict-Check Status Summary Card -->
             <div class="border border-[#e5e3dc] bg-white rounded-md p-5 shadow-xs">
-                <h3 class="text-xs font-mono uppercase tracking-wider text-[#8a8a8a] mb-3">Litigation Team</h3>
-                <div class="flex flex-col gap-3">
-                    <div class="flex items-center gap-3">
-                        @if($matter->leadAttorney?->avatar_url)
-                            <img alt="{{ $matter->leadAttorney?->name }}" class="w-8 h-8 rounded-full object-cover ring-1 ring-[#e5e3dc]" src="{{ $matter->leadAttorney?->avatar_url }}"/>
-                        @else
-                            <div class="w-8 h-8 rounded-full bg-[#5b4382] text-white flex items-center justify-center font-semibold text-xs shrink-0 shadow-xs">
-                                {{ strtoupper(substr($matter->leadAttorney?->name ?? 'L', 0, 1)) }}
+                <div class="flex items-center justify-between pb-2 mb-3 border-b border-[#f0eee8]">
+                    <h3 class="text-xs font-mono uppercase tracking-wider text-[#8a8a8a]">Ethics &amp; Conflicts</h3>
+                    @php
+                        $latestCheck = $matter->conflictChecks->sortByDesc('checked_at')->first();
+                    @endphp
+                    @if($latestCheck)
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase {{ $latestCheck->status === 'clear' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
+                            {{ $latestCheck->status_label }}
+                        </span>
+                    @else
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-amber-50 text-amber-700 border border-amber-200">
+                            Check Pending
+                        </span>
+                    @endif
+                </div>
+                <p class="text-xs text-[#646864] mb-3">
+                    Screen all related parties, opposing counsel, and witnesses against firm conflict records.
+                </p>
+                <a href="{{ route('conflict-checks.index', ['matter_id' => $matter->id]) }}" class="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded bg-[#f5f3ed] hover:bg-[#eae8e2] border border-[#e5e3dc] text-xs font-medium text-[#1a1a1a] transition-colors">
+                    <span class="material-symbols-outlined text-[15px] text-[#23493a]">policy</span>
+                    <span>Launch Conflict Check</span>
+                </a>
+            </div>
+
+            <!-- Assigned Legal Team & Roles (F-13) -->
+            <div id="team-section" class="border border-[#e5e3dc] bg-white rounded-md p-5 shadow-xs">
+                <div class="flex items-center justify-between pb-2 mb-3 border-b border-[#f0eee8]">
+                    <h3 class="text-xs font-mono uppercase tracking-wider text-[#8a8a8a]">Litigation Team</h3>
+                    @if(in_array(auth()->user()->role, ['superadmin', 'partner']) || auth()->id() === $matter->lead_attorney_id)
+                        <button type="button" @click="openAddTeamModal = true" class="text-xs text-[#23493a] hover:underline font-medium flex items-center gap-0.5">
+                            <span class="material-symbols-outlined text-sm">person_add</span>
+                            <span>Add Counsel</span>
+                        </button>
+                    @endif
+                </div>
+                
+                <div class="divide-y divide-[#f0eee8]">
+                    <!-- Lead Attorney -->
+                    <div class="py-2.5 flex items-center justify-between">
+                        <div class="flex items-center gap-3 min-w-0">
+                            @if($matter->leadAttorney?->avatar_url)
+                                <img alt="{{ $matter->leadAttorney?->name }}" class="w-8 h-8 rounded-full object-cover ring-1 ring-[#e5e3dc] shrink-0" src="{{ $matter->leadAttorney?->avatar_url }}"/>
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-[#23493a] text-white flex items-center justify-center font-semibold text-xs shrink-0 shadow-xs">
+                                    {{ strtoupper(substr($matter->leadAttorney?->name ?? 'L', 0, 1)) }}
+                                </div>
+                            @endif
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-xs font-semibold text-[#1a1a1a] truncate">{{ $matter->leadAttorney?->name ?? 'Unassigned' }}</span>
+                                <span class="text-[11px] text-[#646864]">Lead Trial Counsel &middot; Full Admin</span>
                             </div>
-                        @endif
-                        <div class="flex flex-col min-w-0">
-                            <span class="text-xs font-semibold text-[#1a1a1a]">{{ $matter->leadAttorney?->name ?? 'Lead Attorney' }}</span>
-                            <span class="text-[11px] text-[#8a8a8a]">Lead Trial Counsel</span>
                         </div>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase bg-[#23493a]/10 text-[#23493a] font-medium shrink-0">
+                            Lead
+                        </span>
                     </div>
+
+                    <!-- Assigned Team Members -->
+                    @forelse($matter->users->where('id', '!=', $matter->lead_attorney_id) as $member)
+                    <div class="py-2.5 flex items-center justify-between group">
+                        <div class="flex items-center gap-3 min-w-0">
+                            @if($member->avatar_url)
+                                <img alt="{{ $member->name }}" class="w-7 h-7 rounded-full object-cover ring-1 ring-[#e5e3dc] shrink-0" src="{{ $member->avatar_url }}"/>
+                            @else
+                                <div class="w-7 h-7 rounded-full bg-[#5b4382] text-white flex items-center justify-center font-semibold text-[10px] shrink-0 shadow-xs">
+                                    {{ strtoupper(substr($member->name ?? 'U', 0, 1)) }}
+                                </div>
+                            @endif
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-xs font-medium text-[#1a1a1a] truncate">{{ $member->name }}</span>
+                                <div class="flex items-center gap-1.5 text-[10.5px] text-[#8a8a8a]">
+                                    <span class="capitalize">{{ str_replace('_', ' ', $member->pivot->role ?? $member->role) }}</span>
+                                    <span>&middot;</span>
+                                    <span class="font-mono uppercase">{{ $member->pivot->access_level ?? 'read' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if(in_array(auth()->user()->role, ['superadmin', 'partner']) || auth()->id() === $matter->lead_attorney_id)
+                        <form method="POST" action="{{ route('matters.team.destroy', ['matter' => $matter, 'user' => $member]) }}" onsubmit="return confirm('Remove {{ $member->name }} from active team?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="p-1 text-[#8a8a8a] hover:text-rose-600 transition-colors opacity-0 group-hover:opacity-100" title="Remove counsel">
+                                <span class="material-symbols-outlined text-sm">remove_circle_outline</span>
+                            </button>
+                        </form>
+                        @endif
+                    </div>
+                    @empty
+                    @if($matter->users->count() <= 1 && $matter->lead_attorney_id)
+                        <div class="py-2 text-[11.5px] text-[#8a8a8a] italic">
+                            No additional associate counsel or paralegals assigned yet.
+                        </div>
+                    @endif
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- Modal: Add Team Member -->
+            <div x-show="openAddTeamModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+                <div @click.outside="openAddTeamModal = false" class="bg-white border border-[#e5e3dc] rounded-md max-w-md w-full p-6 shadow-xl">
+                    <div class="flex items-center justify-between pb-3 border-b border-[#f0eee8]">
+                        <h3 class="text-sm font-semibold text-[#1a1a1a]">Assign Team Counsel</h3>
+                        <button type="button" @click="openAddTeamModal = false" class="text-[#8a8a8a] hover:text-[#1a1a1a]">
+                            <span class="material-symbols-outlined text-lg">close</span>
+                        </button>
+                    </div>
+
+                    <form method="POST" action="{{ route('matters.team.store', $matter) }}" class="mt-4 space-y-4">
+                        @csrf
+                        <div>
+                            <label class="block text-xs font-semibold text-[#1a1a1a] mb-1">Select Counsel / Staff *</label>
+                            <select name="user_id" required class="w-full h-9 px-3 text-xs rounded-md border border-[#e5e3dc] bg-white text-[#1a1a1a] focus:outline-none focus:border-[#23493a]">
+                                <option value="">-- Choose Advocate / Paralegal --</option>
+                                @foreach($firmStaff ?? [] as $staff)
+                                    <option value="{{ $staff->id }}">{{ $staff->name }} ({{ ucfirst($staff->role) }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-[#1a1a1a] mb-1">Matter Role *</label>
+                            <select name="role" required class="w-full h-9 px-3 text-xs rounded-md border border-[#e5e3dc] bg-white text-[#1a1a1a] focus:outline-none focus:border-[#23493a]">
+                                <option value="associate">Associate Counsel</option>
+                                <option value="lead_attorney">Lead Trial Counsel</option>
+                                <option value="paralegal">Paralegal / Legal Assistant</option>
+                                <option value="consulting_counsel">Consulting Counsel</option>
+                                <option value="of_counsel">Of Counsel</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-[#1a1a1a] mb-1">Access Level *</label>
+                            <select name="access_level" required class="w-full h-9 px-3 text-xs rounded-md border border-[#e5e3dc] bg-white text-[#1a1a1a] focus:outline-none focus:border-[#23493a]">
+                                <option value="admin">Full Admin (Edit, Delete, Assign)</option>
+                                <option value="write" selected>Standard Read/Write (Draft, Upload, Message)</option>
+                                <option value="read">Read Only (Review Filings &amp; Notes)</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#f0eee8]">
+                            <button type="button" @click="openAddTeamModal = false" class="btn-secondary h-9 px-3 text-xs">Cancel</button>
+                            <button type="submit" class="btn-primary h-9 px-4 text-xs">Assign Member</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 

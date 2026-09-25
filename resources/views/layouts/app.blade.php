@@ -62,23 +62,12 @@
             </div>
 
             <!-- Navigation Links -->
-            <nav class="px-3 py-4 flex flex-col gap-1">
+            <nav class="px-3 py-4 flex flex-col gap-0.5 overflow-y-auto max-h-[calc(100vh-140px)]">
                 <!-- Dashboard -->
                 <a href="{{ route('dashboard') }}" 
                    class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('dashboard') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
                     <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('dashboard') ? 'text-white' : 'text-[#9ca3af]' }}">dashboard</span>
                     <span>Dashboard</span>
-                </a>
-
-                <!-- Matters -->
-                <a href="{{ route('matters.index') }}" 
-                   class="flex items-center justify-between px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('matters.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('matters.*') ? 'text-white' : 'text-[#9ca3af]' }}">folder_open</span>
-                        <span>Matters</span>
-                    </div>
-                    @php $mCount = \App\Models\Matter::where('firm_id', auth()->user()->firm_id ?? 1)->count(); @endphp
-                    <span class="text-[11px] px-1.5 py-0.5 rounded font-mono {{ request()->routeIs('matters.*') ? 'bg-white/20 text-white' : 'bg-white/[.06] text-[#8e8e8e]' }}">{{ $mCount }}</span>
                 </a>
 
                 <!-- Clients -->
@@ -92,6 +81,17 @@
                     <span class="text-[11px] px-1.5 py-0.5 rounded font-mono {{ request()->routeIs('clients.*') ? 'bg-white/20 text-white' : 'bg-white/[.06] text-[#8e8e8e]' }}">{{ $cCount }}</span>
                 </a>
 
+                <!-- Matters -->
+                <a href="{{ route('matters.index') }}" 
+                   class="flex items-center justify-between px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('matters.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('matters.*') ? 'text-white' : 'text-[#9ca3af]' }}">folder_open</span>
+                        <span>Matters</span>
+                    </div>
+                    @php $mCount = \App\Models\Matter::where('firm_id', auth()->user()->firm_id ?? 1)->count(); @endphp
+                    <span class="text-[11px] px-1.5 py-0.5 rounded font-mono {{ request()->routeIs('matters.*') ? 'bg-white/20 text-white' : 'bg-white/[.06] text-[#8e8e8e]' }}">{{ $mCount }}</span>
+                </a>
+
                 <!-- Documents -->
                 <a href="{{ route('documents.index') }}" 
                    class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('documents.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
@@ -99,12 +99,44 @@
                     <span>Documents</span>
                 </a>
 
-                <!-- Legal Opinions -->
-                <a href="{{ route('opinions.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('opinions.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
-                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('opinions.*') ? 'text-white' : 'text-[#9ca3af]' }}">draw</span>
-                    <span>Legal Opinions</span>
+                <!-- Document Requests -->
+                @if(Route::has('document-requests.index'))
+                <a href="{{ route('document-requests.index') }}" 
+                   class="flex items-center justify-between px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('document-requests.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('document-requests.*') ? 'text-white' : 'text-[#9ca3af]' }}">fact_check</span>
+                        <span>Document Requests</span>
+                    </div>
+                    @php $drPending = \App\Models\DocumentRequest::where('firm_id', auth()->user()->firm_id ?? 1)->whereIn('status', ['pending', 'submitted', 'under_review'])->count(); @endphp
+                    @if($drPending > 0)
+                        <span class="text-[10px] px-1.5 py-0.2 rounded font-mono bg-amber-500/20 text-amber-300 font-semibold">{{ $drPending }}</span>
+                    @endif
                 </a>
+                @endif
+
+                <!-- Messages -->
+                @if(Route::has('messages.index'))
+                <a href="{{ route('messages.index') }}" 
+                   class="flex items-center justify-between px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('messages.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('messages.*') ? 'text-white' : 'text-[#9ca3af]' }}">forum</span>
+                        <span>Messages</span>
+                    </div>
+                    @php $unrCount = \App\Models\Message::where('firm_id', auth()->user()->firm_id ?? 1)->where('is_read', false)->where('sender_id', '!=', auth()->id())->count(); @endphp
+                    @if($unrCount > 0)
+                        <span class="text-[10px] px-1.5 py-0.2 rounded-full font-mono bg-red-500 text-white font-bold">{{ $unrCount }}</span>
+                    @endif
+                </a>
+                @endif
+
+                <!-- Conflict Checks -->
+                @if(Route::has('conflict-checks.index'))
+                <a href="{{ route('conflict-checks.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('conflict-checks.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('conflict-checks.*') ? 'text-white' : 'text-[#9ca3af]' }}">policy</span>
+                    <span>Conflict Checks</span>
+                </a>
+                @endif
 
                 <!-- Tasks -->
                 <a href="{{ route('tasks.index') }}" 
@@ -113,7 +145,7 @@
                     <span>Tasks</span>
                 </a>
 
-                <!-- My Todos (F-11) -->
+                <!-- My Todos -->
                 @if(Route::has('todos.index'))
                 <a href="{{ route('todos.index') }}" 
                    class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('todos.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
@@ -122,39 +154,87 @@
                 </a>
                 @endif
 
-                <!-- Litigation Calendar -->
+                <!-- Notes -->
+                @if(Route::has('notes.index'))
+                <a href="{{ route('notes.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('notes.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('notes.*') ? 'text-white' : 'text-[#9ca3af]' }}">edit_note</span>
+                    <span>Notes</span>
+                </a>
+                @endif
+
+                <!-- Calendar -->
                 <a href="{{ route('calendar.index') }}" 
                    class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('calendar.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
                     <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('calendar.*') ? 'text-white' : 'text-[#9ca3af]' }}">calendar_month</span>
-                    <span>Litigation Calendar</span>
+                    <span>Calendar</span>
                 </a>
 
-                <!-- Billing & Retainers -->
-                <a href="{{ route('billing.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('billing.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
-                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('billing.*') ? 'text-white' : 'text-[#9ca3af]' }}">receipt_long</span>
-                    <span>Billing</span>
+                <!-- Search -->
+                @if(Route::has('search'))
+                <a href="{{ route('search') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('search') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('search') ? 'text-white' : 'text-[#9ca3af]' }}">search</span>
+                    <span>Search</span>
                 </a>
+                @endif
 
-                <!-- Advocates & Staff -->
-                <a href="{{ route('users.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('users.*') || request()->routeIs('user-groups.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
-                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('users.*') || request()->routeIs('user-groups.*') ? 'text-white' : 'text-[#9ca3af]' }}">group</span>
-                    <span>Advocates &amp; Staff</span>
+                <!-- Analytics -->
+                @if(Route::has('analytics.index'))
+                <a href="{{ route('analytics.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('analytics.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('analytics.*') ? 'text-white' : 'text-[#9ca3af]' }}">insights</span>
+                    <span>Analytics</span>
                 </a>
+                @endif
 
-                <!-- Reports -->
-                <a href="{{ route('reports.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('reports.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
-                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('reports.*') ? 'text-white' : 'text-[#9ca3af]' }}">bar_chart</span>
-                    <span>Reports</span>
+                <!-- Notifications -->
+                @if(Route::has('notifications.index'))
+                <a href="{{ route('notifications.index') }}" 
+                   class="flex items-center justify-between px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('notifications.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('notifications.*') ? 'text-white' : 'text-[#9ca3af]' }}">notifications</span>
+                        <span>Notifications</span>
+                    </div>
+                    @php $ntfUnread = auth()->check() ? auth()->user()->unreadNotifications()->count() : 0; @endphp
+                    @if($ntfUnread > 0)
+                        <span class="text-[10px] px-1.5 py-0.2 rounded-full font-mono bg-[#23493a] text-white font-bold">{{ $ntfUnread }}</span>
+                    @endif
                 </a>
+                @endif
 
-                <!-- Firm Settings -->
+                <!-- Activity -->
+                @if(Route::has('activity.index'))
+                <a href="{{ route('activity.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('activity.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('activity.*') ? 'text-white' : 'text-[#9ca3af]' }}">history</span>
+                    <span>Activity</span>
+                </a>
+                @endif
+
+                <!-- Legal Opinions -->
+                @if(Route::has('opinions.index'))
+                <a href="{{ route('opinions.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('opinions.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('opinions.*') ? 'text-white' : 'text-[#9ca3af]' }}">draw</span>
+                    <span>Legal Opinions</span>
+                </a>
+                @endif
+
+                <!-- Profile -->
+                @if(Route::has('profile.show'))
+                <a href="{{ route('profile.show') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('profile.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('profile.*') ? 'text-white' : 'text-[#9ca3af]' }}">account_circle</span>
+                    <span>Profile</span>
+                </a>
+                @endif
+
+                <!-- Settings -->
                 <a href="{{ route('settings.index') }}" 
                    class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('settings.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
                     <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('settings.*') ? 'text-white' : 'text-[#9ca3af]' }}">settings</span>
-                    <span>Firm settings</span>
+                    <span>Settings</span>
                 </a>
             </nav>
         </div>

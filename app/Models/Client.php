@@ -25,6 +25,84 @@ class Client extends Model
         'age' => 'integer',
     ];
 
+    public const STATUS_LEAD = 'lead';
+
+    public const STATUS_INTAKE = 'intake';
+
+    public const STATUS_CONFLICT_CHECK = 'conflict_check';
+
+    public const STATUS_PROSPECTIVE = 'prospective';
+
+    public const STATUS_ACTIVE = 'active';
+
+    public const STATUS_INACTIVE = 'inactive';
+
+    public const STATUS_FORMER = 'former';
+
+    public const STATUS_ARCHIVED = 'archived';
+
+    /** @var array<string, string> All valid client lifecycle statuses */
+    public const STATUSES = [
+        self::STATUS_LEAD => 'Lead',
+        self::STATUS_INTAKE => 'Intake',
+        self::STATUS_CONFLICT_CHECK => 'Conflict Check',
+        self::STATUS_PROSPECTIVE => 'Prospective',
+        self::STATUS_ACTIVE => 'Active',
+        self::STATUS_INACTIVE => 'Inactive',
+        self::STATUS_FORMER => 'Former Client',
+        self::STATUS_ARCHIVED => 'Archived',
+    ];
+
+    /** @var array<string, string> Intake status labels */
+    public const INTAKE_STATUSES = [
+        'pending' => 'Pending',
+        'in_progress' => 'In Progress',
+        'completed' => 'Completed',
+        'declined' => 'Declined',
+    ];
+
+    /** @var array<string, string> Conflict check status labels */
+    public const CONFLICT_CHECK_STATUSES = [
+        'not_checked' => 'Not Checked',
+        'pending' => 'Pending',
+        'clear' => 'Clear',
+        'potential_conflict' => 'Potential Conflict',
+        'conflict_identified' => 'Conflict Identified',
+        'waiver_required' => 'Waiver Required',
+        'cleared' => 'Cleared',
+        'rejected' => 'Rejected',
+    ];
+
+    /** @var array<string, string> Client type labels (role in litigation) */
+    public const CLIENT_TYPES = [
+        'plaintiff' => 'Plaintiff',
+        'defendant' => 'Defendant',
+        'petitioner' => 'Petitioner',
+        'respondent' => 'Respondent',
+        'appellant' => 'Appellant',
+        'complainant' => 'Complainant',
+        'accused' => 'Accused',
+        'applicant' => 'Applicant',
+        'other' => 'Other',
+    ];
+
+    /** @var array<string, string> Referral source labels */
+    public const REFERRAL_SOURCES = [
+        'walk_in' => 'Walk-in',
+        'referral' => 'Referral',
+        'website' => 'Website',
+        'social_media' => 'Social Media',
+        'court_appointed' => 'Court Appointed',
+        'bar_association' => 'Bar Association',
+        'returning' => 'Returning Client',
+        'other' => 'Other',
+    ];
+
+    public function getStatusLabelAttribute(): string
+    {
+        return self::STATUSES[$this->status] ?? ucfirst(str_replace('_', ' ', $this->status ?? 'active'));
+    }
+
     public function firm(): BelongsTo
     {
         return $this->belongsTo(Firm::class);
@@ -38,6 +116,21 @@ class Client extends Model
     public function primaryAttorney(): BelongsTo
     {
         return $this->belongsTo(User::class, 'primary_attorney_id');
+    }
+
+    public function preferredAttorney(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'preferred_attorney_id');
+    }
+
+    public function assignedParalegal(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_paralegal_id');
+    }
+
+    public function conflictChecks(): HasMany
+    {
+        return $this->hasMany(ConflictCheck::class);
     }
 
     public function matters(): HasMany
@@ -161,5 +254,50 @@ class Client extends Model
     public function scopeByCategory(Builder $query, string $category): Builder
     {
         return $query->where('category', $category);
+    }
+
+    public function scopeStatus(Builder $query, string $status): Builder
+    {
+        return $query->where('status', $status);
+    }
+
+    public function scopeLead(Builder $query): Builder
+    {
+        return $query->where('status', 'lead');
+    }
+
+    public function scopeIntake(Builder $query): Builder
+    {
+        return $query->where('status', 'intake');
+    }
+
+    public function scopeConflictCheck(Builder $query): Builder
+    {
+        return $query->where('status', 'conflict_check');
+    }
+
+    public function scopeProspective(Builder $query): Builder
+    {
+        return $query->where('status', 'prospective');
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('status', 'active');
+    }
+
+    public function scopeInactive(Builder $query): Builder
+    {
+        return $query->where('status', 'inactive');
+    }
+
+    public function scopeFormer(Builder $query): Builder
+    {
+        return $query->where('status', 'former');
+    }
+
+    public function scopeArchived(Builder $query): Builder
+    {
+        return $query->where('status', 'archived');
     }
 }

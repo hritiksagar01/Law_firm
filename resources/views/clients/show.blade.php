@@ -41,6 +41,26 @@
                     <span class="font-mono text-[10.5px] uppercase tracking-wider px-2 py-0.5 rounded bg-[#f5f3ed] text-[#23493a] border border-[#e5e3dc] font-semibold">
                         {{ ucfirst($client->category ?? $client->type) }}
                     </span>
+                    @php
+                        $statusColors = [
+                            'lead' => 'bg-amber-100 text-amber-900 border-amber-300',
+                            'intake' => 'bg-blue-100 text-blue-900 border-blue-300',
+                            'conflict_check' => 'bg-purple-100 text-purple-900 border-purple-300',
+                            'prospective' => 'bg-indigo-100 text-indigo-900 border-indigo-300',
+                            'active' => 'bg-emerald-100 text-emerald-900 border-emerald-300',
+                            'inactive' => 'bg-stone-100 text-stone-700 border-stone-200',
+                            'former' => 'bg-slate-100 text-slate-700 border-slate-200',
+                            'archived' => 'bg-gray-100 text-gray-600 border-gray-200',
+                        ];
+                    @endphp
+                    <span class="font-mono text-[10.5px] uppercase tracking-wider px-2 py-0.5 rounded {{ $statusColors[$client->status] ?? 'bg-stone-100 text-stone-700 border-stone-200' }} border font-semibold">
+                        Status: {{ str_replace('_', ' ', $client->status) }}
+                    </span>
+                    @if($client->conflict_check_status)
+                        <span class="font-mono text-[10.5px] uppercase tracking-wider px-2 py-0.5 rounded {{ $client->conflict_check_status === 'clear' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }} font-medium">
+                            Conflict: {{ str_replace('_', ' ', $client->conflict_check_status) }}
+                        </span>
+                    @endif
                     @if($client->isOfflineOnly())
                         <span class="inline-flex items-center gap-1 text-[11px] font-medium text-[#92400e] bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
@@ -156,6 +176,13 @@
                 :class="activeTab === 'billing' ? 'border-[#23493a] text-[#23493a] font-semibold' : 'border-transparent text-[#646864] hover:text-[#1a1a1a]'">
             <span class="material-symbols-outlined text-[16px]">receipt</span>
             <span>Retainer &amp; Ledger</span>
+        </button>
+
+        <button @click="activeTab = 'conflicts'"
+                class="px-4 py-2.5 border-b-2 transition-colors flex items-center gap-1.5 whitespace-nowrap"
+                :class="activeTab === 'conflicts' ? 'border-[#23493a] text-[#23493a] font-semibold' : 'border-transparent text-[#646864] hover:text-[#1a1a1a]'">
+            <span class="material-symbols-outlined text-[16px]">policy</span>
+            <span>Conflict Checks ({{ $client->conflictChecks->count() }})</span>
         </button>
     </div>
 
@@ -329,6 +356,56 @@
 
             <!-- Right 4 Cols: Service Address, Jurisdiction & Internal Notes -->
             <div class="lg:col-span-4 space-y-6">
+                <!-- Client Lifecycle & Assignment Card (F-16) -->
+                <div class="border border-[#e5e3dc] bg-white rounded-md p-5 shadow-xs">
+                    <div class="flex items-center justify-between pb-3 mb-3 border-b border-[#f0eee8]">
+                        <h3 class="text-[13.5px] font-semibold text-[#1a1a1a]">Lifecycle &amp; Counsel</h3>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase {{ $statusColors[$client->status] ?? 'bg-stone-100 text-stone-700 border-stone-200' }} border font-semibold">
+                            {{ str_replace('_', ' ', $client->status) }}
+                        </span>
+                    </div>
+
+                    <div class="space-y-2 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#8a8a8a]">Intake Status:</span>
+                            <span class="font-mono text-[#1a1a1a] uppercase text-[11px] font-semibold">{{ $client->intake_status ?? 'Pending' }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#8a8a8a]">Conflict-Check:</span>
+                            @if($client->conflict_check_status)
+                                <span class="px-1.5 py-0.2 rounded text-[10.5px] font-mono uppercase {{ $client->conflict_check_status === 'clear' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
+                                    {{ str_replace('_', ' ', $client->conflict_check_status) }}
+                                </span>
+                            @else
+                                <span class="text-[#8a8a8a] italic">Pending Scan</span>
+                            @endif
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#8a8a8a]">Preferred Attorney:</span>
+                            <span class="font-medium text-[#1a1a1a]">{{ $client->preferredAttorney->name ?? 'None' }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#8a8a8a]">Assigned Paralegal:</span>
+                            <span class="font-medium text-[#1a1a1a]">{{ $client->assignedParalegal->name ?? 'None' }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#8a8a8a]">Client Type:</span>
+                            <span class="capitalize text-[#1a1a1a]">{{ str_replace('_', ' ', $client->client_type ?? $client->category) }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#8a8a8a]">Referral Source:</span>
+                            <span class="text-[#1a1a1a]">{{ $client->referral_source ?? 'Direct / Walk-in' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 mt-3 border-t border-[#f0eee8]">
+                        <a href="{{ route('conflict-checks.index', ['client_id' => $client->id]) }}" class="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded bg-[#f5f3ed] hover:bg-[#eae8e2] border border-[#e5e3dc] text-xs font-medium text-[#1a1a1a] transition-colors">
+                            <span class="material-symbols-outlined text-[15px] text-[#23493a]">policy</span>
+                            <span>Launch Conflict Check</span>
+                        </a>
+                    </div>
+                </div>
+
                 <!-- Address for Service Card -->
                 <div class="border border-[#e5e3dc] bg-white rounded-md p-5 shadow-xs">
                     <div class="flex items-center justify-between pb-3 mb-3 border-b border-[#f0eee8]">
@@ -721,6 +798,59 @@
     </div>
 
     <!-- ===================================================================== -->
+    <!-- TAB 6: CONFLICT CHECKS & ETHICAL CLEARANCES                           -->
+    <!-- ===================================================================== -->
+    <div x-show="activeTab === 'conflicts'" class="space-y-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Conflict Checks &amp; Adverse Party Clearances</h2>
+                <p class="text-xs text-[#8a8a8a] mt-0.5">Formal screening of adverse parties, related witnesses, and affiliates</p>
+            </div>
+            <a href="{{ route('conflict-checks.index', ['client_id' => $client->id]) }}" class="btn-primary h-8 px-3 text-xs inline-flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">policy</span>
+                <span>Run Conflict Scan</span>
+            </a>
+        </div>
+
+        <div class="border border-[#e5e3dc] bg-white rounded-md overflow-hidden shadow-xs">
+            <table class="w-full text-xs text-left">
+                <thead class="bg-[#faf8f5] text-[#8a8a8a] uppercase font-mono text-[10px] border-b border-[#e5e3dc]">
+                    <tr>
+                        <th class="py-2.5 px-4">Check ID</th>
+                        <th class="py-2.5 px-4">Status</th>
+                        <th class="py-2.5 px-4">Matter</th>
+                        <th class="py-2.5 px-4">Checked By</th>
+                        <th class="py-2.5 px-4">Date</th>
+                        <th class="py-2.5 px-4 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#f0eee8]">
+                    @forelse($client->conflictChecks as $chk)
+                    <tr class="hover:bg-[#faf9f5] transition-colors">
+                        <td class="py-3 px-4 font-mono font-semibold text-[#1a1a1a]">{{ $chk->check_number }}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase {{ $chk->status === 'clear' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($chk->status === 'conflict_found' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-amber-50 text-amber-700 border border-amber-200') }}">
+                                {{ $chk->status_label }}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-[#646864]">{{ $chk->matter->title ?? 'Pre-Onboarding Client Scan' }}</td>
+                        <td class="py-3 px-4 text-[#1a1a1a]">{{ $chk->checker?->name ?? 'Ethics Officer' }}</td>
+                        <td class="py-3 px-4 font-mono text-[#8a8a8a]">{{ $chk->checked_at?->format('d M Y') ?? 'Recent' }}</td>
+                        <td class="py-3 px-4 text-right">
+                            <a href="{{ route('conflict-checks.show', $chk) }}" class="text-[#23493a] hover:underline font-medium">View Dossier &rarr;</a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-xs text-[#8a8a8a]">No conflict checks logged for this client. Click "Run Conflict Scan" to screen adverse parties.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
     <!-- MODAL: INITIATE NEW DOCUMENT REQUEST WITH INDIAN LEGAL PRESETS        -->
     <!-- ===================================================================== -->
     <div x-show="openRequestModal" x-cloak @click.away="openRequestModal = false"
@@ -963,11 +1093,77 @@
                     <div class="flex flex-col gap-1">
                         <label class="font-semibold text-[#1a1a1a]">Status</label>
                         <select name="status" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]">
+                            <option value="lead" {{ $client->status === 'lead' ? 'selected' : '' }}>Lead</option>
+                            <option value="intake" {{ $client->status === 'intake' ? 'selected' : '' }}>Intake</option>
+                            <option value="conflict_check" {{ $client->status === 'conflict_check' ? 'selected' : '' }}>Conflict Check</option>
+                            <option value="prospective" {{ $client->status === 'prospective' ? 'selected' : '' }}>Prospective</option>
                             <option value="active" {{ $client->status === 'active' ? 'selected' : '' }}>Active</option>
                             <option value="inactive" {{ $client->status === 'inactive' ? 'selected' : '' }}>Inactive</option>
-                            <option value="conflict" {{ $client->status === 'conflict' ? 'selected' : '' }}>Conflict</option>
+                            <option value="former" {{ $client->status === 'former' ? 'selected' : '' }}>Former Client</option>
                             <option value="archived" {{ $client->status === 'archived' ? 'selected' : '' }}>Archived</option>
                         </select>
+                    </div>
+                </div>
+
+                <!-- Lifecycle & Staff Assignment Controls -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Intake Workflow Status</label>
+                        <select name="intake_status" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]">
+                            <option value="pending" {{ $client->intake_status === 'pending' ? 'selected' : '' }}>Pending Intake</option>
+                            <option value="in_review" {{ $client->intake_status === 'in_review' ? 'selected' : '' }}>In Review</option>
+                            <option value="approved" {{ $client->intake_status === 'approved' ? 'selected' : '' }}>Approved</option>
+                            <option value="rejected" {{ $client->intake_status === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                        </select>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Conflict-Check Status</label>
+                        <select name="conflict_check_status" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]">
+                            <option value="pending" {{ $client->conflict_check_status === 'pending' ? 'selected' : '' }}>Pending Check</option>
+                            <option value="clear" {{ $client->conflict_check_status === 'clear' ? 'selected' : '' }}>Cleared (No Conflict)</option>
+                            <option value="conflict_found" {{ $client->conflict_check_status === 'conflict_found' ? 'selected' : '' }}>Conflict Found</option>
+                            <option value="waiver_granted" {{ $client->conflict_check_status === 'waiver_granted' ? 'selected' : '' }}>Waiver Granted</option>
+                        </select>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Client Type</label>
+                        <select name="client_type" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]">
+                            <option value="individual" {{ ($client->client_type ?? $client->category) === 'individual' ? 'selected' : '' }}>Individual</option>
+                            <option value="corporate" {{ $client->client_type === 'corporate' ? 'selected' : '' }}>Corporate</option>
+                            <option value="joint" {{ $client->client_type === 'joint' ? 'selected' : '' }}>Joint</option>
+                            <option value="non_profit" {{ $client->client_type === 'non_profit' ? 'selected' : '' }}>Non-Profit / Trust</option>
+                            <option value="government" {{ $client->client_type === 'government' ? 'selected' : '' }}>Government / Semi-Govt</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Preferred Attorney</label>
+                        <select name="preferred_attorney_id" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]">
+                            <option value="">-- None Selected --</option>
+                            @foreach($attorneys ?? [] as $atty)
+                                <option value="{{ $atty->id }}" {{ $client->preferred_attorney_id == $atty->id ? 'selected' : '' }}>{{ $atty->name }} ({{ ucfirst($atty->role) }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Assigned Paralegal</label>
+                        <select name="assigned_paralegal_id" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]">
+                            <option value="">-- None Assigned --</option>
+                            @foreach($allStaff ?? [] as $stf)
+                                <option value="{{ $stf->id }}" {{ $client->assigned_paralegal_id == $stf->id ? 'selected' : '' }}>{{ $stf->name }} ({{ ucfirst($stf->role) }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Referral Source</label>
+                        <input name="referral_source" value="{{ $client->referral_source }}" placeholder="e.g. Bar Association, Website, Senior Advocate" type="text"
+                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
                     </div>
                 </div>
 

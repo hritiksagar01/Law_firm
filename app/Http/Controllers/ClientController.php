@@ -78,7 +78,7 @@ class ClientController extends Controller
                     $q->where('status', 'lead')
                         ->orWhereNull('primary_attorney_id');
                 });
-            } else {
+            } elseif ($status !== 'all') {
                 $query->where('status', $status);
             }
         }
@@ -99,7 +99,7 @@ class ClientController extends Controller
 
         $clients = $query->latest()->get();
 
-        // Metrics for ribbon
+        // Metrics for ribbon and tabs
         $totalClientsCount = Client::where('firm_id', $firmId)->count();
         $portalActiveCount = Client::where('firm_id', $firmId)
             ->where(fn ($q) => $q->where('portal_status', 'active')->orWhereNotNull('user_id'))
@@ -111,6 +111,19 @@ class ClientController extends Controller
             ->where(fn ($q) => $q->where('status', 'lead')->orWhereNull('primary_attorney_id'))
             ->count();
         $activeMattersCount = Matter::where('firm_id', $firmId)->where('status', 'active')->count();
+
+        // Status counts for lifecycle tabs
+        $statusCounts = [
+            'all' => $totalClientsCount,
+            'lead' => Client::where('firm_id', $firmId)->where(fn ($q) => $q->where('status', 'lead')->orWhereNull('primary_attorney_id'))->count(),
+            'intake' => Client::where('firm_id', $firmId)->where('status', 'intake')->count(),
+            'conflict_check' => Client::where('firm_id', $firmId)->where('status', 'conflict_check')->count(),
+            'prospective' => Client::where('firm_id', $firmId)->where('status', 'prospective')->count(),
+            'active' => Client::where('firm_id', $firmId)->where('status', 'active')->whereNotNull('primary_attorney_id')->count(),
+            'inactive' => Client::where('firm_id', $firmId)->where('status', 'inactive')->count(),
+            'former' => Client::where('firm_id', $firmId)->where('status', 'former')->count(),
+            'archived' => Client::where('firm_id', $firmId)->where('status', 'archived')->count(),
+        ];
 
         $attorneys = User::where('firm_id', $firmId)
             ->whereIn('role', ['partner', 'associate'])
@@ -124,7 +137,8 @@ class ClientController extends Controller
             'portalActiveCount',
             'assistedOfflineCount',
             'unassignedLeadsCount',
-            'activeMattersCount'
+            'activeMattersCount',
+            'statusCounts'
         ));
     }
 
@@ -137,7 +151,7 @@ class ClientController extends Controller
 
         $validated = $request->validate([
             'primary_attorney_id' => 'required|exists:users,id',
-            'status' => 'nullable|string|in:active,lead,inactive,archived',
+            'status' => 'nullable|string|in:lead,intake,conflict_check,prospective,active,inactive,former,archived,conflict',
             'internal_intake_notes' => 'nullable|string|max:2000',
         ]);
 
@@ -176,7 +190,13 @@ class ClientController extends Controller
             'email' => $validated['email'] ?? null,
             'phone' => $validated['phone'] ?? null,
             'trust_balance' => $validated['trust_balance'] ?? 0.00,
-            'status' => 'active',
+            'status' => $validated['status'] ?? 'active',
+            'intake_status' => $validated['intake_status'] ?? 'completed',
+            'conflict_check_status' => $validated['conflict_check_status'] ?? 'not_checked',
+            'preferred_attorney_id' => $validated['preferred_attorney_id'] ?? null,
+            'assigned_paralegal_id' => $validated['assigned_paralegal_id'] ?? null,
+            'referral_source' => $validated['referral_source'] ?? null,
+            'client_type' => $validated['client_type'] ?? null,
 
             // Indian KYC & Personal/Entity Particulars
             'father_husband_name' => $validated['father_husband_name'] ?? null,
@@ -291,6 +311,10 @@ class ClientController extends Controller
 
         $client->load([
             'primaryAttorney',
+            'preferredAttorney',
+            'assignedParalegal',
+            'conflictChecks.checker',
+            'conflictChecks.reviewer',
             'members',
             'matters' => fn ($q) => $q->with(['leadAttorney', 'documents'])->latest(),
             'documentRequests' => fn ($q) => $q->with(['requestedBy', 'document', 'matter', 'assistedBy'])->latest(),
@@ -298,8 +322,9 @@ class ClientController extends Controller
         ]);
 
         $attorneys = User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate'])->get();
+        $allStaff = User::where('firm_id', $firmId)->get();
 
-        return view('clients.show', compact('client', 'attorneys'));
+        return view('clients.show', compact('client', 'attorneys', 'allStaff'));
     }
 
     public function update(UpdateClientRequest $request, Client $client): RedirectResponse
@@ -318,8 +343,14 @@ class ClientController extends Controller
             'email' => $validated['email'] ?? null,
             'phone' => $validated['phone'] ?? null,
             'primary_attorney_id' => $validated['primary_attorney_id'] ?? $client->primary_attorney_id,
+            'preferred_attorney_id' => $validated['preferred_attorney_id'] ?? $client->preferred_attorney_id,
+            'assigned_paralegal_id' => $validated['assigned_paralegal_id'] ?? $client->assigned_paralegal_id,
             'trust_balance' => $validated['trust_balance'] ?? $client->trust_balance,
             'status' => $validated['status'],
+            'intake_status' => $validated['intake_status'] ?? $client->intake_status,
+            'conflict_check_status' => $validated['conflict_check_status'] ?? $client->conflict_check_status,
+            'referral_source' => $validated['referral_source'] ?? $client->referral_source,
+            'client_type' => $validated['client_type'] ?? $client->client_type,
 
             'father_husband_name' => $validated['father_husband_name'] ?? null,
             'gender' => $validated['gender'] ?? null,

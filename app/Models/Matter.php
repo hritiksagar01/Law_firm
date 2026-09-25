@@ -35,9 +35,43 @@ class Matter extends Model
         return $this->belongsTo(User::class, 'lead_attorney_id');
     }
 
+    public const TEAM_ROLES = [
+        'lead_attorney' => 'Lead Attorney',
+        'supervising_attorney' => 'Supervising Attorney',
+        'associate' => 'Associate Counsel',
+        'paralegal' => 'Paralegal',
+        'legal_assistant' => 'Legal Assistant',
+        'case_manager' => 'Case Manager',
+        'clerk' => 'Chamber Clerk',
+        'staff' => 'Staff',
+    ];
+
+    public const ACCESS_LEVELS = [
+        'read' => 'Read Only',
+        'write' => 'Read & Write',
+        'admin' => 'Full Administrative',
+    ];
+
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class)
+            ->withPivot(['role', 'access_level', 'assignment_date', 'removal_date', 'is_active'])
+            ->withTimestamps();
+    }
+
+    public function teamMembers(): BelongsToMany
+    {
+        return $this->users()->wherePivot('is_active', true);
+    }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(MatterActivity::class);
+    }
+
+    public function conflictChecks(): HasMany
+    {
+        return $this->hasMany(ConflictCheck::class);
     }
 
     public function documents(): HasMany

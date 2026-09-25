@@ -3,11 +3,51 @@
 namespace App\Http\Controllers;
 
 use App\Models\CaseNote;
+use App\Models\Matter;
+use App\Models\MatterActivity;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class NoteController extends Controller
 {
+    /**
+     * Display a listing of case notes across all matters.
+     */
+    public function index(Request $request): View
+    {
+        $user = $request->user();
+        $firmId = $user->firm_id ?? 1;
+
+        $query = CaseNote::where('firm_id', $firmId)->with(['matter', 'user']);
+
+        if ($matterId = $request->get('matter_id')) {
+            $query->where('matter_id', $matterId);
+        }
+
+        if ($type = $request->get('type')) {
+            if ($type !== 'all') {
+                $query->where('type', $type);
+            }
+        }
+
+        if ($request->boolean('pinned')) {
+            $query->where('is_pinned', true);
+        }
+
+        if ($search = trim($request->get('q', ''))) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('body', 'like', "%{$search}%");
+            });
+        }
+
+        $notes = $query->orderByDesc('is_pinned')->latest()->paginate(15)->withQueryString();
+        $matters = Matter::where('firm_id', $firmId)->select(['id', 'title', 'case_number'])->get();
+
+        return view('notes.index', compact('notes', 'matters'));
+    }
+
     /**
      * Store a new case / practice note.
      */
@@ -24,7 +64,7 @@ class NoteController extends Controller
 
         $user = $request->user();
 
-        CaseNote::create([
+        $note = CaseNote::create([
             'firm_id' => $user->firm_id,
             'matter_id' => $validated['matter_id'] ?? null,
             'user_id' => $user->id,
@@ -34,6 +74,20 @@ class NoteController extends Controller
             'type' => $validated['type'] ?? 'internal',
             'is_pinned' => $request->boolean('is_pinned'),
         ]);
+
+        if (! empty($note->matter_id)) {
+            $matter = Matter::find($note->matter_id);
+            if ($matter) {
+                MatterActivity::log(
+                    matter: $matter,
+                    activityType: 'note_added',
+                    description: "Advocate {$user->name} recorded case note: '{$note->title}'",
+                    subject: $note,
+                    userId: $user->id,
+                    clientId: $matter->client_id
+                );
+            }
+        }
 
         return back()->with('success', 'Note added successfully.');
     }

@@ -60,65 +60,90 @@
     </div>
 
     <!-- Filters & Search Toolbar -->
-    <div class="border border-[#e5e3dc] bg-white rounded-md p-4 mb-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <!-- Classification Filter Tabs -->
-        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 text-xs">
-            <a href="{{ route('clients.index') }}"
-               class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ !request('category') && !request('mode') ? 'bg-[#23493a] text-white' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a]' }}">
-                All ({{ $totalClientsCount }})
-            </a>
-            <a href="{{ route('clients.index', ['category' => 'individual']) }}"
-               class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('category') === 'individual' ? 'bg-[#23493a] text-white' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a]' }}">
-                Individuals (Single)
-            </a>
-            <a href="{{ route('clients.index', ['category' => 'joint']) }}"
-               class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('category') === 'joint' ? 'bg-[#23493a] text-white' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a]' }}">
-                Joint / Multiple Litigants
-            </a>
-            <a href="{{ route('clients.index', ['category' => 'corporate']) }}"
-               class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('category') === 'corporate' ? 'bg-[#23493a] text-white' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a]' }}">
-                Corporate &amp; LLPs
-            </a>
-            <a href="{{ route('clients.index', ['category' => 'institution']) }}"
-               class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('category') === 'institution' ? 'bg-[#23493a] text-white' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a]' }}">
-                Institutions &amp; Trusts
-            </a>
-            <a href="{{ route('clients.index', ['status' => 'lead']) }}"
-               class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('status') === 'lead' ? 'bg-[#23493a] text-white' : 'text-[#92400e] bg-amber-50 hover:bg-amber-100 border border-amber-200' }}">
-                <span class="inline-flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                    <span>Leads &amp; Unassigned ({{ $unassignedLeadsCount }})</span>
-                </span>
-            </a>
-            <a href="{{ route('clients.index', ['mode' => 'assisted_offline']) }}"
-               class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('mode') === 'assisted_offline' ? 'bg-[#23493a] text-white' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a]' }}">
-                <span class="inline-flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                    <span>Offline / Low Literacy ({{ $assistedOfflineCount }})</span>
-                </span>
-            </a>
+    <div class="border border-[#e5e3dc] bg-white rounded-md p-4 mb-6 shadow-xs flex flex-col gap-3">
+        <!-- Classification Filter Tabs & Search Form -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 text-xs">
+                <a href="{{ route('clients.index') }}"
+                   class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ !request('category') && !request('mode') && !request('status') ? 'bg-[#23493a] text-white' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a]' }}">
+                    All ({{ $totalClientsCount }})
+                </a>
+                <a href="{{ route('clients.index', ['category' => 'individual']) }}"
+                   class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('category') === 'individual' ? 'bg-[#23493a] text-white' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a]' }}">
+                    Individuals
+                </a>
+                <a href="{{ route('clients.index', ['category' => 'joint']) }}"
+                   class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('category') === 'joint' ? 'bg-[#23493a] text-white' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a]' }}">
+                    Joint / Litigants
+                </a>
+                <a href="{{ route('clients.index', ['category' => 'corporate']) }}"
+                   class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('category') === 'corporate' ? 'bg-[#23493a] text-white' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a]' }}">
+                    Corporate &amp; LLPs
+                </a>
+                <a href="{{ route('clients.index', ['category' => 'institution']) }}"
+                   class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('category') === 'institution' ? 'bg-[#23493a] text-white' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a]' }}">
+                    Institutions
+                </a>
+                <a href="{{ route('clients.index', ['mode' => 'assisted_offline']) }}"
+                   class="px-3 py-1.5 rounded-md font-medium transition-colors whitespace-nowrap {{ request('mode') === 'assisted_offline' ? 'bg-[#23493a] text-white' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a]' }}">
+                    <span class="inline-flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        <span>Offline ({{ $assistedOfflineCount }})</span>
+                    </span>
+                </a>
+            </div>
+
+            <!-- Search Form -->
+            <form action="{{ route('clients.index') }}" method="GET" class="flex items-center gap-2 w-full md:w-auto">
+                @if(request('category'))
+                    <input type="hidden" name="category" value="{{ request('category') }}"/>
+                @endif
+                @if(request('mode'))
+                    <input type="hidden" name="mode" value="{{ request('mode') }}"/>
+                @endif
+                @if(request('status'))
+                    <input type="hidden" name="status" value="{{ request('status') }}"/>
+                @endif
+                <div class="relative w-full md:w-64">
+                    <span class="material-symbols-outlined absolute left-2.5 top-2.5 text-[18px] text-[#8a8a8a]">search</span>
+                    <input type="text" name="q" value="{{ request('q') }}" placeholder="Search name, PAN, CIN, P.S..."
+                           class="w-full h-9 pl-9 pr-3 rounded-md bg-[#faf8f5] border border-[#e5e3dc] text-xs text-[#1a1a1a] placeholder-[#8a8a8a] focus:bg-white focus:border-[#23493a] focus:outline-none"/>
+                </div>
+                @if(request('q'))
+                    <a href="{{ route('clients.index', array_filter(['category' => request('category'), 'mode' => request('mode'), 'status' => request('status')])) }}" class="text-xs text-[#8a8a8a] hover:text-[#1a1a1a] px-1">Clear</a>
+                @endif
+            </form>
         </div>
 
-        <!-- Search Form -->
-        <form action="{{ route('clients.index') }}" method="GET" class="flex items-center gap-2 w-full md:w-auto">
-            @if(request('category'))
-                <input type="hidden" name="category" value="{{ request('category') }}"/>
-            @endif
-            @if(request('mode'))
-                <input type="hidden" name="mode" value="{{ request('mode') }}"/>
-            @endif
-            @if(request('status'))
-                <input type="hidden" name="status" value="{{ request('status') }}"/>
-            @endif
-            <div class="relative w-full md:w-64">
-                <span class="material-symbols-outlined absolute left-2.5 top-2.5 text-[18px] text-[#8a8a8a]">search</span>
-                <input type="text" name="q" value="{{ request('q') }}" placeholder="Search name, PAN, CIN, P.S..."
-                       class="w-full h-9 pl-9 pr-3 rounded-md bg-[#faf8f5] border border-[#e5e3dc] text-xs text-[#1a1a1a] placeholder-[#8a8a8a] focus:bg-white focus:border-[#23493a] focus:outline-none"/>
-            </div>
-            @if(request('q'))
-                <a href="{{ route('clients.index', array_filter(['category' => request('category'), 'mode' => request('mode'), 'status' => request('status')])) }}" class="text-xs text-[#8a8a8a] hover:text-[#1a1a1a] px-1">Clear</a>
-            @endif
-        </form>
+        <!-- Lifecycle Status Filter Ribbon (Lead, Intake, Conflict Check, Prospective, Active, Inactive, Former, Archived) -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pt-2.5 border-t border-[#f0eee8] text-xs">
+            <span class="text-[11px] font-semibold text-[#8a8a8a] uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">tune</span>
+                <span>Lifecycle:</span>
+            </span>
+            @php
+                $statusTabs = [
+                    'all' => 'All Statuses',
+                    'lead' => 'Lead',
+                    'intake' => 'Intake',
+                    'conflict_check' => 'Conflict Check',
+                    'prospective' => 'Prospective',
+                    'active' => 'Active',
+                    'inactive' => 'Inactive',
+                    'former' => 'Former Client',
+                    'archived' => 'Archived',
+                ];
+            @endphp
+            @foreach($statusTabs as $sKey => $sLabel)
+                <a href="{{ route('clients.index', array_filter(['status' => $sKey === 'all' ? null : $sKey, 'category' => request('category'), 'mode' => request('mode'), 'q' => request('q')])) }}"
+                   class="px-2.5 py-1 rounded text-xs font-medium transition-colors whitespace-nowrap {{ (request('status') === $sKey || (!request('status') && $sKey === 'all')) ? 'bg-[#23493a] text-white shadow-xs' : 'text-[#646864] hover:bg-[#faf8f5] hover:text-[#1a1a1a] border border-[#e5e3dc] bg-white' }}">
+                    <span>{{ $sLabel }}</span>
+                    @if(isset($statusCounts[$sKey]))
+                        <span class="text-[10.5px] opacity-80 font-mono ml-0.5">({{ $statusCounts[$sKey] }})</span>
+                    @endif
+                </a>
+            @endforeach
+        </div>
     </div>
 
     <!-- Client Cards Grid -->
@@ -132,6 +157,26 @@
                         <span class="font-mono text-[10.5px] uppercase tracking-wider px-2 py-0.5 rounded bg-[#f5f3ed] text-[#23493a] border border-[#e5e3dc] font-semibold">
                             {{ ucfirst($client->category ?? $client->type) }}
                         </span>
+                        @php
+                            $statusColors = [
+                                'lead' => 'bg-amber-100 text-amber-900 border-amber-300',
+                                'intake' => 'bg-blue-100 text-blue-900 border-blue-300',
+                                'conflict_check' => 'bg-purple-100 text-purple-900 border-purple-300',
+                                'prospective' => 'bg-indigo-100 text-indigo-900 border-indigo-300',
+                                'active' => 'bg-emerald-100 text-emerald-900 border-emerald-300',
+                                'inactive' => 'bg-stone-100 text-stone-700 border-stone-200',
+                                'former' => 'bg-slate-100 text-slate-700 border-slate-200',
+                                'archived' => 'bg-gray-100 text-gray-600 border-gray-200',
+                            ];
+                        @endphp
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase {{ $statusColors[$client->status] ?? 'bg-stone-100 text-stone-700 border-stone-200' }} border font-medium">
+                            {{ str_replace('_', ' ', $client->status) }}
+                        </span>
+                        @if($client->conflict_check_status)
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase {{ $client->conflict_check_status === 'clear' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
+                                Conflict: {{ str_replace('_', ' ', $client->conflict_check_status) }}
+                            </span>
+                        @endif
                         @if($client->isJoint())
                             <span class="text-[10.5px] text-[#1e40af] bg-blue-50 border border-blue-200 px-2 py-0.5 rounded font-medium">
                                 {{ $client->members->count() + 1 }} Litigants
@@ -236,6 +281,28 @@
                             @endif
                         </span>
                     </div>
+
+                    @if($client->preferredAttorney || $client->assignedParalegal)
+                    <div class="flex items-center gap-2 text-[11px] text-[#646864] pt-0.5">
+                        @if($client->preferredAttorney)
+                            <span>Pref: <strong>{{ $client->preferredAttorney->name }}</strong></span>
+                        @endif
+                        @if($client->assignedParalegal)
+                            <span>Paralegal: <strong>{{ $client->assignedParalegal->name }}</strong></span>
+                        @endif
+                    </div>
+                    @endif
+
+                    @if($client->client_type || $client->referral_source)
+                    <div class="flex items-center gap-1.5 text-[10.5px] text-[#8a8a8a] font-mono pt-0.5">
+                        @if($client->client_type)
+                            <span class="capitalize">Type: {{ str_replace('_', ' ', $client->client_type) }}</span>
+                        @endif
+                        @if($client->referral_source)
+                            <span>&middot; Source: {{ $client->referral_source }}</span>
+                        @endif
+                    </div>
+                    @endif
                 </div>
             </div>
 

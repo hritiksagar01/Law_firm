@@ -15,11 +15,57 @@ class Document extends Model
 
     protected $casts = [
         'is_client_visible' => 'boolean',
+        'tags' => 'array',
+    ];
+
+    public const DOCUMENT_TYPES = [
+        'Pleading' => 'Pleading',
+        'Motion' => 'Motion',
+        'Brief' => 'Brief',
+        'Order' => 'Court Order',
+        'Judgment' => 'Judgment / Decree',
+        'Contract' => 'Contract / Agreement',
+        'Correspondence' => 'Correspondence / Legal Notice',
+        'Discovery' => 'Discovery / Interrogatories',
+        'Deposition' => 'Deposition / Statement',
+        'Evidence' => 'Evidence / Material Object',
+        'Exhibit' => 'Exhibit',
+        'Affidavit' => 'Affidavit / Oath',
+        'Declaration' => 'Declaration',
+        'Court Filing' => 'Court Filing / Petition',
+        'Notice' => 'Notice / Summons',
+        'Legal Research' => 'Legal Research Memo',
+        'Client Document' => 'Client Document / KYC',
+        'Financial Document' => 'Financial / Audit Record',
+        'Medical Record' => 'Medical / Medico-Legal Record',
+        'Other' => 'Other',
+    ];
+
+    public const CLASSIFICATIONS = [
+        'public' => 'Public',
+        'internal' => 'Internal Chambers',
+        'confidential' => 'Confidential',
+        'highly_confidential' => 'Highly Confidential',
+        'attorney_client_privileged' => 'Attorney-Client Privileged',
+        'attorney_work_product' => 'Attorney Work Product',
+    ];
+
+    public const VISIBILITIES = [
+        'internal_only' => 'Internal Chambers Only',
+        'attorney_only' => 'Attorneys Only',
+        'legal_team' => 'Legal Team Only',
+        'client_visible' => 'Client Portal Visible',
+        'restricted' => 'Restricted Access',
     ];
 
     public function firm(): BelongsTo
     {
         return $this->belongsTo(Firm::class);
+    }
+
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
     }
 
     public function matter(): BelongsTo

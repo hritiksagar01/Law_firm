@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\AdminSettingsController;
@@ -11,11 +12,14 @@ use App\Http\Controllers\Admin\SignInHistoryController;
 use App\Http\Controllers\Admin\SystemSettingsController;
 use App\Http\Controllers\Admin\TestManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ConflictCheckController;
 use App\Http\Controllers\DocumentRequestController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpinionController;
@@ -35,8 +39,8 @@ use App\Models\Document;
 use App\Models\DocumentRequest;
 use App\Models\Event;
 use App\Models\Firm;
-use App\Models\Invoice;
 use App\Models\Matter;
+use App\Models\MatterActivity;
 use App\Models\Message;
 use App\Models\SignInHistory;
 use App\Models\Task;
@@ -44,7 +48,6 @@ use App\Models\User;
 use App\Services\LegalPdfGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -155,11 +158,19 @@ Route::middleware('auth')->group(function () {
             $events = Event::where('firm_id', $firmId)->with('matter')->orderBy('start_time')->take(15)->get();
             $tasks = Task::where('firm_id', $firmId)->with(['assignee', 'matter'])->take(15)->get();
 
-            // Dynamic Metrics for Executive Dashboard
-            $openMattersCount = Matter::where('firm_id', $firmId)
+            // Matter status metrics (Active, New last 30d, Closed)
+            $activeMattersCount = Matter::where('firm_id', $firmId)
                 ->whereIn('status', ['active', 'open', 'pending'])
                 ->count();
+            $newMattersCount = Matter::where('firm_id', $firmId)
+                ->where('created_at', '>=', now()->subDays(30))
+                ->count();
+            $closedMattersCount = Matter::where('firm_id', $firmId)
+                ->whereIn('status', ['closed', 'settled', 'dismissed', 'archived'])
+                ->count();
+            $openMattersCount = $activeMattersCount;
 
+            // Tasks metrics
             $tasksDueThisWeekCount = Task::where('firm_id', $firmId)
                 ->where('status', '!=', 'completed')
                 ->whereBetween('due_date', [now()->startOfWeek(), now()->endOfWeek()->addDays(2)])
@@ -170,6 +181,16 @@ Route::middleware('auth')->group(function () {
                 ->where('due_date', '<', now()->toDateString())
                 ->count();
 
+            // Overdue tasks list
+            $overdueTasksList = Task::where('firm_id', $firmId)
+                ->where('status', '!=', 'completed')
+                ->where('due_date', '<', now()->toDateString())
+                ->with(['matter', 'assignee'])
+                ->orderBy('due_date', 'asc')
+                ->take(8)
+                ->get();
+
+            // Document requests & uploads
             $docRequestsCount = DocumentRequest::where('firm_id', $firmId)
                 ->whereIn('status', ['submitted', 'under_review', 'pending'])
                 ->count();
@@ -179,20 +200,41 @@ Route::middleware('auth')->group(function () {
                 ->count();
             $uploadsToReviewCount = max($docRequestsCount, $clientDocsCount, 1);
 
-            $outstandingAmount = (float) Invoice::where('firm_id', $firmId)
-                ->whereIn('status', ['sent', 'unpaid', 'pending', 'overdue', 'partially_paid'])
-                ->sum(DB::raw('total_amount - amount_paid'));
+            $pendingDocRequestsList = DocumentRequest::where('firm_id', $firmId)
+                ->whereIn('status', ['pending', 'submitted', 'under_review'])
+                ->with(['matter', 'client'])
+                ->latest()
+                ->take(8)
+                ->get();
 
-            $overdueAmount = (float) Invoice::where('firm_id', $firmId)
+            // Unread messages
+            $unreadMessagesCount = Message::where('firm_id', $firmId)
+                ->where('is_read', false)
+                ->where('sender_id', '!=', $user->id)
+                ->count();
+
+            // Matters requiring attention (Hearings/Deadlines within 48h, overdue tasks, or urgent)
+            $mattersRequiringAttention = Matter::where('firm_id', $firmId)
+                ->whereIn('status', ['active', 'open', 'pending'])
                 ->where(function ($q) use ($firmId) {
-                    $q->where('status', 'overdue')
-                        ->orWhere(function ($sq) use ($firmId) {
-                            $sq->where('firm_id', $firmId)
-                                ->where('due_date', '<', now()->toDateString())
-                                ->whereIn('status', ['sent', 'unpaid', 'pending']);
-                        });
+                    $q->whereHas('events', function ($eq) use ($firmId) {
+                        $eq->where('firm_id', $firmId)
+                            ->whereBetween('start_time', [now()->subHours(2), now()->addHours(48)]);
+                    })
+                        ->orWhereHas('tasks', function ($tq) use ($firmId) {
+                            $tq->where('firm_id', $firmId)
+                                ->where('status', '!=', 'completed')
+                                ->where('due_date', '<', now()->toDateString());
+                        })
+                        ->orWhere('priority', 'urgent');
                 })
-                ->sum(DB::raw('total_amount - amount_paid'));
+                ->with(['client', 'leadAttorney', 'tasks' => function ($t) use ($firmId) {
+                    $t->where('firm_id', $firmId)->where('status', '!=', 'completed')->orderBy('due_date');
+                }, 'events' => function ($e) use ($firmId) {
+                    $e->where('firm_id', $firmId)->whereBetween('start_time', [now()->subHours(2), now()->addHours(48)])->orderBy('start_time');
+                }])
+                ->take(6)
+                ->get();
 
             $currencyMap = [
                 'USD' => '$',
@@ -217,7 +259,7 @@ Route::middleware('auth')->group(function () {
                 ->with(['matter', 'assignee'])
                 ->orderByRaw('CASE WHEN due_date < ? THEN 0 ELSE 1 END', [now()->toDateString()])
                 ->orderBy('due_date', 'asc')
-                ->take(5)
+                ->take(6)
                 ->get();
 
             if ($userTasks->isEmpty()) {
@@ -250,42 +292,63 @@ Route::middleware('auth')->group(function () {
                 ->whereIn('status', ['submitted', 'under_review', 'pending'])
                 ->with(['matter', 'client'])
                 ->latest()
-                ->take(3)
+                ->take(4)
                 ->get();
 
             $recentClientDocs = Document::where('firm_id', $firmId)
                 ->with(['matter', 'uploader'])
                 ->latest()
-                ->take(3)
+                ->take(4)
                 ->get();
 
-            // 3. Recent activity on your matters
-            $recentAuditLogs = AuditLog::where('firm_id', $firmId)
+            // 3. Recent activity on your matters (using MatterActivity first, falling back to AuditLog)
+            $activities = collect();
+            $matterActivities = MatterActivity::where('firm_id', $firmId)
+                ->with(['matter', 'user'])
                 ->latest()
                 ->take(12)
                 ->get();
 
-            $activities = collect();
-            foreach ($recentAuditLogs as $log) {
-                $matterNum = null;
-                if (preg_match('/(?:matter|case)\s+([A-Za-z0-9\-\/]+)/i', $log->record_type, $matches)) {
-                    $matterNum = $matches[1];
-                }
-
-                $isClient = false;
-                if (stripos($log->actor_name, 'client') !== false || stripos($log->record_type, 'client') !== false) {
-                    $isClient = true;
-                }
-
+            foreach ($matterActivities as $ma) {
+                $isClient = $ma->user && $ma->user->isClient();
                 $activities->push((object) [
-                    'actor_name' => $log->actor_name ?: 'System',
+                    'actor_name' => $ma->user->name ?? 'System',
                     'is_client' => $isClient,
-                    'role' => $isClient ? 'Client' : 'Counsel',
-                    'action_text' => $log->action_label ?: $log->action,
-                    'matter_case_number' => $matterNum,
-                    'created_at' => $log->created_at,
-                    'formatted_date' => $log->created_at ? $log->created_at->format('M j') : 'Recent',
+                    'role' => $isClient ? 'Client' : ($ma->user->role ?? 'Advocate'),
+                    'action_text' => $ma->description,
+                    'matter_case_number' => $ma->matter->case_number ?? null,
+                    'created_at' => $ma->created_at,
+                    'formatted_date' => $ma->created_at ? $ma->created_at->format('M j') : 'Recent',
                 ]);
+            }
+
+            if ($activities->count() < 6) {
+                $recentAuditLogs = AuditLog::where('firm_id', $firmId)
+                    ->latest()
+                    ->take(12)
+                    ->get();
+
+                foreach ($recentAuditLogs as $log) {
+                    $matterNum = null;
+                    if (preg_match('/(?:matter|case)\s+([A-Za-z0-9\-\/]+)/i', $log->record_type, $matches)) {
+                        $matterNum = $matches[1];
+                    }
+
+                    $isClient = false;
+                    if (stripos($log->actor_name, 'client') !== false || stripos($log->record_type, 'client') !== false) {
+                        $isClient = true;
+                    }
+
+                    $activities->push((object) [
+                        'actor_name' => $log->actor_name ?: 'System',
+                        'is_client' => $isClient,
+                        'role' => $isClient ? 'Client' : 'Counsel',
+                        'action_text' => $log->action_label ?: $log->action,
+                        'matter_case_number' => $matterNum,
+                        'created_at' => $log->created_at,
+                        'formatted_date' => $log->created_at ? $log->created_at->format('M j') : 'Recent',
+                    ]);
+                }
             }
 
             if ($activities->count() < 6) {
@@ -302,29 +365,41 @@ Route::middleware('auth')->group(function () {
                         'formatted_date' => $doc->created_at ? $doc->created_at->format('M j') : 'Recent',
                     ]);
                 }
-
-                $recentInvoices = Invoice::where('firm_id', $firmId)->with(['matter', 'client'])->latest()->take(3)->get();
-                foreach ($recentInvoices as $inv) {
-                    $activities->push((object) [
-                        'actor_name' => 'Finance & Ledger',
-                        'is_client' => false,
-                        'role' => 'Billing',
-                        'action_text' => "Generated invoice {$inv->invoice_number} ({$currencySymbol}".number_format($inv->total_amount, 2).')',
-                        'matter_case_number' => $inv->matter->case_number ?? null,
-                        'created_at' => $inv->created_at,
-                        'formatted_date' => $inv->created_at ? $inv->created_at->format('M j') : 'Recent',
-                    ]);
-                }
             }
 
             $recentActivities = $activities->sortByDesc('created_at')->values()->take(12);
 
-            // 4. Next Two Weeks: Upcoming court dates, hearings, deadlines & meetings
+            // 4. Calendar: Previous Week, This Week, Next Week
+            $prevWeekStart = now()->subWeek()->startOfWeek();
+            $prevWeekEnd = now()->subWeek()->endOfWeek()->endOfDay();
+            $thisWeekStart = now()->startOfWeek();
+            $thisWeekEnd = now()->endOfWeek()->endOfDay();
+            $nextWeekStart = now()->addWeek()->startOfWeek();
+            $nextWeekEnd = now()->addWeek()->endOfWeek()->endOfDay();
+
+            $prevWeekEvents = Event::where('firm_id', $firmId)
+                ->whereBetween('start_time', [$prevWeekStart, $prevWeekEnd])
+                ->with('matter')
+                ->orderBy('start_time')
+                ->get();
+
+            $thisWeekEvents = Event::where('firm_id', $firmId)
+                ->whereBetween('start_time', [$thisWeekStart, $thisWeekEnd])
+                ->with('matter')
+                ->orderBy('start_time')
+                ->get();
+
+            $nextWeekEvents = Event::where('firm_id', $firmId)
+                ->whereBetween('start_time', [$nextWeekStart, $nextWeekEnd])
+                ->with('matter')
+                ->orderBy('start_time')
+                ->get();
+
             $upcomingEvents = Event::where('firm_id', $firmId)
                 ->where('start_time', '>=', now()->subHours(12))
                 ->with('matter')
                 ->orderBy('start_time', 'asc')
-                ->take(6)
+                ->take(8)
                 ->get();
 
             if ($upcomingEvents->isEmpty()) {
@@ -350,18 +425,26 @@ Route::middleware('auth')->group(function () {
                 'matters',
                 'events',
                 'tasks',
+                'activeMattersCount',
+                'newMattersCount',
+                'closedMattersCount',
                 'openMattersCount',
                 'tasksDueThisWeekCount',
                 'tasksOverdueCount',
+                'overdueTasksList',
                 'uploadsToReviewCount',
-                'outstandingAmount',
-                'overdueAmount',
+                'pendingDocRequestsList',
+                'unreadMessagesCount',
+                'mattersRequiringAttention',
                 'currencySymbol',
                 'userTasks',
                 'clientMessages',
                 'clientUploads',
                 'recentClientDocs',
                 'recentActivities',
+                'prevWeekEvents',
+                'thisWeekEvents',
+                'nextWeekEvents',
                 'upcomingEvents',
                 'lastSignIn'
             ));
@@ -468,16 +551,69 @@ Route::middleware('auth')->group(function () {
             $matter->load([
                 'client',
                 'leadAttorney',
-                'documents',
+                'users' => fn ($q) => $q->wherePivot('is_active', true),
+                'activities.user',
+                'documents.uploader',
                 'opinions.author',
                 'appointments.attorney',
                 'events',
                 'tasks.assignee',
                 'messages.sender',
+                'caseNotes.user',
+                'conflictChecks.checker',
+                'conflictChecks.reviewer',
             ]);
 
-            return view('matters.show', compact('matter'));
+            $firmStaff = User::where('firm_id', $user->firm_id ?? 1)->select(['id', 'name', 'role'])->get();
+
+            return view('matters.show', compact('matter', 'firmStaff'));
         })->name('matters.show');
+
+        // Matter Team Management
+        Route::post('/matters/{matter}/team', function (Request $request, Matter $matter) {
+            $validated = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'role' => 'required|string',
+                'access_level' => 'required|in:read,write,admin',
+            ]);
+
+            $user = User::findOrFail($validated['user_id']);
+            $matter->users()->syncWithoutDetaching([
+                $user->id => [
+                    'role' => $validated['role'],
+                    'access_level' => $validated['access_level'],
+                    'assignment_date' => now(),
+                    'is_active' => true,
+                ],
+            ]);
+
+            MatterActivity::log(
+                matter: $matter,
+                activityType: 'assignment_changed',
+                description: "Assigned {$user->name} as ".ucfirst(str_replace('_', ' ', $validated['role'])),
+                subject: $user,
+                userId: Auth::id()
+            );
+
+            return back()->with('success', "Team member {$user->name} added to matter legal team.");
+        })->name('matters.team.store');
+
+        Route::delete('/matters/{matter}/team/{user}', function (Matter $matter, User $user) {
+            $matter->users()->updateExistingPivot($user->id, [
+                'is_active' => false,
+                'removal_date' => now(),
+            ]);
+
+            MatterActivity::log(
+                matter: $matter,
+                activityType: 'assignment_changed',
+                description: "Removed {$user->name} from active matter team",
+                subject: $user,
+                userId: Auth::id()
+            );
+
+            return back()->with('success', "Team member {$user->name} removed from matter team.");
+        })->name('matters.team.destroy');
 
         // Clients Directory, Dossier & Indian Practice Intake
         Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
@@ -764,31 +900,44 @@ Route::middleware('auth')->group(function () {
             $task->status = ($task->status === 'completed') ? 'todo' : 'completed';
             $task->save();
 
+            if ($task->matter) {
+                MatterActivity::log(
+                    matter: $task->matter,
+                    activityType: $task->status === 'completed' ? 'task_completed' : 'task_created',
+                    description: ($task->status === 'completed' ? 'Completed task: ' : 'Re-opened task: ').$task->title,
+                    subject: $task,
+                    userId: Auth::id()
+                );
+            }
+
             return back()->with('success', 'Task status updated.');
         })->name('tasks.toggle');
 
-        // Send Matter Privileged Message
-        Route::post('/messages', function (Request $request) {
-            $request->validate([
-                'matter_id' => 'required|exists:matters,id',
-                'body' => 'required|string|max:1000',
-            ]);
+        // Case Dispatches & Privileged Messages
+        Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+        Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
 
-            Message::create([
-                'firm_id' => Auth::user()->firm_id ?? 1,
-                'matter_id' => $request->matter_id,
-                'sender_id' => Auth::id(),
-                'body' => $request->body,
-                'is_privileged' => true,
-            ]);
-
-            return back()->with('success', 'Privileged attorney-client communication dispatched.');
-        })->name('messages.store');
-
-        // Document Requests from Counsel to Client (F-07)
+        // Document Requests from Counsel to Client
+        Route::get('/document-requests', [DocumentRequestController::class, 'index'])->name('document-requests.index');
         Route::post('/document-requests', [DocumentRequestController::class, 'store'])->name('document-requests.store');
         Route::post('/document-requests/{documentRequest}/review', [DocumentRequestController::class, 'review'])->name('document-requests.review');
         Route::post('/document-requests/{documentRequest}/assisted-upload', [DocumentRequestController::class, 'assistedUpload'])->name('document-requests.assisted-upload');
+
+        // Case Notes & Practice Memos
+        Route::get('/notes', [NoteController::class, 'index'])->name('notes.index');
+
+        // Practice Analytics & Intelligence
+        Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+
+        // Case Activity Feed & Audit Trail
+        Route::get('/activity', [ActivityController::class, 'index'])->name('activity.index');
+
+        // Conflict of Interest Checks & Clearance Registry
+        Route::get('/conflict-checks/search', [ConflictCheckController::class, 'search'])->name('conflict-checks.search');
+        Route::get('/conflict-checks', [ConflictCheckController::class, 'index'])->name('conflict-checks.index');
+        Route::post('/conflict-checks', [ConflictCheckController::class, 'store'])->name('conflict-checks.store');
+        Route::get('/conflict-checks/{conflictCheck}', [ConflictCheckController::class, 'show'])->name('conflict-checks.show');
+        Route::put('/conflict-checks/{conflictCheck}', [ConflictCheckController::class, 'update'])->name('conflict-checks.update');
 
         // Tasks & Productivity Hub
         Route::get('/tasks', function () {

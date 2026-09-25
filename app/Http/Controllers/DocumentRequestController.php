@@ -13,10 +13,64 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\View\View;
 use Throwable;
 
 class DocumentRequestController extends Controller
 {
+    public function index(Request $request): View
+    {
+        $firmId = Auth::user()->firm_id ?? 1;
+
+        $query = DocumentRequest::where('firm_id', $firmId)
+            ->with(['client', 'matter', 'requestedBy', 'document', 'assistedBy']);
+
+        if ($status = $request->get('status')) {
+            if ($status !== 'all') {
+                $query->where('status', $status);
+            }
+        }
+
+        if ($priority = $request->get('priority')) {
+            if ($priority !== 'all') {
+                $query->where('priority', $priority);
+            }
+        }
+
+        if ($clientId = $request->get('client_id')) {
+            $query->where('client_id', $clientId);
+        }
+
+        if ($matterId = $request->get('matter_id')) {
+            $query->where('matter_id', $matterId);
+        }
+
+        if ($search = trim($request->get('q', ''))) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('client', fn ($cq) => $cq->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('matter', fn ($mq) => $mq->where('title', 'like', "%{$search}%")->orWhere('case_number', 'like', "%{$search}%"));
+            });
+        }
+
+        $requests = $query->latest()->paginate(15)->withQueryString();
+
+        $clients = Client::where('firm_id', $firmId)->select(['id', 'name'])->orderBy('name')->get();
+        $matters = Matter::where('firm_id', $firmId)->select(['id', 'title', 'case_number'])->orderBy('title')->get();
+
+        $statusCounts = [
+            'all' => DocumentRequest::where('firm_id', $firmId)->count(),
+            'pending' => DocumentRequest::where('firm_id', $firmId)->where('status', 'pending')->count(),
+            'submitted' => DocumentRequest::where('firm_id', $firmId)->where('status', 'submitted')->count(),
+            'under_review' => DocumentRequest::where('firm_id', $firmId)->where('status', 'under_review')->count(),
+            'completed' => DocumentRequest::where('firm_id', $firmId)->where('status', 'completed')->count(),
+            'rejected' => DocumentRequest::where('firm_id', $firmId)->where('status', 'rejected')->count(),
+        ];
+
+        return view('document-requests.index', compact('requests', 'clients', 'matters', 'statusCounts'));
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $firmId = Auth::user()->firm_id ?? 1;
