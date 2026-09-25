@@ -59,4 +59,51 @@ class ClientRegistrationTest extends TestCase
             'portal_status' => 'active',
         ]);
     }
+
+    public function test_joint_co_clients_can_register_with_dynamic_members(): void
+    {
+        $firm = Firm::create([
+            'name' => 'Sharma & Associates',
+            'slug' => 'sharma-associates-3',
+            'email' => 'info3@sharmalegal.in',
+        ]);
+
+        $response = $this->post('/register/client', [
+            'category' => 'joint',
+            'firm_id' => $firm->id,
+            'name' => 'Vikram & Rajesh (Joint Litigants)',
+            'contact_person' => 'Vikram Malhotra',
+            'email' => 'joint.test@gmail.com',
+            'phone' => '+91 98110 99887',
+            'password' => '123456',
+            'password_confirmation' => '123456',
+            'members' => [
+                [
+                    'name' => 'Rajesh Sharma',
+                    'relationship' => 'Co-petitioner',
+                    'phone' => '+91 98765 11223',
+                    'email' => 'rajesh.sharma@gmail.com',
+                ],
+                [
+                    'name' => 'Sanjay Malhotra',
+                    'relationship' => 'Co-litigant',
+                    'phone' => '+91 98100 44556',
+                    'email' => 'sanjay.m@gmail.com',
+                ],
+            ],
+        ]);
+
+        $response->assertRedirect('/portal/dashboard');
+        $this->assertAuthenticated();
+
+        $this->assertDatabaseHas('client_members', [
+            'name' => 'Rajesh Sharma',
+            'relationship' => 'Co-petitioner',
+        ]);
+
+        $this->assertDatabaseHas('client_members', [
+            'name' => 'Sanjay Malhotra',
+            'relationship' => 'Co-litigant',
+        ]);
+    }
 }

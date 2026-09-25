@@ -9,7 +9,7 @@
     <!-- Google Fonts: Inter, Newsreader & Material Symbols -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -21,6 +21,13 @@
         contactPerson: 'Vikram Malhotra',
         email: 'vikram.client@gmail.com',
         phone: '+91 98765 43210',
+        members: [],
+        addMember() {
+            this.members.push({ name: '', relationship: 'Co-petitioner', phone: '', email: '' });
+        },
+        removeMember(index) {
+            this.members.splice(index, 1);
+        },
         passcode: ['1', '2', '3', '4', '5', '6'],
         showPasscode: false,
         fullPassword: '123456',
@@ -28,21 +35,27 @@
             if (type === 'joint') {
                 this.category = 'joint';
                 this.name = 'Vikram & Rajesh (Joint Litigants)';
-                this.contactPerson = 'Vikram Malhotra';
+                this.contactPerson = 'Vikram Malhotra (Primary Litigant)';
                 this.email = 'joint.litigants@gmail.com';
                 this.phone = '+91 98110 99887';
+                this.members = [
+                    { name: 'Rajesh Sharma', relationship: 'Co-petitioner / Co-owner', phone: '+91 98765 11223', email: 'rajesh.sharma@gmail.com' },
+                    { name: 'Sanjay Malhotra', relationship: 'Co-litigant / Relative', phone: '+91 98100 44556', email: 'sanjay.m@gmail.com' }
+                ];
             } else if (type === 'corporate') {
                 this.category = 'corporate';
                 this.name = 'Malhotra Enterprises Pvt Ltd';
                 this.contactPerson = 'Vikram Malhotra (Director)';
                 this.email = 'vikram.enterprise@gmail.com';
                 this.phone = '+91 98765 12345';
+                this.members = [];
             } else {
                 this.category = 'individual';
                 this.name = 'Vikram Malhotra';
                 this.contactPerson = 'Vikram Malhotra';
                 this.email = 'vikram.client@gmail.com';
                 this.phone = '+91 98765 43210';
+                this.members = [];
             }
             this.passcode = ['1', '2', '3', '4', '5', '6'];
             this.fullPassword = '123456';
@@ -113,12 +126,12 @@
                     <span class="material-symbols-outlined text-[#23493A] text-xl">how_to_reg</span>
                     <h2 class="font-headline text-lg font-medium text-[#1A1E1C]">Onboard as Client</h2>
                 </div>
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-1.5">
                     <button type="button" @click="fillDemo('individual')" class="text-[11px] text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2 py-0.5 rounded-[4px] font-medium border border-[#23493A]/15 cursor-pointer">
-                        <span>Demo Fill</span>
+                        <span>Individual Demo</span>
                     </button>
                     <button type="button" @click="fillDemo('joint')" class="text-[11px] text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2 py-0.5 rounded-[4px] font-medium border border-[#23493A]/15 cursor-pointer">
-                        <span>Joint Client</span>
+                        <span>⚡ Joint Co-Clients Demo</span>
                     </button>
                 </div>
             </div>
@@ -137,31 +150,31 @@
 
                     <div class="flex flex-col gap-1.5">
                         <label class="text-[13px] font-medium text-[#1A1E1C]">Client Entity Type</label>
-                        <select name="category" x-model="category" required class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all">
-                            <option value="individual">Individual Client</option>
-                            <option value="joint">Joint / Co-Clients</option>
+                        <select name="category" x-model="category" @change="if(category === 'joint' && members.length === 0) addMember()" required class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all">
+                            <option value="individual">Individual Client (Single)</option>
+                            <option value="joint">Joint / Co-Clients (Multiple Litigants)</option>
                             <option value="corporate">Corporate Entity / Company</option>
                             <option value="institution">Institution / Trust / Society</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Step 2: Basic Client Information -->
+                <!-- Step 2: Primary Client Information -->
                 <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
                     <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-sm text-[#23493A]">person</span>
-                        <span>02 · Basic Particulars</span>
+                        <span x-text="category === 'joint' ? '02 · Primary Litigant Particulars' : '02 · Basic Particulars'"></span>
                     </span>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1.5">
-                            <label class="text-[13px] font-medium text-[#1A1E1C]" x-text="category === 'corporate' || category === 'institution' ? 'Official Entity / Company Name' : 'Full Name'"></label>
+                            <label class="text-[13px] font-medium text-[#1A1E1C]" x-text="category === 'corporate' || category === 'institution' ? 'Official Entity / Company Name' : (category === 'joint' ? 'Primary Litigant / Client Name' : 'Full Name')"></label>
                             <input name="name" x-model="name" type="text" required placeholder="e.g. Vikram Malhotra" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                         </div>
 
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[13px] font-medium text-[#1A1E1C]">Contact Person Name</label>
-                            <input name="contact_person" x-model="contactPerson" type="text" placeholder="e.g. Vikram Malhotra (Director)" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                            <input name="contact_person" x-model="contactPerson" type="text" placeholder="e.g. Vikram Malhotra (Primary)" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                         </div>
                     </div>
 
@@ -174,6 +187,72 @@
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[13px] font-medium text-[#1A1E1C]">Mobile Contact Number</label>
                             <input name="phone" x-model="phone" type="text" required placeholder="+91 98765 43210" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Step: Joint / Co-Litigants Repeater Section -->
+                <div x-show="category === 'joint' || members.length > 0" x-cloak class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-[#23493A] flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">group</span>
+                            <span>Co-Litigants &amp; Joint Members</span>
+                        </span>
+                        <button type="button" @click="addMember()" class="text-xs font-semibold text-[#23493A] hover:underline inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-[4px] border border-[#E7E4DC] shadow-2xs cursor-pointer">
+                            <span class="material-symbols-outlined text-sm">group_add</span>
+                            <span>+ Add Co-Client</span>
+                        </button>
+                    </div>
+
+                    <p class="text-[11.5px] text-[#646864]">Add co-petitioners, co-owners, or joint party members representing this case dossier:</p>
+
+                    <div class="flex flex-col gap-3">
+                        <template x-for="(member, index) in members" :key="index">
+                            <div class="bg-white p-3 rounded-md border border-[#E7E4DC] flex flex-col gap-2.5 relative">
+                                <div class="flex items-center justify-between pb-1.5 border-b border-[#F0EEE8]">
+                                    <span class="text-xs font-semibold text-[#1A1E1C] flex items-center gap-1">
+                                        <span class="w-4 h-4 rounded-full bg-[#23493A]/10 text-[#23493A] flex items-center justify-center text-[10px] font-bold" x-text="index + 1"></span>
+                                        <span>Joint Co-Client #<span x-text="index + 1"></span></span>
+                                    </span>
+                                    <button type="button" @click="removeMember(index)" class="text-xs text-red-600 hover:text-red-800 flex items-center gap-0.5 cursor-pointer">
+                                        <span class="material-symbols-outlined text-sm">delete</span>
+                                        <span>Remove</span>
+                                    </button>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-[11.5px] font-medium text-[#1A1E1C]">Co-Client Full Name</label>
+                                        <input :name="'members[' + index + '][name]'" x-model="member.name" type="text" required placeholder="e.g. Rajesh Sharma" class="w-full h-[36px] px-2.5 rounded-[4px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A]"/>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-[11.5px] font-medium text-[#1A1E1C]">Legal Relationship / Status</label>
+                                        <select :name="'members[' + index + '][relationship]'" x-model="member.relationship" class="w-full h-[36px] px-2.5 rounded-[4px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A]">
+                                            <option value="Co-petitioner">Co-petitioner</option>
+                                            <option value="Co-respondent">Co-respondent</option>
+                                            <option value="Co-owner">Co-owner / Joint Owner</option>
+                                            <option value="Legal Heir">Legal Heir / Next of Kin</option>
+                                            <option value="Partner">Partner / Director</option>
+                                            <option value="Spouse">Spouse / Family Member</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-[11.5px] font-medium text-[#1A1E1C]">Mobile Contact</label>
+                                        <input :name="'members[' + index + '][phone]'" x-model="member.phone" type="text" placeholder="+91 98765 00000" class="w-full h-[36px] px-2.5 rounded-[4px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A]"/>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-[11.5px] font-medium text-[#1A1E1C]">Email Address</label>
+                                        <input :name="'members[' + index + '][email]'" x-model="member.email" type="email" placeholder="coclient@domain.com" class="w-full h-[36px] px-2.5 rounded-[4px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A]"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <div x-show="members.length === 0" class="p-3 rounded bg-white border border-dashed border-[#cfcbc0] text-center text-xs text-[#646864]">
+                            No co-clients added yet. Click <button type="button" @click="addMember()" class="text-[#23493A] font-semibold underline">"+ Add Co-Client"</button> to add joint litigants.
                         </div>
                     </div>
                 </div>

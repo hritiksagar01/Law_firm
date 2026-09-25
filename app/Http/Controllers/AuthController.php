@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\ResetPasswordMail;
 use App\Models\Client;
+use App\Models\ClientMember;
 use App\Models\Firm;
 use App\Models\Matter;
 use App\Models\Task;
@@ -122,6 +123,11 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|string|max:50',
             'password' => 'required|string|min:6|confirmed',
+            'members' => 'nullable|array',
+            'members.*.name' => 'nullable|string|max:255',
+            'members.*.relationship' => 'nullable|string|max:100',
+            'members.*.phone' => 'nullable|string|max:50',
+            'members.*.email' => 'nullable|email|max:255',
         ]);
 
         $validated['firm_id'] = $firmId;
@@ -137,7 +143,7 @@ class AuthController extends Controller
             'avatar_url' => 'https://ui-avatars.com/api/?name='.urlencode($validated['name']).'&background=23493A&color=fff',
         ]);
 
-        Client::create([
+        $client = Client::create([
             'firm_id' => $validated['firm_id'],
             'user_id' => $user->id,
             'category' => $validated['category'],
@@ -150,6 +156,22 @@ class AuthController extends Controller
             'portal_status' => 'active',
             'status' => 'active',
         ]);
+
+        if (! empty($request->input('members'))) {
+            foreach ($request->input('members') as $m) {
+                if (! empty($m['name'])) {
+                    ClientMember::create([
+                        'firm_id' => $validated['firm_id'],
+                        'client_id' => $client->id,
+                        'name' => $m['name'],
+                        'relationship' => $m['relationship'] ?? 'Co-petitioner',
+                        'phone' => $m['phone'] ?? null,
+                        'email' => $m['email'] ?? null,
+                        'is_primary_signatory' => false,
+                    ]);
+                }
+            }
+        }
 
         Auth::login($user);
 
