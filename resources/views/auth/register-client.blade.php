@@ -23,19 +23,7 @@
         email: 'vikram.client@gmail.com',
         countryCode: '+91',
         phoneRaw: '9876543210',
-        dob: '1988-06-15',
         age: 38,
-        calculateAge() {
-            if (!this.dob) return;
-            const birthDate = new Date(this.dob);
-            const today = new Date();
-            let calculatedAge = today.getFullYear() - birthDate.getFullYear();
-            const monthDiff = today.getMonth() - birthDate.getMonth();
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                calculatedAge--;
-            }
-            this.age = Math.max(0, calculatedAge);
-        },
         members: [],
         addMember() {
             this.members.push({ name: '', relationship: 'Co-petitioner', phone: '', email: '' });
@@ -54,8 +42,7 @@
                 this.email = 'joint.litigants@gmail.com';
                 this.countryCode = '+91';
                 this.phoneRaw = '9811099887';
-                this.dob = '1985-08-20';
-                this.calculateAge();
+                this.age = 41;
                 this.members = [
                     { name: 'Rajesh Sharma', relationship: 'Co-petitioner / Co-owner', phone: '+91 98765 11223', email: 'rajesh.sharma@gmail.com' },
                     { name: 'Sanjay Malhotra', relationship: 'Co-litigant / Relative', phone: '+91 98100 44556', email: 'sanjay.m@gmail.com' }
@@ -68,8 +55,7 @@
                 this.email = 'chandra.assisted@gmail.com';
                 this.countryCode = '+91';
                 this.phoneRaw = '9810077665';
-                this.dob = '1970-03-12';
-                this.calculateAge();
+                this.age = 56;
                 this.members = [];
             } else {
                 this.category = 'individual';
@@ -79,8 +65,7 @@
                 this.email = 'vikram.client@gmail.com';
                 this.countryCode = '+91';
                 this.phoneRaw = '9876543210';
-                this.dob = '1988-06-15';
-                this.calculateAge();
+                this.age = 38;
                 this.members = [];
             }
             this.passcode = ['1', '2', '3', '4', '5', '6'];
@@ -275,17 +260,10 @@
                         </div>
                     </div>
 
-                    <!-- Date of Birth & Age Row -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[13px] font-medium text-[#1A1E1C]">Date of Birth</label>
-                            <input name="date_of_birth" x-model="dob" @change="calculateAge()" type="date" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
-                        </div>
-
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[13px] font-medium text-[#1A1E1C]">Age (Years)</label>
-                            <input name="age" x-model="age" type="number" min="0" max="130" placeholder="e.g. 35" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs font-mono text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
-                        </div>
+                    <!-- Client Age (Years) -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Age (Years)</label>
+                        <input name="age" x-model="age" type="number" min="0" max="130" placeholder="e.g. 35" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs font-mono text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                     </div>
                 </div>
 

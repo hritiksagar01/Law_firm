@@ -1026,30 +1026,11 @@
                     </div>
                 </div>
 
-                <!-- Date of Birth & Age Row -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" x-data="{
-                    dob: '{{ $client->date_of_birth ? $client->date_of_birth->format('Y-m-d') : '' }}',
-                    age: '{{ $client->age ?? '' }}',
-                    calcAge() {
-                        if (!this.dob) return;
-                        const birth = new Date(this.dob);
-                        const today = new Date();
-                        let diff = today.getFullYear() - birth.getFullYear();
-                        const m = today.getMonth() - birth.getMonth();
-                        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) diff--;
-                        this.age = Math.max(0, diff);
-                    }
-                }">
-                    <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">Date of Birth</label>
-                        <input name="date_of_birth" x-model="dob" @change="calcAge()" type="date"
-                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
-                    </div>
-                    <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">Age (Years)</label>
-                        <input name="age" x-model="age" type="number" min="0" max="120" placeholder="e.g. 35"
-                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#1a1a1a]"/>
-                    </div>
+                <!-- Client Age -->
+                <div class="flex flex-col gap-1">
+                    <label class="font-semibold text-[#1a1a1a]">Age (Years)</label>
+                    <input name="age" value="{{ $client->age }}" type="number" min="0" max="120" placeholder="e.g. 35"
+                           class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#1a1a1a]"/>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">

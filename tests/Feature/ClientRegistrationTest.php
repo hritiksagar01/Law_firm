@@ -107,7 +107,7 @@ class ClientRegistrationTest extends TestCase
         ]);
     }
 
-    public function test_client_registration_supports_dob_age_and_country_code(): void
+    public function test_client_registration_supports_age_and_country_code(): void
     {
         $firm = Firm::create([
             'name' => 'Sharma & Associates',
@@ -122,7 +122,6 @@ class ClientRegistrationTest extends TestCase
             'contact_person' => 'John Smith',
             'email' => 'john.us@example.com',
             'phone' => '+1 2025550143',
-            'date_of_birth' => '1990-05-15',
             'age' => 36,
             'password' => '123456',
             'password_confirmation' => '123456',
@@ -135,7 +134,6 @@ class ClientRegistrationTest extends TestCase
             'email' => 'john.us@example.com',
             'name' => 'John Smith',
             'phone' => '+1 2025550143',
-            'date_of_birth' => '1990-05-15 00:00:00',
             'age' => 36,
         ]);
     }
