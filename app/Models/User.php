@@ -34,6 +34,27 @@ class User extends Authenticatable
         'two_factor_recovery_codes',
     ];
 
+    public const LAWYER_ROLES = [
+        'managing_attorney' => 'Managing Attorney',
+        'attorney' => 'Attorney',
+        'associate' => 'Associate',
+        'paralegal' => 'Paralegal',
+        'legal_assistant' => 'Legal Assistant',
+        'staff' => 'Staff',
+    ];
+
+    public const ALL_ROLES = [
+        'managing_attorney' => 'Managing Attorney',
+        'partner' => 'Partner',
+        'attorney' => 'Attorney',
+        'associate' => 'Associate',
+        'paralegal' => 'Paralegal',
+        'legal_assistant' => 'Legal Assistant',
+        'staff' => 'Staff',
+        'superadmin' => 'Super Admin',
+        'client' => 'Client',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -43,6 +64,8 @@ class User extends Authenticatable
             'hourly_rate' => 'decimal:2',
             'id_expiration' => 'date',
             'last_login_at' => 'datetime',
+            'admission_date' => 'date',
+            'practice_areas' => 'array',
         ];
     }
 
@@ -169,6 +192,18 @@ class User extends Authenticatable
         $defaultMatrix = [
             'admin' => ['*'],
             'partner' => ['*'],
+            'managing_attorney' => ['*'],
+            'attorney' => [
+                'matters.view', 'matter.view', 'matters.create', 'matter.create', 'matters.edit', 'matter.edit', 'matters.close', 'matter.close', 'matters.assign',
+                'clients.view', 'client.view', 'clients.create', 'clients.edit',
+                'documents.view', 'document.view', 'documents.upload', 'document.upload', 'documents.download', 'document.download', 'documents.share', 'document.share', 'documents.request', 'document.request',
+                'message.view', 'message.send',
+                'tasks.view', 'task.view', 'tasks.create', 'task.create', 'tasks.edit', 'tasks.assign', 'task.assign', 'tasks.complete', 'task.complete',
+                'note.view', 'note.create',
+                'opinions.view', 'opinions.create', 'opinions.review', 'opinions.publish',
+                'calendar.view', 'hearings.manage', 'appointments.manage',
+                'reports.view', 'reports.export',
+            ],
             'lawyer' => [
                 'matters.view', 'matter.view', 'matters.create', 'matter.create', 'matters.edit', 'matter.edit', 'matters.close', 'matter.close', 'matters.assign',
                 'clients.view', 'client.view', 'clients.create', 'clients.edit',
@@ -200,6 +235,16 @@ class User extends Authenticatable
                 'opinions.view', 'opinions.create',
                 'calendar.view', 'hearings.manage', 'appointments.manage',
             ],
+            'legal_assistant' => [
+                'matters.view', 'matter.view', 'clients.view', 'client.view',
+                'documents.view', 'document.view', 'documents.upload', 'document.upload', 'documents.download', 'document.download',
+                'message.view',
+                'tasks.view', 'task.view', 'tasks.create', 'task.create', 'tasks.edit', 'tasks.complete', 'task.complete',
+                'note.view', 'note.create',
+                'opinions.view', 'opinions.create',
+                'calendar.view', 'hearings.manage', 'appointments.manage',
+            ],
+            'staff' => ['clients.view', 'client.view', 'calendar.view', 'appointments.manage', 'tasks.view', 'task.view'],
             'support_staff' => ['clients.view', 'client.view', 'calendar.view', 'appointments.manage', 'tasks.view', 'task.view'],
             'client' => ['portal.access', 'client.view', 'document.view', 'matters.view'],
         ];
@@ -210,19 +255,24 @@ class User extends Authenticatable
         return in_array('*', $allowed) || in_array($permissionSlug, $allowed);
     }
 
+    public function getRoleDisplayNameAttribute(): string
+    {
+        return self::ALL_ROLES[$this->role] ?? ($this->roleRelation->name ?? ucfirst(str_replace('_', ' ', $this->role)));
+    }
+
     public function isPartner(): bool
     {
-        return in_array($this->role, ['partner', 'senior_partner', 'admin']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['admin', 'partner']));
+        return in_array($this->role, ['partner', 'senior_partner', 'admin', 'managing_attorney']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['admin', 'partner', 'managing_attorney']));
     }
 
     public function isAdmin(): bool
     {
-        return in_array($this->role, ['admin', 'partner', 'superadmin']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['admin', 'partner']));
+        return in_array($this->role, ['admin', 'partner', 'superadmin', 'managing_attorney']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['admin', 'partner']));
     }
 
     public function isAttorney(): bool
     {
-        return in_array($this->role, ['partner', 'senior_partner', 'associate', 'lawyer', 'admin']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['admin', 'partner', 'lawyer']));
+        return in_array($this->role, ['partner', 'senior_partner', 'associate', 'lawyer', 'admin', 'managing_attorney', 'attorney']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['admin', 'partner', 'lawyer', 'attorney', 'associate']));
     }
 
     public function isLawyer(): bool
@@ -232,12 +282,12 @@ class User extends Authenticatable
 
     public function isParalegal(): bool
     {
-        return $this->role === 'paralegal' || ($this->roleRelation && $this->roleRelation->slug === 'paralegal');
+        return in_array($this->role, ['paralegal', 'legal_assistant']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['paralegal', 'legal_assistant']));
     }
 
     public function isSupportStaff(): bool
     {
-        return in_array($this->role, ['support_staff', 'support', 'finance']) || ($this->roleRelation && $this->roleRelation->slug === 'support_staff');
+        return in_array($this->role, ['support_staff', 'support', 'finance', 'staff', 'legal_assistant']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['support_staff', 'staff']));
     }
 
     public function isClient(): bool
