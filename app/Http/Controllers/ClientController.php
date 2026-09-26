@@ -179,13 +179,25 @@ class ClientController extends Controller
             ? 'corporate'
             : 'individual';
 
+        $clientName = $validated['name'];
+        if (! empty($validated['salutation']) && ! str_starts_with(strtolower($clientName), strtolower($validated['salutation']))) {
+            $clientName = trim($validated['salutation'].' '.$clientName);
+        }
+
+        $fatherDisplayName = $validated['father_husband_name'] ?? null;
+        if (! empty($fatherDisplayName) && ! empty($validated['father_salutation'])) {
+            if (! str_starts_with(strtolower($fatherDisplayName), strtolower($validated['father_salutation'])) && ! str_contains(strtolower($fatherDisplayName), strtolower($validated['father_salutation']))) {
+                $fatherDisplayName = trim($validated['father_salutation'].' '.$fatherDisplayName);
+            }
+        }
+
         $client = Client::create([
             'firm_id' => $firmId,
             'primary_attorney_id' => $attorneyId,
             'type' => $legacyType,
             'category' => $validated['category'],
             'onboarding_mode' => $validated['onboarding_mode'],
-            'name' => $validated['name'],
+            'name' => $clientName,
             'contact_person' => $validated['contact_person'] ?? null,
             'email' => $validated['email'] ?? null,
             'phone' => $validated['phone'] ?? null,
@@ -199,7 +211,7 @@ class ClientController extends Controller
             'client_type' => $validated['client_type'] ?? null,
 
             // Indian KYC & Personal/Entity Particulars
-            'father_husband_name' => $validated['father_husband_name'] ?? null,
+            'father_husband_name' => $fatherDisplayName,
             'gender' => $validated['gender'] ?? null,
             'date_of_birth' => $validated['date_of_birth'] ?? null,
             'age' => $validated['age'] ?? null,
@@ -348,8 +360,20 @@ class ClientController extends Controller
 
         $validated = $request->validated();
 
+        $updatedName = $validated['name'];
+        if (! empty($validated['salutation']) && ! str_starts_with(strtolower($updatedName), strtolower($validated['salutation']))) {
+            $updatedName = trim($validated['salutation'].' '.$updatedName);
+        }
+
+        $updatedFather = $validated['father_husband_name'] ?? null;
+        if (! empty($updatedFather) && ! empty($validated['father_salutation'])) {
+            if (! str_starts_with(strtolower($updatedFather), strtolower($validated['father_salutation'])) && ! str_contains(strtolower($updatedFather), strtolower($validated['father_salutation']))) {
+                $updatedFather = trim($validated['father_salutation'].' '.$updatedFather);
+            }
+        }
+
         $client->update([
-            'name' => $validated['name'],
+            'name' => $updatedName,
             'category' => $validated['category'],
             'onboarding_mode' => $validated['onboarding_mode'],
             'email' => $validated['email'] ?? null,
@@ -364,7 +388,7 @@ class ClientController extends Controller
             'referral_source' => $validated['referral_source'] ?? $client->referral_source,
             'client_type' => $validated['client_type'] ?? $client->client_type,
 
-            'father_husband_name' => $validated['father_husband_name'] ?? null,
+            'father_husband_name' => $updatedFather,
             'gender' => $validated['gender'] ?? null,
             'date_of_birth' => $validated['date_of_birth'] ?? null,
             'age' => $validated['age'] ?? null,

@@ -36,6 +36,7 @@
                 salutation: 'Mr.',
                 name: '',
                 contactPerson: '',
+                fatherSalutation: 'Late Shri',
                 fatherHusbandName: '',
                 email: '',
                 countryCode: '+91',
@@ -58,7 +59,8 @@
                         this.category = 'joint';
                         this.name = 'Vikram & Rajesh (Joint Litigants)';
                         this.contactPerson = 'Vikram Malhotra';
-                        this.fatherHusbandName = 'S/o Late Shri Jagdish Malhotra';
+                        this.fatherSalutation = 'Late Shri';
+                        this.fatherHusbandName = 'Rameshwaram';
                         this.email = 'joint.litigants@gmail.com';
                         this.countryCode = '+91';
                         this.phoneRaw = '9811099887';
@@ -73,7 +75,8 @@
                         this.onboardingMode = 'assisted_offline';
                         this.name = 'Chandra Sekhar (Assisted Intake)';
                         this.contactPerson = 'Chandra Sekhar';
-                        this.fatherHusbandName = 'S/o Late Shri Rameshwaram';
+                        this.fatherSalutation = 'Shri';
+                        this.fatherHusbandName = 'K. Sekhar';
                         this.email = 'chandra.assisted@gmail.com';
                         this.countryCode = '+91';
                         this.phoneRaw = '9810077665';
@@ -86,7 +89,8 @@
                         this.onboardingMode = 'portal_online';
                         this.name = 'Vikram Malhotra';
                         this.contactPerson = 'Vikram Malhotra';
-                        this.fatherHusbandName = 'S/o Late Shri Jagdish Malhotra';
+                        this.fatherSalutation = 'Late Shri';
+                        this.fatherHusbandName = 'Jagdish Malhotra';
                         this.email = 'vikram.client@gmail.com';
                         this.countryCode = '+91';
                         this.phoneRaw = '9876543210';

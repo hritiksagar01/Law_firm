@@ -122,6 +122,7 @@ class AuthController extends Controller
             'salutation' => 'nullable|string|max:20',
             'name' => 'required|string|max:255',
             'contact_person' => 'nullable|string|max:255',
+            'father_salutation' => 'nullable|string|max:20',
             'father_husband_name' => 'nullable|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|string|max:50',
@@ -143,6 +144,13 @@ class AuthController extends Controller
             ? trim($validated['salutation'].' '.$validated['name'])
             : $validated['name'];
 
+        $fatherDisplayName = $validated['father_husband_name'] ?? null;
+        if (! empty($fatherDisplayName) && ! empty($validated['father_salutation'])) {
+            if (! str_starts_with(strtolower($fatherDisplayName), strtolower($validated['father_salutation'])) && ! str_contains(strtolower($fatherDisplayName), strtolower($validated['father_salutation']))) {
+                $fatherDisplayName = trim($validated['father_salutation'].' '.$fatherDisplayName);
+            }
+        }
+
         $user = User::create([
             'firm_id' => $validated['firm_id'],
             'name' => $displayName,
@@ -161,7 +169,7 @@ class AuthController extends Controller
             'type' => in_array($validated['category'], ['corporate', 'institution']) ? 'corporate' : 'individual',
             'name' => $displayName,
             'contact_person' => $validated['contact_person'] ?? $displayName,
-            'father_husband_name' => $validated['father_husband_name'] ?? null,
+            'father_husband_name' => $fatherDisplayName,
             'email' => $validated['email'],
             'phone' => $validated['phone'],
             'age' => $validated['age'] ?? null,

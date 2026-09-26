@@ -1067,9 +1067,28 @@
                                class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
                     </div>
                     <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">Parentage (S/o, D/o, W/o)</label>
-                        <input name="father_husband_name" value="{{ $client->father_husband_name }}" type="text"
-                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
+                        <label class="font-semibold text-[#1a1a1a]">Title &amp; Father's / Mother's Name</label>
+                        <div class="flex items-center gap-1.5">
+                            <select name="father_salutation" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] shrink-0 cursor-pointer">
+                                <option value="">—</option>
+                                <option value="Mr.">Mr.</option>
+                                <option value="Late">Late</option>
+                                <option value="Shri">Shri</option>
+                                <option value="Late Shri">Late Shri</option>
+                                <option value="Mrs.">Mrs.</option>
+                                <option value="Smt.">Smt.</option>
+                                <option value="Late Smt.">Late Smt.</option>
+                                <option value="Dr.">Dr.</option>
+                                <option value="Adv.">Adv.</option>
+                                <option value="Prof.">Prof.</option>
+                                <option value="S/o">S/o</option>
+                                <option value="D/o">D/o</option>
+                                <option value="W/o">W/o</option>
+                            </select>
+                            <input name="father_husband_name" value="{{ $client->father_husband_name }}" type="text"
+                                   placeholder="e.g. Jagdish Malhotra"
+                                   class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] w-full"/>
+                        </div>
                     </div>
                 </div>
 

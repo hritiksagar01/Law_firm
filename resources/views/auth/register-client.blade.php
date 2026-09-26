@@ -21,7 +21,8 @@
         salutation: 'Mr.',
         name: 'Vikram Malhotra',
         contactPerson: 'Vikram Malhotra',
-        fatherHusbandName: 'S/o Late Shri Jagdish Malhotra',
+        fatherSalutation: 'Late Shri',
+        fatherHusbandName: 'Jagdish Malhotra',
         email: 'vikram.client@gmail.com',
         countryCode: '+91',
         phoneRaw: '9876543210',
@@ -43,6 +44,8 @@
                 this.category = 'joint';
                 this.name = 'Vikram & Rajesh (Joint Litigants)';
                 this.contactPerson = 'Vikram Malhotra (Primary Litigant)';
+                this.fatherSalutation = 'Late Shri';
+                this.fatherHusbandName = 'Rameshwaram';
                 this.email = 'joint.litigants@gmail.com';
                 this.countryCode = '+91';
                 this.phoneRaw = '9811099887';
@@ -58,6 +61,8 @@
                 this.onboardingMode = 'assisted_offline';
                 this.name = 'Chandra Sekhar (Assisted Intake)';
                 this.contactPerson = 'Chandra Sekhar';
+                this.fatherSalutation = 'Shri';
+                this.fatherHusbandName = 'K. Sekhar';
                 this.email = 'chandra.assisted@gmail.com';
                 this.countryCode = '+91';
                 this.phoneRaw = '9810077665';
@@ -70,6 +75,8 @@
                 this.onboardingMode = 'portal_online';
                 this.name = 'Vikram Malhotra';
                 this.contactPerson = 'Vikram Malhotra';
+                this.fatherSalutation = 'Late Shri';
+                this.fatherHusbandName = 'Jagdish Malhotra';
                 this.email = 'vikram.client@gmail.com';
                 this.countryCode = '+91';
                 this.phoneRaw = '9876543210';
@@ -264,8 +271,25 @@
 
                         <!-- Parentage for Individual & Joint OR Contact Person for Corporate -->
                         <div class="flex flex-col gap-1.5" x-show="category === 'individual' || category === 'joint'">
-                            <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">Father's / Mother's Name</label>
-                            <input name="father_husband_name" x-model="fatherHusbandName" type="text" placeholder="e.g. S/o Late Shri Jagdish Malhotra or D/o Smt. Sunita Sharma" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                            <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">Title &amp; Father's / Mother's Name</label>
+                            <div class="flex items-center gap-1.5">
+                                <select name="father_salutation" x-model="fatherSalutation" class="h-[40px] px-2 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] shrink-0 cursor-pointer">
+                                    <option value="Mr.">Mr.</option>
+                                    <option value="Late">Late</option>
+                                    <option value="Shri">Shri</option>
+                                    <option value="Late Shri">Late Shri</option>
+                                    <option value="Mrs.">Mrs.</option>
+                                    <option value="Smt.">Smt.</option>
+                                    <option value="Late Smt.">Late Smt.</option>
+                                    <option value="Dr.">Dr.</option>
+                                    <option value="Adv.">Adv.</option>
+                                    <option value="Prof.">Prof.</option>
+                                    <option value="S/o">S/o</option>
+                                    <option value="D/o">D/o</option>
+                                    <option value="W/o">W/o</option>
+                                </select>
+                                <input name="father_husband_name" x-model="fatherHusbandName" type="text" placeholder="e.g. Jagdish Malhotra or Sunita Sharma" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                            </div>
                         </div>
 
                         <div class="flex flex-col gap-1.5" x-show="category === 'corporate' || category === 'institution'">

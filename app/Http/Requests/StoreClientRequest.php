@@ -16,6 +16,7 @@ class StoreClientRequest extends FormRequest
         $rules = [
             'firm_id' => 'nullable|exists:firms,id',
             'category' => 'required|in:individual,joint,corporate,institution,partnership,proprietorship',
+            'salutation' => 'nullable|string|max:20',
             'name' => 'required|string|max:255',
             'onboarding_mode' => 'required|in:portal_online,assisted_offline',
             'phone' => 'nullable|string|max:50',
@@ -30,6 +31,8 @@ class StoreClientRequest extends FormRequest
             'trust_balance' => 'nullable|numeric|min:0',
 
             // Indian KYC & Personal/Entity Particulars
+            'father_salutation' => 'nullable|string|max:20',
+            'father_name' => 'nullable|string|max:255',
             'father_husband_name' => 'nullable|string|max:255',
             'gender' => 'nullable|in:male,female,other',
             'date_of_birth' => 'nullable|date',

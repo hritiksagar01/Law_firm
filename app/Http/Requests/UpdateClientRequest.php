@@ -14,6 +14,7 @@ class UpdateClientRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'salutation' => 'nullable|string|max:20',
             'name' => 'required|string|max:255',
             'category' => 'required|in:individual,joint,corporate,institution,partnership,proprietorship',
             'onboarding_mode' => 'required|in:portal_online,assisted_offline',
@@ -30,6 +31,7 @@ class UpdateClientRequest extends FormRequest
             'client_type' => 'nullable|string|max:100',
 
             // Indian KYC & Personal/Entity Particulars
+            'father_salutation' => 'nullable|string|max:20',
             'father_husband_name' => 'nullable|string|max:255',
             'gender' => 'nullable|in:male,female,other',
             'date_of_birth' => 'nullable|date',
