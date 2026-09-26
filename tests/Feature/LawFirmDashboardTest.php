@@ -32,6 +32,7 @@ class LawFirmDashboardTest extends TestCase
         $response->assertSee($partner->name);
         $response->assertSee($firm->name);
         $response->assertSee('Your tasks');
+        $response->assertSee('Pending Document');
         $response->assertSee('Waiting on you');
         $response->assertSee('Clients awaiting a reply');
         $response->assertSee('Client uploads to review');

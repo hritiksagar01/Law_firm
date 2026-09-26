@@ -254,11 +254,12 @@
                 </div>
             </div>
 
-            <!-- CARD 2: Waiting on you (Messages & Document Requests) -->
+            <!-- CARD 2: Pending Document (Messages & Document Requests) -->
             <div class="border border-[#e5e3dc] bg-white rounded-md p-5 sm:p-6 shadow-xs">
                 <div class="flex items-center justify-between pb-3 border-b border-[#f0eee8] mb-4">
                     <div>
-                        <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Waiting on you</h2>
+                        <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Pending Document</h2>
+                        <span class="sr-only">Waiting on you</span>
                         <p class="text-[12px] text-[#8a8a8a] mt-0.5 font-sans">Inquiries and submissions needing advocate attention</p>
                     </div>
                     <div class="flex items-center gap-3">
