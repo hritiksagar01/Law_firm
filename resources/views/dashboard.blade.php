@@ -62,16 +62,18 @@
     <!-- Top 4 Connected Metric Ribbon (Clean Operations Overview, No Receivables) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border border-[#e5e3dc] bg-white rounded-md divide-y sm:divide-y-0 sm:divide-x divide-[#e5e3dc] shadow-xs mb-8">
         <!-- Active / New / Closed Matters -->
-        <a href="{{ route('matters.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">
+        <div class="p-5 flex flex-col justify-between hover:bg-[#faf9f5] transition-colors group">
             <div class="flex items-center justify-between">
-                <span class="text-[12.5px] text-[#646864]">Open matters</span>
-                <span class="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 uppercase tracking-wide">Active</span>
+                <a href="{{ route('matters.index', ['status' => 'open']) }}" class="text-[12.5px] text-[#646864] hover:text-[#23493a] font-medium transition-colors">Open matters</a>
+                <a href="{{ route('matters.index', ['status' => 'open']) }}" class="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 uppercase tracking-wide hover:bg-emerald-100 transition-colors">Active</a>
             </div>
-            <div class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1">{{ $activeMattersCount }}</div>
-            <div class="text-[12px] text-[#8a8a8a] mt-1">
-                open matter records in active litigation &middot; {{ $newMattersCount }} new &middot; {{ $closedMattersCount }} closed
+            <a href="{{ route('matters.index', ['status' => 'open']) }}" class="text-[28px] font-medium text-[#1a1a1a] tracking-tight mt-1 hover:text-[#23493a] transition-colors">{{ $activeMattersCount }}</a>
+            <div class="text-[12px] text-[#8a8a8a] mt-1 flex items-center gap-1.5 flex-wrap">
+                <a href="{{ route('matters.index', ['status' => 'open']) }}" class="hover:text-[#23493a] hover:underline">open matter records in active litigation</a>
+                <span class="text-[#c1c8c3]">&middot;</span>
+                <a href="{{ route('matters.index', ['status' => 'closed']) }}" class="text-[#646864] hover:text-[#23493a] hover:underline font-medium">{{ $closedMattersCount }} closed</a>
             </div>
-        </a>
+        </div>
 
         <!-- Tasks Due This Week / Overdue -->
         <a href="{{ route('tasks.index') }}" class="p-5 block hover:bg-[#faf9f5] transition-colors">

@@ -12,8 +12,22 @@
                 <span class="material-symbols-outlined text-[16px]">arrow_back</span>
                 <span>Matters Directory</span>
             </a>
+            @php
+                $isClosed = in_array(strtolower($matter->status ?? ''), ['closed', 'settled', 'dismissed', 'archived']);
+            @endphp
             <div class="flex items-center gap-2">
-                <span class="font-mono text-xs px-2.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#065f46] font-medium border border-[#a7f3d0]">
+                @if($isClosed)
+                    <span class="inline-flex items-center gap-1 font-mono text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium border border-slate-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                        Closed
+                    </span>
+                @else
+                    <span class="inline-flex items-center gap-1 font-mono text-xs px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium border border-emerald-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        Open
+                    </span>
+                @endif
+                <span class="font-mono text-xs px-2.5 py-0.5 rounded-full bg-[#f5f3ed] text-[#23493a] font-medium border border-[#e5e3dc]">
                     {{ $matter->stage }}
                 </span>
                 <span class="font-mono text-xs px-2.5 py-0.5 rounded bg-[#f5f3ed] text-[#23493a] font-semibold border border-[#e5e3dc]">
@@ -30,6 +44,22 @@
                 </p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
+                @if($isClosed)
+                    <form action="{{ route('matters.status.update', $matter->id) }}" method="POST" class="inline" onsubmit="return confirm('Reopen matter dossier {{ $matter->case_number }}?');">
+                        @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="status" value="open">
+                        <button type="submit" class="btn-secondary h-9 px-3 text-xs inline-flex items-center gap-1.5 text-[#23493a] border-emerald-300 hover:bg-emerald-50">
+                            <span class="material-symbols-outlined text-[16px]">lock_open</span>
+                            <span>Reopen Matter</span>
+                        </button>
+                    </form>
+                @else
+                    <button type="button" onclick="document.getElementById('closeMatterModal').classList.remove('hidden')" class="btn-secondary h-9 px-3 text-xs inline-flex items-center gap-1.5 text-rose-700 hover:text-rose-800 hover:border-rose-300">
+                        <span class="material-symbols-outlined text-[16px]">lock</span>
+                        <span>Close Matter</span>
+                    </button>
+                @endif
                 <a href="{{ route('opinions.create', ['matter_id' => $matter->id]) }}" class="btn-secondary h-9 px-3 text-xs inline-flex items-center gap-1.5">
                     <span class="material-symbols-outlined text-[16px] text-[#23493a]">draw</span>
                     <span>Draft Opinion</span>
@@ -85,6 +115,27 @@
             </a>
         </div>
     </div>
+
+    @if($isClosed)
+        <div class="p-4 mb-6 rounded-md bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+            <div class="flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-amber-700 text-[22px]">lock</span>
+                <div>
+                    <p class="text-xs font-semibold text-amber-900">This matter dossier is Closed (archived on {{ $matter->closed_at ? $matter->closed_at->format('M d, Y') : 'record' }}).</p>
+                    <p class="text-[11.5px] text-amber-800 mt-0.5">Filings, privileged communications, hearings, and orders remain preserved for reference.</p>
+                </div>
+            </div>
+            <form action="{{ route('matters.status.update', $matter->id) }}" method="POST" onsubmit="return confirm('Reopen matter dossier {{ $matter->case_number }}?');">
+                @csrf
+                @method('PATCH')
+                <input type="hidden" name="status" value="open">
+                <button type="submit" class="px-3 py-1.5 rounded bg-white hover:bg-[#faf9f5] border border-amber-300 text-amber-900 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-xs whitespace-nowrap">
+                    <span class="material-symbols-outlined text-[16px]">lock_open</span>
+                    <span>Reopen Matter</span>
+                </button>
+            </form>
+        </div>
+    @endif
 
     <!-- Dossier Content Columns -->
     <div id="overview-section" class="grid grid-cols-1 xl:grid-cols-3 gap-6 pt-4 items-start">
@@ -672,6 +723,45 @@
             </div>
 
         </div>
+    </div>
+</div>
+
+<!-- Close Matter Modal -->
+<div id="closeMatterModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-md w-full p-6 shadow-xl border border-[#e5e3dc]" onclick="event.stopPropagation()">
+        <div class="flex items-center justify-between pb-3 border-b border-[#f0eee8] mb-4">
+            <div class="flex items-center gap-2 text-rose-800">
+                <span class="material-symbols-outlined text-xl">lock</span>
+                <h3 class="text-sm font-semibold text-[#1a1a1a]">Close Matter Dossier</h3>
+            </div>
+            <button type="button" onclick="document.getElementById('closeMatterModal').classList.add('hidden')" class="text-[#8a8a8a] hover:text-[#1a1a1a]">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+        </div>
+        <form action="{{ route('matters.status.update', $matter->id) }}" method="POST" class="space-y-4">
+            @csrf
+            @method('PATCH')
+            <input type="hidden" name="status" value="closed">
+
+            <p class="text-xs text-[#646864] leading-relaxed">
+                Closing matter <strong>{{ $matter->case_number }} ({{ $matter->title }})</strong> will mark this case file as Closed. All historical filings, notes, orders, and privileged communications remain preserved for legal compliance.
+            </p>
+
+            <div>
+                <label class="block text-xs font-medium text-[#1a1a1a] mb-1">Disposition / Closure Notes (Optional)</label>
+                <textarea name="closing_notes" rows="3" placeholder="e.g. Decree finalized; judgment executed; certified copies received..." class="w-full text-xs p-2.5 rounded border border-[#e5e3dc] focus:border-[#23493a] focus:outline-none"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#f0eee8]">
+                <button type="button" onclick="document.getElementById('closeMatterModal').classList.add('hidden')" class="btn-secondary h-9 px-3.5 text-xs">
+                    Cancel
+                </button>
+                <button type="submit" class="h-9 px-4 rounded bg-rose-700 hover:bg-rose-800 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-xs">
+                    <span class="material-symbols-outlined text-[16px]">lock</span>
+                    <span>Confirm &amp; Close Matter</span>
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

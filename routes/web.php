@@ -458,32 +458,68 @@ Route::middleware('auth')->group(function () {
         // Matters Directory
         Route::get('/matters', function (Request $request) {
             $firmId = Auth::user()->firm_id ?? 1;
-            $query = Matter::where('firm_id', $firmId)->with(['client', 'leadAttorney']);
-            if ($request->has('stage') && $request->stage != 'all') {
-                $query->where('stage', $request->stage);
-            }
-            if ($request->has('q') && ! empty($request->q)) {
-                $q = $request->q;
-                $query->where(function ($sub) use ($q) {
-                    $sub->where('title', 'like', "%{$q}%")
-                        ->orWhere('case_number', 'like', "%{$q}%");
-                });
-            }
             $user = Auth::user();
+
+            $baseQuery = Matter::where('firm_id', $firmId);
             if (! in_array($user->role, ['superadmin', 'partner'])) {
                 // Associate / paralegal: only matters where they are lead attorney or team member
-                $query->where(function ($q) use ($user) {
+                $baseQuery->where(function ($q) use ($user) {
                     $q->where('lead_attorney_id', $user->id)
                         ->orWhereHas('users', fn ($uq) => $uq->where('users.id', $user->id));
                 });
             }
-            $matters = $query->latest()->get();
-            $totalCount = $matters->count();
-            $discoveryCount = $matters->where('stage', 'Discovery')->count();
-            $pleadingsCount = $matters->where('stage', 'Pleadings')->count();
-            $preTrialCount = $matters->where('stage', 'Pre-Trial')->count();
 
-            return view('matters.index', compact('matters', 'totalCount', 'discoveryCount', 'pleadingsCount', 'preTrialCount'));
+            // Global accessible counts
+            $accessibleMatters = (clone $baseQuery)->get(['id', 'status', 'stage']);
+            $totalCount = $accessibleMatters->count();
+            $openCount = $accessibleMatters->filter(fn ($m) => ! in_array(strtolower($m->status ?? ''), ['closed', 'settled', 'dismissed', 'archived']))->count();
+            $closedCount = $accessibleMatters->filter(fn ($m) => in_array(strtolower($m->status ?? ''), ['closed', 'settled', 'dismissed', 'archived']))->count();
+            $discoveryCount = $accessibleMatters->where('stage', 'Discovery')->count();
+            $pleadingsCount = $accessibleMatters->where('stage', 'Pleadings')->count();
+            $preTrialCount = $accessibleMatters->where('stage', 'Pre-Trial')->count();
+
+            // Filter query
+            $query = (clone $baseQuery)->with(['client', 'leadAttorney']);
+
+            // Status filter: open, closed, or specific status
+            if ($request->filled('status') && $request->status !== 'all') {
+                if ($request->status === 'open' || $request->status === 'active') {
+                    $query->whereNotIn('status', ['closed', 'settled', 'dismissed', 'archived']);
+                } elseif ($request->status === 'closed') {
+                    $query->whereIn('status', ['closed', 'settled', 'dismissed', 'archived']);
+                } else {
+                    $query->where('status', $request->status);
+                }
+            }
+
+            // Stage filter
+            if ($request->filled('stage') && $request->stage !== 'all') {
+                $query->where('stage', $request->stage);
+            }
+
+            // Search query
+            if ($request->filled('q')) {
+                $q = trim($request->q);
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('title', 'like', "%{$q}%")
+                        ->orWhere('case_number', 'like', "%{$q}%")
+                        ->orWhere('court_name', 'like', "%{$q}%")
+                        ->orWhere('judge_name', 'like', "%{$q}%")
+                        ->orWhereHas('client', fn ($cq) => $cq->where('name', 'like', "%{$q}%"));
+                });
+            }
+
+            $matters = $query->latest()->get();
+
+            return view('matters.index', compact(
+                'matters',
+                'totalCount',
+                'openCount',
+                'closedCount',
+                'discoveryCount',
+                'pleadingsCount',
+                'preTrialCount'
+            ));
         })->name('matters.index');
 
         // Create Matter
@@ -616,6 +652,74 @@ Route::middleware('auth')->group(function () {
 
             return back()->with('success', "Team member {$user->name} removed from matter team.");
         })->name('matters.team.destroy');
+
+        // Matter Status Management (Open / Close)
+        Route::patch('/matters/{matter}/status', function (Request $request, Matter $matter) {
+            $user = Auth::user();
+            if ($matter->firm_id !== ($user->firm_id ?? 1)) {
+                abort(403, 'Unauthorized case dossier.');
+            }
+
+            // Lawyer-level access restriction: non-partners must be assigned
+            if (! in_array($user->role, ['superadmin', 'partner'])) {
+                $isAssigned = ($matter->lead_attorney_id === $user->id) || $matter->users()->where('users.id', $user->id)->exists();
+                if (! $isAssigned) {
+                    abort(403, 'Unauthorized: You are not assigned to this case dossier.');
+                }
+            }
+
+            $validated = $request->validate([
+                'status' => 'required|string|in:active,open,closed',
+                'closing_notes' => 'nullable|string|max:1000',
+            ]);
+
+            $isCloseAction = $validated['status'] === 'closed';
+
+            if ($isCloseAction) {
+                $matter->update([
+                    'status' => 'closed',
+                    'closed_at' => now()->toDateString(),
+                ]);
+
+                if (! empty($validated['closing_notes'])) {
+                    $matter->caseNotes()->create([
+                        'firm_id' => $matter->firm_id,
+                        'user_id' => $user->id,
+                        'title' => 'Case Disposition & Closure Note',
+                        'body' => $validated['closing_notes'],
+                        'type' => 'internal',
+                        'is_pinned' => true,
+                    ]);
+                }
+
+                MatterActivity::log(
+                    matter: $matter,
+                    activityType: 'status_changed',
+                    description: "Closed matter dossier {$matter->case_number} ({$matter->title})".(! empty($validated['closing_notes']) ? " — Notes: {$validated['closing_notes']}" : ''),
+                    subject: $matter,
+                    userId: $user->id
+                );
+
+                $flashMessage = "Matter {$matter->case_number} ({$matter->title}) has been marked as Closed.";
+            } else {
+                $matter->update([
+                    'status' => 'active',
+                    'closed_at' => null,
+                ]);
+
+                MatterActivity::log(
+                    matter: $matter,
+                    activityType: 'status_changed',
+                    description: "Reopened matter dossier {$matter->case_number} ({$matter->title})",
+                    subject: $matter,
+                    userId: $user->id
+                );
+
+                $flashMessage = "Matter {$matter->case_number} ({$matter->title}) has been reopened as Active.";
+            }
+
+            return back()->with('success', $flashMessage);
+        })->name('matters.status.update');
 
         // Clients Directory, Dossier & Indian Practice Intake
         Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
