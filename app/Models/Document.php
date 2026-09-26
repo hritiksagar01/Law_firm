@@ -25,6 +25,7 @@ class Document extends Model
         'Order' => 'Court Order',
         'Judgment' => 'Judgment / Decree',
         'Contract' => 'Contract / Agreement',
+        'Agreement' => 'Agreement',
         'Correspondence' => 'Correspondence / Legal Notice',
         'Discovery' => 'Discovery / Interrogatories',
         'Deposition' => 'Deposition / Statement',
@@ -35,9 +36,11 @@ class Document extends Model
         'Court Filing' => 'Court Filing / Petition',
         'Notice' => 'Notice / Summons',
         'Legal Research' => 'Legal Research Memo',
+        'Memorandum' => 'Memorandum',
         'Client Document' => 'Client Document / KYC',
         'Financial Document' => 'Financial / Audit Record',
         'Medical Record' => 'Medical / Medico-Legal Record',
+        'Photograph' => 'Photograph',
         'Other' => 'Other',
     ];
 
@@ -55,6 +58,8 @@ class Document extends Model
         'attorney_only' => 'Attorneys Only',
         'legal_team' => 'Legal Team Only',
         'client_visible' => 'Client Portal Visible',
+        'specific_users' => 'Specific Users',
+        'specific_client' => 'Specific Client',
         'restricted' => 'Restricted Access',
     ];
 

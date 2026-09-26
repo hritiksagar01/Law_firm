@@ -501,8 +501,19 @@
             </div>
             @endif
 
-            <form action="{{ route('documents.upload') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-3.5 text-xs">
+            <form action="{{ route('documents.upload') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-3.5 text-xs max-h-[70vh] overflow-y-auto pr-1" x-data="{
+                selectedTags: [],
+                tagInput: '',
+                toggleTag(tag) {
+                    const idx = this.selectedTags.indexOf(tag);
+                    if (idx === -1) { this.selectedTags.push(tag); } else { this.selectedTags.splice(idx, 1); }
+                },
+                get tagsValue() { return this.selectedTags.join(','); }
+            }">
                 @csrf
+                {{-- Hidden field to sync selected tags --}}
+                <input type="hidden" name="tags" :value="tagsValue" />
+
                 <div class="flex flex-col gap-1">
                     <label class="font-semibold text-[#1a1a1a]">Matter Dossier *</label>
                     <select name="matter_id" required class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
@@ -517,50 +528,119 @@
                     <input name="title" required type="text" placeholder="e.g. Plaintiff's Response to Defendant's Motion to Dismiss" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
                 </div>
 
+                {{-- Row 1: Document Type + Document Status --}}
                 <div class="grid grid-cols-2 gap-3">
                     <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">Filing Category / Type</label>
-                        <select name="category" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
-                            <option value="Pleading" selected>Pleading / Complaint</option>
-                            <option value="Motion">Motion / Memorandum</option>
-                            <option value="Brief">Appellate Brief</option>
-                            <option value="Exhibit">Exhibit / Evidentiary Artifact</option>
-                            <option value="Deposition">Deposition Transcript</option>
-                            <option value="Contract">Executed Contract</option>
-                            <option value="Court Order">Court Order</option>
-                            <option value="Notice">Legal Notice / Summons</option>
-                            <option value="Affidavit">Affidavit</option>
+                        <label class="font-semibold text-[#1a1a1a]">Legal Document Type *</label>
+                        <select name="category" required class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                            <option value="" disabled selected>Select type…</option>
+                            <optgroup label="Court Filings & Pleadings">
+                                <option value="Pleading">Pleading</option>
+                                <option value="Motion">Motion</option>
+                                <option value="Brief">Brief</option>
+                                <option value="Order">Order</option>
+                                <option value="Judgment">Judgment</option>
+                                <option value="Court Filing">Court Filing</option>
+                                <option value="Notice">Notice</option>
+                            </optgroup>
+                            <optgroup label="Contracts & Agreements">
+                                <option value="Contract">Contract</option>
+                                <option value="Agreement">Agreement</option>
+                                <option value="Correspondence">Correspondence</option>
+                            </optgroup>
+                            <optgroup label="Discovery & Evidence">
+                                <option value="Discovery">Discovery</option>
+                                <option value="Deposition">Deposition</option>
+                                <option value="Evidence">Evidence</option>
+                                <option value="Exhibit">Exhibit</option>
+                            </optgroup>
+                            <optgroup label="Sworn Statements">
+                                <option value="Affidavit">Affidavit</option>
+                                <option value="Declaration">Declaration</option>
+                            </optgroup>
+                            <optgroup label="Research & Client Documents">
+                                <option value="Legal Research">Legal Research</option>
+                                <option value="Memorandum">Memorandum</option>
+                                <option value="Client Document">Client Document</option>
+                            </optgroup>
+                            <optgroup label="Other Records">
+                                <option value="Financial Document">Financial Document</option>
+                                <option value="Medical Record">Medical Record</option>
+                                <option value="Photograph">Photograph</option>
+                                <option value="Other">Other</option>
+                            </optgroup>
                         </select>
-                    </div>
-                    <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">Confidentiality Level</label>
-                        <select name="classification" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
-                            <option value="confidential" selected>Confidential</option>
-                            <option value="public">Public Court Filing</option>
-                            <option value="attorney_client_privileged">Attorney-Client Privileged</option>
-                            <option value="highly_confidential">Highly Confidential</option>
-                            <option value="internal">Internal Chambers</option>
-                        </select>
-                        <input type="hidden" name="privilege" value="Confidential"/>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">Tags (Comma-Separated)</label>
-                        <input name="tags" type="text" placeholder="e.g. pleading, urgent, injunction" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
                     </div>
                     <div class="flex flex-col gap-1">
                         <label class="font-semibold text-[#1a1a1a]">Document Status</label>
                         <select name="document_status" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
-                            <option value="final" selected>Final</option>
                             <option value="draft">Draft</option>
+                            <option value="final" selected>Final</option>
                             <option value="in_review">In Review</option>
                             <option value="archived">Archived</option>
                         </select>
                     </div>
                 </div>
 
+                {{-- Row 2: Visibility + Classification --}}
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Visibility</label>
+                        <select name="visibility" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                            <option value="internal_only" selected>Internal Only</option>
+                            <option value="attorney_only">Attorney Only</option>
+                            <option value="legal_team">Legal Team</option>
+                            <option value="client_visible">Client Visible</option>
+                            <option value="specific_users">Specific Users</option>
+                            <option value="specific_client">Specific Client</option>
+                            <option value="restricted">Restricted</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Classification</label>
+                        <select name="classification" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                            <option value="public">Public</option>
+                            <option value="internal">Internal</option>
+                            <option value="confidential" selected>Confidential</option>
+                            <option value="highly_confidential">Highly Confidential</option>
+                            <option value="attorney_client_privileged">Attorney-Client Privileged</option>
+                            <option value="attorney_work_product">Attorney Work Product</option>
+                        </select>
+                        <input type="hidden" name="privilege" value="Confidential"/>
+                    </div>
+                </div>
+
+                {{-- Document Tags Section --}}
+                <div class="flex flex-col gap-1.5">
+                    <label class="font-semibold text-[#1a1a1a]">Document Tags</label>
+                    <div class="flex flex-wrap gap-1.5">
+                        @php
+                            $tagPresets = [
+                                'confidential', 'privileged', 'work-product', 'discovery', 'evidence', 'court-filing',
+                                'client-provided', 'opposing-counsel', 'draft', 'final', 'urgent', 'hearing',
+                                'settlement', 'contract', 'deposition', 'review-required', 'follow-up'
+                            ];
+                        @endphp
+                        @foreach($tagPresets as $preset)
+                        <button type="button"
+                            @click="toggleTag('{{ $preset }}')"
+                            :class="selectedTags.includes('{{ $preset }}') ? 'bg-[#23493a] text-white border-[#23493a]' : 'bg-white text-[#334155] border-[#cbd5e1] hover:border-[#23493a] hover:text-[#23493a]'"
+                            class="px-2 py-1 rounded text-[10.5px] font-medium border transition-all duration-150 cursor-pointer inline-flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[11px]" x-text="selectedTags.includes('{{ $preset }}') ? 'check_circle' : 'add_circle_outline'"></span>
+                            #{{ $preset }}
+                        </button>
+                        @endforeach
+                    </div>
+                    {{-- Selected tags summary --}}
+                    <template x-if="selectedTags.length > 0">
+                        <div class="flex items-center gap-1.5 text-[10.5px] text-[#23493a] font-medium mt-0.5">
+                            <span class="material-symbols-outlined text-xs">label</span>
+                            <span x-text="selectedTags.length + ' tag' + (selectedTags.length > 1 ? 's' : '') + ' selected'"></span>
+                        </div>
+                    </template>
+                </div>
+
+                {{-- Client visibility checkbox --}}
                 <div class="p-3 rounded-md bg-[#faf8f5] border border-[#e5e3dc] flex items-start gap-2.5">
                     <input type="checkbox" name="is_client_visible" id="is_client_visible" value="1" checked class="mt-0.5 rounded border-[#e5e3dc] text-[#23493a] focus:ring-[#23493a]"/>
                     <label for="is_client_visible" class="text-xs text-[#1a1a1a] font-medium flex flex-col cursor-pointer">
@@ -569,31 +649,70 @@
                     </label>
                 </div>
 
+                {{-- Classification disclaimer --}}
+                <div class="p-2 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10.5px] flex items-start gap-1.5">
+                    <span class="material-symbols-outlined text-sm mt-0.5 shrink-0">info</span>
+                    <span>Classification labels are administrative markers and should <strong>not</strong> be treated as a legal determination merely because a user selected a label.</span>
+                </div>
+
+                {{-- File Selection + Capture --}}
                 <div class="flex flex-col gap-1">
                     <div class="flex items-center justify-between">
                         <label class="font-semibold text-[#1a1a1a]">Document File (PDF, DOCX, TXT, Images) *</label>
                         <span class="text-[10px] text-[#8a8a8a] font-mono">Max 50 MB</span>
                     </div>
-                    <input name="file" required type="file" 
-                        accept=".pdf,.docx,.doc,.txt,.tiff,.png,.jpg,.jpeg"
-                        @change="
-                            const f = $event.target.files[0];
-                            if (f) {
-                                selectedFileName = f.name;
-                                const mb = (f.size / (1024 * 1024)).toFixed(2);
-                                selectedFileSizeText = mb + ' MB';
-                                if (f.size > 52428800) {
-                                    fileSizeError = 'File size (' + mb + ' MB) exceeds the maximum allowed 50 MB limit.';
-                                } else {
-                                    fileSizeError = '';
-                                }
-                            } else {
-                                selectedFileName = '';
-                                selectedFileSizeText = '';
-                                fileSizeError = '';
-                            }
-                        "
-                        class="h-10 text-xs text-[#1a1a1a] file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#f5f3ed] file:text-[#23493a] hover:file:bg-[#eae8e2] cursor-pointer"/>
+                    <div class="flex items-center gap-2">
+                        {{-- Select Document File button --}}
+                        <label class="flex-1 cursor-pointer">
+                            <input name="file" required type="file" 
+                                accept=".pdf,.docx,.doc,.txt,.tiff,.png,.jpg,.jpeg"
+                                @change="
+                                    const f = $event.target.files[0];
+                                    if (f) {
+                                        selectedFileName = f.name;
+                                        const mb = (f.size / (1024 * 1024)).toFixed(2);
+                                        selectedFileSizeText = mb + ' MB';
+                                        if (f.size > 52428800) {
+                                            fileSizeError = 'File size (' + mb + ' MB) exceeds the maximum allowed 50 MB limit.';
+                                        } else {
+                                            fileSizeError = '';
+                                        }
+                                    } else {
+                                        selectedFileName = '';
+                                        selectedFileSizeText = '';
+                                        fileSizeError = '';
+                                    }
+                                "
+                                class="hidden" id="upload-file-input"/>
+                            <span class="h-10 px-4 rounded-md bg-[#f5f3ed] text-[#23493a] hover:bg-[#eae8e2] border border-[#e5e3dc] font-semibold text-xs inline-flex items-center gap-2 transition-colors w-full justify-center cursor-pointer">
+                                <span class="material-symbols-outlined text-base">folder_open</span>
+                                <span>Select Document File</span>
+                            </span>
+                        </label>
+                        {{-- Capture button (camera) --}}
+                        <label class="shrink-0 cursor-pointer">
+                            <input type="file" accept="image/*" capture="environment"
+                                @change="
+                                    const f = $event.target.files[0];
+                                    if (f) {
+                                        selectedFileName = f.name;
+                                        const mb = (f.size / (1024 * 1024)).toFixed(2);
+                                        selectedFileSizeText = mb + ' MB';
+                                        if (f.size > 52428800) {
+                                            fileSizeError = 'File size (' + mb + ' MB) exceeds the maximum allowed 50 MB limit.';
+                                        } else {
+                                            fileSizeError = '';
+                                        }
+                                        document.getElementById('upload-file-input').files = $event.target.files;
+                                    }
+                                "
+                                class="hidden"/>
+                            <span class="h-10 px-3.5 rounded-md bg-[#23493a] text-white hover:bg-[#1a3a2e] font-semibold text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+                                <span class="material-symbols-outlined text-base">photo_camera</span>
+                                <span>Capture</span>
+                            </span>
+                        </label>
+                    </div>
                     
                     <template x-if="selectedFileName">
                         <div class="flex items-center justify-between text-[11px] p-2 mt-1 rounded bg-[#faf8f5] border border-[#e5e3dc]">
