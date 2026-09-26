@@ -51,78 +51,171 @@
             </div>
         </div>
 
-        <table class="w-full text-left border-collapse text-[13px]">
-            <thead>
-                <tr class="border-b border-[#f0eee8] text-[11.5px] text-[#8a8a8a] font-medium uppercase tracking-wider bg-[#faf8f5]">
-                    <th class="py-3 px-4 font-medium">Document Title</th>
-                    <th class="py-3 px-4 font-medium">Matter Dossier</th>
-                    <th class="py-3 px-4 font-medium">Category</th>
-                    <th class="py-3 px-4 font-medium">Privilege Assertion</th>
-                    <th class="py-3 px-4 font-medium">Portal Visibility</th>
-                    <th class="py-3 px-4 font-medium">Size</th>
-                    <th class="py-3 px-4 font-medium">SHA-256 Checksum</th>
-                    <th class="py-3 px-4 font-medium text-center">Download</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-[#f0eee8]">
-                @forelse($documents as $doc)
-                <tr x-show="categoryFilter === 'all' || categoryFilter === '{{ $doc->category }}'" class="hover:bg-[#faf9f5] transition-colors group">
-                    <td class="py-3.5 px-4">
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-red-700 text-xl">picture_as_pdf</span>
-                            <div class="flex flex-col">
-                                <span class="font-medium text-xs text-[#1a1a1a] group-hover:text-[#23493a] transition-colors">{{ $doc->title }}</span>
-                                <span class="font-mono text-[10px] text-[#8a8a8a]">{{ $doc->filename }} (v{{ $doc->version }})</span>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-[13px] whitespace-nowrap">
+                <thead>
+                    <tr class="border-b border-[#f0eee8] text-[11.5px] text-[#8a8a8a] font-medium uppercase tracking-wider bg-[#faf8f5]">
+                        <th class="py-3 px-4 font-medium">Doc ID</th>
+                        <th class="py-3 px-4 font-medium">File Name</th>
+                        <th class="py-3 px-4 font-medium">Doc Title</th>
+                        <th class="py-3 px-4 font-medium">Type</th>
+                        <th class="py-3 px-4 font-medium">Matter</th>
+                        <th class="py-3 px-4 font-medium">Client</th>
+                        <th class="py-3 px-4 font-medium">Tag</th>
+                        <th class="py-3 px-4 font-medium">Confidentiality</th>
+                        <th class="py-3 px-4 font-medium">Visibility</th>
+                        <th class="py-3 px-4 font-medium">Doc Status</th>
+                        <th class="py-3 px-4 font-medium text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#f0eee8]">
+                    @forelse($documents as $doc)
+                    <tr x-show="categoryFilter === 'all' || categoryFilter === '{{ $doc->category }}' || categoryFilter === '{{ $doc->document_type }}'" class="hover:bg-[#faf9f5] transition-colors group">
+                        <td class="py-3.5 px-4 font-mono text-xs font-semibold text-[#23493a]">
+                            {{ $doc->document_number ?: ('DOC-' . ($doc->created_at ? $doc->created_at->format('Y') : date('Y')) . '-' . str_pad($doc->id, 4, '0', STR_PAD_LEFT)) }}
+                        </td>
+                        <td class="py-3.5 px-4 font-mono text-xs text-[#1a1a1a]">
+                            <div class="flex items-center gap-1.5" title="{{ $doc->filename }}">
+                                <span class="material-symbols-outlined text-[#8a8a8a] text-base shrink-0">
+                                    @if(str_ends_with(strtolower($doc->filename), '.pdf'))
+                                        picture_as_pdf
+                                    @elseif(str_ends_with(strtolower($doc->filename), '.doc') || str_ends_with(strtolower($doc->filename), '.docx'))
+                                        description
+                                    @elseif(str_ends_with(strtolower($doc->filename), '.png') || str_ends_with(strtolower($doc->filename), '.jpg') || str_ends_with(strtolower($doc->filename), '.jpeg'))
+                                        image
+                                    @else
+                                        draft
+                                    @endif
+                                </span>
+                                <span class="truncate max-w-[150px] font-medium">{{ $doc->filename }}</span>
                             </div>
-                        </div>
-                    </td>
-                    <td class="py-3.5 px-4 text-xs font-medium text-[#1a1a1a]">
-                        {{ $doc->matter->case_number ?? 'General' }}
-                    </td>
-                    <td class="py-3.5 px-4">
-                        <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-[#f5f3ed] text-[#1a1a1a] border border-[#e5e3dc]">
-                            {{ $doc->category }}
-                        </span>
-                    </td>
-                    <td class="py-3.5 px-4">
-                        <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-[#f5f3ed] text-[#23493a] font-semibold border border-[#e5e3dc]">
-                            {{ $doc->privilege }}
-                        </span>
-                    </td>
-                    <td class="py-3.5 px-4">
-                        @if($doc->is_client_visible)
-                            <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-full bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0]">
-                                <span class="material-symbols-outlined text-xs">visibility</span>
-                                <span>Client Visible</span>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <span class="font-medium text-xs text-[#1a1a1a] group-hover:text-[#23493a] transition-colors block max-w-[200px] truncate" title="{{ $doc->title }}">
+                                {{ $doc->title }}
                             </span>
-                        @else
-                            <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-full bg-[#fbf3db] text-[#634812] border border-[#f0dfaa]">
-                                <span class="material-symbols-outlined text-xs">lock</span>
-                                <span>Chambers Only</span>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-[#f5f3ed] text-[#1a1a1a] border border-[#e5e3dc]">
+                                {{ $doc->document_type ?: ($doc->category ?: 'Pleading') }}
                             </span>
-                        @endif
-                    </td>
-                    <td class="py-3.5 px-4 font-mono text-xs text-[#646864]">
-                        {{ $doc->formattedSize() }}
-                    </td>
-                    <td class="py-3.5 px-4 font-mono text-[10.5px] text-[#8a8a8a] max-w-[120px] truncate" title="{{ $doc->sha256 }}">
-                        {{ substr($doc->sha256, 0, 16) }}...
-                    </td>
-                    <td class="py-3.5 px-4 text-center">
-                        <a href="{{ route('documents.download', $doc->id) }}" class="p-1.5 text-[#646864] hover:text-[#23493a] hover:bg-[#f5f3ed] rounded transition-colors inline-flex" title="Download Verified File">
-                            <span class="material-symbols-outlined text-lg">download</span>
-                        </a>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="8" class="py-8 text-center text-xs text-[#8a8a8a]">
-                        No documents stored in the vault yet.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+                        </td>
+                        <td class="py-3.5 px-4 text-xs">
+                            @if($doc->matter)
+                                <a href="{{ route('matters.show', $doc->matter->id) }}" class="font-medium text-[#23493a] hover:underline block truncate max-w-[160px]" title="{{ $doc->matter->title }} ({{ $doc->matter->case_number }})">
+                                    {{ $doc->matter->case_number ?? $doc->matter->title }}
+                                </a>
+                            @else
+                                <span class="text-[#8a8a8a]">General</span>
+                            @endif
+                        </td>
+                        <td class="py-3.5 px-4 text-xs">
+                            @php
+                                $docClient = $doc->client ?? ($doc->matter->client ?? null);
+                            @endphp
+                            @if($docClient)
+                                <a href="{{ route('clients.show', $docClient->id) }}" class="font-medium text-[#1a1a1a] hover:text-[#23493a] hover:underline block truncate max-w-[150px]" title="{{ $docClient->name }}">
+                                    {{ $docClient->name }}
+                                </a>
+                            @else
+                                <span class="text-[#8a8a8a]">—</span>
+                            @endif
+                        </td>
+                        <td class="py-3.5 px-4">
+                            @php
+                                $rawTags = $doc->tags;
+                                $docTags = is_array($rawTags) ? $rawTags : ($rawTags ? (json_decode($rawTags, true) ?: []) : []);
+                            @endphp
+                            @if(!empty($docTags) && count($docTags) > 0)
+                                <div class="flex flex-wrap gap-1 max-w-[150px]">
+                                    @foreach(array_slice($docTags, 0, 2) as $t)
+                                        <span class="px-1.5 py-0.5 rounded text-[10.5px] font-medium bg-[#eef2f6] text-[#334155] border border-[#cbd5e1]">
+                                            #{{ $t }}
+                                        </span>
+                                    @endforeach
+                                    @if(count($docTags) > 2)
+                                        <span class="px-1.5 py-0.5 rounded text-[10px] text-[#64748b] bg-gray-100" title="{{ implode(', ', array_slice($docTags, 2)) }}">
+                                            +{{ count($docTags) - 2 }}
+                                        </span>
+                                    @endif
+                                </div>
+                            @else
+                                <span class="px-1.5 py-0.5 rounded text-[10.5px] text-[#8a8a8a] bg-[#faf8f5] border border-[#f0eee8]">
+                                    #docket
+                                </span>
+                            @endif
+                        </td>
+                        <td class="py-3.5 px-4">
+                            @php
+                                $classification = $doc->classification ?? (strtolower($doc->privilege ?? '') === 'public filing' ? 'public' : 'confidential');
+                            @endphp
+                            @if(str_contains(strtolower($classification), 'public'))
+                                <span class="inline-flex items-center gap-1 font-mono text-[10.5px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+                                    <span>Public</span>
+                                </span>
+                            @elseif(str_contains(strtolower($classification), 'privileged') || str_contains(strtolower($classification), 'attorney'))
+                                <span class="inline-flex items-center gap-1 font-mono text-[10.5px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 font-medium">
+                                    <span>Privileged</span>
+                                </span>
+                            @elseif(str_contains(strtolower($classification), 'highly'))
+                                <span class="inline-flex items-center gap-1 font-mono text-[10.5px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-medium">
+                                    <span>Highly Conf.</span>
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 font-mono text-[10.5px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-medium">
+                                    <span>Confidential</span>
+                                </span>
+                            @endif
+                        </td>
+                        <td class="py-3.5 px-4">
+                            @if($doc->is_client_visible || $doc->visibility === 'client_visible')
+                                <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-full bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0] font-medium">
+                                    <span class="material-symbols-outlined text-xs">visibility</span>
+                                    <span>Client Visible</span>
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-full bg-[#fbf3db] text-[#634812] border border-[#f0dfaa] font-medium">
+                                    <span class="material-symbols-outlined text-xs">lock</span>
+                                    <span>Chambers Only</span>
+                                </span>
+                            @endif
+                        </td>
+                        <td class="py-3.5 px-4">
+                            @php
+                                $status = strtolower($doc->document_status ?? 'final');
+                            @endphp
+                            @if($status === 'final' || $status === 'approved')
+                                <span class="inline-flex items-center gap-1 font-mono text-[10.5px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    <span>Final</span>
+                                </span>
+                            @elseif($status === 'archived')
+                                <span class="inline-flex items-center gap-1 font-mono text-[10.5px] px-2 py-0.5 rounded bg-gray-100 text-gray-700 border border-gray-200 font-medium">
+                                    <span>Archived</span>
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 font-mono text-[10.5px] px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-medium">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                    <span>Draft</span>
+                                </span>
+                            @endif
+                        </td>
+                        <td class="py-3.5 px-4 text-center">
+                            <a href="{{ route('documents.download', $doc->id) }}" class="p-1.5 text-[#646864] hover:text-[#23493a] hover:bg-[#f5f3ed] rounded transition-colors inline-flex" title="Download Verified File">
+                                <span class="material-symbols-outlined text-lg">download</span>
+                            </a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="11" class="py-8 text-center text-xs text-[#8a8a8a]">
+                            No documents stored in the vault yet.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Document Upload Modal -->
@@ -178,7 +271,7 @@
 
                 <div class="grid grid-cols-2 gap-3">
                     <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">Filing Category</label>
+                        <label class="font-semibold text-[#1a1a1a]">Filing Category / Type</label>
                         <select name="category" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
                             <option value="Pleading" selected>Pleading / Complaint</option>
                             <option value="Motion">Motion / Memorandum</option>
@@ -186,15 +279,36 @@
                             <option value="Exhibit">Exhibit / Evidentiary Artifact</option>
                             <option value="Deposition">Deposition Transcript</option>
                             <option value="Contract">Executed Contract</option>
+                            <option value="Court Order">Court Order</option>
+                            <option value="Notice">Legal Notice / Summons</option>
+                            <option value="Affidavit">Affidavit</option>
                         </select>
                     </div>
                     <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">Privilege Assertion</label>
-                        <select name="privilege" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
-                            <option value="Attorney-Client" selected>Attorney-Client Privileged</option>
-                            <option value="Work Product">Attorney Work Product</option>
-                            <option value="Confidential">Confidential / Protective Order</option>
-                            <option value="Public Filing">Public Court Filing</option>
+                        <label class="font-semibold text-[#1a1a1a]">Confidentiality Level</label>
+                        <select name="classification" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                            <option value="confidential" selected>Confidential</option>
+                            <option value="public">Public Court Filing</option>
+                            <option value="attorney_client_privileged">Attorney-Client Privileged</option>
+                            <option value="highly_confidential">Highly Confidential</option>
+                            <option value="internal">Internal Chambers</option>
+                        </select>
+                        <input type="hidden" name="privilege" value="Confidential"/>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Tags (Comma-Separated)</label>
+                        <input name="tags" type="text" placeholder="e.g. pleading, urgent, injunction" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"/>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Document Status</label>
+                        <select name="document_status" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                            <option value="final" selected>Final</option>
+                            <option value="draft">Draft</option>
+                            <option value="in_review">In Review</option>
+                            <option value="archived">Archived</option>
                         </select>
                     </div>
                 </div>

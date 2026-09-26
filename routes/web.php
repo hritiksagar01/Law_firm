@@ -743,7 +743,7 @@ Route::middleware('auth')->group(function () {
 
             if (in_array($user->role, ['superadmin', 'partner'])) {
                 $matters = Matter::where('firm_id', $firmId)->get();
-                $documents = Document::where('firm_id', $firmId)->with(['matter', 'uploader'])->latest()->get();
+                $documents = Document::where('firm_id', $firmId)->with(['matter.client', 'client', 'uploader'])->latest()->get();
             } else {
                 // Associate / paralegal: only documents for matters they are assigned to
                 $matters = Matter::where('firm_id', $firmId)
@@ -754,7 +754,7 @@ Route::middleware('auth')->group(function () {
 
                 $documents = Document::where('firm_id', $firmId)
                     ->whereIn('matter_id', $matters->pluck('id'))
-                    ->with(['matter', 'uploader'])->latest()->get();
+                    ->with(['matter.client', 'client', 'uploader'])->latest()->get();
             }
 
             return view('documents.index', compact('documents', 'matters'));
@@ -783,6 +783,9 @@ Route::middleware('auth')->group(function () {
                 'title' => 'required|string|max:255',
                 'category' => 'required|string',
                 'privilege' => 'required|string',
+                'classification' => 'nullable|string',
+                'document_status' => 'nullable|string',
+                'tags' => 'nullable',
                 'is_client_visible' => 'nullable',
                 'file' => 'required|file|max:51200', // 50MB max
             ]);
@@ -818,10 +821,14 @@ Route::middleware('auth')->group(function () {
                 ? $request->boolean('is_client_visible')
                 : ($request->privilege !== 'Work Product');
 
+            $docTags = $request->tags ? (is_array($request->tags) ? $request->tags : array_values(array_filter(array_map('trim', explode(',', $request->tags))))) : ['docket'];
+
             $doc = Document::create([
                 'firm_id' => $firmId,
                 'matter_id' => $matter->id,
+                'client_id' => $matter->client_id,
                 'user_id' => $user->id,
+                'document_number' => 'DOC-'.date('Y').'-'.str_pad((Document::where('firm_id', $firmId)->count() + 1), 4, '0', STR_PAD_LEFT),
                 'title' => $request->title,
                 'filename' => $file->getClientOriginalName(),
                 'file_path' => $path,
@@ -829,7 +836,12 @@ Route::middleware('auth')->group(function () {
                 'mime_type' => $file->getClientMimeType() ?: 'application/pdf',
                 'sha256' => $sha256,
                 'category' => $request->category,
+                'document_type' => $request->document_type ?? $request->category,
                 'privilege' => $request->privilege,
+                'classification' => $request->classification ?? (strtolower($request->privilege) === 'public filing' ? 'public' : 'confidential'),
+                'visibility' => $isClientVisible ? 'client_visible' : 'internal_only',
+                'document_status' => $request->document_status ?? 'final',
+                'tags' => $docTags,
                 'is_client_visible' => $isClientVisible,
                 'version' => 1,
             ]);
