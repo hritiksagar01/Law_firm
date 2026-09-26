@@ -56,7 +56,7 @@
                 @endif
                 <span
                     class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#8a8a8a] text-[18px]">search</span>
-                <input name="q" value="{{ request('q') }}" placeholder="Filter case, client, or docket #..."
+                <input name="q" value="{{ request('q') }}" placeholder="Filter case, client, or matter #..."
                     class="w-full h-9 pl-9 pr-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none" />
             </form>
         </div>
@@ -67,7 +67,7 @@
                 <thead>
                     <tr
                         class="border-b border-[#f0eee8] text-[11.5px] text-[#8a8a8a] font-medium uppercase tracking-wider bg-[#faf8f5]">
-                        <th class="py-3 px-4 font-medium">Docket Number</th>
+                        <th class="py-3 px-4 font-medium">Matter Number</th>
                         <th class="py-3 px-4 font-medium">Matter Title &amp; Forum</th>
                         <th class="py-3 px-4 font-medium">Client</th>
                         <th class="py-3 px-4 font-medium">Status</th>
