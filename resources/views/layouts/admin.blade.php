@@ -35,7 +35,12 @@
                 onboardingMode: 'portal_online',
                 salutation: 'Mr.',
                 name: '',
+                contactSalutation: 'Mr.',
                 contactPerson: '',
+                registrationNumber: '',
+                taxId: '',
+                industry: '',
+                website: '',
                 preferredCommunicationMethod: 'email',
                 email: '',
                 countryCode: '+91',
@@ -56,7 +61,21 @@
                     this.members.splice(index, 1);
                 },
                 fillDemo(type) {
-                    if (type === 'joint') {
+                    if (type === 'corporate') {
+                        this.category = 'corporate';
+                        this.name = 'Malhotra Enterprises Pvt Ltd';
+                        this.contactSalutation = 'Mr.';
+                        this.contactPerson = 'Vikram Malhotra';
+                        this.registrationNumber = 'U74999DL2020PTC123456';
+                        this.taxId = '07AAAAA0000A1Z5';
+                        this.industry = 'Real Estate & Infrastructure';
+                        this.website = 'https://malhotraenterprises.com';
+                        this.preferredCommunicationMethod = 'email';
+                        this.email = 'legal@malhotraenterprises.com';
+                        this.countryCode = '+91';
+                        this.phoneRaw = '9811002233';
+                        this.members = [];
+                    } else if (type === 'joint') {
                         this.category = 'joint';
                         this.name = 'Vikram & Rajesh (Joint Litigants)';
                         this.contactPerson = 'Vikram Malhotra';

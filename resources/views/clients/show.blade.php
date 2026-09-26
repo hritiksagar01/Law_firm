@@ -10,6 +10,7 @@
     openReviewModal: false,
     openAssistedModal: false,
     openEditModal: false,
+    editCategory: '{{ $client->category ?? $client->type }}',
     selectedRequest: null,
     reviewStatus: 'completed',
     rejectionReason: '',
@@ -257,33 +258,43 @@
                 </div>
 
                 <!-- Corporate / Institutional Information if Applicable -->
-                @if($client->isCorporate() || $client->isInstitutional() || $client->cin || $client->gstin)
+                @if($client->isCorporate() || $client->isInstitutional() || $client->cin || $client->gstin || $client->registration_number || $client->tax_id || $client->industry || $client->website)
                 <div class="border border-[#e5e3dc] bg-white rounded-md p-5 sm:p-6 shadow-xs">
                     <div class="pb-3 mb-4 border-b border-[#f0eee8]">
                         <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Corporate &amp; Regulatory Credentials</h2>
-                        <p class="text-[12px] text-[#8a8a8a] mt-0.5 font-sans">Ministry of Corporate Affairs (MCA) and GST credentials</p>
+                        <p class="text-[12px] text-[#8a8a8a] mt-0.5 font-sans">Entity registration, tax identifiers, industry sector, and authorized personnel</p>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 text-xs">
                         <div>
-                            <span class="text-[11px] text-[#8a8a8a] block uppercase font-mono">CIN / LLPIN</span>
-                            <span class="font-mono font-semibold text-[#1a1a1a]">{{ $client->cin ?: ($client->llpin ?: '—') }}</span>
+                            <span class="text-[11px] text-[#8a8a8a] block uppercase font-mono">Registration Number / CIN</span>
+                            <span class="font-mono font-semibold text-[#1a1a1a]">{{ $client->registration_number ?: ($client->cin ?: ($client->llpin ?: '—')) }}</span>
                         </div>
 
                         <div>
-                            <span class="text-[11px] text-[#8a8a8a] block uppercase font-mono">GSTIN</span>
-                            <span class="font-mono font-semibold text-[#1a1a1a]">{{ $client->gstin ?? '—' }}</span>
+                            <span class="text-[11px] text-[#8a8a8a] block uppercase font-mono">Tax ID / GSTIN / PAN</span>
+                            <span class="font-mono font-semibold text-[#1a1a1a]">{{ $client->tax_id ?: ($client->gstin ?: ($client->pan ?: '—')) }}</span>
                         </div>
 
                         <div>
-                            <span class="text-[11px] text-[#8a8a8a] block uppercase font-mono">Authorized Signatory</span>
+                            <span class="text-[11px] text-[#8a8a8a] block uppercase font-mono">Authorized Contact Person</span>
                             <span class="text-[#1a1a1a] font-medium">{{ $client->contact_person ?? '—' }}</span>
                         </div>
 
                         <div>
-                            <span class="text-[11px] text-[#8a8a8a] block uppercase font-mono">ROC Jurisdiction / Reg. No.</span>
-                            <span class="text-[#1a1a1a]">{{ $client->roc_jurisdiction ?: ($client->registration_number ?: '—') }}</span>
+                            <span class="text-[11px] text-[#8a8a8a] block uppercase font-mono">Industry / Sector</span>
+                            <span class="text-[#1a1a1a] font-medium">{{ $client->industry ?? '—' }}</span>
                         </div>
+
+                        @if($client->website)
+                        <div class="sm:col-span-2">
+                            <span class="text-[11px] text-[#8a8a8a] block uppercase font-mono">Official Website</span>
+                            <a href="{{ $client->website }}" target="_blank" rel="noopener noreferrer" class="text-[#23493A] hover:underline font-mono text-xs inline-flex items-center gap-1">
+                                <span>{{ $client->website }}</span>
+                                <span class="material-symbols-outlined text-[13px]">open_in_new</span>
+                            </a>
+                        </div>
+                        @endif
                     </div>
                 </div>
                 @endif
@@ -1093,7 +1104,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div class="flex flex-col gap-1">
                         <label class="font-semibold text-[#1a1a1a]">Classification</label>
-                        <select name="category" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]">
+                        <select name="category" x-model="editCategory" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]">
                             <option value="individual" {{ ($client->category ?? $client->type) === 'individual' ? 'selected' : '' }}>Individual</option>
                             <option value="joint" {{ $client->category === 'joint' ? 'selected' : '' }}>Joint / Multiple</option>
                             <option value="corporate" {{ in_array($client->category, ['corporate', 'company', 'llp']) ? 'selected' : '' }}>Corporate / LLP</option>
@@ -1258,6 +1269,38 @@
                     <div class="flex flex-col gap-1">
                         <label class="font-semibold text-[#1a1a1a]">Occupation / Profession</label>
                         <input name="occupation" value="{{ $client->occupation }}" type="text" placeholder="e.g. Business / Salaried"
+                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
+                    </div>
+                </div>
+
+                <!-- Corporate / Trust Particulars (When Category is Corporate or Institution) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" x-show="['corporate', 'institution'].includes(editCategory)">
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Authorized Contact Person</label>
+                        <input name="contact_person" value="{{ $client->contact_person }}" type="text" placeholder="e.g. Vikram Malhotra"
+                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Registration Number</label>
+                        <input name="registration_number" value="{{ $client->registration_number }}" type="text" placeholder="CIN / LLPIN / Reg #"
+                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" x-show="['corporate', 'institution'].includes(editCategory)">
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Tax ID / GSTIN / PAN</label>
+                        <input name="tax_id" value="{{ $client->tax_id }}" type="text" placeholder="GSTIN / PAN / Tax ID"
+                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Industry / Sector</label>
+                        <input name="industry" value="{{ $client->industry }}" type="text" placeholder="e.g. Real Estate, Tech"
+                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-semibold text-[#1a1a1a]">Official Website</label>
+                        <input name="website" value="{{ $client->website }}" type="url" placeholder="https://example.com"
                                class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
                     </div>
                 </div>

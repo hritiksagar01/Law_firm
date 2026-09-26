@@ -49,8 +49,12 @@ class StoreClientRequest extends FormRequest
             'llpin' => 'nullable|string|max:15',
             'gstin' => ['nullable', 'string', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i'],
             'registration_number' => 'nullable|string|max:100',
+            'tax_id' => 'nullable|string|max:100',
+            'industry' => 'nullable|string|max:100',
+            'website' => 'nullable|string|max:255',
             'roc_jurisdiction' => 'nullable|string|max:100',
             'contact_person' => 'nullable|string|max:255',
+            'contact_salutation' => 'nullable|string|max:20',
 
             // Address & Jurisdiction
             'address_line_1' => 'nullable|string|max:255',

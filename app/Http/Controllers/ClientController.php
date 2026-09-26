@@ -181,8 +181,16 @@ class ClientController extends Controller
             : 'individual';
 
         $clientName = $validated['name'];
-        if (! empty($validated['salutation']) && ! str_starts_with(strtolower($clientName), strtolower($validated['salutation']))) {
+        if (! in_array($validated['category'], ['corporate', 'institution', 'partnership']) && ! empty($validated['salutation']) && ! str_starts_with(strtolower($clientName), strtolower($validated['salutation']))) {
             $clientName = trim($validated['salutation'].' '.$clientName);
+        }
+
+        $contactPerson = $validated['contact_person'] ?? null;
+        $contactSalutation = $validated['contact_salutation'] ?? $request->input('contact_salutation');
+        if (! empty($contactPerson) && ! empty($contactSalutation)) {
+            if (! str_starts_with(strtolower($contactPerson), strtolower($contactSalutation))) {
+                $contactPerson = trim($contactSalutation.' '.$contactPerson);
+            }
         }
 
         $fatherDisplayName = $validated['father_husband_name'] ?? null;
@@ -199,7 +207,7 @@ class ClientController extends Controller
             'category' => $validated['category'],
             'onboarding_mode' => $validated['onboarding_mode'],
             'name' => $clientName,
-            'contact_person' => $validated['contact_person'] ?? null,
+            'contact_person' => $contactPerson,
             'email' => $validated['email'] ?? null,
             'phone' => $validated['phone'] ?? null,
             'trust_balance' => $validated['trust_balance'] ?? 0.00,
@@ -228,6 +236,9 @@ class ClientController extends Controller
             'llpin' => ! empty($validated['llpin']) ? strtoupper($validated['llpin']) : null,
             'gstin' => ! empty($validated['gstin']) ? strtoupper($validated['gstin']) : null,
             'registration_number' => $validated['registration_number'] ?? null,
+            'tax_id' => $validated['tax_id'] ?? null,
+            'industry' => $validated['industry'] ?? null,
+            'website' => $validated['website'] ?? null,
             'roc_jurisdiction' => $validated['roc_jurisdiction'] ?? null,
 
             // Address & Court Jurisdiction
@@ -363,8 +374,16 @@ class ClientController extends Controller
         $validated = $request->validated();
 
         $updatedName = $validated['name'];
-        if (! empty($validated['salutation']) && ! str_starts_with(strtolower($updatedName), strtolower($validated['salutation']))) {
+        if (! in_array($validated['category'], ['corporate', 'institution', 'partnership']) && ! empty($validated['salutation']) && ! str_starts_with(strtolower($updatedName), strtolower($validated['salutation']))) {
             $updatedName = trim($validated['salutation'].' '.$updatedName);
+        }
+
+        $contactPerson = $validated['contact_person'] ?? null;
+        $contactSalutation = $validated['contact_salutation'] ?? $request->input('contact_salutation');
+        if (! empty($contactPerson) && ! empty($contactSalutation)) {
+            if (! str_starts_with(strtolower($contactPerson), strtolower($contactSalutation))) {
+                $contactPerson = trim($contactSalutation.' '.$contactPerson);
+            }
         }
 
         $updatedFather = $validated['father_husband_name'] ?? null;
@@ -405,8 +424,11 @@ class ClientController extends Controller
             'llpin' => ! empty($validated['llpin']) ? strtoupper($validated['llpin']) : null,
             'gstin' => ! empty($validated['gstin']) ? strtoupper($validated['gstin']) : null,
             'registration_number' => $validated['registration_number'] ?? null,
+            'tax_id' => $validated['tax_id'] ?? null,
+            'industry' => $validated['industry'] ?? null,
+            'website' => $validated['website'] ?? null,
             'roc_jurisdiction' => $validated['roc_jurisdiction'] ?? null,
-            'contact_person' => $validated['contact_person'] ?? null,
+            'contact_person' => $contactPerson,
 
             'address_line_1' => $validated['address_line_1'] ?? null,
             'address_line_2' => $validated['address_line_2'] ?? null,

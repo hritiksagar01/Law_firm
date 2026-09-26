@@ -133,4 +133,111 @@ class ClientOnboardingParticularsOverlayTest extends TestCase
         $this->assertEquals('plaintiff', $client->client_type);
         $this->assertEquals('bar_association', $client->referral_source);
     }
+
+    /**
+     * Test onboarding overlay renders corporate fields (official entity name, authorized contact person
+     * with salutation, registration number, tax id, industry, website) and joint-only repeater.
+     */
+    public function test_client_onboarding_overlay_renders_corporate_and_joint_fields(): void
+    {
+        $lawyer = User::where('role', 'partner')->firstOrFail();
+
+        $response = $this->actingAs($lawyer)->get(route('clients.index'));
+
+        $response->assertStatus(200);
+
+        // Corporate entity & contact person fields
+        $response->assertSee('Official Entity / Company Name *');
+        $response->assertSee('Authorized Contact Person Name');
+        $response->assertSee('name="contact_salutation"', false);
+        $response->assertSee('name="contact_person"', false);
+
+        // Registration number, tax id, industry, website
+        $response->assertSee('name="registration_number"', false);
+        $response->assertSee('name="tax_id"', false);
+        $response->assertSee('name="industry"', false);
+        $response->assertSee('name="website"', false);
+
+        // Joint Co-Litigants repeater is visible strictly when joint is selected
+        $response->assertSee('x-show="category === \'joint\'"', false);
+        $response->assertDontSee("x-show=\"category === 'joint' || members.length > 0\"", false);
+    }
+
+    /**
+     * Test onboarding a corporate/trust entity with clean official entity name (no Mr.),
+     * authorized contact person formatted with salutation, registration number, tax id, industry, and website.
+     */
+    public function test_can_onboard_corporate_client_with_authorized_contact_and_registration_tax_id_industry_website(): void
+    {
+        $lawyer = User::where('role', 'partner')->firstOrFail();
+
+        $postData = [
+            'category' => 'corporate',
+            'onboarding_mode' => 'portal_online',
+            'name' => 'Malhotra Enterprises Pvt Ltd',
+            'salutation' => 'Mr.', // Modal might have salutation bound, but it must NOT be prepended to company name
+            'contact_salutation' => 'Mr.',
+            'contact_person' => 'Vikram Malhotra',
+            'email' => 'contact@malhotraenterprises.com',
+            'phone' => '+91 98110 02233',
+            'preferred_communication_method' => 'email',
+            'registration_number' => 'U74999DL2020PTC123456',
+            'tax_id' => '07AAAAA0000A1Z5',
+            'industry' => 'Real Estate & Infrastructure',
+            'website' => 'https://malhotraenterprises.com',
+            'status' => 'active',
+            'client_type' => 'petitioner',
+            'referral_source' => 'referral',
+            'primary_attorney_id' => $lawyer->id,
+        ];
+
+        $response = $this->actingAs($lawyer)->post(route('clients.store'), $postData);
+
+        $response->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('clients', [
+            'name' => 'Malhotra Enterprises Pvt Ltd', // Must NOT be 'Mr. Malhotra Enterprises Pvt Ltd'
+            'contact_person' => 'Mr. Vikram Malhotra', // Authorized contact person has salutation
+            'registration_number' => 'U74999DL2020PTC123456',
+            'tax_id' => '07AAAAA0000A1Z5',
+            'industry' => 'Real Estate & Infrastructure',
+            'website' => 'https://malhotraenterprises.com',
+            'category' => 'corporate',
+        ]);
+    }
+
+    /**
+     * Test updating a corporate client's registration number, tax id, industry, website, and contact person.
+     */
+    public function test_can_update_corporate_client_particulars(): void
+    {
+        $lawyer = User::where('role', 'partner')->firstOrFail();
+        $client = Client::where('firm_id', $lawyer->firm_id)->firstOrFail();
+
+        $updateData = [
+            'name' => 'Apex Global Logistics Pvt Ltd',
+            'category' => 'corporate',
+            'onboarding_mode' => 'portal_online',
+            'status' => 'active',
+            'contact_salutation' => 'Dr.',
+            'contact_person' => 'Arun Sen',
+            'registration_number' => 'U63090DL2018PTC998877',
+            'tax_id' => '07BBBBB1111B2Z6',
+            'industry' => 'Supply Chain & Logistics',
+            'website' => 'https://apexlogistic.example.com',
+            'preferred_communication_method' => 'email',
+        ];
+
+        $response = $this->actingAs($lawyer)->put(route('clients.update', $client->id), $updateData);
+
+        $response->assertSessionHasNoErrors();
+        $client->refresh();
+
+        $this->assertEquals('Apex Global Logistics Pvt Ltd', $client->name);
+        $this->assertEquals('Dr. Arun Sen', $client->contact_person);
+        $this->assertEquals('U63090DL2018PTC998877', $client->registration_number);
+        $this->assertEquals('07BBBBB1111B2Z6', $client->tax_id);
+        $this->assertEquals('Supply Chain & Logistics', $client->industry);
+        $this->assertEquals('https://apexlogistic.example.com', $client->website);
+    }
 }

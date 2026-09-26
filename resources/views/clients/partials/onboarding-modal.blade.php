@@ -27,6 +27,9 @@
                     <button type="button" @click="fillDemo('individual')" class="text-[11px] text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2.5 py-1 rounded-[4px] font-medium border border-[#23493A]/15 cursor-pointer">
                         <span>Individual Demo</span>
                     </button>
+                    <button type="button" @click="fillDemo('corporate')" class="text-[11px] text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2.5 py-1 rounded-[4px] font-medium border border-[#23493A]/15 cursor-pointer">
+                        <span>🏢 Corporate Demo</span>
+                    </button>
                     <button type="button" @click="fillDemo('joint')" class="text-[11px] text-[#23493A] hover:underline flex items-center gap-1 bg-[#23493A]/5 px-2.5 py-1 rounded-[4px] font-medium border border-[#23493A]/15 cursor-pointer">
                         <span>⚡ Joint Co-Clients</span>
                     </button>
@@ -141,14 +144,15 @@
             <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
                 <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">
                     <span class="material-symbols-outlined text-sm text-[#23493A]">person</span>
-                    <span x-text="category === 'joint' ? '03 · Primary Litigant Particulars' : '03 · Basic Particulars'"></span>
+                    <span x-text="category === 'corporate' ? '03 · Corporate Entity Particulars' : (category === 'institution' ? '03 · Trust / Organization Particulars' : (category === 'joint' ? '03 · Primary Litigant Particulars' : '03 · Basic Particulars'))"></span>
                 </span>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+                <!-- Name & Contact Person Row: Individual & Joint -->
+                <div class="grid grid-cols-1 gap-3 items-start" x-show="category === 'individual' || category === 'joint'">
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center" x-text="category === 'corporate' || category === 'institution' ? 'Official Entity / Company Name *' : (category === 'joint' ? 'Title & Primary Litigant Name *' : 'Title & Full Name *')"></label>
+                        <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center" x-text="category === 'joint' ? 'Title & Primary Litigant Name *' : 'Title & Full Name *'"></label>
                         <div class="flex items-center gap-1.5">
-                            <select name="salutation" x-model="salutation" class="h-[40px] px-2 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] shrink-0 cursor-pointer">
+                            <select name="salutation" x-model="salutation" :disabled="category === 'corporate' || category === 'institution'" class="h-[40px] px-2 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] shrink-0 cursor-pointer">
                                 <option value="Mr.">Mr.</option>
                                 <option value="Mrs.">Mrs.</option>
                                 <option value="Ms.">Ms.</option>
@@ -158,31 +162,42 @@
                                 <option value="Shri">Shri</option>
                                 <option value="Smt.">Smt.</option>
                             </select>
-                            <input name="name" x-model="name" type="text" required placeholder="e.g. Vikram Malhotra" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                            <input name="name" x-model="name" type="text" :required="category === 'individual' || category === 'joint'" :disabled="category === 'corporate' || category === 'institution'" placeholder="e.g. Vikram Malhotra" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                         </div>
-                    </div>
-
-                    <!-- Contact Person for Corporate / Institution -->
-                    <div class="flex flex-col gap-1.5" x-show="category === 'corporate' || category === 'institution'">
-                        <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">Authorized Contact Person Name</label>
-                        <input name="contact_person" x-model="contactPerson" type="text" placeholder="e.g. Vikram Malhotra (Managing Director)" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
-                    </div>
-
-                    <!-- Preferred Communication Method (Replaces Father / Mother Name) -->
-                    <div class="flex flex-col gap-1.5" :class="category === 'corporate' || category === 'institution' ? 'sm:col-span-2' : 'sm:col-span-1'">
-                        <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">Preferred Communication Method</label>
-                        <select name="preferred_communication_method" x-model="preferredCommunicationMethod" class="h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] cursor-pointer">
-                            <option value="email">📧 Email Dispatch</option>
-                            <option value="phone">📞 Phone Call</option>
-                            <option value="whatsapp">💬 WhatsApp Message</option>
-                            <option value="portal">🌐 Online Client Portal</option>
-                            <option value="sms">📱 SMS / Text Message</option>
-                            <option value="in_person">🏛️ In-Person Chamber Visit</option>
-                        </select>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- Name & Contact Person Row: Company & Trust -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start" x-show="category === 'corporate' || category === 'institution'">
+                    <!-- Official Entity / Company Name (Clean, NO MR.) -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">
+                            <span x-text="category === 'corporate' ? 'Official Entity / Company Name *' : 'Official Entity / Trust Name *'"></span>
+                        </label>
+                        <input name="name" x-model="name" type="text" :required="category === 'corporate' || category === 'institution'" :disabled="category === 'individual' || category === 'joint'" placeholder="e.g. Malhotra Enterprises Pvt Ltd" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                    </div>
+
+                    <!-- Authorized Contact Person Name (WITH MR. SALUTATION) -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">Authorized Contact Person Name</label>
+                        <div class="flex items-center gap-1.5">
+                            <select name="contact_salutation" x-model="contactSalutation" :disabled="category === 'individual' || category === 'joint'" class="h-[40px] px-2 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] shrink-0 cursor-pointer">
+                                <option value="Mr.">Mr.</option>
+                                <option value="Mrs.">Mrs.</option>
+                                <option value="Ms.">Ms.</option>
+                                <option value="Miss">Miss</option>
+                                <option value="Dr.">Dr.</option>
+                                <option value="Adv.">Adv.</option>
+                                <option value="Shri">Shri</option>
+                                <option value="Smt.">Smt.</option>
+                            </select>
+                            <input name="contact_person" x-model="contactPerson" type="text" :disabled="category === 'individual' || category === 'joint'" placeholder="e.g. Vikram Malhotra" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact & Communication Grid (Email, Phone, Preferred Method) -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div class="flex flex-col gap-1.5">
                         <label class="text-[13px] font-medium text-[#1A1E1C]">
                             Email Address <span x-show="onboardingMode === 'portal_online'" class="text-red-500">*</span>
@@ -219,18 +234,30 @@
                             <input x-model="phoneRaw" type="text" :required="onboardingMode === 'assisted_offline'" placeholder="9876543210" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs font-mono text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                         </div>
                     </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Preferred Communication Method</label>
+                        <select name="preferred_communication_method" x-model="preferredCommunicationMethod" class="h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] cursor-pointer">
+                            <option value="email">📧 Email Dispatch</option>
+                            <option value="phone">📞 Phone Call</option>
+                            <option value="whatsapp">💬 WhatsApp Message</option>
+                            <option value="portal">🌐 Online Client Portal</option>
+                            <option value="sms">📱 SMS / Text Message</option>
+                            <option value="in_person">🏛️ In-Person Chamber Visit</option>
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Demographics: Date of Birth, Gender & Occupation (NO AADHAAR, NO PAN) -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <!-- Demographics: Date of Birth, Gender & Occupation (Shown ONLY for Individual & Joint) -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" x-show="category === 'individual' || category === 'joint'">
                     <div class="flex flex-col gap-1.5">
                         <label class="text-[13px] font-medium text-[#1A1E1C]">Date of Birth</label>
-                        <input name="date_of_birth" x-model="dateOfBirth" type="date" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs font-mono text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all cursor-pointer"/>
+                        <input name="date_of_birth" x-model="dateOfBirth" :disabled="category === 'corporate' || category === 'institution'" type="date" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs font-mono text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all cursor-pointer"/>
                     </div>
 
                     <div class="flex flex-col gap-1.5">
                         <label class="text-[13px] font-medium text-[#1A1E1C]">Gender</label>
-                        <select name="gender" x-model="gender" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all cursor-pointer">
+                        <select name="gender" x-model="gender" :disabled="category === 'corporate' || category === 'institution'" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all cursor-pointer">
                             <option value="male">Male</option>
                             <option value="female">Female</option>
                             <option value="other">Other</option>
@@ -239,13 +266,36 @@
 
                     <div class="flex flex-col gap-1.5">
                         <label class="text-[13px] font-medium text-[#1A1E1C]">Occupation / Vocation</label>
-                        <input name="occupation" x-model="occupation" type="text" placeholder="e.g. Business / Salaried / Agriculture" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                        <input name="occupation" x-model="occupation" :disabled="category === 'corporate' || category === 'institution'" type="text" placeholder="e.g. Business / Salaried / Agriculture" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                    </div>
+                </div>
+
+                <!-- Corporate / Trust Particulars (Registration No, Tax ID, Industry, Website) (Shown ONLY for Company & Trust) -->
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3" x-show="category === 'corporate' || category === 'institution'">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Registration Number</label>
+                        <input name="registration_number" x-model="registrationNumber" :disabled="category === 'individual' || category === 'joint'" type="text" placeholder="CIN / LLPIN / Reg #" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Tax ID / GSTIN / PAN</label>
+                        <input name="tax_id" x-model="taxId" :disabled="category === 'individual' || category === 'joint'" type="text" placeholder="GSTIN / PAN / Tax ID" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Industry / Sector</label>
+                        <input name="industry" x-model="industry" :disabled="category === 'individual' || category === 'joint'" type="text" placeholder="e.g. Real Estate, Tech" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Official Website</label>
+                        <input name="website" x-model="website" :disabled="category === 'individual' || category === 'joint'" type="url" placeholder="https://example.com" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
                     </div>
                 </div>
             </div>
 
             <!-- 4. Dynamic Step: Joint / Co-Litigants Repeater Section -->
-            <div x-show="category === 'joint' || members.length > 0" x-cloak class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
+            <div x-show="category === 'joint'" x-cloak class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-semibold uppercase tracking-wider text-[#23493A] flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-sm">group</span>
