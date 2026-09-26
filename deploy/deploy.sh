@@ -8,6 +8,9 @@ export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
 
 APP_DIR="/var/www/lawfirm"
 
+# Ensure application is brought back up if an error occurs
+trap 'echo "Notice: Deployment encountered an error. Bringing application back up..."; cd "$APP_DIR" && php artisan up || true' ERR
+
 echo "=== [1/6] Navigating to Application Root ==="
 cd "$APP_DIR"
 
@@ -16,22 +19,30 @@ echo "=== [2/6] Activating Maintenance Mode ==="
 php artisan down --render="errors::503" --retry=15 || true
 
 # Determine active git branch
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "quire-layout")
 echo "=== [3/6] Pulling Latest Changes from Git ($CURRENT_BRANCH) ==="
 git fetch origin "$CURRENT_BRANCH" || git fetch origin || true
 git reset --hard "origin/$CURRENT_BRANCH" || git reset --hard HEAD || true
 
 echo "=== [4/6] Installing Dependencies & Compiling Production Assets ==="
+# Clean temporary files, logs, and caches to reclaim disk space
+rm -rf /tmp/npm* /tmp/v8* /tmp/*.log ~/.npm/_logs ~/.npm/_cacache 2>/dev/null || true
+journalctl --vacuum-time=1d 2>/dev/null || sudo journalctl --vacuum-time=1d 2>/dev/null || true
+sudo apt-get clean 2>/dev/null || true
+
 composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
 if command -v npm &> /dev/null; then
-    npm install --no-audit --no-fund
+    # Clear npm cache and omit optional foreign architecture dependencies to avoid ENOSPC
+    npm cache clean --force 2>/dev/null || true
+    npm install --no-audit --no-fund --omit=optional
     npm run build
 fi
 
 echo "=== [5/6] Running Database Migrations & Caching Configuration ==="
 php artisan config:clear || true
 php artisan migrate --force || echo "Notice: Database migration completed or skipped."
+php artisan db:seed --class=DocumentVersionSeeder --force || echo "Notice: DocumentVersionSeeder completed or skipped."
 php artisan db:seed --class=QuireDemoSeeder --force || echo "Notice: Quire demo seeding completed or skipped."
 
 # Clear and rebuild caches for maximum performance
