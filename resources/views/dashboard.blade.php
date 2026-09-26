@@ -71,6 +71,8 @@
             <div class="text-[12px] text-[#8a8a8a] mt-1 flex items-center gap-1.5 flex-wrap">
                 <a href="{{ route('matters.index', ['status' => 'open']) }}" class="hover:text-[#23493a] hover:underline">open matter records in active litigation</a>
                 <span class="text-[#c1c8c3]">&middot;</span>
+                <a href="{{ route('matters.index', ['status' => 'new']) }}" class="text-[#646864] hover:text-[#23493a] hover:underline font-medium">{{ $newMattersCount }} new</a>
+                <span class="text-[#c1c8c3]">&middot;</span>
                 <a href="{{ route('matters.index', ['status' => 'closed']) }}" class="text-[#646864] hover:text-[#23493a] hover:underline font-medium">{{ $closedMattersCount }} closed</a>
             </div>
         </div>

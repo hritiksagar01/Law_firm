@@ -46,6 +46,7 @@ use App\Models\SignInHistory;
 use App\Models\Task;
 use App\Models\User;
 use App\Services\LegalPdfGenerator;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -470,10 +471,11 @@ Route::middleware('auth')->group(function () {
             }
 
             // Global accessible counts
-            $accessibleMatters = (clone $baseQuery)->get(['id', 'status', 'stage']);
+            $accessibleMatters = (clone $baseQuery)->get(['id', 'status', 'stage', 'created_at']);
             $totalCount = $accessibleMatters->count();
             $openCount = $accessibleMatters->filter(fn ($m) => ! in_array(strtolower($m->status ?? ''), ['closed', 'settled', 'dismissed', 'archived']))->count();
             $closedCount = $accessibleMatters->filter(fn ($m) => in_array(strtolower($m->status ?? ''), ['closed', 'settled', 'dismissed', 'archived']))->count();
+            $newCount = $accessibleMatters->filter(fn ($m) => $m->created_at && Carbon::parse($m->created_at)->gte(now()->subDays(30)))->count();
             $discoveryCount = $accessibleMatters->where('stage', 'Discovery')->count();
             $pleadingsCount = $accessibleMatters->where('stage', 'Pleadings')->count();
             $preTrialCount = $accessibleMatters->where('stage', 'Pre-Trial')->count();
@@ -481,12 +483,14 @@ Route::middleware('auth')->group(function () {
             // Filter query
             $query = (clone $baseQuery)->with(['client', 'leadAttorney']);
 
-            // Status filter: open, closed, or specific status
+            // Status filter: open, closed, new, or specific status
             if ($request->filled('status') && $request->status !== 'all') {
                 if ($request->status === 'open' || $request->status === 'active') {
                     $query->whereNotIn('status', ['closed', 'settled', 'dismissed', 'archived']);
                 } elseif ($request->status === 'closed') {
                     $query->whereIn('status', ['closed', 'settled', 'dismissed', 'archived']);
+                } elseif ($request->status === 'new') {
+                    $query->where('created_at', '>=', now()->subDays(30));
                 } else {
                     $query->where('status', $request->status);
                 }
@@ -515,6 +519,7 @@ Route::middleware('auth')->group(function () {
                 'matters',
                 'totalCount',
                 'openCount',
+                'newCount',
                 'closedCount',
                 'discoveryCount',
                 'pleadingsCount',

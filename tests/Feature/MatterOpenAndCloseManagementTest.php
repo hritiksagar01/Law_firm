@@ -20,25 +20,31 @@ class MatterOpenAndCloseManagementTest extends TestCase
     }
 
     /**
-     * Test matters index displays Open and Closed filter pills and Status column.
+     * Test matters index displays All, Open, New, and Closed filter pills and removes stage pills.
      */
-    public function test_matters_index_displays_open_and_closed_pills_and_status_column(): void
+    public function test_matters_index_displays_open_new_and_closed_pills_and_status_column(): void
     {
         $partner = User::where('role', 'partner')->firstOrFail();
 
         $response = $this->actingAs($partner)->get(route('matters.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Open (');
-        $response->assertSee('Closed (');
         $response->assertSee('All (');
+        $response->assertSee('Open (');
+        $response->assertSee('New (');
+        $response->assertSee('Closed (');
         $response->assertSee('Status');
+
+        // Verify discovery, pleadings, and pre-trial pills are removed from the filter tabs
+        $response->assertDontSee('Discovery (');
+        $response->assertDontSee('Pleadings (');
+        $response->assertDontSee('Pre-Trial (');
     }
 
     /**
-     * Test filtering matters by Open and Closed status.
+     * Test filtering matters by Open, New, and Closed status.
      */
-    public function test_can_filter_matters_by_open_and_closed_status(): void
+    public function test_can_filter_matters_by_open_new_and_closed_status(): void
     {
         $partner = User::where('role', 'partner')->firstOrFail();
 
@@ -46,7 +52,11 @@ class MatterOpenAndCloseManagementTest extends TestCase
         $openResponse = $this->actingAs($partner)->get(route('matters.index', ['status' => 'open']));
         $openResponse->assertStatus(200);
 
-        // 2. Filter by closed
+        // 2. Filter by new
+        $newResponse = $this->actingAs($partner)->get(route('matters.index', ['status' => 'new']));
+        $newResponse->assertStatus(200);
+
+        // 3. Filter by closed
         $closedResponse = $this->actingAs($partner)->get(route('matters.index', ['status' => 'closed']));
         $closedResponse->assertStatus(200);
     }
@@ -118,7 +128,7 @@ class MatterOpenAndCloseManagementTest extends TestCase
     }
 
     /**
-     * Test dashboard renders links to Open and Closed matters.
+     * Test dashboard renders links to Open, New, and Closed matters.
      */
     public function test_dashboard_links_to_open_and_closed_matters(): void
     {
@@ -128,6 +138,7 @@ class MatterOpenAndCloseManagementTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee(route('matters.index', ['status' => 'open']));
+        $response->assertSee(route('matters.index', ['status' => 'new']));
         $response->assertSee(route('matters.index', ['status' => 'closed']));
     }
 }

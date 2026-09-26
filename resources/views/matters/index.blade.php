@@ -22,38 +22,30 @@
 
         <!-- Filter Pills & Search Bar -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <!-- Status & Stage Filters -->
+            <!-- Status & Lifecycle Filters -->
             <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
-                <!-- Status Pills -->
+                <!-- All -->
                 <a href="{{ route('matters.index', array_filter(['q' => request('q')])) }}"
-                    class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap {{ (!request('status') || request('status') == 'all') && !request('stage') ? 'bg-[#23493a] text-white shadow-xs' : 'bg-white border border-[#e5e3dc] text-[#646864] hover:bg-[#faf9f5]' }}">
+                    class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap {{ (!request('status') || request('status') == 'all') ? 'bg-[#23493a] text-white shadow-xs' : 'bg-white border border-[#e5e3dc] text-[#646864] hover:bg-[#faf9f5]' }}">
                     All ({{ $totalCount ?? $matters->count() }})
                 </a>
+                <!-- Open -->
                 <a href="{{ route('matters.index', array_filter(['status' => 'open', 'q' => request('q')])) }}"
-                    class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap inline-flex items-center gap-1.5 {{ request('status') == 'open' && !request('stage') ? 'bg-[#23493a] text-white shadow-xs' : 'bg-white border border-[#e5e3dc] text-[#646864] hover:bg-[#faf9f5]' }}">
-                    <span class="w-1.5 h-1.5 rounded-full {{ request('status') == 'open' && !request('stage') ? 'bg-emerald-300' : 'bg-emerald-500' }}"></span>
+                    class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap inline-flex items-center gap-1.5 {{ request('status') == 'open' ? 'bg-[#23493a] text-white shadow-xs' : 'bg-white border border-[#e5e3dc] text-[#646864] hover:bg-[#faf9f5]' }}">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request('status') == 'open' ? 'bg-emerald-300' : 'bg-emerald-500' }}"></span>
                     <span>Open ({{ $openCount ?? 0 }})</span>
                 </a>
+                <!-- New -->
+                <a href="{{ route('matters.index', array_filter(['status' => 'new', 'q' => request('q')])) }}"
+                    class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap inline-flex items-center gap-1.5 {{ request('status') == 'new' ? 'bg-[#23493a] text-white shadow-xs' : 'bg-white border border-[#e5e3dc] text-[#646864] hover:bg-[#faf9f5]' }}">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request('status') == 'new' ? 'bg-blue-300' : 'bg-blue-500' }}"></span>
+                    <span>New ({{ $newCount ?? 0 }})</span>
+                </a>
+                <!-- Closed -->
                 <a href="{{ route('matters.index', array_filter(['status' => 'closed', 'q' => request('q')])) }}"
-                    class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap inline-flex items-center gap-1.5 {{ request('status') == 'closed' && !request('stage') ? 'bg-[#23493a] text-white shadow-xs' : 'bg-white border border-[#e5e3dc] text-[#646864] hover:bg-[#faf9f5]' }}">
-                    <span class="w-1.5 h-1.5 rounded-full {{ request('status') == 'closed' && !request('stage') ? 'bg-slate-300' : 'bg-slate-400' }}"></span>
+                    class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap inline-flex items-center gap-1.5 {{ request('status') == 'closed' ? 'bg-[#23493a] text-white shadow-xs' : 'bg-white border border-[#e5e3dc] text-[#646864] hover:bg-[#faf9f5]' }}">
+                    <span class="w-1.5 h-1.5 rounded-full {{ request('status') == 'closed' ? 'bg-slate-300' : 'bg-slate-400' }}"></span>
                     <span>Closed ({{ $closedCount ?? 0 }})</span>
-                </a>
-
-                <div class="h-4 w-px bg-[#e5e3dc] mx-1 shrink-0"></div>
-
-                <!-- Stage Pills -->
-                <a href="{{ route('matters.index', array_filter(['stage' => 'Discovery', 'status' => request('status'), 'q' => request('q')])) }}"
-                    class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap {{ request('stage') == 'Discovery' ? 'bg-[#23493a] text-white shadow-xs' : 'bg-white border border-[#e5e3dc] text-[#646864] hover:bg-[#faf9f5]' }}">
-                    Discovery ({{ $discoveryCount ?? 0 }})
-                </a>
-                <a href="{{ route('matters.index', array_filter(['stage' => 'Pleadings', 'status' => request('status'), 'q' => request('q')])) }}"
-                    class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap {{ request('stage') == 'Pleadings' ? 'bg-[#23493a] text-white shadow-xs' : 'bg-white border border-[#e5e3dc] text-[#646864] hover:bg-[#faf9f5]' }}">
-                    Pleadings ({{ $pleadingsCount ?? 0 }})
-                </a>
-                <a href="{{ route('matters.index', array_filter(['stage' => 'Pre-Trial', 'status' => request('status'), 'q' => request('q')])) }}"
-                    class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap {{ request('stage') == 'Pre-Trial' ? 'bg-[#23493a] text-white shadow-xs' : 'bg-white border border-[#e5e3dc] text-[#646864] hover:bg-[#faf9f5]' }}">
-                    Pre-Trial ({{ $preTrialCount ?? 0 }})
                 </a>
             </div>
 
@@ -61,9 +53,6 @@
             <form action="{{ route('matters.index') }}" method="GET" class="relative w-full md:w-72">
                 @if(request('status'))
                     <input type="hidden" name="status" value="{{ request('status') }}">
-                @endif
-                @if(request('stage'))
-                    <input type="hidden" name="stage" value="{{ request('stage') }}">
                 @endif
                 <span
                     class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#8a8a8a] text-[18px]">search</span>
