@@ -10,6 +10,15 @@
     selectedFileName: '',
     selectedFileSizeText: '',
     fileSizeError: '',
+    selectedTags: [],
+    toggleTag(tag) {
+        const idx = this.selectedTags.indexOf(tag);
+        if (idx === -1) {
+            this.selectedTags.push(tag);
+        } else {
+            this.selectedTags.splice(idx, 1);
+        }
+    },
     openVersionModal: false,
     versionFilterStatus: 'all',
     versionFilterDoc: 'all',
@@ -25,7 +34,7 @@
             <p class="text-[13px] text-[#646864] mt-1">SHA-256 authenticated filings, exhibits, depositions, and executed agreements</p>
         </div>
         <div class="flex items-center gap-2">
-            <button @click="openUploadModal = true" class="btn-primary h-9 px-3.5 text-xs inline-flex items-center gap-2">
+            <button type="button" @click.stop="openUploadModal = true" class="btn-primary h-9 px-3.5 text-xs inline-flex items-center gap-2 cursor-pointer">
                 <span class="material-symbols-outlined text-[18px]">upload</span>
                 <span>Upload New Filing</span>
             </button>
@@ -34,17 +43,17 @@
 
     <!-- Drag & Drop Upload Zone -->
     <div class="p-6 mb-6 rounded-md border-2 border-dashed border-[#e5e3dc] bg-white hover:border-[#23493a] transition-colors flex flex-col items-center justify-center text-center shadow-xs">
-        <div @click="openUploadModal = true" class="w-10 h-10 rounded-full bg-[#f5f3ed] hover:bg-[#ecfdf5] flex items-center justify-center text-[#23493a] mb-2.5 transition-colors cursor-pointer">
+        <div @click.stop="openUploadModal = true" class="w-10 h-10 rounded-full bg-[#f5f3ed] hover:bg-[#ecfdf5] flex items-center justify-center text-[#23493a] mb-2.5 transition-colors cursor-pointer">
             <span class="material-symbols-outlined text-2xl">cloud_upload</span>
         </div>
-        <h3 @click="openUploadModal = true" class="text-sm font-semibold text-[#1a1a1a] cursor-pointer">Drag and drop legal filings or exhibit archives here</h3>
+        <h3 @click.stop="openUploadModal = true" class="text-sm font-semibold text-[#1a1a1a] cursor-pointer">Drag and drop legal filings or exhibit archives here</h3>
         <p class="text-xs text-[#8a8a8a] mt-0.5">Supports PDF, DOCX, TIFF, Bates-stamped bundles up to 50 MB (SHA-256 Hash Authenticated)</p>
         <div class="mt-3.5 flex items-center justify-center gap-2">
-            <button type="button" @click="openUploadModal = true" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-medium bg-[#f5f3ed] text-[#1a1a1a] hover:bg-[#23493a] hover:text-white border border-[#e5e3dc] transition-colors cursor-pointer shadow-2xs">
+            <button type="button" @click.stop="openUploadModal = true" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-medium bg-[#f5f3ed] text-[#1a1a1a] hover:bg-[#23493a] hover:text-white border border-[#e5e3dc] transition-colors cursor-pointer shadow-2xs">
                 <span class="material-symbols-outlined text-base">folder_open</span>
                 <span>Select Document File</span>
             </button>
-            <button type="button" @click="openUploadModal = true" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-semibold bg-[#23493a] text-white hover:bg-[#1a3a2e] border border-[#23493a] transition-colors cursor-pointer shadow-2xs">
+            <button type="button" @click.stop="openUploadModal = true" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-semibold bg-[#23493a] text-white hover:bg-[#1a3a2e] border border-[#23493a] transition-colors cursor-pointer shadow-2xs">
                 <span class="material-symbols-outlined text-base">photo_camera</span>
                 <span>Capture</span>
             </button>
@@ -263,7 +272,7 @@
                     </select>
 
                     <!-- Upload New Version Button -->
-                    <button type="button" @click="selectedVersionDocId = '{{ $documents->first()?->id ?? '' }}'; openVersionModal = true" class="btn-primary h-8 px-3 text-xs inline-flex items-center gap-1.5 cursor-pointer">
+                    <button type="button" @click.stop="selectedVersionDocId = '{{ $documents->first()?->id ?? '' }}'; openVersionModal = true" class="btn-primary h-8 px-3 text-xs inline-flex items-center gap-1.5 cursor-pointer">
                         <span class="material-symbols-outlined text-base">upload_file</span>
                         <span>Upload New Version</span>
                     </button>
@@ -478,9 +487,10 @@
     <!-- Document Upload Modal -->
     <div x-show="openUploadModal" 
          x-cloak 
-         @click.away="openUploadModal = false" 
-         class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-        <div class="bg-white border border-[#e5e3dc] rounded-md shadow-xl w-full max-w-lg p-6 flex flex-col">
+         @click.self="openUploadModal = false" 
+         @keydown.escape.window="openUploadModal = false"
+         class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white border border-[#e5e3dc] rounded-md shadow-xl w-full max-w-lg p-6 flex flex-col" @click.stop>
             <div class="flex items-center justify-between pb-4 border-b border-[#f0eee8] mb-4">
                 <div class="flex items-center gap-2">
                     <span class="material-symbols-outlined text-[#23493a]">upload_file</span>
@@ -510,18 +520,10 @@
             </div>
             @endif
 
-            <form action="{{ route('documents.upload') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-3.5 text-xs max-h-[70vh] overflow-y-auto pr-1" x-data="{
-                selectedTags: [],
-                tagInput: '',
-                toggleTag(tag) {
-                    const idx = this.selectedTags.indexOf(tag);
-                    if (idx === -1) { this.selectedTags.push(tag); } else { this.selectedTags.splice(idx, 1); }
-                },
-                get tagsValue() { return this.selectedTags.join(','); }
-            }">
+            <form action="{{ route('documents.upload') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-3.5 text-xs max-h-[70vh] overflow-y-auto pr-1">
                 @csrf
                 {{-- Hidden field to sync selected tags --}}
-                <input type="hidden" name="tags" :value="tagsValue" />
+                <input type="hidden" name="tags" :value="selectedTags.join(',')" />
 
                 <div class="flex flex-col gap-1">
                     <label class="font-semibold text-[#1a1a1a]">Matter Dossier *</label>
@@ -756,9 +758,10 @@
     <!-- Upload New Version Modal -->
     <div x-show="openVersionModal" 
          x-cloak 
-         @click.away="openVersionModal = false" 
-         class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-        <div class="bg-white border border-[#e5e3dc] rounded-md shadow-xl w-full max-w-lg p-6 flex flex-col">
+         @click.self="openVersionModal = false" 
+         @keydown.escape.window="openVersionModal = false"
+         class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white border border-[#e5e3dc] rounded-md shadow-xl w-full max-w-lg p-6 flex flex-col" @click.stop>
             <div class="flex items-center justify-between pb-4 border-b border-[#f0eee8] mb-4">
                 <div class="flex items-center gap-2">
                     <span class="material-symbols-outlined text-[#23493a]">history_edu</span>
