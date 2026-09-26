@@ -37,6 +37,7 @@ use App\Models\AuditLog;
 use App\Models\Client;
 use App\Models\Document;
 use App\Models\DocumentRequest;
+use App\Models\DocumentVersion;
 use App\Models\Event;
 use App\Models\Firm;
 use App\Models\Matter;
@@ -743,7 +744,7 @@ Route::middleware('auth')->group(function () {
 
             if (in_array($user->role, ['superadmin', 'partner'])) {
                 $matters = Matter::where('firm_id', $firmId)->get();
-                $documents = Document::where('firm_id', $firmId)->with(['matter.client', 'client', 'uploader'])->latest()->get();
+                $documents = Document::where('firm_id', $firmId)->with(['matter.client', 'client', 'uploader', 'versions'])->latest()->get();
             } else {
                 // Associate / paralegal: only documents for matters they are assigned to
                 $matters = Matter::where('firm_id', $firmId)
@@ -754,10 +755,16 @@ Route::middleware('auth')->group(function () {
 
                 $documents = Document::where('firm_id', $firmId)
                     ->whereIn('matter_id', $matters->pluck('id'))
-                    ->with(['matter.client', 'client', 'uploader'])->latest()->get();
+                    ->with(['matter.client', 'client', 'uploader', 'versions'])->latest()->get();
             }
 
-            return view('documents.index', compact('documents', 'matters'));
+            $documentIds = $documents->pluck('id');
+            $documentVersions = DocumentVersion::whereIn('document_id', $documentIds)
+                ->with(['document.matter', 'uploader', 'previousVersion'])
+                ->orderByDesc('created_at')
+                ->get();
+
+            return view('documents.index', compact('documents', 'matters', 'documentVersions'));
         })->name('documents.index');
 
         Route::post('/documents/upload', function (Request $request) {
@@ -848,11 +855,15 @@ Route::middleware('auth')->group(function () {
 
             $doc->versions()->create([
                 'version_number' => 1,
+                'filename' => $file->getClientOriginalName(),
+                'version_status' => $request->version_status ?: 'Draft',
                 'file_path' => $path,
                 'file_size' => $file->getSize(),
                 'file_hash' => $sha256,
                 'uploaded_by' => $user->id,
-                'change_summary' => 'Initial filing',
+                'change_summary' => $request->change_description ?: 'Initial filing draft v1',
+                'change_description' => $request->change_description ?: 'Initial filing draft v1',
+                'previous_version_id' => null,
             ]);
 
             return back()->with('success', 'Filing securely uploaded and SHA-256 authenticated.');
@@ -866,7 +877,9 @@ Route::middleware('auth')->group(function () {
 
             $request->validate([
                 'file' => 'required|file|max:51200',
-                'change_summary' => 'nullable|string|max:500',
+                'change_description' => 'nullable|string|max:1000',
+                'change_summary' => 'nullable|string|max:1000',
+                'version_status' => 'nullable|string|in:Draft,Review,Final,Executed',
             ]);
 
             $file = $request->file('file');
@@ -883,15 +896,22 @@ Route::middleware('auth')->group(function () {
                 }
             }
 
+            $previousVersion = $document->versions()->latest('version_number')->first();
             $newVersionNumber = ($document->version ?? 1) + 1;
+            $versionStatus = $request->version_status ?: 'Draft';
+            $changeDesc = $request->change_description ?: ($request->change_summary ?: 'Version v'.$newVersionNumber.' revision');
 
             $document->versions()->create([
                 'version_number' => $newVersionNumber,
+                'filename' => $file->getClientOriginalName(),
+                'version_status' => $versionStatus,
                 'file_path' => $path,
                 'file_size' => $file->getSize(),
                 'file_hash' => $sha256,
                 'uploaded_by' => $user->id,
-                'change_summary' => $request->change_summary ?? 'New revision uploaded',
+                'change_summary' => $changeDesc,
+                'change_description' => $changeDesc,
+                'previous_version_id' => $previousVersion?->id,
             ]);
 
             $document->update([
@@ -901,10 +921,124 @@ Route::middleware('auth')->group(function () {
                 'file_size' => $file->getSize(),
                 'mime_type' => $file->getClientMimeType() ?: 'application/pdf',
                 'sha256' => $sha256,
+                'document_status' => in_array(strtolower($versionStatus), ['final', 'executed']) ? 'final' : 'draft',
             ]);
 
-            return back()->with('success', 'New document version v'.$newVersionNumber.' uploaded.');
+            return back()->with('success', 'New document version v'.$newVersionNumber.' ('.$versionStatus.') uploaded successfully.');
         })->name('documents.versions.store');
+
+        Route::post('/documents/versions/upload', function (Request $request) {
+            $user = Auth::user();
+            $request->validate([
+                'document_id' => 'required|exists:documents,id',
+                'file' => 'required|file|max:51200',
+                'change_description' => 'nullable|string|max:1000',
+                'version_status' => 'nullable|string|in:Draft,Review,Final,Executed',
+            ]);
+
+            $document = Document::findOrFail($request->document_id);
+            if ($document->firm_id !== ($user->firm_id ?? 1)) {
+                abort(403);
+            }
+
+            $file = $request->file('file');
+            $sha256 = hash_file('sha256', $file->getRealPath());
+            $disk = config('filesystems.default', 'local');
+            try {
+                $path = $file->store('documents', $disk);
+            } catch (Throwable $e) {
+                if ($disk !== 'local') {
+                    $disk = 'local';
+                    $path = $file->store('documents', 'local');
+                } else {
+                    throw $e;
+                }
+            }
+
+            $previousVersion = $document->versions()->latest('version_number')->first();
+            $newVersionNumber = ($document->version ?? 1) + 1;
+            $versionStatus = $request->version_status ?: 'Draft';
+            $changeDesc = $request->change_description ?: 'Version v'.$newVersionNumber.' revision';
+
+            $document->versions()->create([
+                'version_number' => $newVersionNumber,
+                'filename' => $file->getClientOriginalName(),
+                'version_status' => $versionStatus,
+                'file_path' => $path,
+                'file_size' => $file->getSize(),
+                'file_hash' => $sha256,
+                'uploaded_by' => $user->id,
+                'change_summary' => $changeDesc,
+                'change_description' => $changeDesc,
+                'previous_version_id' => $previousVersion?->id,
+            ]);
+
+            $document->update([
+                'version' => $newVersionNumber,
+                'filename' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'file_size' => $file->getSize(),
+                'mime_type' => $file->getClientMimeType() ?: 'application/pdf',
+                'sha256' => $sha256,
+                'document_status' => in_array(strtolower($versionStatus), ['final', 'executed']) ? 'final' : 'draft',
+            ]);
+
+            return back()->with('success', 'New document version v'.$newVersionNumber.' ('.$versionStatus.') uploaded successfully.');
+        })->name('documents.versions.upload');
+
+        Route::get('/documents/{document}/versions/{version}/download', function (Document $document, DocumentVersion $version) {
+            $user = Auth::user();
+            if ($document->firm_id !== ($user->firm_id ?? 1) || (int) $version->document_id !== (int) $document->id) {
+                abort(403, 'Unauthorized version access across firms.');
+            }
+
+            // Lawyer-level isolation: non-partners must be assigned to this matter or be author/requester
+            if (! in_array($user->role, ['superadmin', 'partner'])) {
+                $isCreatorOrRequester = ($document->user_id === $user->id) ||
+                    DocumentRequest::where('document_id', $document->id)->where('requested_by', $user->id)->exists();
+
+                $assigned = $isCreatorOrRequester || ($document->matter && (
+                    $document->matter->lead_attorney_id === $user->id ||
+                    $document->matter->users()->where('users.id', $user->id)->exists()
+                ));
+                if (! $assigned) {
+                    abort(403, 'Unauthorized: You are not assigned to this case dossier.');
+                }
+            }
+
+            $defaultDisk = config('filesystems.default', 'local');
+            $filePath = $version->file_path;
+            $filename = $version->filename ?: $document->filename;
+
+            if ($filePath) {
+                try {
+                    if (Storage::disk($defaultDisk)->exists($filePath)) {
+                        return Storage::disk($defaultDisk)->download($filePath, $filename, [
+                            'Content-Type' => $document->mime_type ?: 'application/pdf',
+                        ]);
+                    }
+                } catch (Throwable $e) {
+                }
+
+                try {
+                    if ($defaultDisk !== 'local' && Storage::disk('local')->exists($filePath)) {
+                        return Storage::disk('local')->download($filePath, $filename, [
+                            'Content-Type' => $document->mime_type ?: 'application/pdf',
+                        ]);
+                    }
+                } catch (Throwable $e) {
+                }
+            }
+
+            // Dynamic compliant PDF stream fallback
+            $pdfContent = LegalPdfGenerator::forDocument($document);
+
+            return response($pdfContent, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+                'Content-Length' => strlen($pdfContent),
+            ]);
+        })->name('documents.versions.download');
 
         Route::get('/documents/{document}/download', function (Document $document) {
             $user = Auth::user();

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Client;
 use App\Models\Document;
 use App\Models\DocumentRequest;
+use App\Models\DocumentVersion;
 use App\Models\Event;
 use App\Models\Firm;
 use App\Models\Invoice;
@@ -338,6 +339,178 @@ class DatabaseSeeder extends Seeder
         $pdfBytes3 = LegalPdfGenerator::forDocument($doc3);
         Storage::disk('local')->put($doc3->file_path, $pdfBytes3);
         $doc3->update(['file_size' => strlen($pdfBytes3), 'sha256' => hash('sha256', $pdfBytes3)]);
+
+        // 5.1 Document Versions (Audit Trail & Version Control Lineage)
+        // Doc 1 Versions: Draft v1 -> Draft v2 -> Review v3 -> Final
+        $v1_1 = DocumentVersion::create([
+            'document_id' => $doc1->id,
+            'version_number' => 1,
+            'filename' => 'Plaint_Commercial_Suit_draft_v1.pdf',
+            'version_status' => 'Draft',
+            'file_path' => $doc1->file_path,
+            'file_size' => 4210000,
+            'file_hash' => hash('sha256', 'v1-doc1-sample'),
+            'uploaded_by' => $rajesh->id,
+            'change_summary' => 'Initial draft of plaint under Order VII Rule 1 CPC with supporting affidavits',
+            'change_description' => 'Initial draft of plaint under Order VII Rule 1 CPC with supporting affidavits',
+            'previous_version_id' => null,
+            'created_at' => now()->subDays(14),
+        ]);
+
+        $v1_2 = DocumentVersion::create([
+            'document_id' => $doc1->id,
+            'version_number' => 2,
+            'filename' => 'Plaint_draft_v2_redline.pdf',
+            'version_status' => 'Draft',
+            'file_path' => $doc1->file_path,
+            'file_size' => 4320000,
+            'file_hash' => hash('sha256', 'v2-doc1-sample'),
+            'uploaded_by' => $priya->id,
+            'change_summary' => 'Incorporated senior counsel redline amendments to paras 14-18 regarding jurisdiction',
+            'change_description' => 'Incorporated senior counsel redline amendments to paras 14-18 regarding jurisdiction',
+            'previous_version_id' => $v1_1->id,
+            'created_at' => now()->subDays(9),
+        ]);
+
+        $v1_3 = DocumentVersion::create([
+            'document_id' => $doc1->id,
+            'version_number' => 3,
+            'filename' => 'Plaint_review_v3_partner_edits.pdf',
+            'version_status' => 'Review',
+            'file_path' => $doc1->file_path,
+            'file_size' => 4380000,
+            'file_hash' => hash('sha256', 'v3-doc1-sample'),
+            'uploaded_by' => $rajesh->id,
+            'change_summary' => 'Pre-filing internal review and annexure validation with client verification records',
+            'change_description' => 'Pre-filing internal review and annexure validation with client verification records',
+            'previous_version_id' => $v1_2->id,
+            'created_at' => now()->subDays(4),
+        ]);
+
+        $v1_4 = DocumentVersion::create([
+            'document_id' => $doc1->id,
+            'version_number' => 4,
+            'filename' => 'Plaint_Commercial_Suit_Malhotra_v_Apex.pdf',
+            'version_status' => 'Final',
+            'file_path' => $doc1->file_path,
+            'file_size' => strlen($pdfBytes1),
+            'file_hash' => hash('sha256', $pdfBytes1),
+            'uploaded_by' => $rajesh->id,
+            'change_summary' => 'Court authenticated e-filing plaint with High Court registry seal and hash stamp',
+            'change_description' => 'Court authenticated e-filing plaint with High Court registry seal and hash stamp',
+            'previous_version_id' => $v1_3->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        $doc1->update([
+            'version' => 4,
+            'document_number' => 'DOC-2026-0001',
+            'document_status' => 'final',
+        ]);
+
+        // Doc 2 Versions: Draft v1 -> Review v2 -> Final
+        $v2_1 = DocumentVersion::create([
+            'document_id' => $doc2->id,
+            'version_number' => 1,
+            'filename' => 'Written_Statement_draft_v1.pdf',
+            'version_status' => 'Draft',
+            'file_path' => $doc2->file_path,
+            'file_size' => 8800000,
+            'file_hash' => hash('sha256', 'v1-doc2-sample'),
+            'uploaded_by' => $priya->id,
+            'change_summary' => 'Preliminary grounds of defense and preliminary objections on limitation period',
+            'change_description' => 'Preliminary grounds of defense and preliminary objections on limitation period',
+            'previous_version_id' => null,
+            'created_at' => now()->subDays(10),
+        ]);
+
+        $v2_2 = DocumentVersion::create([
+            'document_id' => $doc2->id,
+            'version_number' => 2,
+            'filename' => 'Written_Statement_v2_review.pdf',
+            'version_status' => 'Review',
+            'file_path' => $doc2->file_path,
+            'file_size' => 8900000,
+            'file_hash' => hash('sha256', 'v2-doc2-sample'),
+            'uploaded_by' => $rajesh->id,
+            'change_summary' => 'Partner review on jurisdictional objection and Statement of Truth compliance',
+            'change_description' => 'Partner review on jurisdictional objection and Statement of Truth compliance',
+            'previous_version_id' => $v2_1->id,
+            'created_at' => now()->subDays(5),
+        ]);
+
+        $v2_3 = DocumentVersion::create([
+            'document_id' => $doc2->id,
+            'version_number' => 3,
+            'filename' => 'Written_Statement_Apex_Bank.pdf',
+            'version_status' => 'Final',
+            'file_path' => $doc2->file_path,
+            'file_size' => strlen($pdfBytes2),
+            'file_hash' => hash('sha256', $pdfBytes2),
+            'uploaded_by' => $priya->id,
+            'change_summary' => 'Final signed written statement along with sworn statement of truth',
+            'change_description' => 'Final signed written statement along with sworn statement of truth',
+            'previous_version_id' => $v2_2->id,
+            'created_at' => now()->subDays(2),
+        ]);
+
+        $doc2->update([
+            'version' => 3,
+            'document_number' => 'DOC-2026-0002',
+            'document_status' => 'final',
+        ]);
+
+        // Doc 3 Versions: Draft v1 -> Final v2 -> Executed v3
+        $v3_1 = DocumentVersion::create([
+            'document_id' => $doc3->id,
+            'version_number' => 1,
+            'filename' => 'Sec_7_IBC_draft_v1.pdf',
+            'version_status' => 'Draft',
+            'file_path' => $doc3->file_path,
+            'file_size' => 12100000,
+            'file_hash' => hash('sha256', 'v1-doc3-sample'),
+            'uploaded_by' => $priya->id,
+            'change_summary' => 'Initial petition under Section 7 of Insolvency and Bankruptcy Code 2016',
+            'change_description' => 'Initial petition under Section 7 of Insolvency and Bankruptcy Code 2016',
+            'previous_version_id' => null,
+            'created_at' => now()->subDays(12),
+        ]);
+
+        $v3_2 = DocumentVersion::create([
+            'document_id' => $doc3->id,
+            'version_number' => 2,
+            'filename' => 'Sec_7_IBC_Application_NCLT.pdf',
+            'version_status' => 'Final',
+            'file_path' => $doc3->file_path,
+            'file_size' => strlen($pdfBytes3),
+            'file_hash' => hash('sha256', $pdfBytes3),
+            'uploaded_by' => $priya->id,
+            'change_summary' => 'Final NCLT petition along with NeSL record of default and Form 1 schedule',
+            'change_description' => 'Final NCLT petition along with NeSL record of default and Form 1 schedule',
+            'previous_version_id' => $v3_1->id,
+            'created_at' => now()->subDays(6),
+        ]);
+
+        $v3_3 = DocumentVersion::create([
+            'document_id' => $doc3->id,
+            'version_number' => 3,
+            'filename' => 'Sec_7_IBC_Executed_Affidavits.pdf',
+            'version_status' => 'Executed',
+            'file_path' => $doc3->file_path,
+            'file_size' => strlen($pdfBytes3),
+            'file_hash' => hash('sha256', $pdfBytes3),
+            'uploaded_by' => $rajesh->id,
+            'change_summary' => 'Executed and notarized affidavits by authorized bank representative with board resolution',
+            'change_description' => 'Executed and notarized affidavits by authorized bank representative with board resolution',
+            'previous_version_id' => $v3_2->id,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        $doc3->update([
+            'version' => 3,
+            'document_number' => 'DOC-2026-0003',
+            'document_status' => 'final',
+        ]);
 
         // 6. Time Entries & Professional Fee Register
         TimeEntry::create([

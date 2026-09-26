@@ -9,7 +9,14 @@
     categoryFilter: 'all',
     selectedFileName: '',
     selectedFileSizeText: '',
-    fileSizeError: ''
+    fileSizeError: '',
+    openVersionModal: false,
+    versionFilterStatus: 'all',
+    versionFilterDoc: 'all',
+    selectedVersionDocId: '{{ $documents->first()?->id ?? '' }}',
+    selectedVersionFileName: '',
+    selectedVersionFileSizeText: '',
+    versionFileSizeError: ''
 }}" class="flex flex-col w-full text-[#1a1a1a]">
     <!-- Header & Action Ribbon -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -212,6 +219,253 @@
         </div>
     </div>
 
+    <!-- Document Version Control Section -->
+    <div class="mt-8 border border-[#e5e3dc] bg-white rounded-md shadow-xs overflow-hidden" id="document-version-control">
+        <!-- Section Header -->
+        <div class="p-4 sm:p-5 border-b border-[#f0eee8] bg-[#faf8f5]">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[#23493a] text-xl">history_edu</span>
+                        <h2 class="text-base sm:text-lg font-semibold text-[#1a1a1a]">Document Version Control</h2>
+                        <span class="px-2 py-0.5 rounded-full text-[11px] font-mono font-medium bg-[#f5f3ed] text-[#23493a] border border-[#e5e3dc]">
+                            {{ $documentVersions->count() }} {{ Str::plural('revision', $documentVersions->count()) }}
+                        </span>
+                    </div>
+                    <p class="text-xs text-[#646864] mt-1">Audit trail, revision lineage, change descriptions, and lifecycle tracking across legal case files</p>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Filter by Document -->
+                    <select x-model="versionFilterDoc" class="h-8 px-2.5 rounded bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                        <option value="all">All Documents</option>
+                        @foreach($documents as $d)
+                            <option value="{{ $d->id }}">{{ $d->document_number ?: ('DOC-' . $d->id) }} &middot; {{ Str::limit($d->filename, 22) }}</option>
+                        @endforeach
+                    </select>
+
+                    <!-- Filter by Version Status -->
+                    <select x-model="versionFilterStatus" class="h-8 px-2.5 rounded bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                        <option value="all">All Statuses</option>
+                        <option value="Draft">Draft</option>
+                        <option value="Review">Review</option>
+                        <option value="Final">Final</option>
+                        <option value="Executed">Executed</option>
+                    </select>
+
+                    <!-- Upload New Version Button -->
+                    <button type="button" @click="selectedVersionDocId = '{{ $documents->first()?->id ?? '' }}'; openVersionModal = true" class="btn-primary h-8 px-3 text-xs inline-flex items-center gap-1.5 cursor-pointer">
+                        <span class="material-symbols-outlined text-base">upload_file</span>
+                        <span>Upload New Version</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Typical Sequence Lifecycle Pipeline Banner -->
+            <div class="mt-4 pt-3.5 border-t border-[#edebe4] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2 font-medium text-[#646864] text-[11.5px]">
+                    <span class="material-symbols-outlined text-[#23493a] text-sm">timeline</span>
+                    <span>Typical Sequence:</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] font-mono">
+                    <span class="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-semibold flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Draft v1
+                    </span>
+                    <span class="text-[#8a8a8a] text-xs">&rarr;</span>
+                    <span class="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-semibold flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Draft v2
+                    </span>
+                    <span class="text-[#8a8a8a] text-xs">&rarr;</span>
+                    <span class="px-2 py-0.5 rounded bg-purple-50 text-purple-800 border border-purple-200 font-semibold flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> Review v3
+                    </span>
+                    <span class="text-[#8a8a8a] text-xs">&rarr;</span>
+                    <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Final
+                    </span>
+                    <span class="text-[#8a8a8a] text-xs">&rarr;</span>
+                    <span class="px-2 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-300 font-semibold flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span> Executed
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Version Control Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-[13px] whitespace-nowrap">
+                <thead>
+                    <tr class="border-b border-[#f0eee8] text-[11.5px] text-[#8a8a8a] font-medium uppercase tracking-wider bg-[#faf8f5]">
+                        <th class="py-3 px-4 font-medium">Version</th>
+                        <th class="py-3 px-4 font-medium">Document ID</th>
+                        <th class="py-3 px-4 font-medium">Stored File</th>
+                        <th class="py-3 px-4 font-medium">Uploaded By / Date</th>
+                        <th class="py-3 px-4 font-medium">Change Description</th>
+                        <th class="py-3 px-4 font-medium">Version Status &amp; Relationship</th>
+                        <th class="py-3 px-4 font-medium text-center">Download</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#f0eee8]">
+                    @forelse($documentVersions as $version)
+                    @php
+                        $parentDoc = $version->document;
+                        $isCurrent = $parentDoc && ((int)$parentDoc->version === (int)$version->version_number);
+                        $status = $version->version_status ?: 'Draft';
+                        $statusLower = strtolower($status);
+                    @endphp
+                    <tr x-show="(versionFilterStatus === 'all' || versionFilterStatus.toLowerCase() === '{{ strtolower($status) }}') && (versionFilterDoc === 'all' || versionFilterDoc == '{{ $version->document_id }}')" 
+                        class="hover:bg-[#faf9f5] transition-colors group">
+                        
+                        <!-- Version Number & Sequence Label -->
+                        <td class="py-3.5 px-4 font-mono text-xs">
+                            <div class="flex items-center gap-1.5">
+                                @if($statusLower === 'executed')
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold text-[11px] bg-teal-100 text-teal-900 border border-teal-300">
+                                        <span class="material-symbols-outlined text-[13px]">verified</span>
+                                        <span>Executed (v{{ $version->version_number }})</span>
+                                    </span>
+                                @elseif($statusLower === 'final')
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold text-[11px] bg-emerald-100 text-emerald-900 border border-emerald-300">
+                                        <span class="material-symbols-outlined text-[13px]">task_alt</span>
+                                        <span>Final (v{{ $version->version_number }})</span>
+                                    </span>
+                                @elseif($statusLower === 'review')
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold text-[11px] bg-purple-100 text-purple-900 border border-purple-300">
+                                        <span class="material-symbols-outlined text-[13px]">rate_review</span>
+                                        <span>Review v{{ $version->version_number }}</span>
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold text-[11px] bg-amber-100 text-amber-900 border border-amber-300">
+                                        <span class="material-symbols-outlined text-[13px]">edit_document</span>
+                                        <span>Draft v{{ $version->version_number }}</span>
+                                    </span>
+                                @endif
+                            </div>
+                        </td>
+
+                        <!-- Document ID & Matter Reference -->
+                        <td class="py-3.5 px-4">
+                            <div class="flex flex-col">
+                                <span class="font-mono text-xs font-semibold text-[#23493a]">
+                                    {{ $parentDoc ? ($parentDoc->document_number ?: ('DOC-' . ($parentDoc->created_at ? $parentDoc->created_at->format('Y') : date('Y')) . '-' . str_pad($parentDoc->id, 4, '0', STR_PAD_LEFT))) : ('DOC-' . $version->document_id) }}
+                                </span>
+                                @if($parentDoc && $parentDoc->matter)
+                                    <a href="{{ route('matters.show', $parentDoc->matter->id) }}" class="text-[11px] text-[#646864] hover:text-[#23493a] hover:underline truncate max-w-[170px]" title="{{ $parentDoc->matter->title }} ({{ $parentDoc->matter->case_number }})">
+                                        {{ $parentDoc->matter->case_number ?? $parentDoc->matter->title }}
+                                    </a>
+                                @endif
+                            </div>
+                        </td>
+
+                        <!-- Stored File -->
+                        <td class="py-3.5 px-4 font-mono text-xs text-[#1a1a1a]">
+                            <div class="flex items-center gap-2" title="{{ $version->filename }}">
+                                <span class="material-symbols-outlined text-[#8a8a8a] text-base shrink-0">
+                                    @if(str_ends_with(strtolower($version->filename), '.pdf'))
+                                        picture_as_pdf
+                                    @elseif(str_ends_with(strtolower($version->filename), '.doc') || str_ends_with(strtolower($version->filename), '.docx'))
+                                        description
+                                    @elseif(str_ends_with(strtolower($version->filename), '.png') || str_ends_with(strtolower($version->filename), '.jpg') || str_ends_with(strtolower($version->filename), '.jpeg'))
+                                        image
+                                    @else
+                                        draft
+                                    @endif
+                                </span>
+                                <div class="flex flex-col">
+                                    <span class="font-medium text-xs truncate max-w-[180px] text-[#1a1a1a]">{{ $version->filename }}</span>
+                                    <span class="text-[10.5px] text-[#8a8a8a] font-normal">{{ $version->formattedSize() }}</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Uploaded By / Date -->
+                        <td class="py-3.5 px-4 text-xs">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-full bg-[#f0eee8] text-[#23493a] flex items-center justify-center font-bold text-[10px] shrink-0 border border-[#e5e3dc]">
+                                    {{ $version->uploader ? strtoupper(substr($version->uploader->name, 0, 2)) : 'SC' }}
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="font-medium text-[#1a1a1a] text-xs leading-tight">
+                                        {{ $version->uploader ? $version->uploader->name : 'Chambers Legal Team' }}
+                                    </span>
+                                    <span class="text-[10.5px] text-[#8a8a8a] font-mono leading-tight mt-0.5">
+                                        {{ $version->created_at ? $version->created_at->format('d M Y, h:i A') : '—' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Change Description -->
+                        <td class="py-3.5 px-4 text-xs">
+                            <div class="max-w-[260px] truncate" title="{{ $version->change_description ?: ($version->change_summary ?: 'No description provided') }}">
+                                <span class="text-[#1a1a1a] font-normal">
+                                    {{ $version->change_description ?: ($version->change_summary ?: 'Initial repository version') }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <!-- Version Status & Previous/Current Relationship -->
+                        <td class="py-3.5 px-4 text-xs">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex items-center gap-1.5">
+                                    @if($isCurrent)
+                                        <span class="inline-flex items-center gap-1 text-[10.5px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                            <span>Current Version</span>
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 text-[10.5px] font-medium text-[#646864] bg-[#f5f3ed] px-2 py-0.5 rounded-full border border-[#e5e3dc]">
+                                            <span class="material-symbols-outlined text-[12px]">history</span>
+                                            <span>Superseded</span>
+                                        </span>
+                                    @endif
+
+                                    <span class="text-[11px] font-mono text-[#8a8a8a]">
+                                        ({{ $status }})
+                                    </span>
+                                </div>
+
+                                <!-- Relationship Lineage -->
+                                <div class="text-[10.5px] text-[#8a8a8a] font-mono flex items-center gap-1">
+                                    @if($version->previous_version_id && $version->previousVersion)
+                                        <span class="material-symbols-outlined text-xs text-[#23493a]">subdirectory_arrow_right</span>
+                                        <span>Supersedes v{{ $version->previousVersion->version_number }} ({{ $version->previousVersion->version_status ?: 'Draft' }})</span>
+                                    @elseif($version->version_number > 1)
+                                        <span class="material-symbols-outlined text-xs text-[#23493a]">subdirectory_arrow_right</span>
+                                        <span>Supersedes v{{ $version->version_number - 1 }}</span>
+                                    @else
+                                        <span class="material-symbols-outlined text-xs text-[#8a8a8a]">fiber_manual_record</span>
+                                        <span>Root Origin (v1)</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Download Version Action -->
+                        <td class="py-3.5 px-4 text-center">
+                            @if($parentDoc)
+                                <a href="{{ route('documents.versions.download', ['document' => $parentDoc->id, 'version' => $version->id]) }}" 
+                                   class="p-1.5 text-[#646864] hover:text-[#23493a] hover:bg-[#f5f3ed] rounded transition-colors inline-flex" 
+                                   title="Download Stored Version {{ $version->version_number }} File">
+                                    <span class="material-symbols-outlined text-lg">download</span>
+                                </a>
+                            @else
+                                <span class="text-[#8a8a8a]">—</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" class="py-8 text-center text-xs text-[#8a8a8a]">
+                            No document versions recorded yet. Upload a document filing or revision to initiate version control.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Document Upload Modal -->
     <div x-show="openUploadModal" 
          x-cloak 
@@ -366,6 +620,107 @@
                 <div class="pt-3 border-t border-[#f0eee8] flex items-center justify-end gap-2">
                     <button type="button" @click="openUploadModal = false" class="btn-secondary h-9 px-4 text-xs">Cancel</button>
                     <button type="submit" :disabled="fileSizeError !== ''" class="btn-primary h-9 px-4 text-xs disabled:opacity-50 disabled:cursor-not-allowed">Authenticate &amp; Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload New Version Modal -->
+    <div x-show="openVersionModal" 
+         x-cloak 
+         @click.away="openVersionModal = false" 
+         class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white border border-[#e5e3dc] rounded-md shadow-xl w-full max-w-lg p-6 flex flex-col">
+            <div class="flex items-center justify-between pb-4 border-b border-[#f0eee8] mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[#23493a]">history_edu</span>
+                    <h3 class="text-[15px] font-semibold text-[#1a1a1a]">Upload New Document Version</h3>
+                </div>
+                <button type="button" @click="openVersionModal = false" class="text-[#8a8a8a] hover:text-[#1a1a1a] cursor-pointer">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+            </div>
+
+            <form action="{{ route('documents.versions.upload') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-3.5 text-xs">
+                @csrf
+                <div class="flex flex-col gap-1">
+                    <label class="font-semibold text-[#1a1a1a]">Target Document Dossier *</label>
+                    <select name="document_id" x-model="selectedVersionDocId" required class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                        @foreach($documents as $d)
+                        <option value="{{ $d->id }}">
+                            {{ $d->document_number ?: ('DOC-' . $d->id) }} &middot; {{ $d->filename }} (Current: v{{ $d->version ?? 1 }})
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label class="font-semibold text-[#1a1a1a]">New Version Status *</label>
+                    <select name="version_status" required class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
+                        <option value="Draft">Draft (e.g. Draft v2, Draft v3)</option>
+                        <option value="Review">Review (e.g. Review v3 - Pre-filing)</option>
+                        <option value="Final">Final (Final court e-filing version)</option>
+                        <option value="Executed">Executed (Executed agreement / attested affidavits)</option>
+                    </select>
+                    <p class="text-[11px] text-[#8a8a8a] mt-0.5">Typical lifecycle sequence: Draft v1 &rarr; Draft v2 &rarr; Review v3 &rarr; Final &rarr; Executed</p>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label class="font-semibold text-[#1a1a1a]">Change Description / Revision Notes *</label>
+                    <textarea name="change_description" rows="3" required placeholder="Explain changes in this version (e.g. incorporated client feedback, amended jurisdiction clause 14, signed and executed affidavits)..." class="p-2.5 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none"></textarea>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <div class="flex items-center justify-between">
+                        <label class="font-semibold text-[#1a1a1a]">Revised Stored File (PDF, DOCX, TXT, Images) *</label>
+                        <span class="text-[10px] text-[#8a8a8a] font-mono">Max 50 MB</span>
+                    </div>
+                    <input name="file" required type="file" 
+                        accept=".pdf,.docx,.doc,.txt,.tiff,.png,.jpg,.jpeg"
+                        @change="
+                            const f = $event.target.files[0];
+                            if (f) {
+                                selectedVersionFileName = f.name;
+                                const mb = (f.size / (1024 * 1024)).toFixed(2);
+                                selectedVersionFileSizeText = mb + ' MB';
+                                if (f.size > 52428800) {
+                                    versionFileSizeError = 'File size (' + mb + ' MB) exceeds the maximum allowed 50 MB limit.';
+                                } else {
+                                    versionFileSizeError = '';
+                                }
+                            } else {
+                                selectedVersionFileName = '';
+                                selectedVersionFileSizeText = '';
+                                versionFileSizeError = '';
+                            }
+                        "
+                        class="h-10 text-xs text-[#1a1a1a] file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#f5f3ed] file:text-[#23493a] hover:file:bg-[#eae8e2] cursor-pointer"/>
+                    
+                    <template x-if="selectedVersionFileName">
+                        <div class="flex items-center justify-between text-[11px] p-2 mt-1 rounded bg-[#faf8f5] border border-[#e5e3dc]">
+                            <div class="flex items-center gap-1.5 truncate">
+                                <span class="material-symbols-outlined text-sm text-[#23493a]">attach_file</span>
+                                <span class="font-mono truncate" x-text="selectedVersionFileName"></span>
+                            </div>
+                            <span class="font-mono text-[#8a8a8a] shrink-0 ml-2" x-text="selectedVersionFileSizeText"></span>
+                        </div>
+                    </template>
+                    <template x-if="versionFileSizeError">
+                        <div class="text-[11px] text-red-600 flex items-center gap-1 font-medium mt-1">
+                            <span class="material-symbols-outlined text-sm">warning</span>
+                            <span x-text="versionFileSizeError"></span>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="p-2.5 rounded-md bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0] text-[11px] flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-sm">history</span>
+                    <span>New version will establish revision lineage and preserve previous versions without overwriting.</span>
+                </div>
+
+                <div class="pt-3 border-t border-[#f0eee8] flex items-center justify-end gap-2">
+                    <button type="button" @click="openVersionModal = false" class="btn-secondary h-9 px-4 text-xs">Cancel</button>
+                    <button type="submit" :disabled="versionFileSizeError !== ''" class="btn-primary h-9 px-4 text-xs disabled:opacity-50 disabled:cursor-not-allowed">Record &amp; Upload Version</button>
                 </div>
             </form>
         </div>
