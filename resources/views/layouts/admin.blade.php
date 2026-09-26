@@ -36,16 +36,17 @@
                 salutation: 'Mr.',
                 name: '',
                 contactPerson: '',
-                fatherSalutation: 'Late Shri',
-                fatherHusbandName: '',
+                preferredCommunicationMethod: 'email',
                 email: '',
                 countryCode: '+91',
                 phoneRaw: '',
-                age: '',
+                dateOfBirth: '',
                 gender: 'male',
                 occupation: '',
                 primaryAttorneyId: defaultAttorneyId,
                 initialStatus: 'lead',
+                clientType: 'petitioner',
+                referralSource: 'referral',
                 internalIntakeNotes: '',
                 members: [],
                 addMember() {
@@ -59,14 +60,15 @@
                         this.category = 'joint';
                         this.name = 'Vikram & Rajesh (Joint Litigants)';
                         this.contactPerson = 'Vikram Malhotra';
-                        this.fatherSalutation = 'Late Shri';
-                        this.fatherHusbandName = 'Rameshwaram';
+                        this.preferredCommunicationMethod = 'whatsapp';
                         this.email = 'joint.litigants@gmail.com';
                         this.countryCode = '+91';
                         this.phoneRaw = '9811099887';
-                        this.age = 41;
+                        this.dateOfBirth = '1983-11-20';
                         this.gender = 'male';
                         this.occupation = 'Property Owner & Business';
+                        this.clientType = 'petitioner';
+                        this.referralSource = 'walk_in';
                         this.members = [
                             { name: 'Rajesh Sharma', relationship: 'Co-petitioner / Co-owner', phone: '+91 98765 11223', email: 'rajesh.sharma@gmail.com' }
                         ];
@@ -75,28 +77,30 @@
                         this.onboardingMode = 'assisted_offline';
                         this.name = 'Chandra Sekhar (Assisted Intake)';
                         this.contactPerson = 'Chandra Sekhar';
-                        this.fatherSalutation = 'Shri';
-                        this.fatherHusbandName = 'K. Sekhar';
+                        this.preferredCommunicationMethod = 'phone';
                         this.email = 'chandra.assisted@gmail.com';
                         this.countryCode = '+91';
                         this.phoneRaw = '9810077665';
-                        this.age = 56;
+                        this.dateOfBirth = '1968-04-10';
                         this.gender = 'male';
                         this.occupation = 'Agriculture / Self-Employed';
+                        this.clientType = 'respondent';
+                        this.referralSource = 'bar_association';
                         this.members = [];
                     } else {
                         this.category = 'individual';
                         this.onboardingMode = 'portal_online';
                         this.name = 'Vikram Malhotra';
                         this.contactPerson = 'Vikram Malhotra';
-                        this.fatherSalutation = 'Late Shri';
-                        this.fatherHusbandName = 'Jagdish Malhotra';
+                        this.preferredCommunicationMethod = 'email';
                         this.email = 'vikram.client@gmail.com';
                         this.countryCode = '+91';
                         this.phoneRaw = '9876543210';
-                        this.age = 38;
+                        this.dateOfBirth = '1986-05-14';
                         this.gender = 'male';
                         this.occupation = 'Business & Commercial';
+                        this.clientType = 'petitioner';
+                        this.referralSource = 'referral';
                         this.members = [];
                     }
                 }

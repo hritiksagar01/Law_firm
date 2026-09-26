@@ -29,6 +29,7 @@ class UpdateClientRequest extends FormRequest
             'assigned_paralegal_id' => 'nullable|exists:users,id',
             'referral_source' => 'nullable|string|max:100',
             'client_type' => 'nullable|string|max:100',
+            'preferred_communication_method' => 'nullable|string|max:50',
 
             // Indian KYC & Personal/Entity Particulars
             'father_salutation' => 'nullable|string|max:20',

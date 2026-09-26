@@ -160,32 +160,23 @@
                         </div>
                     </div>
 
-                    <!-- Parentage for Individual & Joint OR Contact Person for Corporate -->
-                    <div class="flex flex-col gap-1.5" x-show="category === 'individual' || category === 'joint'">
-                        <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">Title &amp; Father's / Mother's Name</label>
-                        <div class="flex items-center gap-1.5">
-                            <select name="father_salutation" x-model="fatherSalutation" class="h-[40px] px-2 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] shrink-0 cursor-pointer">
-                                <option value="Mr.">Mr.</option>
-                                <option value="Late">Late</option>
-                                <option value="Shri">Shri</option>
-                                <option value="Late Shri">Late Shri</option>
-                                <option value="Mrs.">Mrs.</option>
-                                <option value="Smt.">Smt.</option>
-                                <option value="Late Smt.">Late Smt.</option>
-                                <option value="Dr.">Dr.</option>
-                                <option value="Adv.">Adv.</option>
-                                <option value="Prof.">Prof.</option>
-                                <option value="S/o">S/o</option>
-                                <option value="D/o">D/o</option>
-                                <option value="W/o">W/o</option>
-                            </select>
-                            <input name="father_husband_name" x-model="fatherHusbandName" type="text" placeholder="e.g. Jagdish Malhotra or Sunita Sharma" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
-                        </div>
-                    </div>
-
+                    <!-- Contact Person for Corporate / Institution -->
                     <div class="flex flex-col gap-1.5" x-show="category === 'corporate' || category === 'institution'">
                         <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">Authorized Contact Person Name</label>
                         <input name="contact_person" x-model="contactPerson" type="text" placeholder="e.g. Vikram Malhotra (Managing Director)" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                    </div>
+
+                    <!-- Preferred Communication Method (Replaces Father / Mother Name) -->
+                    <div class="flex flex-col gap-1.5" :class="category === 'corporate' || category === 'institution' ? 'sm:col-span-2' : 'sm:col-span-1'">
+                        <label class="text-[13px] font-medium text-[#1A1E1C] min-h-[20px] flex items-center">Preferred Communication Method</label>
+                        <select name="preferred_communication_method" x-model="preferredCommunicationMethod" class="h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] outline-none focus:border-[#23493A] cursor-pointer">
+                            <option value="email">📧 Email Dispatch</option>
+                            <option value="phone">📞 Phone Call</option>
+                            <option value="whatsapp">💬 WhatsApp Message</option>
+                            <option value="portal">🌐 Online Client Portal</option>
+                            <option value="sms">📱 SMS / Text Message</option>
+                            <option value="in_person">🏛️ In-Person Chamber Visit</option>
+                        </select>
                     </div>
                 </div>
 
@@ -228,11 +219,11 @@
                     </div>
                 </div>
 
-                <!-- Demographics: Age, Gender & Occupation (NO AADHAAR, NO PAN) -->
+                <!-- Demographics: Date of Birth, Gender & Occupation (NO AADHAAR, NO PAN) -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[13px] font-medium text-[#1A1E1C]">Age (Years)</label>
-                        <input name="age" x-model="age" type="number" min="0" max="130" placeholder="e.g. 35" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs font-mono text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all"/>
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Date of Birth</label>
+                        <input name="date_of_birth" x-model="dateOfBirth" type="date" class="w-full h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs font-mono text-[#1A1E1C] outline-none focus:border-[#23493A] focus:ring-1 focus:ring-[#23493A] transition-all cursor-pointer"/>
                     </div>
 
                     <div class="flex flex-col gap-1.5">
@@ -317,31 +308,74 @@
                 </div>
             </div>
 
-            <!-- 5. Counsel Assignment & Initial Status -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-                <div class="flex flex-col gap-1">
-                    <label class="font-semibold text-[#1A1E1C]">Lead Consulting Counsel</label>
-                    <select name="primary_attorney_id" x-model="primaryAttorneyId" class="h-10 px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] focus:border-[#23493A] focus:outline-none cursor-pointer">
-                        <option value="">-- Assign Later / General Chamber Lead --</option>
-                        @if(isset($attorneys) && $attorneys->isNotEmpty())
-                            @foreach($attorneys as $attorney)
-                                <option value="{{ $attorney->id }}" {{ Auth::id() === $attorney->id ? 'selected' : '' }}>
-                                    {{ $attorney->name }} ({{ ucfirst($attorney->role) }})
-                                </option>
-                            @endforeach
-                        @endif
-                    </select>
-                </div>
+            <!-- 5. Client Status, Litigation Role & Referral Details -->
+            <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-sm text-[#23493A]">tune</span>
+                    <span>05 · Client Status, Litigation Role &amp; Referral Details</span>
+                </span>
 
-                <div class="flex flex-col gap-1">
-                    <label class="font-semibold text-[#1A1E1C]">Initial Lifecycle Status</label>
-                    <select name="status" x-model="initialStatus" class="h-10 px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] focus:border-[#23493A] focus:outline-none cursor-pointer">
-                        <option value="lead">Lead (Pending Initial Consultation)</option>
-                        <option value="intake">Intake (Document &amp; Case Review)</option>
-                        <option value="conflict_check">Conflict Check (Bar Clearance)</option>
-                        <option value="prospective">Prospective Client</option>
-                        <option value="active">Active (Retained Client)</option>
-                    </select>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <!-- Client Status -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Client Status *</label>
+                        <select name="status" x-model="initialStatus" required class="h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] focus:border-[#23493A] focus:outline-none cursor-pointer">
+                            <option value="lead">Lead (Initial Consultation)</option>
+                            <option value="intake">Intake (Case Review)</option>
+                            <option value="conflict_check">Conflict Check (Bar Clearance)</option>
+                            <option value="prospective">Prospective Client</option>
+                            <option value="active">Active (Retained Client)</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="former">Former Client</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                    </div>
+
+                    <!-- Client Type -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Client Type</label>
+                        <select name="client_type" x-model="clientType" class="h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] focus:border-[#23493A] focus:outline-none cursor-pointer">
+                            <option value="petitioner">Petitioner</option>
+                            <option value="respondent">Respondent</option>
+                            <option value="plaintiff">Plaintiff</option>
+                            <option value="defendant">Defendant</option>
+                            <option value="appellant">Appellant</option>
+                            <option value="complainant">Complainant</option>
+                            <option value="accused">Accused</option>
+                            <option value="applicant">Applicant</option>
+                            <option value="other">Other / Retainer</option>
+                        </select>
+                    </div>
+
+                    <!-- Referral Source -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Referral Source</label>
+                        <select name="referral_source" x-model="referralSource" class="h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] focus:border-[#23493A] focus:outline-none cursor-pointer">
+                            <option value="walk_in">Walk-in</option>
+                            <option value="referral">Colleague / Client Referral</option>
+                            <option value="website">Chambers Website</option>
+                            <option value="social_media">Social Media / Network</option>
+                            <option value="court_appointed">Court Appointed / Legal Aid</option>
+                            <option value="bar_association">Bar Association</option>
+                            <option value="returning">Returning Client</option>
+                            <option value="other">Other Source</option>
+                        </select>
+                    </div>
+
+                    <!-- Lead Consulting Counsel -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[13px] font-medium text-[#1A1E1C]">Lead Consulting Counsel</label>
+                        <select name="primary_attorney_id" x-model="primaryAttorneyId" class="h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] focus:border-[#23493A] focus:outline-none cursor-pointer">
+                            <option value="">-- General Chamber Lead --</option>
+                            @if(isset($attorneys) && $attorneys->isNotEmpty())
+                                @foreach($attorneys as $attorney)
+                                    <option value="{{ $attorney->id }}" {{ Auth::id() === $attorney->id ? 'selected' : '' }}>
+                                        {{ $attorney->name }} ({{ ucfirst($attorney->role) }})
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
                 </div>
             </div>
 

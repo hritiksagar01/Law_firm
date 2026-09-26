@@ -213,8 +213,19 @@
                         </div>
 
                         <div>
-                            <span class="text-[11px] text-[#8a8a8a] block uppercase font-mono">Parentage / Spouse (Court Memo)</span>
-                            <span class="text-[#1a1a1a] font-medium">{{ $client->father_husband_name ?? '—' }}</span>
+                            <span class="text-[11px] text-[#8a8a8a] block uppercase font-mono">Preferred Communication</span>
+                            <span class="text-[#1a1a1a] font-medium flex items-center gap-1.5 mt-0.5">
+                                <span class="material-symbols-outlined text-[15px] text-[#23493a]">
+                                    @if(($client->preferred_communication_method ?? 'email') === 'whatsapp') chat
+                                    @elseif(($client->preferred_communication_method ?? 'email') === 'phone') call
+                                    @elseif(($client->preferred_communication_method ?? 'email') === 'portal') public
+                                    @elseif(($client->preferred_communication_method ?? 'email') === 'sms') sms
+                                    @elseif(($client->preferred_communication_method ?? 'email') === 'in_person') meeting_room
+                                    @else mail
+                                    @endif
+                                </span>
+                                <span>{{ $client->preferred_communication_method_label }}</span>
+                            </span>
                         </div>
 
                         <div>
@@ -232,9 +243,9 @@
                         </div>
 
                         <div>
-                            <span class="text-[11px] text-[#8a8a8a] block uppercase font-mono">Age &amp; Gender</span>
+                            <span class="text-[11px] text-[#8a8a8a] block uppercase font-mono">Date of Birth &amp; Gender</span>
                             <span class="text-[#1a1a1a]">
-                                {{ $client->age ? $client->age . ' Years' : '—' }} / {{ ucfirst($client->gender ?? 'Not Specified') }}
+                                {{ $client->date_of_birth ? $client->date_of_birth->format('d M Y') . ($client->age ? ' (' . $client->age . ' yrs)' : '') : ($client->age ? $client->age . ' Years' : '—') }} / {{ ucfirst($client->gender ?? 'Not Specified') }}
                             </span>
                         </div>
 
@@ -1067,28 +1078,15 @@
                                class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a]"/>
                     </div>
                     <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">Title &amp; Father's / Mother's Name</label>
-                        <div class="flex items-center gap-1.5">
-                            <select name="father_salutation" class="h-9 px-2 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] shrink-0 cursor-pointer">
-                                <option value="">—</option>
-                                <option value="Mr.">Mr.</option>
-                                <option value="Late">Late</option>
-                                <option value="Shri">Shri</option>
-                                <option value="Late Shri">Late Shri</option>
-                                <option value="Mrs.">Mrs.</option>
-                                <option value="Smt.">Smt.</option>
-                                <option value="Late Smt.">Late Smt.</option>
-                                <option value="Dr.">Dr.</option>
-                                <option value="Adv.">Adv.</option>
-                                <option value="Prof.">Prof.</option>
-                                <option value="S/o">S/o</option>
-                                <option value="D/o">D/o</option>
-                                <option value="W/o">W/o</option>
-                            </select>
-                            <input name="father_husband_name" value="{{ $client->father_husband_name }}" type="text"
-                                   placeholder="e.g. Jagdish Malhotra"
-                                   class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] w-full"/>
-                        </div>
+                        <label class="font-semibold text-[#1a1a1a]">Preferred Communication Method</label>
+                        <select name="preferred_communication_method" class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] cursor-pointer">
+                            <option value="email" {{ ($client->preferred_communication_method ?? 'email') === 'email' ? 'selected' : '' }}>📧 Email Dispatch</option>
+                            <option value="phone" {{ $client->preferred_communication_method === 'phone' ? 'selected' : '' }}>📞 Phone Call</option>
+                            <option value="whatsapp" {{ $client->preferred_communication_method === 'whatsapp' ? 'selected' : '' }}>💬 WhatsApp Message</option>
+                            <option value="portal" {{ $client->preferred_communication_method === 'portal' ? 'selected' : '' }}>🌐 Online Client Portal</option>
+                            <option value="sms" {{ $client->preferred_communication_method === 'sms' ? 'selected' : '' }}>📱 SMS / Text Message</option>
+                            <option value="in_person" {{ $client->preferred_communication_method === 'in_person' ? 'selected' : '' }}>🏛️ In-Person Chamber Visit</option>
+                        </select>
                     </div>
                 </div>
 
@@ -1244,9 +1242,9 @@
                 <!-- Client Demographics: Age, Gender, Occupation -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">Age (Years)</label>
-                        <input name="age" value="{{ $client->age }}" type="number" min="0" max="120" placeholder="e.g. 35"
-                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#1a1a1a]"/>
+                        <label class="font-semibold text-[#1a1a1a]">Date of Birth</label>
+                        <input name="date_of_birth" value="{{ $client->date_of_birth ? $client->date_of_birth->format('Y-m-d') : '' }}" type="date"
+                               class="h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#1a1a1a] cursor-pointer"/>
                     </div>
                     <div class="flex flex-col gap-1">
                         <label class="font-semibold text-[#1a1a1a]">Gender</label>

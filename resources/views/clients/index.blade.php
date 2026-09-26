@@ -15,16 +15,17 @@
     salutation: 'Mr.',
     name: '',
     contactPerson: '',
-    fatherSalutation: 'Late Shri',
-    fatherHusbandName: '',
+    preferredCommunicationMethod: 'email',
     email: '',
     countryCode: '+91',
     phoneRaw: '',
-    age: '',
+    dateOfBirth: '',
     gender: 'male',
     occupation: '',
     primaryAttorneyId: '{{ Auth::id() }}',
     initialStatus: 'lead',
+    clientType: 'petitioner',
+    referralSource: 'referral',
     internalIntakeNotes: '',
     members: [],
     addMember() {
@@ -38,14 +39,15 @@
             this.category = 'joint';
             this.name = 'Vikram & Rajesh (Joint Litigants)';
             this.contactPerson = 'Vikram Malhotra';
-            this.fatherSalutation = 'Late Shri';
-            this.fatherHusbandName = 'Rameshwaram';
+            this.preferredCommunicationMethod = 'whatsapp';
             this.email = 'joint.litigants@gmail.com';
             this.countryCode = '+91';
             this.phoneRaw = '9811099887';
-            this.age = 41;
+            this.dateOfBirth = '1983-11-20';
             this.gender = 'male';
             this.occupation = 'Property Owner & Business';
+            this.clientType = 'petitioner';
+            this.referralSource = 'walk_in';
             this.members = [
                 { name: 'Rajesh Sharma', relationship: 'Co-petitioner / Co-owner', phone: '+91 98765 11223', email: 'rajesh.sharma@gmail.com' }
             ];
@@ -54,28 +56,30 @@
             this.onboardingMode = 'assisted_offline';
             this.name = 'Chandra Sekhar';
             this.contactPerson = 'Chandra Sekhar';
-            this.fatherSalutation = 'Shri';
-            this.fatherHusbandName = 'K. Sekhar';
+            this.preferredCommunicationMethod = 'phone';
             this.email = '';
             this.countryCode = '+91';
             this.phoneRaw = '9810077665';
-            this.age = 56;
+            this.dateOfBirth = '1968-04-10';
             this.gender = 'male';
             this.occupation = 'Agriculture / Self-Employed';
+            this.clientType = 'respondent';
+            this.referralSource = 'bar_association';
             this.members = [];
         } else {
             this.category = 'individual';
             this.onboardingMode = 'portal_online';
             this.name = 'Vikram Malhotra';
             this.contactPerson = 'Vikram Malhotra';
-            this.fatherSalutation = 'Late Shri';
-            this.fatherHusbandName = 'Jagdish Malhotra';
+            this.preferredCommunicationMethod = 'email';
             this.email = 'vikram.client@gmail.com';
             this.countryCode = '+91';
             this.phoneRaw = '9876543210';
-            this.age = 38;
+            this.dateOfBirth = '1986-05-14';
             this.gender = 'male';
             this.occupation = 'Business & Commercial';
+            this.clientType = 'petitioner';
+            this.referralSource = 'referral';
             this.members = [];
         }
     }
@@ -279,18 +283,30 @@
                     </a>
                 </h3>
 
-                @if($client->father_husband_name)
-                    <p class="text-[11.5px] text-[#646864] mb-1.5 font-sans">{{ $client->father_husband_name }}</p>
-                @elseif($client->contact_person)
-                    <p class="text-[11.5px] text-[#646864] mb-1.5">Attn: {{ $client->contact_person }}</p>
+                @if($client->contact_person)
+                    <p class="text-[11.5px] text-[#646864] mb-1.5 font-sans">Attn: {{ $client->contact_person }}</p>
                 @endif
 
-                <!-- Demographics Particulars: Age, Gender & Occupation -->
-                @if($client->age || $client->gender || $client->occupation)
+                <!-- Demographics & Classification Particulars: DOB, Preferred Comm, Role & Referral -->
                 <div class="flex flex-wrap items-center gap-1.5 my-2.5">
-                    @if($client->age)
+                    @if($client->date_of_birth || $client->age)
                         <span class="inline-flex items-center gap-1 font-mono text-[10.5px] bg-[#faf8f5] text-[#1a1a1a] border border-[#e5e3dc] px-2 py-0.5 rounded">
-                            <span class="text-[9px] text-[#8a8a8a] font-sans uppercase">Age:</span> {{ $client->age }} yrs
+                            <span class="text-[9px] text-[#8a8a8a] font-sans uppercase">DOB:</span> {{ $client->date_of_birth ? $client->date_of_birth->format('d M Y') : ($client->age . ' yrs') }}
+                        </span>
+                    @endif
+                    @if($client->preferred_communication_method)
+                        <span class="inline-flex items-center gap-1 text-[10.5px] bg-[#f5f3ed] text-[#23493a] border border-[#e5e3dc] px-2 py-0.5 rounded font-medium">
+                            <span class="text-[9px] text-[#8a8a8a] font-sans uppercase">Pref:</span> {{ $client->preferred_communication_method_label }}
+                        </span>
+                    @endif
+                    @if($client->client_type)
+                        <span class="inline-flex items-center gap-1 text-[10.5px] bg-[#faf8f5] text-[#1a1a1a] border border-[#e5e3dc] px-2 py-0.5 rounded capitalize">
+                            <span class="text-[9px] text-[#8a8a8a] font-sans uppercase">Role:</span> {{ ucfirst($client->client_type) }}
+                        </span>
+                    @endif
+                    @if($client->referral_source)
+                        <span class="inline-flex items-center gap-1 text-[10.5px] bg-[#faf8f5] text-[#646864] border border-[#e5e3dc] px-2 py-0.5 rounded">
+                            <span class="text-[9px] text-[#8a8a8a] font-sans uppercase">Ref:</span> {{ ucfirst(str_replace('_', ' ', $client->referral_source)) }}
                         </span>
                     @endif
                     @if($client->gender)
@@ -304,7 +320,6 @@
                         </span>
                     @endif
                 </div>
-                @endif
 
                 <!-- Contact Particulars -->
                 <div class="space-y-1 text-xs text-[#646864] pt-2 border-t border-[#f0eee8]">

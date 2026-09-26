@@ -28,6 +28,7 @@ class StoreClientRequest extends FormRequest
             'conflict_check_status' => 'nullable|in:not_checked,pending,clear,potential_conflict,conflict_identified,waiver_required,cleared,rejected',
             'referral_source' => 'nullable|string|max:100',
             'client_type' => 'nullable|string|max:100',
+            'preferred_communication_method' => 'nullable|string|max:50',
             'trust_balance' => 'nullable|numeric|min:0',
 
             // Indian KYC & Personal/Entity Particulars

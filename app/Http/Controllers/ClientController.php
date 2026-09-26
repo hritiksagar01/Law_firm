@@ -9,6 +9,7 @@ use App\Models\Client;
 use App\Models\ClientMember;
 use App\Models\Matter;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -209,12 +210,13 @@ class ClientController extends Controller
             'assigned_paralegal_id' => $validated['assigned_paralegal_id'] ?? null,
             'referral_source' => $validated['referral_source'] ?? null,
             'client_type' => $validated['client_type'] ?? null,
+            'preferred_communication_method' => $validated['preferred_communication_method'] ?? 'email',
 
             // Indian KYC & Personal/Entity Particulars
             'father_husband_name' => $fatherDisplayName,
             'gender' => $validated['gender'] ?? null,
             'date_of_birth' => $validated['date_of_birth'] ?? null,
-            'age' => $validated['age'] ?? null,
+            'age' => $validated['age'] ?? (! empty($validated['date_of_birth']) ? Carbon::parse($validated['date_of_birth'])->age : null),
             'occupation' => $validated['occupation'] ?? null,
             'pan' => ! empty($validated['pan']) ? strtoupper($validated['pan']) : null,
             'aadhaar_last_four' => $validated['aadhaar_last_four'] ?? null,
@@ -387,11 +389,12 @@ class ClientController extends Controller
             'conflict_check_status' => $validated['conflict_check_status'] ?? $client->conflict_check_status,
             'referral_source' => $validated['referral_source'] ?? $client->referral_source,
             'client_type' => $validated['client_type'] ?? $client->client_type,
+            'preferred_communication_method' => $validated['preferred_communication_method'] ?? $client->preferred_communication_method,
 
             'father_husband_name' => $updatedFather,
             'gender' => $validated['gender'] ?? null,
             'date_of_birth' => $validated['date_of_birth'] ?? null,
-            'age' => $validated['age'] ?? null,
+            'age' => $validated['age'] ?? (! empty($validated['date_of_birth']) ? Carbon::parse($validated['date_of_birth'])->age : $client->age),
             'occupation' => $validated['occupation'] ?? null,
             'pan' => ! empty($validated['pan']) ? strtoupper($validated['pan']) : null,
             'aadhaar_last_four' => $validated['aadhaar_last_four'] ?? null,

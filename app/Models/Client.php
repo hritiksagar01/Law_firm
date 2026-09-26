@@ -98,9 +98,24 @@ class Client extends Model
         'other' => 'Other',
     ];
 
+    /** @var array<string, string> Preferred communication method labels */
+    public const COMMUNICATION_METHODS = [
+        'email' => 'Email',
+        'phone' => 'Phone Call',
+        'whatsapp' => 'WhatsApp',
+        'portal' => 'Client Portal',
+        'sms' => 'SMS / Text Message',
+        'in_person' => 'In-Person / Physical Chamber',
+    ];
+
     public function getStatusLabelAttribute(): string
     {
         return self::STATUSES[$this->status] ?? ucfirst(str_replace('_', ' ', $this->status ?? 'active'));
+    }
+
+    public function getPreferredCommunicationMethodLabelAttribute(): string
+    {
+        return self::COMMUNICATION_METHODS[$this->preferred_communication_method] ?? ucfirst(str_replace('_', ' ', $this->preferred_communication_method ?? 'Email'));
     }
 
     public function firm(): BelongsTo
