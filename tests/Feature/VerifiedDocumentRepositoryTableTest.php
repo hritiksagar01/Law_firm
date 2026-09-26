@@ -24,8 +24,8 @@ class VerifiedDocumentRepositoryTableTest extends TestCase
 
     /**
      * Test Verified Document Repository table renders the requested 10 headers:
-     * Doc ID, File Name, Doc Title, Type, Matter, Client, Tag, Confidentiality, Visibility, Doc Status
-     * and removes Privilege Assertion, Size, and SHA-256 Checksum.
+     * Doc ID, File Name, Type, Matter, Client, Tag, Confidentiality, Visibility, Doc Status, Download
+     * and removes Doc Title, Action, Privilege Assertion, Size, and SHA-256 Checksum.
      */
     public function test_verified_document_repository_renders_requested_columns_and_removes_old_columns(): void
     {
@@ -38,7 +38,6 @@ class VerifiedDocumentRepositoryTableTest extends TestCase
         // Assert presence of the 10 requested columns
         $response->assertSee('Doc ID');
         $response->assertSee('File Name');
-        $response->assertSee('Doc Title');
         $response->assertSee('Type');
         $response->assertSee('Matter');
         $response->assertSee('Client');
@@ -46,8 +45,11 @@ class VerifiedDocumentRepositoryTableTest extends TestCase
         $response->assertSee('Confidentiality');
         $response->assertSee('Visibility');
         $response->assertSee('Doc Status');
+        $response->assertSee('<th class="py-3 px-4 font-medium text-center">Download</th>', false);
 
         // Assert removed columns are NOT in the table headers
+        $response->assertDontSee('<th class="py-3 px-4 font-medium">Doc Title</th>', false);
+        $response->assertDontSee('<th class="py-3 px-4 font-medium text-center">Action</th>', false);
         $response->assertDontSee('<th class="py-3 px-4 font-medium">Privilege Assertion</th>', false);
         $response->assertDontSee('<th class="py-3 px-4 font-medium">Size</th>', false);
         $response->assertDontSee('<th class="py-3 px-4 font-medium">SHA-256 Checksum</th>', false);
@@ -92,7 +94,6 @@ class VerifiedDocumentRepositoryTableTest extends TestCase
         // Check document data appears in the repository
         $response->assertSee('DOC-2026-7788');
         $response->assertSee('interim_mandatory_arguments.pdf');
-        $response->assertSee('Written Arguments on Interim Mandatory Relief');
         $response->assertSee('Pleading');
         $response->assertSee($matter->case_number);
         $response->assertSee($client->name);

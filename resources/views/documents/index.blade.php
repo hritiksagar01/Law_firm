@@ -57,7 +57,6 @@
                     <tr class="border-b border-[#f0eee8] text-[11.5px] text-[#8a8a8a] font-medium uppercase tracking-wider bg-[#faf8f5]">
                         <th class="py-3 px-4 font-medium">Doc ID</th>
                         <th class="py-3 px-4 font-medium">File Name</th>
-                        <th class="py-3 px-4 font-medium">Doc Title</th>
                         <th class="py-3 px-4 font-medium">Type</th>
                         <th class="py-3 px-4 font-medium">Matter</th>
                         <th class="py-3 px-4 font-medium">Client</th>
@@ -65,7 +64,7 @@
                         <th class="py-3 px-4 font-medium">Confidentiality</th>
                         <th class="py-3 px-4 font-medium">Visibility</th>
                         <th class="py-3 px-4 font-medium">Doc Status</th>
-                        <th class="py-3 px-4 font-medium text-center">Action</th>
+                        <th class="py-3 px-4 font-medium text-center">Download</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#f0eee8]">
@@ -89,11 +88,6 @@
                                 </span>
                                 <span class="truncate max-w-[150px] font-medium">{{ $doc->filename }}</span>
                             </div>
-                        </td>
-                        <td class="py-3.5 px-4">
-                            <span class="font-medium text-xs text-[#1a1a1a] group-hover:text-[#23493a] transition-colors block max-w-[200px] truncate" title="{{ $doc->title }}">
-                                {{ $doc->title }}
-                            </span>
                         </td>
                         <td class="py-3.5 px-4">
                             <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-[#f5f3ed] text-[#1a1a1a] border border-[#e5e3dc]">
@@ -208,7 +202,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="11" class="py-8 text-center text-xs text-[#8a8a8a]">
+                        <td colspan="10" class="py-8 text-center text-xs text-[#8a8a8a]">
                             No documents stored in the vault yet.
                         </td>
                     </tr>
