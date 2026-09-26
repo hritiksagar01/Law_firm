@@ -45,6 +45,8 @@
             @csrf
             <input type="hidden" name="phone" :value="(countryCode + ' ' + phoneRaw).trim()"/>
             <input type="hidden" name="redirect_to" value="{{ $redirectTo ?? (request()->is('admin*') ? 'admin' : 'chambers') }}"/>
+            <input type="hidden" name="status" :value="initialStatus"/>
+            <input type="hidden" name="primary_attorney_id" :value="primaryAttorneyId"/>
 
             <!-- 0. Assigned Law Firm (When Multiple Firms Exist / Super Admin Mode) -->
             @if(isset($firms) && $firms->count() > 1)
@@ -307,79 +309,7 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 5. Client Status, Litigation Role & Referral Details -->
-            <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-3">
-                <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-sm text-[#23493A]">tune</span>
-                    <span>05 · Client Status, Litigation Role &amp; Referral Details</span>
-                </span>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <!-- Client Status -->
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[13px] font-medium text-[#1A1E1C]">Client Status *</label>
-                        <select name="status" x-model="initialStatus" required class="h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] focus:border-[#23493A] focus:outline-none cursor-pointer">
-                            <option value="lead">Lead (Initial Consultation)</option>
-                            <option value="intake">Intake (Case Review)</option>
-                            <option value="conflict_check">Conflict Check (Bar Clearance)</option>
-                            <option value="prospective">Prospective Client</option>
-                            <option value="active">Active (Retained Client)</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="former">Former Client</option>
-                            <option value="archived">Archived</option>
-                        </select>
-                    </div>
-
-                    <!-- Client Type -->
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[13px] font-medium text-[#1A1E1C]">Client Type</label>
-                        <select name="client_type" x-model="clientType" class="h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] focus:border-[#23493A] focus:outline-none cursor-pointer">
-                            <option value="petitioner">Petitioner</option>
-                            <option value="respondent">Respondent</option>
-                            <option value="plaintiff">Plaintiff</option>
-                            <option value="defendant">Defendant</option>
-                            <option value="appellant">Appellant</option>
-                            <option value="complainant">Complainant</option>
-                            <option value="accused">Accused</option>
-                            <option value="applicant">Applicant</option>
-                            <option value="other">Other / Retainer</option>
-                        </select>
-                    </div>
-
-                    <!-- Referral Source -->
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[13px] font-medium text-[#1A1E1C]">Referral Source</label>
-                        <select name="referral_source" x-model="referralSource" class="h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] focus:border-[#23493A] focus:outline-none cursor-pointer">
-                            <option value="walk_in">Walk-in</option>
-                            <option value="referral">Colleague / Client Referral</option>
-                            <option value="website">Chambers Website</option>
-                            <option value="social_media">Social Media / Network</option>
-                            <option value="court_appointed">Court Appointed / Legal Aid</option>
-                            <option value="bar_association">Bar Association</option>
-                            <option value="returning">Returning Client</option>
-                            <option value="other">Other Source</option>
-                        </select>
-                    </div>
-
-                    <!-- Lead Consulting Counsel -->
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[13px] font-medium text-[#1A1E1C]">Lead Consulting Counsel</label>
-                        <select name="primary_attorney_id" x-model="primaryAttorneyId" class="h-[40px] px-3 rounded-[6px] bg-white border border-[#E7E4DC] text-xs text-[#1A1E1C] focus:border-[#23493A] focus:outline-none cursor-pointer">
-                            <option value="">-- General Chamber Lead --</option>
-                            @if(isset($attorneys) && $attorneys->isNotEmpty())
-                                @foreach($attorneys as $attorney)
-                                    <option value="{{ $attorney->id }}" {{ Auth::id() === $attorney->id ? 'selected' : '' }}>
-                                        {{ $attorney->name }} ({{ ucfirst($attorney->role) }})
-                                    </option>
-                                @endforeach
-                            @endif
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 6. Confidential Case Summary / Representation Notes -->
+            <!-- 4. Confidential Case Summary / Representation Notes -->
             <div class="bg-[#F6F4EE] p-4 rounded-lg border border-[#E7E4DC] flex flex-col gap-2.5">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-semibold uppercase tracking-wider text-[#646864] flex items-center gap-1.5">

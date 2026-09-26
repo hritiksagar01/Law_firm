@@ -50,12 +50,11 @@ class ClientOnboardingParticularsOverlayTest extends TestCase
         $response->assertSee('name="date_of_birth"', false);
         $response->assertDontSee('name="age"', false);
 
-        // Assert Client Status, Client Type, and Referral Source are present
-        $response->assertSee('Client Status');
-        $response->assertSee('Client Type');
-        $response->assertSee('Referral Source');
-        $response->assertSee('name="client_type"', false);
-        $response->assertSee('name="referral_source"', false);
+        // Assert '05 · Client Status, Litigation Role & Referral Details' is removed from modal
+        $response->assertDontSee('05 · Client Status, Litigation Role &amp; Referral Details', false);
+        $response->assertDontSee('05 · Client Status, Litigation Role & Referral Details', false);
+        $response->assertSee('name="status"', false);
+        $response->assertSee('name="primary_attorney_id"', false);
     }
 
     /**
