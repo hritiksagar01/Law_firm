@@ -32,7 +32,9 @@ sudo apt-get clean 2>/dev/null || true
 
 composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-if command -v npm &> /dev/null; then
+if [ -f "public/build/manifest.json" ]; then
+    echo "Notice: Production assets pre-compiled in public/build. Skipping npm build to conserve server disk and memory."
+elif command -v npm &> /dev/null; then
     # Clear npm cache and omit optional foreign architecture dependencies to avoid ENOSPC
     npm cache clean --force 2>/dev/null || true
     npm install --no-audit --no-fund --omit=optional
