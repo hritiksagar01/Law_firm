@@ -791,6 +791,7 @@ Route::middleware('auth')->group(function () {
                 'category' => 'required|string',
                 'privilege' => 'required|string',
                 'classification' => 'nullable|string',
+                'visibility' => 'nullable|string',
                 'document_status' => 'nullable|string',
                 'tags' => 'nullable',
                 'is_client_visible' => 'nullable',
@@ -826,7 +827,7 @@ Route::middleware('auth')->group(function () {
             // Determine client visibility
             $isClientVisible = $request->has('is_client_visible')
                 ? $request->boolean('is_client_visible')
-                : ($request->privilege !== 'Work Product');
+                : ($request->visibility === 'client_visible' || $request->privilege !== 'Work Product');
 
             $docTags = $request->tags ? (is_array($request->tags) ? $request->tags : array_values(array_filter(array_map('trim', explode(',', $request->tags))))) : ['docket'];
 
@@ -846,7 +847,7 @@ Route::middleware('auth')->group(function () {
                 'document_type' => $request->document_type ?? $request->category,
                 'privilege' => $request->privilege,
                 'classification' => $request->classification ?? (strtolower($request->privilege) === 'public filing' ? 'public' : 'confidential'),
-                'visibility' => $isClientVisible ? 'client_visible' : 'internal_only',
+                'visibility' => $request->visibility ?: ($isClientVisible ? 'client_visible' : 'internal_only'),
                 'document_status' => $request->document_status ?? 'final',
                 'tags' => $docTags,
                 'is_client_visible' => $isClientVisible,

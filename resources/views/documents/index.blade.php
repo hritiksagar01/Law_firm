@@ -33,13 +33,22 @@
     </div>
 
     <!-- Drag & Drop Upload Zone -->
-    <div @click="openUploadModal = true" class="p-6 mb-6 rounded-md border-2 border-dashed border-[#e5e3dc] bg-white hover:border-[#23493a] transition-colors flex flex-col items-center justify-center text-center cursor-pointer group shadow-xs">
-        <div class="w-10 h-10 rounded-full bg-[#f5f3ed] group-hover:bg-[#ecfdf5] flex items-center justify-center text-[#23493a] mb-2.5 transition-colors">
+    <div class="p-6 mb-6 rounded-md border-2 border-dashed border-[#e5e3dc] bg-white hover:border-[#23493a] transition-colors flex flex-col items-center justify-center text-center shadow-xs">
+        <div @click="openUploadModal = true" class="w-10 h-10 rounded-full bg-[#f5f3ed] hover:bg-[#ecfdf5] flex items-center justify-center text-[#23493a] mb-2.5 transition-colors cursor-pointer">
             <span class="material-symbols-outlined text-2xl">cloud_upload</span>
         </div>
-        <h3 class="text-sm font-semibold text-[#1a1a1a]">Drag and drop legal filings or exhibit archives here</h3>
+        <h3 @click="openUploadModal = true" class="text-sm font-semibold text-[#1a1a1a] cursor-pointer">Drag and drop legal filings or exhibit archives here</h3>
         <p class="text-xs text-[#8a8a8a] mt-0.5">Supports PDF, DOCX, TIFF, Bates-stamped bundles up to 50 MB (SHA-256 Hash Authenticated)</p>
-        <span class="mt-3 inline-flex items-center px-3 py-1 rounded text-xs font-medium bg-[#f5f3ed] text-[#1a1a1a] group-hover:bg-[#23493a] group-hover:text-white transition-colors">Select Document File</span>
+        <div class="mt-3.5 flex items-center justify-center gap-2">
+            <button type="button" @click="openUploadModal = true" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-medium bg-[#f5f3ed] text-[#1a1a1a] hover:bg-[#23493a] hover:text-white border border-[#e5e3dc] transition-colors cursor-pointer shadow-2xs">
+                <span class="material-symbols-outlined text-base">folder_open</span>
+                <span>Select Document File</span>
+            </button>
+            <button type="button" @click="openUploadModal = true" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-semibold bg-[#23493a] text-white hover:bg-[#1a3a2e] border border-[#23493a] transition-colors cursor-pointer shadow-2xs">
+                <span class="material-symbols-outlined text-base">photo_camera</span>
+                <span>Capture</span>
+            </button>
+        </div>
     </div>
 
     <!-- Vault Files Table -->
@@ -475,7 +484,7 @@
             <div class="flex items-center justify-between pb-4 border-b border-[#f0eee8] mb-4">
                 <div class="flex items-center gap-2">
                     <span class="material-symbols-outlined text-[#23493a]">upload_file</span>
-                    <h3 class="text-[15px] font-semibold text-[#1a1a1a]">File Legal Filing into Vault</h3>
+                    <h3 class="text-[15px] font-semibold text-[#1a1a1a]">Upload New Filing</h3>
                 </div>
                 <button type="button" @click="openUploadModal = false" class="text-[#8a8a8a] hover:text-[#1a1a1a] cursor-pointer">
                     <span class="material-symbols-outlined text-xl">close</span>
