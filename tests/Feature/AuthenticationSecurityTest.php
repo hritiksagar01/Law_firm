@@ -72,4 +72,35 @@ class AuthenticationSecurityTest extends TestCase
         $this->assertAuthenticated();
         $this->assertTrue(auth()->user()->isSuperAdmin());
     }
+
+    /**
+     * Test advocate / law firm partner login redirects to Chambers dashboard, NOT client portal.
+     */
+    public function test_advocate_login_redirects_to_chambers_dashboard_not_client_portal(): void
+    {
+        $response = $this->post(route('login'), [
+            'email' => 'hritiksagar.tech@gmail.com',
+            'password' => '12345678',
+        ]);
+
+        $response->assertRedirect(route('dashboard'));
+        $this->assertAuthenticated();
+        $this->assertFalse(auth()->user()->isClient());
+        $this->assertTrue(auth()->user()->isPartner());
+    }
+
+    /**
+     * Test client login redirects to client portal dashboard.
+     */
+    public function test_client_login_redirects_to_client_portal(): void
+    {
+        $response = $this->post(route('login'), [
+            'email' => 'hritik.srivastava28@gmail.com',
+            'password' => '12345678',
+        ]);
+
+        $response->assertRedirect(route('portal.dashboard'));
+        $this->assertAuthenticated();
+        $this->assertTrue(auth()->user()->isClient());
+    }
 }

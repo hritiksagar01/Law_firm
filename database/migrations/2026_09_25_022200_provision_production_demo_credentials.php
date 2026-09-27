@@ -3,6 +3,7 @@
 use App\Models\Client;
 use App\Models\Firm;
 use App\Models\Matter;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Hash;
@@ -41,6 +42,9 @@ return new class extends Migration
             ]
         );
 
+        $adminRole = Role::where('slug', 'admin')->first();
+        $clientRole = Role::where('slug', 'client')->first();
+
         // 3. Advocate / Law Firm Credentials
         User::updateOrCreate(
             ['email' => 'hritiksagar.tech@gmail.com'],
@@ -49,6 +53,7 @@ return new class extends Migration
                 'name' => 'Adv. Rajesh Sharma',
                 'password' => Hash::make('12345678'),
                 'role' => 'partner',
+                'role_id' => $adminRole?->id,
                 'status' => 'active',
                 'title' => 'Senior Advocate & Managing Partner',
                 'hourly_rate' => 12000.00,
@@ -63,6 +68,7 @@ return new class extends Migration
                 'name' => 'Adv. Rajesh Sharma',
                 'password' => Hash::make('password123'),
                 'role' => 'partner',
+                'role_id' => $adminRole?->id,
                 'status' => 'active',
                 'title' => 'Senior Advocate & Managing Partner',
                 'hourly_rate' => 12000.00,

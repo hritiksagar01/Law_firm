@@ -292,6 +292,10 @@ class User extends Authenticatable
 
     public function isClient(): bool
     {
+        if ($this->isSuperAdmin() || $this->isPartner() || $this->isAttorney() || $this->isParalegal() || $this->isSupportStaff()) {
+            return false;
+        }
+
         return $this->role === 'client' || ($this->roleRelation && $this->roleRelation->slug === 'client');
     }
 
