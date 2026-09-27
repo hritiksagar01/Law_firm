@@ -206,24 +206,28 @@
                         <span class="material-symbols-outlined text-[#23493a] text-xl">folder_managed</span>
                         <h2 class="text-sm font-semibold uppercase tracking-wider text-[#1a1a1a]">1.1 Case Title &amp; Client Relationship</h2>
                     </div>
-                    <span class="text-[11px] font-mono text-[#8a8a8a]">Fields marked * are mandatory</span>
+                    <span class="text-xs font-mono text-[#23493a] font-medium bg-[#f5f3ed] px-2.5 py-1 rounded border border-[#e5e3dc]">
+                        Matter ID: Auto-assigned (e.g. {{ $suggestedCaseNumber }})
+                    </span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <!-- 1ST: Case Title (Case Caption / Full Matter Name) -->
                     <div class="flex flex-col gap-1.5 md:col-span-2">
-                        <label class="text-xs font-semibold text-[#1a1a1a]">Case Title / Matter Caption *</label>
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-semibold text-[#1a1a1a]">Case Title / Matter Caption *</label>
+                            <span class="text-[11px] text-[#8a8a8a]">Formal judicial caption on petitions or briefs</span>
+                        </div>
                         <input type="text" name="title" x-model="title" required
                                placeholder="e.g. Malhotra Enterprises Pvt. Ltd. v. Apex Commercial Bank &amp; Ors."
                                class="w-full h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs font-medium text-[#1a1a1a] focus:outline-none focus:border-[#23493a]"/>
-                        <span class="text-[10.5px] text-[#8a8a8a]">Formal judicial caption as styled on court petitions, pleadings, or legal briefs</span>
                     </div>
 
                     <!-- 2ND: Client / Corporate Entity -->
-                    <div class="flex flex-col gap-1.5 md:col-span-2">
+                    <div class="flex flex-col gap-1.5">
                         <div class="flex items-center justify-between">
                             <label class="text-xs font-semibold text-[#1a1a1a]">Client / Corporate Entity *</label>
-                            <span class="text-[11px] text-[#646864]">Select corporate client or individual principal</span>
+                            <span class="text-[11px] text-[#646864]">Principal or corporate litigant</span>
                         </div>
                         <select name="client_id" x-model="clientId" required 
                                 class="w-full h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:outline-none focus:border-[#23493a]">
@@ -237,25 +241,27 @@
 
                         <!-- Dynamic Client Context Banner -->
                         <template x-if="selectedClientObj">
-                            <div class="mt-2 p-3 rounded-md bg-[#faf8f5] border border-[#f0eee8] flex items-center justify-between text-xs">
-                                <div class="flex items-center gap-2.5">
-                                    <span class="material-symbols-outlined text-[#23493a] text-[18px]">verified_user</span>
+                            <div class="mt-1 p-2 rounded-md bg-[#faf8f5] border border-[#f0eee8] flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[#23493a] text-[16px]">verified_user</span>
                                     <div>
                                         <span class="font-semibold text-[#1a1a1a]" x-text="selectedClientObj.name"></span>
-                                        <span class="text-[#646864] text-[11px] ml-1" x-text="'(' + selectedClientObj.type + ')'"></span>
-                                        <div class="text-[11px] text-[#8a8a8a] mt-0.5" x-text="selectedClientObj.email ? 'Email: ' + selectedClientObj.email : 'No email listed'"></div>
+                                        <span class="text-[#646864] text-[10.5px] ml-1" x-text="'(' + selectedClientObj.type + ')'"></span>
                                     </div>
                                 </div>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                    Client Verified
+                                <span class="px-1.5 py-0.2 rounded text-[9px] font-mono uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    Verified
                                 </span>
                             </div>
                         </template>
                     </div>
 
                     <!-- 3RD: Primary Practice Area Discipline -->
-                    <div class="flex flex-col gap-1.5 md:col-span-2">
-                        <label class="text-xs font-semibold text-[#1a1a1a]">Primary Practice Area *</label>
+                    <div class="flex flex-col gap-1.5">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-semibold text-[#1a1a1a]">Primary Practice Area *</label>
+                            <span class="text-[11px] text-[#8a8a8a]">Responsible discipline</span>
+                        </div>
                         <select name="practice_area" x-model="practiceArea" required
                                 class="w-full h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:outline-none focus:border-[#23493a]">
                             <option value="Commercial Litigation & Arbitration">Commercial Litigation &amp; Arbitration</option>
@@ -272,20 +278,6 @@
                             <option value="Regulatory & Environmental Compliance">Regulatory &amp; Environmental Compliance</option>
                         </select>
                         <span class="text-[10.5px] text-[#8a8a8a]">Primary chambers discipline responsible for this engagement</span>
-                    </div>
-
-                    <!-- Matter ID Notice (Auto-created on submit) -->
-                    <div class="md:col-span-2 p-3 rounded-md bg-[#faf8f5] border border-[#f0eee8] flex items-center justify-between text-xs">
-                        <div class="flex items-center gap-2.5">
-                            <span class="material-symbols-outlined text-[#23493a] text-lg">tag</span>
-                            <div>
-                                <span class="font-semibold text-[#1a1a1a]">Matter ID / Number: </span>
-                                <span class="text-[#646864]">Will be automatically generated upon creating this case dossier</span>
-                            </div>
-                        </div>
-                        <span class="text-[11px] font-mono text-[#23493a] bg-white px-2.5 py-0.5 rounded border border-[#e5e3dc]">
-                            Auto-assigned (e.g. {{ $suggestedCaseNumber }})
-                        </span>
                     </div>
                 </div>
             </div>
@@ -310,7 +302,7 @@
                     <!-- Group A: Litigation & Dispute Resolution -->
                     <div>
                         <span class="text-[11px] font-mono uppercase tracking-wider text-[#8a8a8a] block mb-2 font-medium">Dispute Resolution &amp; Litigation</span>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+                        <div class="flex flex-wrap gap-2">
                             @php
                                 $litigationTypes = [
                                     'Civil Litigation', 'Criminal', 'Family Law', 'Employment',
@@ -318,12 +310,14 @@
                                 ];
                             @endphp
                             @foreach($litigationTypes as $type)
-                            <label class="relative flex items-center gap-2 p-2.5 rounded-md border text-xs cursor-pointer select-none transition-all"
-                                   :class="selectedTypes.includes('{{ $type }}') ? 'bg-[#23493a]/[0.06] border-[#23493a] text-[#23493a] font-medium shadow-xs' : 'bg-white border-[#e5e3dc] text-[#1a1a1a] hover:bg-[#faf9f5]'">
+                            <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs cursor-pointer select-none transition-all"
+                                   :class="selectedTypes.includes('{{ $type }}') ? 'bg-[#23493a]/10 border-[#23493a] text-[#23493a] font-semibold shadow-xs' : 'bg-white border-[#e5e3dc] text-[#555] hover:border-[#23493a] hover:text-[#1a1a1a]'">
                                 <input type="checkbox" name="matter_types[]" value="{{ $type }}"
                                        :checked="selectedTypes.includes('{{ $type }}')"
                                        @change="toggleType('{{ $type }}')"
-                                       class="rounded text-[#23493a] focus:ring-[#23493a] border-[#e5e3dc]"/>
+                                       class="sr-only"/>
+                                <span class="material-symbols-outlined text-[15px]" x-show="selectedTypes.includes('{{ $type }}')">check_circle</span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#c5c3bc]" x-show="!selectedTypes.includes('{{ $type }}')"></span>
                                 <span>{{ $type }}</span>
                             </label>
                             @endforeach
@@ -333,19 +327,21 @@
                     <!-- Group B: Contracts, Corporate & Real Estate Transactions -->
                     <div>
                         <span class="text-[11px] font-mono uppercase tracking-wider text-[#8a8a8a] block mb-2 font-medium">Transactional, Corporate &amp; Estates</span>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+                        <div class="flex flex-wrap gap-2">
                             @php
                                 $transactionalTypes = [
                                     'Contracts', 'Corporate', 'M&A', 'Real Estate Transactions', 'Estate Planning'
                                 ];
                             @endphp
                             @foreach($transactionalTypes as $type)
-                            <label class="relative flex items-center gap-2 p-2.5 rounded-md border text-xs cursor-pointer select-none transition-all"
-                                   :class="selectedTypes.includes('{{ $type }}') ? 'bg-[#23493a]/[0.06] border-[#23493a] text-[#23493a] font-medium shadow-xs' : 'bg-white border-[#e5e3dc] text-[#1a1a1a] hover:bg-[#faf9f5]'">
+                            <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs cursor-pointer select-none transition-all"
+                                   :class="selectedTypes.includes('{{ $type }}') ? 'bg-[#23493a]/10 border-[#23493a] text-[#23493a] font-semibold shadow-xs' : 'bg-white border-[#e5e3dc] text-[#555] hover:border-[#23493a] hover:text-[#1a1a1a]'">
                                 <input type="checkbox" name="matter_types[]" value="{{ $type }}"
                                        :checked="selectedTypes.includes('{{ $type }}')"
                                        @change="toggleType('{{ $type }}')"
-                                       class="rounded text-[#23493a] focus:ring-[#23493a] border-[#e5e3dc]"/>
+                                       class="sr-only"/>
+                                <span class="material-symbols-outlined text-[15px]" x-show="selectedTypes.includes('{{ $type }}')">check_circle</span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#c5c3bc]" x-show="!selectedTypes.includes('{{ $type }}')"></span>
                                 <span>{{ $type }}</span>
                             </label>
                             @endforeach
@@ -355,19 +351,21 @@
                     <!-- Group C: Regulatory, Tax, Insolvency & Specialty -->
                     <div>
                         <span class="text-[11px] font-mono uppercase tracking-wider text-[#8a8a8a] block mb-2 font-medium">Regulatory, Fiscal &amp; Specialty Forums</span>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+                        <div class="flex flex-wrap gap-2">
                             @php
                                 $specialtyTypes = [
                                     'Immigration', 'Tax', 'Bankruptcy', 'Regulatory', 'Probate', 'Insurance'
                                 ];
                             @endphp
                             @foreach($specialtyTypes as $type)
-                            <label class="relative flex items-center gap-2 p-2.5 rounded-md border text-xs cursor-pointer select-none transition-all"
-                                   :class="selectedTypes.includes('{{ $type }}') ? 'bg-[#23493a]/[0.06] border-[#23493a] text-[#23493a] font-medium shadow-xs' : 'bg-white border-[#e5e3dc] text-[#1a1a1a] hover:bg-[#faf9f5]'">
+                            <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs cursor-pointer select-none transition-all"
+                                   :class="selectedTypes.includes('{{ $type }}') ? 'bg-[#23493a]/10 border-[#23493a] text-[#23493a] font-semibold shadow-xs' : 'bg-white border-[#e5e3dc] text-[#555] hover:border-[#23493a] hover:text-[#1a1a1a]'">
                                 <input type="checkbox" name="matter_types[]" value="{{ $type }}"
                                        :checked="selectedTypes.includes('{{ $type }}')"
                                        @change="toggleType('{{ $type }}')"
-                                       class="rounded text-[#23493a] focus:ring-[#23493a] border-[#e5e3dc]"/>
+                                       class="sr-only"/>
+                                <span class="material-symbols-outlined text-[15px]" x-show="selectedTypes.includes('{{ $type }}')">check_circle</span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#c5c3bc]" x-show="!selectedTypes.includes('{{ $type }}')"></span>
                                 <span>{{ $type }}</span>
                             </label>
                             @endforeach
@@ -377,12 +375,12 @@
                     <!-- Group D: Firm-defined custom type input -->
                     <div class="pt-2">
                         <label class="text-xs font-semibold text-[#1a1a1a] mb-1.5 block">Other Firm-Defined Matter Type</label>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 max-w-xl">
                             <input type="text" name="custom_matter_type" x-model="customType"
                                    placeholder="e.g. Maritime &amp; Admiralty, Cyber Law &amp; Data Privacy..."
                                    class="flex-1 h-9 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:outline-none focus:border-[#23493a]"/>
                             <button type="button" @click="if(customType.trim() && !selectedTypes.includes(customType.trim())) { selectedTypes.push(customType.trim()); customType = ''; }"
-                                    class="btn-secondary h-9 px-3 text-xs inline-flex items-center gap-1">
+                                    class="btn-secondary h-9 px-3 text-xs inline-flex items-center gap-1 shrink-0">
                                 <span class="material-symbols-outlined text-sm">add</span>
                                 <span>Add Custom Type</span>
                             </button>
@@ -425,26 +423,35 @@
                     <div class="flex flex-col gap-1.5">
                         <label class="text-xs font-semibold text-[#1a1a1a]">Priority Level *</label>
                         <input type="hidden" name="priority" :value="priority"/>
-                        <div class="grid grid-cols-4 gap-1 p-1 rounded-md bg-[#faf8f5] border border-[#e5e3dc] h-10">
+                        <div class="w-full h-10 p-1 rounded-md bg-[#faf8f5] border border-[#e5e3dc] flex items-stretch gap-1"
+                             style="display: flex !important; flex-direction: row !important; align-items: stretch !important; box-sizing: border-box !important;">
                             <button type="button" @click="priority = 'low'"
-                                    class="rounded text-[11px] font-medium transition-colors flex items-center justify-center gap-1"
-                                    :class="priority === 'low' ? 'bg-white shadow-xs text-stone-700 font-semibold border border-stone-200' : 'text-[#646864] hover:text-[#1a1a1a]'">
-                                Low
+                                    class="flex-1 h-full rounded text-[11px] font-medium transition-all flex items-center justify-center gap-1.5 px-1 cursor-pointer"
+                                    :class="priority === 'low' ? 'bg-white shadow-xs text-stone-900 font-semibold border border-stone-300' : 'text-[#646864] hover:text-[#1a1a1a] hover:bg-white/60'"
+                                    style="flex: 1 1 0% !important; min-width: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important;">
+                                <span class="w-1.5 h-1.5 rounded-full bg-stone-400 shrink-0"></span>
+                                <span class="truncate">Low</span>
                             </button>
                             <button type="button" @click="priority = 'medium'"
-                                    class="rounded text-[11px] font-medium transition-colors flex items-center justify-center gap-1"
-                                    :class="priority === 'medium' ? 'bg-white shadow-xs text-blue-700 font-semibold border border-blue-200' : 'text-[#646864] hover:text-[#1a1a1a]'">
-                                Med
+                                    class="flex-1 h-full rounded text-[11px] font-medium transition-all flex items-center justify-center gap-1.5 px-1 cursor-pointer"
+                                    :class="priority === 'medium' ? 'bg-white shadow-xs text-blue-700 font-semibold border border-blue-300' : 'text-[#646864] hover:text-[#1a1a1a] hover:bg-white/60'"
+                                    style="flex: 1 1 0% !important; min-width: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important;">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
+                                <span class="truncate">Med</span>
                             </button>
                             <button type="button" @click="priority = 'high'"
-                                    class="rounded text-[11px] font-medium transition-colors flex items-center justify-center gap-1"
-                                    :class="priority === 'high' ? 'bg-white shadow-xs text-amber-700 font-semibold border border-amber-200' : 'text-[#646864] hover:text-[#1a1a1a]'">
-                                High
+                                    class="flex-1 h-full rounded text-[11px] font-medium transition-all flex items-center justify-center gap-1.5 px-1 cursor-pointer"
+                                    :class="priority === 'high' ? 'bg-white shadow-xs text-amber-700 font-semibold border border-amber-300' : 'text-[#646864] hover:text-[#1a1a1a] hover:bg-white/60'"
+                                    style="flex: 1 1 0% !important; min-width: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important;">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+                                <span class="truncate">High</span>
                             </button>
                             <button type="button" @click="priority = 'urgent'"
-                                    class="rounded text-[11px] font-medium transition-colors flex items-center justify-center gap-1"
-                                    :class="priority === 'urgent' ? 'bg-white shadow-xs text-rose-700 font-semibold border border-rose-200' : 'text-[#646864] hover:text-[#1a1a1a]'">
-                                Urgent
+                                    class="flex-1 h-full rounded text-[11px] font-medium transition-all flex items-center justify-center gap-1.5 px-1 cursor-pointer"
+                                    :class="priority === 'urgent' ? 'bg-white shadow-xs text-rose-700 font-semibold border border-rose-300' : 'text-[#646864] hover:text-[#1a1a1a] hover:bg-white/60'"
+                                    style="flex: 1 1 0% !important; min-width: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important;">
+                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span>
+                                <span class="truncate">Urgent</span>
                             </button>
                         </div>
                         <span class="text-[10.5px] text-[#8a8a8a]">Triaging and escalation priority</span>
