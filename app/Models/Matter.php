@@ -114,6 +114,11 @@ class Matter extends Model
         return $this->hasMany(Task::class);
     }
 
+    public function threads(): HasMany
+    {
+        return $this->hasMany(MessageThread::class)->orderBy('last_message_at', 'desc');
+    }
+
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class);

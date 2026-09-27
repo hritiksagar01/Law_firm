@@ -835,7 +835,11 @@ Route::middleware('auth')->group(function () {
                 'appointments.attorney',
                 'events',
                 'tasks.assignee',
+                'threads.creator',
                 'messages.sender',
+                'messages.recipient',
+                'messages.thread',
+                'messages.attachments',
                 'caseNotes.user',
                 'conflictChecks.checker',
                 'conflictChecks.reviewer',
@@ -1407,6 +1411,8 @@ Route::middleware('auth')->group(function () {
         // Case Dispatches & Privileged Messages
         Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
         Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+        Route::post('/messages/threads', [MessageController::class, 'storeThread'])->name('messages.threads.store');
+        Route::get('/messages/attachments/{attachment}/download', [MessageController::class, 'downloadAttachment'])->name('messages.attachments.download');
 
         // Document Requests from Counsel to Client
         Route::get('/document-requests', [DocumentRequestController::class, 'index'])->name('document-requests.index');
@@ -1559,6 +1565,8 @@ Route::middleware('auth')->group(function () {
         // Counsel Communications / Messages
         Route::get('/messages', [PortalController::class, 'messages'])->name('messages.index');
         Route::post('/messages', [PortalController::class, 'storeMessage'])->name('messages.store');
+        Route::post('/messages/threads', [PortalController::class, 'storeThread'])->name('messages.threads.store');
+        Route::get('/messages/attachments/{attachment}/download', [PortalController::class, 'downloadAttachment'])->name('messages.attachments.download');
 
         // Hearings & Calendar
         Route::get('/calendar', [PortalController::class, 'calendar'])->name('calendar.index');

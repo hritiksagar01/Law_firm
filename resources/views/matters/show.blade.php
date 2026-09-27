@@ -327,53 +327,138 @@
             </div>
 
             <!-- Privileged Attorney-Client Communications -->
+            <!-- Privileged Attorney-Client Communications & Matter Threads -->
             <div id="dispatches-section" class="border border-[#e5e3dc] bg-white rounded-md shadow-xs overflow-hidden">
-                <div class="p-4 border-b border-[#f0eee8] bg-[#faf8f5] flex items-center justify-between">
+                <div class="p-4 border-b border-[#f0eee8] bg-[#faf8f5] flex items-center justify-between flex-wrap gap-2">
                     <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#23493a] text-xl">lock</span>
+                        <span class="material-symbols-outlined text-[#23493a] text-xl">forum</span>
                         <div>
-                            <h3 class="text-sm font-semibold text-[#1a1a1a]">Privileged Matter Dispatch</h3>
-                            <span class="text-[10px] font-mono text-[#23493a] bg-[#ecfdf5] border border-[#a7f3d0] px-1.5 py-0.5 rounded font-medium uppercase">ABA Model Rule 1.6 Protected</span>
+                            <h3 class="text-sm font-semibold text-[#1a1a1a]">Matter Message Threads &amp; Dispatches</h3>
+                            <span class="text-[10px] font-mono text-[#23493a] bg-[#ecfdf5] border border-[#a7f3d0] px-1.5 py-0.5 rounded font-medium uppercase">Sec 126 &amp; 129 Evidence Act &middot; Database Separated</span>
                         </div>
                     </div>
-                    <span class="font-mono text-xs text-[#8a8a8a]">{{ $matter->messages->count() }} Dispatches</span>
+                    <div class="flex items-center gap-2">
+                        <a href="{{ route('messages.index', ['matter_id' => $matter->id]) }}" class="btn-secondary h-7 px-2.5 text-[11px] inline-flex items-center gap-1">
+                            <span>Open Thread Console</span>
+                            <span class="material-symbols-outlined text-[13px]">open_in_new</span>
+                        </a>
+                    </div>
                 </div>
 
+                <!-- Active Threads Pills Bar -->
+                @if($matter->threads && $matter->threads->count() > 0)
+                <div class="p-3 bg-[#faf9f5]/50 border-b border-[#f0eee8] flex items-center gap-2 overflow-x-auto text-xs">
+                    <span class="font-mono text-[10.5px] uppercase tracking-wider text-[#8a8a8a] shrink-0 font-semibold">Threads:</span>
+                    @foreach($matter->threads as $th)
+                        @php
+                            $thBadge = match($th->thread_type) {
+                                'internal_team' => 'bg-amber-50 text-amber-900 border-amber-200',
+                                'client_communication' => 'bg-emerald-50 text-emerald-800 border-emerald-200',
+                                'document_request' => 'bg-indigo-50 text-indigo-800 border-indigo-200',
+                                default => 'bg-blue-50 text-blue-800 border-blue-200'
+                            };
+                        @endphp
+                        <a href="{{ route('messages.index', ['matter_id' => $matter->id, 'thread_id' => $th->id]) }}" 
+                           class="px-2.5 py-1 rounded-md bg-white border border-[#e5e3dc] text-xs hover:border-[#23493a] transition-colors flex items-center gap-1.5 shrink-0 shadow-2xs">
+                            <span class="font-mono text-[10px] text-[#8a8a8a]">{{ $th->thread_number ?? 'THR-'.$th->id }}</span>
+                            <span class="font-medium text-[#1a1a1a] truncate max-w-[140px]">{{ $th->subject }}</span>
+                            <span class="px-1 py-0.2 rounded text-[9px] font-mono border {{ $thBadge }}">
+                                {{ $th->is_internal ? '🔒 Internal' : $th->type_label }}
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
+                @endif
+
                 <!-- Messages Stream -->
-                <div class="p-4 flex flex-col gap-4 max-h-96 overflow-y-auto bg-[#faf8f5]">
+                <div class="p-4 flex flex-col gap-4 max-h-[380px] overflow-y-auto bg-[#faf8f5]">
                     @forelse($matter->messages as $msg)
-                    <div class="flex items-start gap-3 {{ $msg->sender_id === auth()->id() ? 'flex-row-reverse' : '' }}">
-                        @if($msg->sender?->avatar_url)
-                            <img alt="{{ $msg->sender->name }}" class="w-7 h-7 rounded-full object-cover ring-1 ring-[#e5e3dc] shrink-0" src="{{ $msg->sender->avatar_url }}"/>
-                        @else
-                            <div class="w-7 h-7 rounded-full bg-[#5b4382] text-white flex items-center justify-center font-semibold text-[10px] shrink-0 shadow-xs">
-                                {{ strtoupper(substr($msg->sender?->name ?? 'A', 0, 1)) }}
+                    @php
+                        $isMe = ($msg->sender_id === auth()->id());
+                        $senderName = $msg->sender?->name ?? 'Participant';
+                        $senderRole = $msg->sender?->role ?? 'advocate';
+                    @endphp
+                    <div class="flex items-start gap-3 {{ $isMe ? 'flex-row-reverse' : '' }}">
+                        <div class="w-7 h-7 rounded-full flex items-center justify-center font-semibold text-[10px] shrink-0 shadow-xs {{ $isMe ? 'bg-[#23493a] text-white' : ($senderRole === 'client' ? 'bg-sky-700 text-white' : 'bg-[#161718] text-white') }}">
+                            {{ strtoupper(substr($senderName, 0, 1)) }}
+                        </div>
+                        <div class="flex flex-col max-w-lg {{ $isMe ? 'items-end' : '' }}">
+                            <div class="flex items-center gap-2 mb-1 text-[11px] flex-wrap">
+                                <span class="font-mono text-[9px] bg-[#f5f3ed] border border-[#e5e3dc] px-1 py-0.2 rounded text-[#8a8a8a]">
+                                    {{ $msg->formatted_id }}
+                                </span>
+                                <span class="font-semibold text-[#1a1a1a]">{{ $isMe ? 'You' : $senderName }}</span>
+                                @if($msg->recipient)
+                                    <span class="text-[10px] text-[#8a8a8a]">&rarr; {{ $msg->recipient->name }}</span>
+                                @endif
+                                <span class="text-[#8a8a8a] font-mono text-[10px]">{{ ($msg->sent_at ?? $msg->created_at)->format('M d, g:i A') }}</span>
+                                @if($msg->thread)
+                                    <span class="font-mono text-[9px] px-1 py-0.2 rounded bg-stone-100 text-stone-600">
+                                        {{ $msg->thread->type_label }}
+                                    </span>
+                                @endif
                             </div>
-                        @endif
-                        <div class="flex flex-col max-w-lg {{ $msg->sender_id === auth()->id() ? 'items-end' : '' }}">
-                            <div class="flex items-center gap-2 mb-1 text-[11px]">
-                                <span class="font-semibold text-[#1a1a1a]">{{ $msg->sender->name ?? 'Participant' }}</span>
-                                <span class="text-[#8a8a8a] font-mono">{{ $msg->created_at->format('M d, g:i A') }}</span>
+                            <div class="p-3 rounded-md text-xs leading-relaxed {{ $isMe ? 'bg-[#23493a] text-white rounded-tr-none shadow-xs' : 'bg-white border border-[#e5e3dc] text-[#1a1a1a] rounded-tl-none shadow-xs' }}">
+                                <p class="whitespace-pre-line">{{ $msg->body }}</p>
+
+                                @if($msg->attachments && $msg->attachments->count() > 0)
+                                <div class="mt-2 pt-2 border-t {{ $isMe ? 'border-[#3a6352]' : 'border-[#e5e3dc]' }} flex flex-col gap-1">
+                                    @foreach($msg->attachments as $att)
+                                    <a href="{{ route('messages.attachments.download', $att->id) }}" 
+                                       class="inline-flex items-center justify-between gap-2 p-1 rounded text-[11px] {{ $isMe ? 'bg-[#1a382b] text-white hover:bg-[#152e23]' : 'bg-[#faf9f5] border border-[#e5e3dc] text-[#23493a] hover:bg-white' }}">
+                                        <span class="flex items-center gap-1 truncate">
+                                            <span class="material-symbols-outlined text-[13px]">attach_file</span>
+                                            <span class="truncate">{{ $att->file_name }}</span>
+                                        </span>
+                                        <span class="font-mono text-[9px] opacity-75 shrink-0">{{ $att->formattedSize() }}</span>
+                                    </a>
+                                    @endforeach
+                                </div>
+                                @endif
                             </div>
-                            <div class="p-3 rounded-md text-xs leading-relaxed {{ $msg->sender_id === auth()->id() ? 'bg-[#23493a] text-white rounded-tr-none shadow-xs' : 'bg-white border border-[#e5e3dc] text-[#1a1a1a] rounded-tl-none shadow-xs' }}">
-                                {{ $msg->body }}
+                            <div class="flex items-center gap-1 mt-0.5 text-[9.5px] font-mono text-[#8a8a8a]">
+                                @if($msg->is_read)
+                                    <span class="text-[#065f46] inline-flex items-center gap-0.5">
+                                        <span class="material-symbols-outlined text-[12px]">done_all</span>
+                                        <span>Read</span>
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-0.5">
+                                        <span class="material-symbols-outlined text-[12px]">check</span>
+                                        <span>Sent</span>
+                                    </span>
+                                @endif
                             </div>
                         </div>
                     </div>
                     @empty
-                    <div class="p-6 text-center text-xs text-[#8a8a8a]">No encrypted dispatches sent under this matter yet.</div>
+                    <div class="p-6 text-center text-xs text-[#8a8a8a]">No dispatches recorded under this matter dossier yet.</div>
                     @endforelse
                 </div>
 
                 <!-- Message Composer -->
-                <form action="{{ route('messages.store') }}" method="POST" class="p-3 bg-white border-t border-[#f0eee8] flex gap-2">
+                <form action="{{ route('messages.store') }}" method="POST" enctype="multipart/form-data" class="p-3 bg-white border-t border-[#f0eee8] flex flex-col gap-2">
                     @csrf
                     <input type="hidden" name="matter_id" value="{{ $matter->id }}"/>
-                    <input name="body" required placeholder="Type privileged counsel communication or discovery inquiry..." class="flex-1 px-3 py-2 text-xs rounded-md border border-[#e5e3dc] outline-none focus:border-[#23493a]"/>
-                    <button type="submit" class="btn-primary h-9 px-4 text-xs flex items-center gap-1 shrink-0">
-                        <span class="material-symbols-outlined text-sm">send</span>
-                        <span>Send</span>
-                    </button>
+                    @if($matter->threads && $matter->threads->first())
+                        <input type="hidden" name="thread_id" value="{{ $matter->threads->first()->id }}"/>
+                    @endif
+                    <div class="flex gap-2">
+                        <input name="body" required placeholder="Type privileged counsel communication or reply..." class="flex-1 px-3 py-2 text-xs rounded-md border border-[#e5e3dc] outline-none focus:border-[#23493a]"/>
+                        <button type="submit" class="btn-primary h-9 px-4 text-xs flex items-center gap-1 shrink-0 cursor-pointer">
+                            <span class="material-symbols-outlined text-sm">send</span>
+                            <span>Send</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] text-[#646864]">
+                        <label class="inline-flex items-center gap-1 cursor-pointer hover:text-[#1a1a1a]">
+                            <span class="material-symbols-outlined text-sm text-[#23493a]">attach_file</span>
+                            <span>Attach file</span>
+                            <input type="file" name="attachments[]" multiple class="hidden" onchange="document.getElementById('matter-inline-attach').innerText = this.files.length + ' file(s)'"/>
+                        </label>
+                        <span id="matter-inline-attach" class="font-mono text-[10px]"></span>
+                        <a href="{{ route('messages.index', ['matter_id' => $matter->id]) }}" class="hover:underline text-[#23493a] font-medium">Start new thread &rarr;</a>
+                    </div>
                 </form>
             </div>
 

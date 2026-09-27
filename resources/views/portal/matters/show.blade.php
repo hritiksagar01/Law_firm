@@ -4,7 +4,7 @@
 @section('header_title', 'Case Dossier: ' . $matter->case_number)
 
 @section('content')
-<div class="flex flex-col w-full text-[#1a1a1a] gap-6" x-data="{ activeTab: 'overview' }">
+<div class="flex flex-col w-full text-[#1a1a1a] gap-6" x-data="{ activeTab: 'overview', newThreadModal: false, activeThreadId: {{ $matter->threads->first()?->id ?? 0 }} }">
     
     <!-- Top Bar Navigation Back & Docket Header -->
     <div class="flex items-center justify-between">
@@ -591,66 +591,243 @@
             </div>
 
             <!-- ========================================== -->
-            <!-- TAB 4: MESSAGES -->
+            <!-- TAB 4: MESSAGES & MATTER THREADS -->
             <!-- ========================================== -->
             <div x-show="activeTab === 'messages'" class="flex flex-col gap-4">
-                <div class="flex items-center justify-between pb-3 border-b border-[#f0eee8]">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#f0eee8] gap-2">
                     <div class="flex items-center gap-2">
                         <span class="material-symbols-outlined text-[#23493a] text-xl">forum</span>
                         <div>
-                            <h3 class="text-sm font-semibold text-[#1a1a1a]">Privileged Counsel Communications</h3>
-                            <p class="text-xs text-[#8a8a8a]">Direct confidential thread with lead counsel and assigned team</p>
+                            <h3 class="text-sm font-semibold text-[#1a1a1a]">Matter-Based Communication Threads</h3>
+                            <p class="text-xs text-[#8a8a8a]">Privileged case threads, document requests &amp; client dispatches</p>
                         </div>
                     </div>
-                    <span class="text-[11px] font-mono text-[#065f46] bg-[#ecfdf5] px-2.5 py-1 rounded border border-[#a7f3d0]">
-                        Section 126 Protected
-                    </span>
-                </div>
-
-                <!-- Message Thread Container -->
-                <div class="flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-1 text-xs">
-                    @forelse($matter->messages as $msg)
-                    @php
-                        $isSelf = (Auth::id() === $msg->sender_id);
-                    @endphp
-                    <div class="flex flex-col p-3 rounded-md max-w-[85%] {{ $isSelf ? 'bg-[#23493a] text-white self-end shadow-xs' : 'bg-[#faf9f5] border border-[#e5e3dc] self-start' }}">
-                        <div class="flex items-center gap-2 mb-1 {{ $isSelf ? 'justify-between' : '' }}">
-                            <span class="font-semibold {{ $isSelf ? 'text-white' : 'text-[#23493a]' }}">
-                                {{ $isSelf ? 'You (Client)' : ($msg->sender?->name ?? 'Counsel') }}
-                            </span>
-                            <span class="text-[10px] font-mono {{ $isSelf ? 'text-[#a7f3d0]' : 'text-[#8a8a8a]' }}">
-                                {{ $msg->created_at->format('d M · g:i A') }}
-                            </span>
-                        </div>
-                        <p class="{{ $isSelf ? 'text-white' : 'text-[#1a1a1a]' }} leading-relaxed whitespace-pre-wrap">
-                            {{ $msg->body }}
-                        </p>
-                    </div>
-                    @empty
-                    <div class="py-12 text-center text-xs text-[#8a8a8a] bg-[#faf9f5] rounded-md border border-[#e5e3dc] flex flex-col items-center justify-center">
-                        <span class="material-symbols-outlined text-4xl text-[#8a8a8a] mb-2">chat_bubble_outline</span>
-                        <p class="font-medium text-[#1a1a1a] text-sm">No messages in this case thread yet.</p>
-                        <p class="text-[11.5px] text-[#646864] mt-1">Use the transmission box below to securely message your chambers counsel.</p>
-                    </div>
-                    @endforelse
-                </div>
-
-                <!-- Fast Message Transmit Form -->
-                <form action="{{ route('portal.messages.store') }}" method="POST" class="pt-3 border-t border-[#f0eee8] flex flex-col gap-2.5">
-                    @csrf
-                    <input type="hidden" name="matter_id" value="{{ $matter->id }}"/>
-                    <textarea name="body" required rows="3" placeholder="Compose a confidential inquiry or procedural update to lead counsel..." class="w-full bg-[#faf9f5] border border-[#e5e3dc] rounded-md p-3 text-xs text-[#1a1a1a] placeholder:text-[#8a8a8a] resize-none focus:outline-none focus:border-[#23493a] focus:bg-white transition-all"></textarea>
-                    <div class="flex items-center justify-between">
-                        <span class="text-[11px] text-[#8a8a8a] flex items-center gap-1 font-mono">
-                            <span class="material-symbols-outlined text-[13px] text-[#065f46]">lock</span>
-                            <span>Direct transmission to counsel chambers</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-mono text-[#065f46] bg-[#ecfdf5] px-2.5 py-1 rounded border border-[#a7f3d0]">
+                            Section 126 Protected
                         </span>
-                        <button type="submit" class="bg-[#23493a] text-white hover:bg-[#1a382b] px-4 py-2 text-xs font-medium rounded-md shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer">
-                            <span>Transmit</span>
-                            <span class="material-symbols-outlined text-[14px]">send</span>
+                        <button @click="newThreadModal = true" class="px-3 py-1 bg-[#23493a] text-white hover:bg-[#1a382b] text-xs font-medium rounded-md shadow-xs transition-colors flex items-center gap-1 cursor-pointer">
+                            <span class="material-symbols-outlined text-[15px]">add</span>
+                            <span>New Thread</span>
                         </button>
                     </div>
-                </form>
+                </div>
+
+                @php
+                    $matterThreads = $matter->threads;
+                @endphp
+
+                @if($matterThreads->count() > 0)
+                <div class="grid grid-cols-1 lg:grid-cols-12 border border-[#e5e3dc] rounded-md overflow-hidden min-h-[460px]">
+                    <!-- Left: Thread List Selector (4 cols) -->
+                    <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-[#e5e3dc] bg-[#faf9f5] flex flex-col">
+                        <div class="p-3 border-b border-[#e5e3dc] bg-white flex items-center justify-between">
+                            <span class="text-[11px] font-mono font-semibold uppercase text-[#646864]">Threads ({{ $matterThreads->count() }})</span>
+                            <span class="text-[10px] text-[#8a8a8a] font-mono">Case CNR: {{ $matter->case_number }}</span>
+                        </div>
+
+                        <div class="divide-y divide-[#f0eee8] overflow-y-auto max-h-[460px] flex-1">
+                            @foreach($matterThreads as $mThread)
+                            @php
+                                $mTypeClass = match($mThread->thread_type) {
+                                    'client_communication' => 'bg-emerald-50 text-emerald-800 border-emerald-200',
+                                    'document_request' => 'bg-amber-50 text-amber-800 border-amber-200',
+                                    default => 'bg-blue-50 text-blue-800 border-blue-200'
+                                };
+                            @endphp
+                            <button type="button" 
+                                    @click="activeThreadId = {{ $mThread->id }}" 
+                                    :class="activeThreadId === {{ $mThread->id }} ? 'bg-white border-l-4 border-[#23493a] shadow-xs' : 'hover:bg-white/80'"
+                                    class="w-full text-left p-3 transition-colors block cursor-pointer">
+                                <div class="flex items-center justify-between gap-1">
+                                    <span class="font-mono text-[10px] text-[#8a8a8a]">{{ $mThread->thread_number ?? 'THR-'.$mThread->id }}</span>
+                                    <span class="px-1.5 py-0.2 rounded text-[9.5px] font-mono font-medium border {{ $mTypeClass }}">
+                                        {{ $mThread->type_label }}
+                                    </span>
+                                </div>
+                                <h4 class="text-xs font-semibold text-[#1a1a1a] truncate mt-1">{{ $mThread->subject }}</h4>
+                                <div class="flex items-center justify-between text-[10.5px] text-[#8a8a8a] mt-1 font-mono">
+                                    <span>{{ $mThread->messages->count() }} messages</span>
+                                    <span>{{ $mThread->last_message_at ? $mThread->last_message_at->format('d M') : '' }}</span>
+                                </div>
+                            </button>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Right: Thread Messages & Reply Console (8 cols) -->
+                    <div class="lg:col-span-8 flex flex-col justify-between bg-white">
+                        @foreach($matterThreads as $mThread)
+                        <div x-show="activeThreadId === {{ $mThread->id }}" class="flex flex-col h-full justify-between">
+                            <!-- Thread Header -->
+                            <div class="p-3.5 border-b border-[#e5e3dc] bg-[#faf9f5] flex items-center justify-between">
+                                <div class="flex flex-col min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-mono text-xs font-semibold text-[#23493a] bg-white border border-[#e5e3dc] px-1.5 py-0.5 rounded">
+                                            {{ $mThread->thread_number ?? 'THR-'.$mThread->id }}
+                                        </span>
+                                        <span class="text-xs font-semibold text-[#1a1a1a] truncate">{{ $mThread->subject }}</span>
+                                    </div>
+                                    <span class="text-[11px] text-[#8a8a8a] font-mono mt-0.5">Thread Type: {{ $mThread->type_label }} &middot; Status: {{ ucfirst($mThread->status) }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Messages in this thread -->
+                            <div class="p-4 flex-1 overflow-y-auto flex flex-col gap-3.5 max-h-[380px]">
+                                @forelse($mThread->messages as $msg)
+                                @php
+                                    $isSenderClient = ($msg->sender_id === auth()->id());
+                                    $statusColor = match($msg->status) {
+                                        'read' => 'text-[#065f46]',
+                                        'delivered' => 'text-blue-700',
+                                        default => 'text-[#8a8a8a]'
+                                    };
+                                @endphp
+                                <div class="flex items-start gap-2.5 {{ $isSenderClient ? 'flex-row-reverse' : '' }}">
+                                    <div class="w-7 h-7 rounded-full flex items-center justify-center font-semibold text-xs shrink-0 shadow-xs {{ $isSenderClient ? 'bg-[#23493a] text-white' : 'bg-[#161718] text-white' }}">
+                                        {{ strtoupper(substr($msg->sender->name ?? 'User', 0, 2)) }}
+                                    </div>
+
+                                    <div class="flex flex-col max-w-[85%] {{ $isSenderClient ? 'items-end' : '' }}">
+                                        <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                            <span class="font-mono text-[9px] text-[#8a8a8a]">{{ $msg->formatted_id }}</span>
+                                            <span class="text-xs font-semibold text-[#1a1a1a]">{{ $msg->sender->name ?? 'Counsel' }}</span>
+                                            @if($msg->recipient)
+                                                <span class="text-[10px] text-[#8a8a8a]">&rarr; {{ $msg->recipient->name }}</span>
+                                            @endif
+                                            <span class="font-mono text-[10px] text-[#8a8a8a]">{{ ($msg->sent_at ?? $msg->created_at)->format('d M, h:i A') }}</span>
+                                        </div>
+
+                                        <div class="p-3 rounded-md text-xs leading-relaxed shadow-xs {{ $isSenderClient ? 'bg-[#23493a] text-white rounded-tr-none' : 'bg-[#faf9f5] text-[#1a1a1a] rounded-tl-none border border-[#e5e3dc]' }}">
+                                            <p class="whitespace-pre-line">{{ $msg->body }}</p>
+
+                                            <!-- Attachments -->
+                                            @if($msg->attachments->count() > 0)
+                                            <div class="mt-2 pt-2 border-t {{ $isSenderClient ? 'border-[#3a6352]' : 'border-[#e5e3dc]' }} flex flex-col gap-1">
+                                                <span class="text-[9.5px] uppercase font-mono tracking-wider {{ $isSenderClient ? 'text-[#a7f3d0]' : 'text-[#8a8a8a]' }}">
+                                                    Attachments ({{ $msg->attachments->count() }})
+                                                </span>
+                                                @foreach($msg->attachments as $att)
+                                                <a href="{{ route('portal.messages.attachments.download', $att->id) }}" 
+                                                   class="inline-flex items-center justify-between gap-2 p-1.5 rounded text-[10.5px] transition-colors {{ $isSenderClient ? 'bg-[#1a382b] text-white hover:bg-[#152e23]' : 'bg-white border border-[#e5e3dc] text-[#23493a] hover:bg-[#faf9f5]' }}">
+                                                    <span class="flex items-center gap-1 truncate">
+                                                        <span class="material-symbols-outlined text-[13px]">attach_file</span>
+                                                        <span class="truncate">{{ $att->file_name }}</span>
+                                                    </span>
+                                                    <span class="font-mono text-[9px] opacity-75 shrink-0">{{ $att->formattedSize() }}</span>
+                                                </a>
+                                                @endforeach
+                                            </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="flex items-center gap-1 mt-0.5 text-[9.5px] font-mono {{ $statusColor }}">
+                                            @if($msg->is_read)
+                                                <span class="material-symbols-outlined text-[12px]">done_all</span>
+                                                <span>Read {{ $msg->read_at ? $msg->read_at->format('d M, h:i A') : '' }}</span>
+                                            @else
+                                                <span class="material-symbols-outlined text-[12px]">check</span>
+                                                <span>{{ ucfirst($msg->status ?? 'Sent') }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                @empty
+                                <div class="py-12 text-center text-xs text-[#8a8a8a]">No messages in this thread yet.</div>
+                                @endforelse
+                            </div>
+
+                            <!-- Reply Box -->
+                            <div class="p-3 border-t border-[#e5e3dc] bg-[#faf9f5]">
+                                <form action="{{ route('portal.messages.store') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-2">
+                                    @csrf
+                                    <input type="hidden" name="matter_id" value="{{ $matter->id }}"/>
+                                    <input type="hidden" name="thread_id" value="{{ $mThread->id }}"/>
+                                    <textarea name="body" required rows="2" placeholder="Send reply on this thread to counsel..." class="w-full p-2.5 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] outline-none focus:border-[#23493a] resize-none shadow-xs"></textarea>
+
+                                    <div class="flex items-center justify-between">
+                                        <label class="inline-flex items-center gap-1 text-[11px] text-[#646864] hover:text-[#1a1a1a] cursor-pointer">
+                                            <span class="material-symbols-outlined text-[15px] text-[#23493a]">attach_file</span>
+                                            <span>Attach files</span>
+                                            <input type="file" name="attachments[]" multiple class="hidden"/>
+                                        </label>
+                                        <button type="submit" class="px-3.5 py-1.5 bg-[#23493a] text-white hover:bg-[#1a382b] rounded-md text-xs font-medium shadow-xs flex items-center gap-1 cursor-pointer">
+                                            <span>Reply</span>
+                                            <span class="material-symbols-outlined text-xs">send</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @else
+                <!-- No threads yet -->
+                <div class="py-12 text-center text-xs text-[#8a8a8a] bg-[#faf9f5] rounded-md border border-[#e5e3dc] flex flex-col items-center justify-center">
+                    <span class="material-symbols-outlined text-4xl text-[#8a8a8a] mb-2">chat_bubble_outline</span>
+                    <p class="font-medium text-[#1a1a1a] text-sm">No communication threads created for this matter yet.</p>
+                    <p class="text-[11.5px] text-[#646864] mt-1">Start a dedicated client thread below to dispatch inquiries to your lead counsel.</p>
+                    <button @click="newThreadModal = true" class="mt-3 px-3.5 py-2 bg-[#23493a] hover:bg-[#1a382b] text-white text-xs font-medium rounded-md shadow-xs">
+                        Start First Thread
+                    </button>
+                </div>
+                @endif
+
+                <!-- New Thread Modal inside Case View -->
+                <div x-show="newThreadModal" 
+                     x-cloak
+                     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+                    <div @click.outside="newThreadModal = false" class="bg-white border border-[#e5e3dc] rounded-lg max-w-lg w-full p-6 shadow-xl">
+                        <div class="flex items-center justify-between pb-3 border-b border-[#f0eee8]">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[#23493a]">add_comment</span>
+                                <h3 class="text-sm font-semibold text-[#1a1a1a]">New Communication Thread</h3>
+                            </div>
+                            <button @click="newThreadModal = false" class="text-[#8a8a8a] hover:text-[#1a1a1a] cursor-pointer">
+                                <span class="material-symbols-outlined text-xl">close</span>
+                            </button>
+                        </div>
+
+                        <form action="{{ route('portal.messages.threads.store') }}" method="POST" enctype="multipart/form-data" class="mt-4 flex flex-col gap-4">
+                            @csrf
+                            <input type="hidden" name="matter_id" value="{{ $matter->id }}"/>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="text-[11px] font-mono uppercase tracking-wider text-[#646864] font-semibold">Thread Classification *</label>
+                                <select name="thread_type" required class="p-2.5 rounded-md border border-[#e5e3dc] bg-white text-xs text-[#1a1a1a] focus:border-[#23493a] outline-none">
+                                    <option value="client_communication">Client Communication</option>
+                                    <option value="document_request">Document Request</option>
+                                    <option value="general_matter_communication">General Matter Communication</option>
+                                </select>
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="text-[11px] font-mono uppercase tracking-wider text-[#646864] font-semibold">Subject *</label>
+                                <input type="text" name="subject" required placeholder="Subject of query or dispatch..." class="p-2.5 rounded-md border border-[#e5e3dc] bg-white text-xs text-[#1a1a1a] focus:border-[#23493a] outline-none"/>
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="text-[11px] font-mono uppercase tracking-wider text-[#646864] font-semibold">Message Body *</label>
+                                <textarea name="body" required rows="4" placeholder="Detail your communication to lead counsel..." class="p-2.5 rounded-md border border-[#e5e3dc] bg-white text-xs text-[#1a1a1a] focus:border-[#23493a] outline-none resize-none"></textarea>
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="text-[11px] font-mono uppercase tracking-wider text-[#646864] font-semibold">Attachments (Optional)</label>
+                                <input type="file" name="attachments[]" multiple class="text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-[#faf9f5] file:text-[#23493a] file:font-semibold hover:file:bg-[#e5e3dc]"/>
+                            </div>
+
+                            <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-[#f0eee8]">
+                                <button type="button" @click="newThreadModal = false" class="bg-white border border-[#e5e3dc] text-[#1a1a1a] px-3.5 py-2 text-xs font-medium rounded-md shadow-xs hover:bg-[#faf9f5]">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="bg-[#23493a] text-white hover:bg-[#1a382b] px-4 py-2 text-xs font-medium rounded-md shadow-xs">
+                                    Open Thread
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
 
             <!-- ========================================== -->

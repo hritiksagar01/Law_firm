@@ -13,6 +13,8 @@ use App\Models\Invoice;
 use App\Models\Matter;
 use App\Models\MatterActivity;
 use App\Models\Message;
+use App\Models\MessageAttachment;
+use App\Models\MessageThread;
 use App\Models\Task;
 use App\Services\LegalPdfGenerator;
 use Carbon\Carbon;
@@ -279,7 +281,8 @@ class PortalController extends Controller
             'teamMembers',
             'documentRequests.requestedBy',
             'events' => fn ($q) => $q->orderBy('start_time'),
-            'messages.sender',
+            'threads' => fn ($q) => $q->where('is_internal', false)->with(['messages.sender', 'messages.attachments', 'creator'])->orderBy('last_message_at', 'desc'),
+            'messages' => fn ($q) => $q->where('is_internal', false)->with(['sender', 'attachments'])->orderBy('created_at', 'asc'),
             'tasks' => fn ($q) => $q->where(function ($q2) use ($client, $matter) {
                 if ($client->user_id) {
                     $q2->where('assigned_to', $client->user_id);
@@ -514,11 +517,106 @@ class PortalController extends Controller
     {
         $client = $this->getClient();
 
-        $matters = Matter::where('client_id', $client->id)->with(['leadAttorney', 'messages.sender'])->get();
-        $selectedMatterId = $request->input('matter_id', $matters->first()->id ?? null);
-        $selectedMatter = $matters->firstWhere('id', $selectedMatterId);
+        $matters = Matter::where('client_id', $client->id)
+            ->with(['leadAttorney'])
+            ->withCount(['messages as unread_count' => function ($q) {
+                $q->where('is_read', false)->where('sender_id', '!=', Auth::id());
+            }])
+            ->get();
 
-        return view('portal.messages.index', compact('client', 'matters', 'selectedMatter'));
+        $selectedMatterId = $request->input('matter_id', $matters->first()->id ?? null);
+        $selectedMatter = $selectedMatterId ? Matter::where('client_id', $client->id)->find($selectedMatterId) : null;
+
+        $typeFilter = $request->get('type', 'all');
+        $threads = collect();
+        $selectedThread = null;
+        $messages = collect();
+
+        if ($selectedMatter) {
+            $threadsQuery = MessageThread::where('matter_id', $selectedMatter->id)
+                ->where('is_internal', false) // Technical database authorization
+                ->with(['creator', 'client'])
+                ->withCount(['messages as unread_count' => function ($q) {
+                    $q->where('is_read', false)->where('sender_id', '!=', Auth::id());
+                }])
+                ->orderBy('last_message_at', 'desc');
+
+            if ($typeFilter !== 'all' && in_array($typeFilter, [
+                MessageThread::TYPE_CLIENT_COMMUNICATION,
+                MessageThread::TYPE_DOCUMENT_REQUEST,
+                MessageThread::TYPE_GENERAL_MATTER,
+            ])) {
+                $threadsQuery->where('thread_type', $typeFilter);
+            }
+
+            $threads = $threadsQuery->get();
+
+            if ($request->filled('thread_id')) {
+                $requestedId = $request->get('thread_id');
+                $rawThread = MessageThread::withoutGlobalScopes()->where('matter_id', $selectedMatter->id)->find($requestedId);
+                if ($rawThread && ($rawThread->is_internal || $rawThread->thread_type === MessageThread::TYPE_INTERNAL_TEAM)) {
+                    abort(403, 'Unauthorized communication thread: Access to internal chambers communications is strictly prohibited.');
+                }
+
+                $selectedThread = $threads->firstWhere('id', $requestedId)
+                    ?? MessageThread::where('matter_id', $selectedMatter->id)
+                        ->where('is_internal', false)
+                        ->find($requestedId);
+
+                if (! $selectedThread && ! $rawThread) {
+                    abort(404, 'Thread not found.');
+                }
+            } else {
+                $selectedThread = $threads->first();
+            }
+
+            if ($selectedThread) {
+                // Strict technical database authorization: Ensure thread is not internal
+                if ($selectedThread->is_internal || $selectedThread->thread_type === MessageThread::TYPE_INTERNAL_TEAM) {
+                    abort(403, 'Unauthorized communication thread.');
+                }
+
+                // Mark messages sent to client as read
+                Message::where('thread_id', $selectedThread->id)
+                    ->where('sender_id', '!=', Auth::id())
+                    ->where('is_read', false)
+                    ->update([
+                        'is_read' => true,
+                        'read_at' => now(),
+                        'status' => 'read',
+                    ]);
+
+                $messages = Message::where('thread_id', $selectedThread->id)
+                    ->where('is_internal', false)
+                    ->with(['sender', 'recipient', 'attachments'])
+                    ->orderBy('created_at', 'asc')
+                    ->get();
+            } else {
+                // Direct matter messages fallback
+                $messages = Message::where('matter_id', $selectedMatter->id)
+                    ->where('is_internal', false)
+                    ->with(['sender', 'recipient', 'attachments'])
+                    ->orderBy('created_at', 'asc')
+                    ->get();
+            }
+        }
+
+        $threadTypes = [
+            MessageThread::TYPE_CLIENT_COMMUNICATION => 'Client Communication',
+            MessageThread::TYPE_DOCUMENT_REQUEST => 'Document Request',
+            MessageThread::TYPE_GENERAL_MATTER => 'General Matter Communication',
+        ];
+
+        return view('portal.messages.index', compact(
+            'client',
+            'matters',
+            'selectedMatter',
+            'threads',
+            'selectedThread',
+            'messages',
+            'typeFilter',
+            'threadTypes'
+        ));
     }
 
     /**
@@ -531,20 +629,234 @@ class PortalController extends Controller
 
         $request->validate([
             'matter_id' => 'required|exists:matters,id',
-            'body' => 'required|string|max:1000',
+            'thread_id' => 'nullable|exists:message_threads,id',
+            'body' => 'required|string|max:10000',
+            'attachments.*' => 'nullable|file|max:25600',
         ]);
 
         $matter = Matter::where('id', $request->matter_id)->where('client_id', $client->id)->firstOrFail();
 
-        Message::create([
+        $thread = null;
+        if (! empty($request->thread_id)) {
+            $thread = MessageThread::where('id', $request->thread_id)
+                ->where('matter_id', $matter->id)
+                ->where('is_internal', false) // Technical database authorization
+                ->firstOrFail();
+        } else {
+            $thread = MessageThread::firstOrCreate(
+                [
+                    'matter_id' => $matter->id,
+                    'firm_id' => $matter->firm_id,
+                    'is_internal' => false,
+                    'thread_type' => MessageThread::TYPE_CLIENT_COMMUNICATION,
+                ],
+                [
+                    'client_id' => $client->id,
+                    'created_by' => $user->id,
+                    'subject' => 'Client Communication: '.$matter->case_number,
+                    'status' => 'open',
+                    'last_message_at' => now(),
+                ]
+            );
+        }
+
+        // Strict technical database authorization: Client cannot create internal messages
+        $msg = Message::create([
             'firm_id' => $matter->firm_id,
             'matter_id' => $matter->id,
+            'thread_id' => $thread->id,
             'sender_id' => $user->id,
+            'recipient_id' => $matter->lead_attorney_id,
+            'subject' => $thread->subject,
             'body' => $request->body,
             'is_privileged' => true,
+            'is_internal' => false,
+            'status' => 'sent',
+            'sent_at' => now(),
+            'is_read' => false,
         ]);
 
+        // Process attachments
+        if ($request->hasFile('attachments')) {
+            $disk = config('filesystems.default', 'local');
+            foreach ($request->file('attachments') as $file) {
+                if ($file->isValid()) {
+                    try {
+                        $path = $file->store('messages/attachments', $disk);
+                    } catch (Throwable $e) {
+                        $disk = 'local';
+                        $path = $file->store('messages/attachments', 'local');
+                    }
+
+                    $sha256 = hash_file('sha256', $file->getRealPath());
+
+                    MessageAttachment::create([
+                        'firm_id' => $matter->firm_id,
+                        'message_id' => $msg->id,
+                        'file_path' => $path,
+                        'file_name' => $file->getClientOriginalName(),
+                        'file_size' => $file->getSize(),
+                        'mime_type' => $file->getClientMimeType() ?: 'application/octet-stream',
+                        'sha256' => $sha256,
+                    ]);
+
+                    if (empty($msg->attachment_path)) {
+                        $msg->update([
+                            'attachment_path' => $path,
+                            'attachment_name' => $file->getClientOriginalName(),
+                            'attachment_size' => $file->getSize(),
+                            'attachment_mime' => $file->getClientMimeType(),
+                        ]);
+                    }
+                }
+            }
+        }
+
+        $thread->update(['last_message_at' => now()]);
+
+        MatterActivity::log(
+            matter: $matter,
+            activityType: 'message_sent',
+            description: "Client {$client->name} sent a message in thread '{$thread->subject}'",
+            subject: $msg,
+            userId: $user->id,
+            clientId: $client->id
+        );
+
         return back()->with('success', 'Message dispatched to legal counsel.');
+    }
+
+    /**
+     * Start a new client communication thread on a matter.
+     */
+    public function storeThread(Request $request)
+    {
+        $user = Auth::user();
+        $client = $this->getClient();
+
+        $request->validate([
+            'matter_id' => 'required|exists:matters,id',
+            'subject' => 'required|string|max:255',
+            'thread_type' => 'required|string|in:client_communication,document_request,general_matter_communication',
+            'body' => 'required|string|max:10000',
+            'attachments.*' => 'nullable|file|max:25600',
+        ]);
+
+        $matter = Matter::where('id', $request->matter_id)->where('client_id', $client->id)->firstOrFail();
+
+        // Technical separation: Client threads are strictly NEVER internal
+        $thread = MessageThread::create([
+            'firm_id' => $matter->firm_id,
+            'matter_id' => $matter->id,
+            'client_id' => $client->id,
+            'created_by' => $user->id,
+            'subject' => $request->subject,
+            'thread_type' => $request->thread_type,
+            'is_internal' => false,
+            'status' => 'open',
+            'last_message_at' => now(),
+        ]);
+
+        $msg = Message::create([
+            'firm_id' => $matter->firm_id,
+            'matter_id' => $matter->id,
+            'thread_id' => $thread->id,
+            'sender_id' => $user->id,
+            'recipient_id' => $matter->lead_attorney_id,
+            'subject' => $thread->subject,
+            'body' => $request->body,
+            'is_privileged' => true,
+            'is_internal' => false,
+            'status' => 'sent',
+            'sent_at' => now(),
+            'is_read' => false,
+        ]);
+
+        if ($request->hasFile('attachments')) {
+            $disk = config('filesystems.default', 'local');
+            foreach ($request->file('attachments') as $file) {
+                if ($file->isValid()) {
+                    try {
+                        $path = $file->store('messages/attachments', $disk);
+                    } catch (Throwable $e) {
+                        $disk = 'local';
+                        $path = $file->store('messages/attachments', 'local');
+                    }
+
+                    $sha256 = hash_file('sha256', $file->getRealPath());
+
+                    MessageAttachment::create([
+                        'firm_id' => $matter->firm_id,
+                        'message_id' => $msg->id,
+                        'file_path' => $path,
+                        'file_name' => $file->getClientOriginalName(),
+                        'file_size' => $file->getSize(),
+                        'mime_type' => $file->getClientMimeType() ?: 'application/octet-stream',
+                        'sha256' => $sha256,
+                    ]);
+
+                    if (empty($msg->attachment_path)) {
+                        $msg->update([
+                            'attachment_path' => $path,
+                            'attachment_name' => $file->getClientOriginalName(),
+                            'attachment_size' => $file->getSize(),
+                            'attachment_mime' => $file->getClientMimeType(),
+                        ]);
+                    }
+                }
+            }
+        }
+
+        MatterActivity::log(
+            matter: $matter,
+            activityType: 'message_sent',
+            description: "Client initiated thread: '{$thread->subject}'",
+            subject: $thread,
+            userId: $user->id,
+            clientId: $client->id
+        );
+
+        return redirect()->route('portal.messages.index', [
+            'matter_id' => $matter->id,
+            'thread_id' => $thread->id,
+        ])->with('success', "Communication thread '{$thread->subject}' opened successfully.");
+    }
+
+    /**
+     * Download message attachment with strict technical database authorization.
+     */
+    public function downloadAttachment(MessageAttachment $attachment)
+    {
+        $client = $this->getClient();
+        $message = Message::withoutGlobalScopes()->find($attachment->message_id);
+        if (! $message || $message->is_internal) {
+            abort(403, 'Unauthorized access: This attachment is restricted to internal chambers counsel.');
+        }
+
+        $thread = MessageThread::withoutGlobalScopes()->find($message->thread_id);
+        if ($thread && $thread->is_internal) {
+            abort(403, 'Unauthorized access: This attachment is restricted to internal chambers counsel.');
+        }
+
+        // Must belong to client's matter
+        if (! $message->matter || $message->matter->client_id !== $client->id) {
+            abort(403, 'Unauthorized attachment access.');
+        }
+
+        $defaultDisk = config('filesystems.default', 'local');
+        if (Storage::disk($defaultDisk)->exists($attachment->file_path)) {
+            return Storage::disk($defaultDisk)->download($attachment->file_path, $attachment->file_name, [
+                'Content-Type' => $attachment->mime_type ?: 'application/octet-stream',
+            ]);
+        }
+
+        if ($defaultDisk !== 'local' && Storage::disk('local')->exists($attachment->file_path)) {
+            return Storage::disk('local')->download($attachment->file_path, $attachment->file_name, [
+                'Content-Type' => $attachment->mime_type ?: 'application/octet-stream',
+            ]);
+        }
+
+        abort(404, 'Attachment file not found on storage.');
     }
 
     /**
