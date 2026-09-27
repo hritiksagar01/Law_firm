@@ -131,7 +131,7 @@
                 <div class="grid grid-cols-2 p-1 bg-[#F6F4EE] rounded-lg border border-[#E7E4DC] gap-1 mb-2.5">
                     <!-- Client Portal -->
                     <button type="button" @click="setCredential('client', 'hritik.srivastava28@gmail.com', '12345678')"
-                        class="py-2 px-2 sm:px-3 rounded-[6px] text-xs flex items-center justify-center gap-2 transition-all cursor-pointer select-none"
+                        class="py-2 px-1.5 sm:px-2.5 rounded-[6px] text-[11.5px] sm:text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer select-none"
                         :class="tab === 'client'
                             ? 'bg-white text-[#23493A] shadow-xs font-semibold border border-[#E7E4DC]'
                             : 'text-[#646864] hover:text-[#1A1E1C] font-medium border border-transparent'">
@@ -143,12 +143,12 @@
                         </span>
                         <span class="material-symbols-outlined text-[15px] shrink-0"
                             :class="tab === 'client' ? 'text-[#23493A]' : 'text-[#8A8E89]'">domain</span>
-                        <span class="truncate">Client Portal</span>
+                        <span class="whitespace-nowrap">Client Portal</span>
                     </button>
 
-                    <!-- Law Firm & Advocate Login -->
+                    <!-- Law Firms & Advocate Login -->
                     <button type="button" @click="setCredential('firm', 'hritiksagar.tech@gmail.com', '12345678')"
-                        class="py-2 px-2 sm:px-3 rounded-[6px] text-xs flex items-center justify-center gap-2 transition-all cursor-pointer select-none"
+                        class="py-2 px-1.5 sm:px-2.5 rounded-[6px] text-[11.5px] sm:text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer select-none"
                         :class="tab === 'firm'
                             ? 'bg-white text-[#23493A] shadow-xs font-semibold border border-[#E7E4DC]'
                             : 'text-[#646864] hover:text-[#1A1E1C] font-medium border border-transparent'">
@@ -160,7 +160,7 @@
                         </span>
                         <span class="material-symbols-outlined text-[15px] shrink-0"
                             :class="tab === 'firm' ? 'text-[#23493A]' : 'text-[#8A8E89]'">balance</span>
-                        <span class="truncate">Law Firm &amp; Advocate</span>
+                        <span class="whitespace-nowrap">Law Firms &amp; Advocate</span>
                     </button>
                 </div>
 
@@ -178,7 +178,7 @@
                 </template>
                 <template x-if="tab === 'firm'">
                     <div>
-                        <h2 class="font-headline text-[22px] font-medium text-[#1A1E1C] tracking-tight">Law Firm &amp;
+                        <h2 class="font-headline text-[22px] font-medium text-[#1A1E1C] tracking-tight">Law Firms &amp;
                             Advocate Login</h2>
                         <p class="text-xs text-[#646864] mt-0.5 font-sans">Practice credentials for active litigation
                             dockets, filings, and trust ledger.</p>
@@ -305,14 +305,14 @@
                     </a>
                 </div>
 
-                <!-- Law Firm & Advocate Registration -->
+                <!-- Law Firms & Advocate Registration -->
                 <div class="flex items-center justify-between gap-3 bg-amber-50/80 p-3.5 rounded-lg border border-amber-200/80 hover:bg-amber-50 transition-colors">
                     <div class="flex items-center gap-2.5">
                         <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
                             <span class="material-symbols-outlined text-amber-800 text-lg">domain_add</span>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-xs font-semibold text-[#1A1E1C]">New Law Firm / Advocate</span>
+                            <span class="text-xs font-semibold text-[#1A1E1C]">New Law Firms &amp; Advocate</span>
                             <span class="text-[11px] text-[#646864]">Establish chambers &amp; practice</span>
                         </div>
                     </div>
