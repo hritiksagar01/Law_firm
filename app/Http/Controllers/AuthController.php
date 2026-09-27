@@ -23,7 +23,9 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        return view('auth.login');
+        $firms = Firm::select('id', 'name')->orderBy('name')->get();
+
+        return view('auth.login', compact('firms'));
     }
 
     public function login(Request $request)
@@ -121,15 +123,22 @@ class AuthController extends Controller
             'onboarding_mode' => 'nullable|in:portal_online,assisted_offline',
             'salutation' => 'nullable|string|max:20',
             'name' => 'required|string|max:255',
+            'contact_salutation' => 'nullable|string|max:20',
             'contact_person' => 'nullable|string|max:255',
             'father_salutation' => 'nullable|string|max:20',
             'father_husband_name' => 'nullable|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|string|max:50',
             'password' => 'required|string|min:6|confirmed',
+            'date_of_birth' => 'nullable|date',
             'age' => 'nullable|integer|min:0|max:130',
             'gender' => 'nullable|string|in:male,female,other',
             'occupation' => 'nullable|string|max:255',
+            'preferred_communication_method' => 'nullable|string|in:email,phone,whatsapp,portal,sms,in_person',
+            'registration_number' => 'nullable|string|max:100',
+            'tax_id' => 'nullable|string|max:100',
+            'industry' => 'nullable|string|max:150',
+            'website' => 'nullable|string|max:255',
             'internal_intake_notes' => 'nullable|string|max:2000',
             'members' => 'nullable|array',
             'members.*.name' => 'nullable|string|max:255',
@@ -139,10 +148,20 @@ class AuthController extends Controller
         ]);
 
         $validated['firm_id'] = $firmId;
+        $isCorporate = in_array($validated['category'], ['corporate', 'institution', 'partnership']);
 
-        $displayName = ! empty($validated['salutation'])
-            ? trim($validated['salutation'].' '.$validated['name'])
-            : $validated['name'];
+        $displayName = $validated['name'];
+        if (! $isCorporate && ! empty($validated['salutation']) && ! str_starts_with(strtolower($displayName), strtolower($validated['salutation']))) {
+            $displayName = trim($validated['salutation'].' '.$displayName);
+        }
+
+        $contactPerson = $validated['contact_person'] ?? null;
+        $contactSalutation = $validated['contact_salutation'] ?? $request->input('contact_salutation');
+        if (! empty($contactPerson) && ! empty($contactSalutation)) {
+            if (! str_starts_with(strtolower($contactPerson), strtolower($contactSalutation))) {
+                $contactPerson = trim($contactSalutation.' '.$contactPerson);
+            }
+        }
 
         $fatherDisplayName = $validated['father_husband_name'] ?? null;
         if (! empty($fatherDisplayName) && ! empty($validated['father_salutation'])) {
@@ -151,30 +170,38 @@ class AuthController extends Controller
             }
         }
 
+        $userName = $isCorporate ? ($contactPerson ?: $displayName) : $displayName;
+
         $user = User::create([
             'firm_id' => $validated['firm_id'],
-            'name' => $displayName,
+            'name' => $userName,
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 'client',
-            'title' => in_array($validated['category'], ['corporate', 'institution']) ? 'Authorized Corporate Representative' : 'Individual Retainer Client',
+            'title' => $isCorporate ? 'Authorized Corporate Representative' : 'Individual Retainer Client',
             'phone' => $validated['phone'],
-            'avatar_url' => 'https://ui-avatars.com/api/?name='.urlencode($displayName).'&background=23493A&color=fff',
+            'avatar_url' => 'https://ui-avatars.com/api/?name='.urlencode($userName).'&background=23493A&color=fff',
         ]);
 
         $client = Client::create([
             'firm_id' => $validated['firm_id'],
             'user_id' => $user->id,
             'category' => $validated['category'],
-            'type' => in_array($validated['category'], ['corporate', 'institution']) ? 'corporate' : 'individual',
+            'type' => $isCorporate ? 'corporate' : 'individual',
             'name' => $displayName,
-            'contact_person' => $validated['contact_person'] ?? $displayName,
+            'contact_person' => $contactPerson ?? $displayName,
             'father_husband_name' => $fatherDisplayName,
             'email' => $validated['email'],
             'phone' => $validated['phone'],
-            'age' => $validated['age'] ?? null,
+            'date_of_birth' => $validated['date_of_birth'] ?? null,
+            'age' => $validated['age'] ?? (! empty($validated['date_of_birth']) ? Carbon::parse($validated['date_of_birth'])->age : null),
             'gender' => $validated['gender'] ?? null,
             'occupation' => $validated['occupation'] ?? null,
+            'preferred_communication_method' => $validated['preferred_communication_method'] ?? 'email',
+            'registration_number' => $validated['registration_number'] ?? null,
+            'tax_id' => $validated['tax_id'] ?? null,
+            'industry' => $validated['industry'] ?? null,
+            'website' => $validated['website'] ?? null,
             'onboarding_mode' => $validated['onboarding_mode'] ?? 'portal_online',
             'internal_intake_notes' => $validated['internal_intake_notes'] ?? null,
             'portal_status' => 'active',

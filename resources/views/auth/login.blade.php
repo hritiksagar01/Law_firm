@@ -311,6 +311,7 @@
                     </div>
                 </div>
                 <a href="{{ route('register.client') }}"
+                    @click.prevent="$dispatch('open-client-register-modal')"
                     class="py-1.5 px-3 rounded-[6px] bg-[#23493A] hover:bg-[#1B3B2F] text-white text-xs font-semibold transition-all shrink-0 shadow-xs flex items-center gap-1 cursor-pointer">
                     <span>Register Now</span>
                     <span class="material-symbols-outlined text-xs">arrow_forward</span>
@@ -360,6 +361,9 @@
             </button>
         </div>
     </footer>
+
+    <!-- Client Registration Intake Overlay Modal -->
+    @include('auth.partials.client-registration-modal', ['firms' => $firms ?? collect()])
 
 </body>
 

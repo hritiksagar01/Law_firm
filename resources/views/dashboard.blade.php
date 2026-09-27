@@ -33,7 +33,7 @@
 <!-- Compatibility anchors for automated test suites -->
 <span class="sr-only">Chambers Docket · Active Case Dossiers</span>
 
-<div class="flex flex-col w-full text-[#1a1a1a]">
+<div x-data="clientOnboardingState({{ auth()->user()->firm_id ?? 1 }}, '{{ Auth::id() }}')" class="flex flex-col w-full text-[#1a1a1a]">
     
     <!-- Top Editorial Headline Bar -->
     <div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -48,6 +48,10 @@
             </p>
         </div>
         <div class="flex items-center gap-2">
+            <button type="button" @click="openCreateModal = true" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-white border border-[#e5e3dc] text-[#1a1a1a] hover:bg-[#faf9f5] text-xs font-medium transition-colors shadow-xs cursor-pointer">
+                <span class="material-symbols-outlined text-[15px] text-[#23493a]">person_add</span>
+                <span>Client Intake</span>
+            </button>
             <a href="{{ route('matters.create') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#23493a] text-white hover:bg-[#1a382c] text-xs font-medium transition-colors shadow-xs">
                 <span class="material-symbols-outlined text-[15px]">add</span>
                 <span>New Matter</span>
@@ -580,6 +584,12 @@
         </div>
 
     </div>
+
+    @include('clients.partials.onboarding-modal', [
+        'firms' => isset($firms) ? $firms : ($firm ? collect([$firm]) : collect()),
+        'attorneys' => isset($attorneys) ? $attorneys : collect([auth()->user()]),
+        'redirectTo' => 'chambers',
+    ])
 
 </div>
 @endsection

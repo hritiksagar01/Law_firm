@@ -195,4 +195,49 @@ class ClientRegistrationTest extends TestCase
             'internal_intake_notes' => 'Intake completed by Senior Advocate.',
         ]);
     }
+
+    public function test_corporate_client_registration_saves_particulars_and_avoids_individual_salutation_on_entity_name(): void
+    {
+        $firm = Firm::create([
+            'name' => 'Sharma & Associates',
+            'slug' => 'sharma-associates-corp',
+            'email' => 'corp@sharmalegal.in',
+        ]);
+
+        $response = $this->post('/register/client', [
+            'category' => 'corporate',
+            'firm_id' => $firm->id,
+            'name' => 'Malhotra Enterprises Pvt Ltd',
+            'contact_salutation' => 'Mr.',
+            'contact_person' => 'Vikram Malhotra',
+            'email' => 'legal@malhotraenterprises.com',
+            'phone' => '+91 98110 02233',
+            'registration_number' => 'U74999DL2020PTC123456',
+            'tax_id' => '07AAAAA0000A1Z5',
+            'industry' => 'Real Estate & Infrastructure',
+            'website' => 'https://malhotraenterprises.com',
+            'preferred_communication_method' => 'email',
+            'internal_intake_notes' => 'Commercial dispute regarding construction contract.',
+            'password' => '123456',
+            'password_confirmation' => '123456',
+        ]);
+
+        $response->assertRedirect('/portal/dashboard');
+        $this->assertAuthenticated();
+
+        $this->assertDatabaseHas('clients', [
+            'category' => 'corporate',
+            'type' => 'corporate',
+            'name' => 'Malhotra Enterprises Pvt Ltd',
+            'contact_person' => 'Mr. Vikram Malhotra',
+            'email' => 'legal@malhotraenterprises.com',
+            'registration_number' => 'U74999DL2020PTC123456',
+            'tax_id' => '07AAAAA0000A1Z5',
+            'industry' => 'Real Estate & Infrastructure',
+            'website' => 'https://malhotraenterprises.com',
+            'preferred_communication_method' => 'email',
+            'internal_intake_notes' => 'Commercial dispute regarding construction contract.',
+            'status' => 'lead',
+        ]);
+    }
 }

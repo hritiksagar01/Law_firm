@@ -24,6 +24,108 @@
             font-family: 'JetBrains Mono', monospace !important;
         }
     </style>
+
+    <script>
+        function clientOnboardingState(defaultFirmId = 1, defaultAttorneyId = '') {
+            return {
+                openCreateModal: false,
+                isSubmitting: false,
+                firmId: defaultFirmId,
+                category: 'individual',
+                onboardingMode: 'portal_online',
+                salutation: 'Mr.',
+                name: '',
+                contactSalutation: 'Mr.',
+                contactPerson: '',
+                registrationNumber: '',
+                taxId: '',
+                industry: '',
+                website: '',
+                preferredCommunicationMethod: 'email',
+                email: '',
+                countryCode: '+91',
+                phoneRaw: '',
+                dateOfBirth: '',
+                gender: 'male',
+                occupation: '',
+                primaryAttorneyId: defaultAttorneyId,
+                initialStatus: 'lead',
+                clientType: 'petitioner',
+                referralSource: 'referral',
+                internalIntakeNotes: '',
+                members: [],
+                addMember() {
+                    this.members.push({ name: '', relationship: 'Co-petitioner', phone: '', email: '' });
+                },
+                removeMember(index) {
+                    this.members.splice(index, 1);
+                },
+                fillDemo(type) {
+                    if (type === 'corporate') {
+                        this.category = 'corporate';
+                        this.name = 'Malhotra Enterprises Pvt Ltd';
+                        this.contactSalutation = 'Mr.';
+                        this.contactPerson = 'Vikram Malhotra';
+                        this.registrationNumber = 'U74999DL2020PTC123456';
+                        this.taxId = '07AAAAA0000A1Z5';
+                        this.industry = 'Real Estate & Infrastructure';
+                        this.website = 'https://malhotraenterprises.com';
+                        this.preferredCommunicationMethod = 'email';
+                        this.email = 'legal@malhotraenterprises.com';
+                        this.countryCode = '+91';
+                        this.phoneRaw = '9811002233';
+                        this.members = [];
+                    } else if (type === 'joint') {
+                        this.category = 'joint';
+                        this.name = 'Vikram & Rajesh (Joint Litigants)';
+                        this.contactPerson = 'Vikram Malhotra';
+                        this.preferredCommunicationMethod = 'whatsapp';
+                        this.email = 'joint.litigants@gmail.com';
+                        this.countryCode = '+91';
+                        this.phoneRaw = '9811099887';
+                        this.dateOfBirth = '1983-11-20';
+                        this.gender = 'male';
+                        this.occupation = 'Property Owner & Business';
+                        this.clientType = 'petitioner';
+                        this.referralSource = 'walk_in';
+                        this.members = [
+                            { name: 'Rajesh Sharma', relationship: 'Co-petitioner / Co-owner', phone: '+91 98765 11223', email: 'rajesh.sharma@gmail.com' }
+                        ];
+                    } else if (type === 'assisted') {
+                        this.category = 'individual';
+                        this.onboardingMode = 'assisted_offline';
+                        this.name = 'Chandra Sekhar (Assisted Intake)';
+                        this.contactPerson = 'Chandra Sekhar';
+                        this.preferredCommunicationMethod = 'phone';
+                        this.email = 'chandra.assisted@gmail.com';
+                        this.countryCode = '+91';
+                        this.phoneRaw = '9810077665';
+                        this.dateOfBirth = '1968-04-10';
+                        this.gender = 'male';
+                        this.occupation = 'Agriculture / Self-Employed';
+                        this.clientType = 'respondent';
+                        this.referralSource = 'bar_association';
+                        this.members = [];
+                    } else {
+                        this.category = 'individual';
+                        this.onboardingMode = 'portal_online';
+                        this.name = 'Vikram Malhotra';
+                        this.contactPerson = 'Vikram Malhotra';
+                        this.preferredCommunicationMethod = 'email';
+                        this.email = 'vikram.client@gmail.com';
+                        this.countryCode = '+91';
+                        this.phoneRaw = '9876543210';
+                        this.dateOfBirth = '1986-05-14';
+                        this.gender = 'male';
+                        this.occupation = 'Business & Commercial';
+                        this.clientType = 'petitioner';
+                        this.referralSource = 'referral';
+                        this.members = [];
+                    }
+                }
+            };
+        }
+    </script>
 </head>
 <body class="bg-[#f4f2ed] font-sans text-[#1b1c18] antialiased min-h-screen"
       x-data="{ 
