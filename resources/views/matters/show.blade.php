@@ -78,21 +78,27 @@
                 @endif
             </div>
             <div class="flex items-center gap-2 shrink-0">
-                @if($isClosed)
-                    <form action="{{ route('matters.status.update', $matter->id) }}" method="POST" class="inline" onsubmit="return confirm('Reopen matter dossier {{ $matter->case_number }}?');">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="status" value="open">
-                        <button type="submit" class="btn-secondary h-9 px-3 text-xs inline-flex items-center gap-1.5 text-[#23493a] border-emerald-300 hover:bg-emerald-50">
-                            <span class="material-symbols-outlined text-[16px]">lock_open</span>
-                            <span>Reopen Matter</span>
+                <button type="button" onclick="document.getElementById('editAdminModal').classList.remove('hidden')" class="btn-secondary h-9 px-3 text-xs inline-flex items-center gap-1.5 text-[#23493a] border-[#e5e3dc] hover:bg-[#faf8f5]" title="Maintain Permitted Matter Administrative Metadata">
+                    <span class="material-symbols-outlined text-[16px]">edit_calendar</span>
+                    <span>Edit Details</span>
+                </button>
+                @if(auth()->user()->canCloseMatters())
+                    @if($isClosed)
+                        <form action="{{ route('matters.status.update', $matter->id) }}" method="POST" class="inline" onsubmit="return confirm('Reopen matter dossier {{ $matter->case_number }}?');">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="status" value="open">
+                            <button type="submit" class="btn-secondary h-9 px-3 text-xs inline-flex items-center gap-1.5 text-[#23493a] border-emerald-300 hover:bg-emerald-50">
+                                <span class="material-symbols-outlined text-[16px]">lock_open</span>
+                                <span>Reopen Matter</span>
+                            </button>
+                        </form>
+                    @else
+                        <button type="button" onclick="document.getElementById('closeMatterModal').classList.remove('hidden')" class="btn-secondary h-9 px-3 text-xs inline-flex items-center gap-1.5 text-rose-700 hover:text-rose-800 hover:border-rose-300">
+                            <span class="material-symbols-outlined text-[16px]">lock</span>
+                            <span>Close Matter</span>
                         </button>
-                    </form>
-                @else
-                    <button type="button" onclick="document.getElementById('closeMatterModal').classList.remove('hidden')" class="btn-secondary h-9 px-3 text-xs inline-flex items-center gap-1.5 text-rose-700 hover:text-rose-800 hover:border-rose-300">
-                        <span class="material-symbols-outlined text-[16px]">lock</span>
-                        <span>Close Matter</span>
-                    </button>
+                    @endif
                 @endif
                 <a href="{{ route('opinions.create', ['matter_id' => $matter->id]) }}" class="btn-secondary h-9 px-3 text-xs inline-flex items-center gap-1.5">
                     <span class="material-symbols-outlined text-[16px] text-[#23493a]">draw</span>
@@ -547,16 +553,22 @@
                                 class="w-full p-3 text-xs rounded-lg border border-[#e5e3dc] bg-white focus:outline-none focus:border-[#23493a] text-[#1a1a1a]"></textarea>
                         </div>
                         <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
-                            <div class="flex items-center gap-4">
-                                <label class="flex items-center gap-1.5 text-[#646864]">
+                            <div class="flex items-center gap-4 flex-wrap">
+                                <label class="flex items-center gap-1.5 text-[#646864] cursor-pointer">
                                     <input type="radio" name="type" value="internal" checked class="text-[#23493a] focus:ring-[#23493a]"/>
                                     <span>Internal Only</span>
                                 </label>
-                                <label class="flex items-center gap-1.5 text-[#646864]">
+                                <label class="flex items-center gap-1.5 text-[#646864] cursor-pointer">
                                     <input type="radio" name="type" value="client_visible" class="text-[#23493a] focus:ring-[#23493a]"/>
                                     <span>Client Visible</span>
                                 </label>
-                                <label class="flex items-center gap-1.5 text-[#646864]">
+                                @if(auth()->user()->canAccessPrivilegedNotes())
+                                <label class="flex items-center gap-1.5 text-purple-800 font-medium cursor-pointer">
+                                    <input type="radio" name="type" value="privileged" class="text-purple-700 focus:ring-purple-700"/>
+                                    <span>Privileged Attorney Note</span>
+                                </label>
+                                @endif
+                                <label class="flex items-center gap-1.5 text-[#646864] cursor-pointer">
                                     <input type="checkbox" name="is_pinned" value="1" class="rounded text-[#23493a] focus:ring-[#23493a]"/>
                                     <span>Pin to Top</span>
                                 </label>
@@ -582,9 +594,15 @@
                                     </span>
                                     @endif
                                     <h4 class="text-xs font-semibold text-[#1a1a1a]">{{ $note->title }}</h4>
-                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-mono {{ $note->type === 'client_visible' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-stone-100 text-stone-600' }}">
-                                        {{ $note->type === 'client_visible' ? 'Client Visible' : 'Internal Memo' }}
-                                    </span>
+                                    @if($note->is_privileged || in_array($note->type, ['privileged', 'attorney_only']))
+                                        <span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-50 text-purple-700 border border-purple-200">
+                                            Privileged Attorney Memo
+                                        </span>
+                                    @else
+                                        <span class="px-1.5 py-0.5 rounded text-[10px] font-mono {{ $note->type === 'client_visible' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-stone-100 text-stone-600' }}">
+                                            {{ $note->type === 'client_visible' ? 'Client Visible' : 'Internal Memo' }}
+                                        </span>
+                                    @endif
                                 </div>
                                 <p class="text-xs text-[#646864] mt-1.5 leading-relaxed whitespace-pre-line">{{ $note->body }}</p>
                                 <div class="flex items-center gap-3 mt-2 text-[11px] text-[#8a8a8a]">
@@ -1138,6 +1156,122 @@
                     <span class="material-symbols-outlined text-[16px]">lock</span>
                     <span>Confirm &amp; Close Matter</span>
                 </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Administrative Details Modal (Permitted Matter Metadata Maintenance) -->
+<div id="editAdminModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-2xl w-full p-6 shadow-2xl border border-[#e5e3dc] max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+        <div class="flex items-center justify-between pb-3 border-b border-[#f0eee8] mb-4">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[#23493a] text-xl">edit_calendar</span>
+                <h3 class="text-sm font-semibold text-[#1a1a1a]">Update Administrative Matter Fields</h3>
+            </div>
+            <button type="button" onclick="document.getElementById('editAdminModal').classList.add('hidden')" class="text-[#8a8a8a] hover:text-[#1a1a1a]">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+        </div>
+
+        <form action="{{ route('matters.administrative.update', $matter->id) }}" method="POST" class="space-y-4 text-xs">
+            @csrf
+            @method('PUT')
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-medium text-[#1a1a1a] mb-1">Case Number</label>
+                    <input type="text" name="case_number" value="{{ $matter->case_number }}" required class="w-full h-8 px-2.5 rounded border border-[#e5e3dc] font-mono"/>
+                </div>
+                <div>
+                    <label class="block font-medium text-[#1a1a1a] mb-1">Court Docket Number</label>
+                    <input type="text" name="docket_number" value="{{ $matter->docket_number }}" class="w-full h-8 px-2.5 rounded border border-[#e5e3dc] font-mono"/>
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-medium text-[#1a1a1a] mb-1">Matter Title *</label>
+                <input type="text" name="title" value="{{ $matter->title }}" required class="w-full h-8 px-2.5 rounded border border-[#e5e3dc]"/>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block font-medium text-[#1a1a1a] mb-1">Court Name</label>
+                    <input type="text" name="court_name" value="{{ $matter->court_name }}" placeholder="e.g. High Court of Delhi" class="w-full h-8 px-2.5 rounded border border-[#e5e3dc]"/>
+                </div>
+                <div>
+                    <label class="block font-medium text-[#1a1a1a] mb-1">Court Type / Forum</label>
+                    <input type="text" name="court_type" value="{{ $matter->court_type }}" placeholder="e.g. District / Appellate / NCLT" class="w-full h-8 px-2.5 rounded border border-[#e5e3dc]"/>
+                </div>
+                <div>
+                    <label class="block font-medium text-[#1a1a1a] mb-1">Presiding Judge</label>
+                    <input type="text" name="judge_name" value="{{ $matter->judge_name }}" placeholder="e.g. Hon. Justice R. Sharma" class="w-full h-8 px-2.5 rounded border border-[#e5e3dc]"/>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block font-medium text-[#1a1a1a] mb-1">Jurisdiction / Bench</label>
+                    <input type="text" name="jurisdiction" value="{{ $matter->jurisdiction }}" class="w-full h-8 px-2.5 rounded border border-[#e5e3dc]"/>
+                </div>
+                <div>
+                    <label class="block font-medium text-[#1a1a1a] mb-1">County / District</label>
+                    <input type="text" name="county" value="{{ $matter->county }}" class="w-full h-8 px-2.5 rounded border border-[#e5e3dc]"/>
+                </div>
+                <div>
+                    <label class="block font-medium text-[#1a1a1a] mb-1">State</label>
+                    <input type="text" name="state" value="{{ $matter->state }}" class="w-full h-8 px-2.5 rounded border border-[#e5e3dc]"/>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-medium text-[#1a1a1a] mb-1">Matter Stage *</label>
+                    <select name="stage" required class="w-full h-8 px-2.5 rounded border border-[#e5e3dc] bg-white">
+                        @foreach(['Intake', 'Pleadings', 'Discovery', 'Pre-Trial', 'Trial', 'Judgment', 'Appellate', 'Execution'] as $stg)
+                            <option value="{{ $stg }}" {{ (strtolower($matter->stage ?? '') === strtolower($stg)) ? 'selected' : '' }}>{{ $stg }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-medium text-[#1a1a1a] mb-1">Priority</label>
+                    <select name="priority" class="w-full h-8 px-2.5 rounded border border-[#e5e3dc] bg-white">
+                        <option value="low" {{ $matter->priority === 'low' ? 'selected' : '' }}>Low</option>
+                        <option value="medium" {{ in_array($matter->priority, ['medium', 'normal', '']) ? 'selected' : '' }}>Medium</option>
+                        <option value="high" {{ $matter->priority === 'high' ? 'selected' : '' }}>High</option>
+                        <option value="urgent" {{ $matter->priority === 'urgent' ? 'selected' : '' }}>Urgent</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block font-medium text-[#1a1a1a] mb-1">Filing Date</label>
+                    <input type="date" name="filing_date" value="{{ $matter->filing_date ? \Carbon\Carbon::parse($matter->filing_date)->toDateString() : '' }}" class="w-full h-8 px-2.5 rounded border border-[#e5e3dc] font-mono"/>
+                </div>
+                <div>
+                    <label class="block font-medium text-[#1a1a1a] mb-1">Next Hearing Date</label>
+                    <input type="date" name="hearing_date" value="{{ $matter->hearing_date ? \Carbon\Carbon::parse($matter->hearing_date)->toDateString() : '' }}" class="w-full h-8 px-2.5 rounded border border-[#e5e3dc] font-mono"/>
+                </div>
+                <div>
+                    <label class="block font-medium text-[#1a1a1a] mb-1">Trial / Final Date</label>
+                    <input type="date" name="trial_date" value="{{ $matter->trial_date ? \Carbon\Carbon::parse($matter->trial_date)->toDateString() : '' }}" class="w-full h-8 px-2.5 rounded border border-[#e5e3dc] font-mono"/>
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-medium text-[#1a1a1a] mb-1">Statutory Provisions &amp; Act References</label>
+                <input type="text" name="statute_references" value="{{ $matter->statute_references }}" placeholder="e.g. Section 138 NI Act, Order XXXVII CPC" class="w-full h-8 px-2.5 rounded border border-[#e5e3dc]"/>
+            </div>
+
+            <div>
+                <label class="block font-medium text-[#1a1a1a] mb-1">Procedural Notes / Description</label>
+                <textarea name="description" rows="2" class="w-full p-2.5 rounded border border-[#e5e3dc]">{{ $matter->description }}</textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#f0eee8]">
+                <button type="button" onclick="document.getElementById('editAdminModal').classList.add('hidden')" class="btn-secondary h-8 px-3 text-xs">Cancel</button>
+                <button type="submit" class="btn-primary h-8 px-4 text-xs font-semibold">Save Administrative Updates</button>
             </div>
         </form>
     </div>

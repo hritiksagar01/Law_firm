@@ -491,6 +491,10 @@ class SearchController extends Controller
             }
         } else {
             $notesQuery->where('firm_id', $firmId);
+            if (! $user->canAccessPrivilegedNotes()) {
+                $notesQuery->where('is_privileged', false)
+                    ->whereNotIn('type', ['privileged', 'attorney_only']);
+            }
         }
 
         if ($q !== '') {

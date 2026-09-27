@@ -21,6 +21,12 @@ class NoteController extends Controller
 
         $query = CaseNote::where('firm_id', $firmId)->with(['matter', 'user']);
 
+        // Staff / Legal Assistant protection: Privileged notes are strictly hidden by default
+        if (! $user->canAccessPrivilegedNotes()) {
+            $query->where('is_privileged', false)
+                ->whereNotIn('type', ['privileged', 'attorney_only']);
+        }
+
         if ($matterId = $request->get('matter_id')) {
             $query->where('matter_id', $matterId);
         }
@@ -58,11 +64,18 @@ class NoteController extends Controller
             'category_id' => 'nullable|exists:note_categories,id',
             'title' => 'required|string|max:255',
             'body' => 'required|string',
-            'type' => 'nullable|in:internal,client_visible',
+            'type' => 'nullable|in:internal,client_visible,privileged,attorney_only',
             'is_pinned' => 'nullable|boolean',
+            'is_privileged' => 'nullable|boolean',
         ]);
 
         $user = $request->user();
+        $isPrivileged = $request->boolean('is_privileged') || in_array($validated['type'] ?? '', ['privileged', 'attorney_only']);
+
+        // Privileged attorney notes restriction: staff cannot author or access privileged notes
+        if ($isPrivileged && ! $user->canAccessPrivilegedNotes()) {
+            abort(403, 'Unauthorized: Staff members do not have permission to author or access privileged attorney notes.');
+        }
 
         $note = CaseNote::create([
             'firm_id' => $user->firm_id,
@@ -73,6 +86,7 @@ class NoteController extends Controller
             'body' => $validated['body'],
             'type' => $validated['type'] ?? 'internal',
             'is_pinned' => $request->boolean('is_pinned'),
+            'is_privileged' => $isPrivileged,
         ]);
 
         if (! empty($note->matter_id)) {
@@ -85,7 +99,7 @@ class NoteController extends Controller
                     subject: $note,
                     userId: $user->id,
                     clientId: $matter->client_id,
-                    isClientSafe: ($note->type === 'client_visible')
+                    isClientSafe: ($note->type === 'client_visible' && ! $note->is_privileged)
                 );
             }
         }
@@ -102,12 +116,25 @@ class NoteController extends Controller
             abort(403);
         }
 
+        if (($note->is_privileged || in_array($note->type, ['privileged', 'attorney_only'])) && ! $request->user()->canAccessPrivilegedNotes()) {
+            abort(403, 'Unauthorized: Staff members do not have permission to access privileged attorney notes.');
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'body' => 'required|string',
-            'type' => 'nullable|in:internal,client_visible',
+            'type' => 'nullable|in:internal,client_visible,privileged,attorney_only',
             'category_id' => 'nullable|exists:note_categories,id',
+            'is_privileged' => 'nullable|boolean',
         ]);
+
+        if ($request->has('is_privileged') || in_array($validated['type'] ?? '', ['privileged', 'attorney_only'])) {
+            $willBePrivileged = $request->boolean('is_privileged') || in_array($validated['type'] ?? '', ['privileged', 'attorney_only']);
+            if ($willBePrivileged && ! $request->user()->canAccessPrivilegedNotes()) {
+                abort(403, 'Unauthorized: Staff members do not have permission to mark notes as privileged.');
+            }
+            $validated['is_privileged'] = $willBePrivileged;
+        }
 
         $note->update($validated);
 
@@ -121,6 +148,10 @@ class NoteController extends Controller
     {
         if ($note->firm_id !== $request->user()->firm_id) {
             abort(403);
+        }
+
+        if (($note->is_privileged || in_array($note->type, ['privileged', 'attorney_only'])) && ! $request->user()->canAccessPrivilegedNotes()) {
+            abort(403, 'Unauthorized: Staff members do not have permission to access privileged attorney notes.');
         }
 
         $note->update([
@@ -137,6 +168,10 @@ class NoteController extends Controller
     {
         if ($note->firm_id !== $request->user()->firm_id) {
             abort(403);
+        }
+
+        if (($note->is_privileged || in_array($note->type, ['privileged', 'attorney_only'])) && ! $request->user()->canAccessPrivilegedNotes()) {
+            abort(403, 'Unauthorized: Staff members do not have permission to delete privileged attorney notes.');
         }
 
         $note->delete();

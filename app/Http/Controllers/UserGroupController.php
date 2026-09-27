@@ -12,11 +12,20 @@ use Illuminate\View\View;
 
 class UserGroupController extends Controller
 {
+    protected function authorizeUserManagement(): void
+    {
+        if (! Auth::user() || ! Auth::user()->canManageUsers()) {
+            abort(403, 'Unauthorized: Staff members do not have access to user permissions and practice group management.');
+        }
+    }
+
     /**
      * List practice groups and teams.
      */
     public function index(): View
     {
+        $this->authorizeUserManagement();
+
         $firmId = Auth::user()->firm_id;
 
         $groups = UserGroup::where('firm_id', $firmId)
@@ -36,6 +45,8 @@ class UserGroupController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $this->authorizeUserManagement();
+
         $firmId = Auth::user()->firm_id;
 
         $validated = $request->validate([
@@ -72,6 +83,8 @@ class UserGroupController extends Controller
      */
     public function update(Request $request, UserGroup $userGroup): RedirectResponse
     {
+        $this->authorizeUserManagement();
+
         $firmId = Auth::user()->firm_id;
 
         if ($userGroup->firm_id !== $firmId) {
@@ -115,6 +128,8 @@ class UserGroupController extends Controller
      */
     public function destroy(UserGroup $userGroup): RedirectResponse
     {
+        $this->authorizeUserManagement();
+
         $firmId = Auth::user()->firm_id;
 
         if ($userGroup->firm_id !== $firmId) {

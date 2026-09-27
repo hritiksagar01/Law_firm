@@ -14,7 +14,29 @@ class CaseNote extends Model
 
     protected $casts = [
         'is_pinned' => 'boolean',
+        'is_privileged' => 'boolean',
     ];
+
+    /**
+     * Scope query to only non-privileged notes (safe for general staff).
+     */
+    public function scopeNonPrivileged($query)
+    {
+        return $query->where('is_privileged', false)
+            ->whereNotIn('type', ['privileged', 'attorney_only']);
+    }
+
+    /**
+     * Scope query based on viewing user's authorization to access privileged attorney notes.
+     */
+    public function scopeForUser($query, User $user)
+    {
+        if (! $user->canAccessPrivilegedNotes()) {
+            return $this->scopeNonPrivileged($query);
+        }
+
+        return $query;
+    }
 
     public function firm(): BelongsTo
     {

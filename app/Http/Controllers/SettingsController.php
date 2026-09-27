@@ -15,11 +15,20 @@ use Illuminate\Support\Facades\Auth;
 
 class SettingsController extends Controller
 {
+    protected function authorizeSettingsAccess(): void
+    {
+        if (! Auth::user() || ! Auth::user()->canManageSettings()) {
+            abort(403, 'Unauthorized: Staff members do not have access to firm and security settings.');
+        }
+    }
+
     /**
      * Display the dynamic practice settings hub.
      */
     public function index(Request $request)
     {
+        $this->authorizeSettingsAccess();
+
         $firm = Auth::user()->firm ?? Firm::first();
         $firmId = $firm->id ?? 1;
 
@@ -51,6 +60,8 @@ class SettingsController extends Controller
      */
     public function updateFirm(Request $request)
     {
+        $this->authorizeSettingsAccess();
+
         $firm = Auth::user()->firm ?? Firm::first();
 
         $validated = $request->validate([
@@ -72,6 +83,8 @@ class SettingsController extends Controller
      */
     public function storePracticeArea(Request $request)
     {
+        $this->authorizeSettingsAccess();
+
         $firmId = Auth::user()->firm_id ?? 1;
 
         $validated = $request->validate([
@@ -97,6 +110,8 @@ class SettingsController extends Controller
      */
     public function togglePracticeArea(PracticeArea $practiceArea)
     {
+        $this->authorizeSettingsAccess();
+
         $practiceArea->is_active = ! $practiceArea->is_active;
         $practiceArea->save();
 

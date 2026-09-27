@@ -201,6 +201,23 @@
                     <span class="text-[11px] px-1.5 py-0.5 rounded font-mono {{ request()->routeIs('matters.*') ? 'bg-white/20 text-white' : 'bg-white/[.06] text-[#8e8e8e]' }}">{{ $mCount }}</span>
                 </a>
 
+                <!-- Paralegal / Staff Console -->
+                @if(Route::has('paralegal.dashboard'))
+                <a href="{{ route('paralegal.dashboard') }}" 
+                   class="flex items-center justify-between px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('paralegal.*') || request()->routeIs('staff.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('paralegal.*') || request()->routeIs('staff.*') ? 'text-white' : 'text-[#9ca3af]' }}">assignment_ind</span>
+                        <span>{{ auth()->check() && auth()->user()->isStaff() ? 'Staff Console' : 'Paralegal Hub' }}</span>
+                    </div>
+                    @php
+                        $assignedCount = auth()->check() ? auth()->user()->assignedMatters()->count() : 0;
+                    @endphp
+                    @if($assignedCount > 0)
+                        <span class="text-[11px] px-1.5 py-0.5 rounded font-mono {{ request()->routeIs('paralegal.*') || request()->routeIs('staff.*') ? 'bg-white/20 text-white' : 'bg-white/[.06] text-[#8e8e8e]' }}">{{ $assignedCount }}</span>
+                    @endif
+                </a>
+                @endif
+
                 <!-- Documents -->
                 <a href="{{ route('documents.index') }}" 
                    class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('documents.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
@@ -324,11 +341,13 @@
                 @endif
 
                 <!-- Settings -->
+                @if(!auth()->check() || auth()->user()->canManageSettings())
                 <a href="{{ route('settings.index') }}" 
                    class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('settings.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
                     <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('settings.*') ? 'text-white' : 'text-[#9ca3af]' }}">settings</span>
                     <span>Settings</span>
                 </a>
+                @endif
             </nav>
         </div>
 
@@ -475,11 +494,13 @@
                 </div>
 
                 <!-- Settings Gear Icon -->
+                @if(!auth()->check() || auth()->user()->canManageSettings())
                 <a href="{{ route('settings.index') }}" 
                    class="p-2 text-[#5e625e] hover:text-[#1b1c18] hover:bg-[#f5f3ed] rounded-md transition-colors" 
                    title="Firm Settings">
                     <span class="material-symbols-outlined text-[20px]">settings</span>
                 </a>
+                @endif
 
                 <div class="h-5 w-px bg-[#e5e3dc] mx-1"></div>
 

@@ -23,6 +23,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpinionController;
+use App\Http\Controllers\ParalegalController;
 use App\Http\Controllers\Portal\InvitationController;
 use App\Http\Controllers\Portal\PortalController;
 use App\Http\Controllers\ProfileController;
@@ -483,18 +484,25 @@ Route::middleware('auth')->group(function () {
             }
 
             // 5. Important Case Notes (Pinned & Privileged Memos)
-            $importantNotes = CaseNote::where('firm_id', $firmId)
-                ->with(['matter', 'user'])
+            $importantNotesQuery = CaseNote::where('firm_id', $firmId)
+                ->with(['matter', 'user']);
+
+            if (! $user->canAccessPrivilegedNotes()) {
+                $importantNotesQuery->where('is_privileged', false)
+                    ->whereNotIn('type', ['privileged', 'attorney_only']);
+            }
+
+            $importantNotes = (clone $importantNotesQuery)
                 ->orderByDesc('is_pinned')
                 ->latest()
                 ->take(5)
                 ->get();
 
-            $importantNotesCount = CaseNote::where('firm_id', $firmId)
+            $importantNotesCount = (clone $importantNotesQuery)
                 ->where('is_pinned', true)
                 ->count();
             if ($importantNotesCount === 0) {
-                $importantNotesCount = CaseNote::where('firm_id', $firmId)->count();
+                $importantNotesCount = (clone $importantNotesQuery)->count();
             }
 
             // 6. Last Sign-in for current user
@@ -552,9 +560,10 @@ Route::middleware('auth')->group(function () {
 
             $baseQuery = Matter::where('firm_id', $firmId);
             if (! in_array($user->role, ['superadmin', 'partner'])) {
-                // Associate / paralegal: only matters where they are lead attorney or team member
+                // Associate / paralegal: only matters where they are lead attorney, assigned paralegal, or team member
                 $baseQuery->where(function ($q) use ($user) {
                     $q->where('lead_attorney_id', $user->id)
+                        ->orWhere('assigned_paralegal_id', $user->id)
                         ->orWhereHas('users', fn ($uq) => $uq->where('users.id', $user->id));
                 });
             }
@@ -820,9 +829,11 @@ Route::middleware('auth')->group(function () {
                 abort(403, 'Unauthorized case dossier.');
             }
 
-            // Lawyer-level access restriction: non-partners must be assigned
+            // Lawyer & Staff level access restriction: non-partners must be assigned
             if (! in_array($user->role, ['superadmin', 'partner'])) {
-                $isAssigned = ($matter->lead_attorney_id === $user->id) || $matter->users()->where('users.id', $user->id)->exists();
+                $isAssigned = ($matter->lead_attorney_id === $user->id) ||
+                    ($matter->assigned_paralegal_id === $user->id) ||
+                    $matter->users()->where('users.id', $user->id)->exists();
                 if (! $isAssigned) {
                     abort(403, 'Unauthorized: You are not assigned to this case dossier.');
                 }
@@ -845,7 +856,12 @@ Route::middleware('auth')->group(function () {
                 'messages.recipient',
                 'messages.thread',
                 'messages.attachments',
-                'caseNotes.user',
+                'caseNotes' => function ($q) use ($user) {
+                    if (! $user->canAccessPrivilegedNotes()) {
+                        $q->where('is_privileged', false)->whereNotIn('type', ['privileged', 'attorney_only']);
+                    }
+                    $q->with('user');
+                },
                 'conflictChecks.checker',
                 'conflictChecks.reviewer',
             ]);
@@ -908,9 +924,11 @@ Route::middleware('auth')->group(function () {
                 abort(403, 'Unauthorized case dossier.');
             }
 
-            // Lawyer-level access restriction: non-partners must be assigned
+            // Lawyer & Staff level access restriction: non-partners must be assigned
             if (! in_array($user->role, ['superadmin', 'partner'])) {
-                $isAssigned = ($matter->lead_attorney_id === $user->id) || $matter->users()->where('users.id', $user->id)->exists();
+                $isAssigned = ($matter->lead_attorney_id === $user->id) ||
+                    ($matter->assigned_paralegal_id === $user->id) ||
+                    $matter->users()->where('users.id', $user->id)->exists();
                 if (! $isAssigned) {
                     abort(403, 'Unauthorized: You are not assigned to this case dossier.');
                 }
@@ -924,6 +942,11 @@ Route::middleware('auth')->group(function () {
             $isCloseAction = $validated['status'] === 'closed';
 
             if ($isCloseAction) {
+                // Security Rule: Staff & legal assistants cannot close matters by default
+                if (! $user->canCloseMatters()) {
+                    abort(403, 'Unauthorized: Staff members and legal assistants do not have authorization to close or archive matters.');
+                }
+
                 $matter->update([
                     'status' => 'closed',
                     'closed_at' => now()->toDateString(),
@@ -969,6 +992,13 @@ Route::middleware('auth')->group(function () {
             return back()->with('success', $flashMessage);
         })->name('matters.status.update');
 
+        // Matter Administrative Details (Feature 26 & 27: Paralegal & Staff permitted)
+        Route::put('/matters/{matter}/administrative', [ParalegalController::class, 'updateMatterAdministrative'])->name('matters.administrative.update');
+
+        // Assigned Matters Dashboards (Features 26 & 27)
+        Route::get('/paralegal/dashboard', [ParalegalController::class, 'dashboard'])->name('paralegal.dashboard');
+        Route::get('/staff/dashboard', [ParalegalController::class, 'dashboard'])->name('staff.dashboard');
+
         // Matter Chronology & Milestone Timeline (Feature 28)
         Route::get('/matters/{matter}/chronology', [ActivityController::class, 'matterChronology'])->name('matters.chronology');
         Route::post('/matters/{matter}/chronology', [ActivityController::class, 'storeMatterChronology'])->name('matters.chronology.store');
@@ -995,10 +1025,11 @@ Route::middleware('auth')->group(function () {
                 $matters = Matter::where('firm_id', $firmId)->get();
                 $documents = Document::where('firm_id', $firmId)->with(['matter.client', 'client', 'uploader', 'versions'])->latest()->get();
             } else {
-                // Associate / paralegal: only documents for matters they are assigned to
+                // Associate / paralegal / staff: only documents for matters they are assigned to
                 $matters = Matter::where('firm_id', $firmId)
                     ->where(function ($q) use ($user) {
                         $q->where('lead_attorney_id', $user->id)
+                            ->orWhere('assigned_paralegal_id', $user->id)
                             ->orWhereHas('users', fn ($uq) => $uq->where('users.id', $user->id));
                     })->get();
 

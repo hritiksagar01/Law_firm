@@ -227,25 +227,39 @@ class User extends Authenticatable
                 'reports.view', 'reports.export',
             ],
             'paralegal' => [
-                'matters.view', 'matter.view', 'clients.view', 'client.view',
-                'documents.view', 'document.view', 'documents.upload', 'document.upload', 'documents.download', 'document.download',
-                'message.view',
+                'matters.view', 'matter.view', 'matters.edit_admin', 'matters.edit_metadata', 'clients.view', 'client.view',
+                'documents.view', 'document.view', 'documents.upload', 'document.upload', 'documents.download', 'document.download', 'documents.request', 'document.request',
+                'message.view', 'message.send',
                 'tasks.view', 'task.view', 'tasks.create', 'task.create', 'tasks.edit', 'tasks.complete', 'task.complete',
                 'note.view', 'note.create',
                 'opinions.view', 'opinions.create',
-                'calendar.view', 'hearings.manage', 'appointments.manage',
+                'calendar.view', 'hearings.manage', 'appointments.manage', 'events.create',
             ],
             'legal_assistant' => [
-                'matters.view', 'matter.view', 'clients.view', 'client.view',
+                'matters.view', 'matter.view', 'matters.edit_admin', 'matters.edit_metadata', 'clients.view', 'client.view',
                 'documents.view', 'document.view', 'documents.upload', 'document.upload', 'documents.download', 'document.download',
-                'message.view',
+                'message.view', 'message.send',
                 'tasks.view', 'task.view', 'tasks.create', 'task.create', 'tasks.edit', 'tasks.complete', 'task.complete',
-                'note.view', 'note.create',
+                'todos.manage', 'note.view', 'note.create',
                 'opinions.view', 'opinions.create',
-                'calendar.view', 'hearings.manage', 'appointments.manage',
+                'calendar.view', 'hearings.manage', 'appointments.manage', 'events.create',
             ],
-            'staff' => ['clients.view', 'client.view', 'calendar.view', 'appointments.manage', 'tasks.view', 'task.view'],
-            'support_staff' => ['clients.view', 'client.view', 'calendar.view', 'appointments.manage', 'tasks.view', 'task.view'],
+            'staff' => [
+                'matters.view', 'matter.view', 'matters.edit_admin', 'matters.edit_metadata', 'clients.view', 'client.view',
+                'documents.view', 'document.view', 'documents.upload', 'document.upload', 'documents.download', 'document.download',
+                'message.view', 'message.send',
+                'tasks.view', 'task.view', 'tasks.create', 'task.create', 'tasks.edit', 'tasks.complete', 'task.complete',
+                'todos.manage', 'note.view', 'note.create',
+                'calendar.view', 'hearings.manage', 'appointments.manage', 'events.create',
+            ],
+            'support_staff' => [
+                'matters.view', 'matter.view', 'matters.edit_admin', 'matters.edit_metadata', 'clients.view', 'client.view',
+                'documents.view', 'document.view', 'documents.upload', 'document.upload', 'documents.download', 'document.download',
+                'message.view', 'message.send',
+                'tasks.view', 'task.view', 'tasks.create', 'task.create', 'tasks.edit', 'tasks.complete', 'task.complete',
+                'todos.manage', 'note.view', 'note.create',
+                'calendar.view', 'hearings.manage', 'appointments.manage', 'events.create',
+            ],
             'client' => ['portal.access', 'client.view', 'document.view', 'matters.view'],
         ];
 
@@ -282,12 +296,80 @@ class User extends Authenticatable
 
     public function isParalegal(): bool
     {
-        return in_array($this->role, ['paralegal', 'legal_assistant']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['paralegal', 'legal_assistant']));
+        return in_array($this->role, ['paralegal']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['paralegal']));
     }
 
     public function isSupportStaff(): bool
     {
         return in_array($this->role, ['support_staff', 'support', 'finance', 'staff', 'legal_assistant']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['support_staff', 'staff']));
+    }
+
+    public function isStaff(): bool
+    {
+        return in_array($this->role, ['staff', 'support_staff', 'legal_assistant']) || ($this->roleRelation && in_array($this->roleRelation->slug, ['staff', 'support_staff', 'legal_assistant']));
+    }
+
+    /**
+     * Check if user has authorization to view/manage privileged attorney notes.
+     * By default, staff and legal assistants do NOT have unrestricted access.
+     */
+    public function canAccessPrivilegedNotes(): bool
+    {
+        if ($this->isSuperAdmin() || $this->isPartner() || $this->isAttorney()) {
+            return true;
+        }
+
+        return $this->hasPermission('notes.privileged') || $this->hasPermission('notes.view_privileged');
+    }
+
+    /**
+     * Check if user is authorized to close or archive matters.
+     * Staff/legal assistants are restricted from closing matters by default.
+     */
+    public function canCloseMatters(): bool
+    {
+        if ($this->isSuperAdmin() || $this->isPartner() || $this->isAttorney()) {
+            return true;
+        }
+
+        return $this->hasPermission('matters.close');
+    }
+
+    /**
+     * Check if user is authorized to manage user accounts and role permissions.
+     */
+    public function canManageUsers(): bool
+    {
+        if ($this->isSuperAdmin() || $this->isPartner() || $this->isAdmin()) {
+            return true;
+        }
+
+        return $this->hasPermission('users.manage');
+    }
+
+    /**
+     * Check if user is authorized to view and modify firm security and system settings.
+     */
+    public function canManageSettings(): bool
+    {
+        if ($this->isSuperAdmin() || $this->isPartner() || $this->isAdmin()) {
+            return true;
+        }
+
+        return $this->hasPermission('settings.manage') || $this->hasPermission('settings.view');
+    }
+
+    /**
+     * Query helper for matters assigned to this user (as lead, paralegal, or team member).
+     */
+    public function assignedMatters()
+    {
+        return Matter::where('firm_id', $this->firm_id ?? 1)
+            ->where(function ($q) {
+                $q->where('lead_attorney_id', $this->id)
+                    ->orWhere('assigned_paralegal_id', $this->id)
+                    ->orWhereHas('users', fn ($uq) => $uq->where('users.id', $this->id));
+            });
     }
 
     public function isClient(): bool

@@ -13,11 +13,20 @@ use Illuminate\View\View;
 
 class UserController extends Controller
 {
+    protected function authorizeUserManagement(): void
+    {
+        if (! Auth::user() || ! Auth::user()->canManageUsers()) {
+            abort(403, 'Unauthorized: Staff members do not have access to user permissions and role management.');
+        }
+    }
+
     /**
      * Display personnel & advocate directory.
      */
     public function index(Request $request): View
     {
+        $this->authorizeUserManagement();
+
         $firmId = Auth::user()->firm_id;
 
         $query = User::where('firm_id', $firmId)
@@ -59,6 +68,8 @@ class UserController extends Controller
      */
     public function create(): View
     {
+        $this->authorizeUserManagement();
+
         $firmId = Auth::user()->firm_id;
 
         $roles = Role::where(function ($q) use ($firmId) {
@@ -75,6 +86,8 @@ class UserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $this->authorizeUserManagement();
+
         $firmId = Auth::user()->firm_id;
 
         $validated = $request->validate([
@@ -115,6 +128,8 @@ class UserController extends Controller
      */
     public function edit(User $user): View
     {
+        $this->authorizeUserManagement();
+
         $firmId = Auth::user()->firm_id;
 
         if ($user->firm_id !== $firmId) {
@@ -136,6 +151,8 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user): RedirectResponse
     {
+        $this->authorizeUserManagement();
+
         $firmId = Auth::user()->firm_id;
 
         if ($user->firm_id !== $firmId) {
@@ -187,6 +204,8 @@ class UserController extends Controller
      */
     public function toggleStatus(User $user): RedirectResponse
     {
+        $this->authorizeUserManagement();
+
         $firmId = Auth::user()->firm_id;
 
         if ($user->firm_id !== $firmId) {
