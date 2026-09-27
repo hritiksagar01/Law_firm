@@ -7,7 +7,9 @@ use App\Mail\AppointmentScheduledMail;
 use App\Models\Appointment;
 use App\Models\Client;
 use App\Models\Matter;
+use App\Models\MatterActivity;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -118,6 +120,23 @@ class AppointmentController extends Controller
             'notes' => $validated['notes'] ?? null,
             'status' => 'scheduled',
         ]);
+
+        if ($appointment->matter_id) {
+            $matter = Matter::find($appointment->matter_id);
+            if ($matter) {
+                $activityType = ($appointment->type === 'court_appearance') ? 'hearing_scheduled' : 'calendar_event';
+                MatterActivity::log(
+                    matter: $matter,
+                    activityType: $activityType,
+                    description: 'Scheduled '.ucwords(str_replace('_', ' ', $appointment->type)).": {$appointment->title} on ".date('M d, Y H:i', strtotime($appointment->scheduled_at)),
+                    subject: $appointment,
+                    userId: Auth::id(),
+                    clientId: $appointment->client_id,
+                    isClientSafe: true,
+                    occurredAt: Carbon::parse($appointment->scheduled_at)
+                );
+            }
+        }
 
         // Dispatch email notification to client if client exists
         if ($appointment->client_id) {

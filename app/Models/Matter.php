@@ -84,6 +84,11 @@ class Matter extends Model
         return $this->hasMany(MatterActivity::class);
     }
 
+    public function clientSafeActivities(): HasMany
+    {
+        return $this->hasMany(MatterActivity::class)->where('is_client_safe', true);
+    }
+
     public function conflictChecks(): HasMany
     {
         return $this->hasMany(ConflictCheck::class);

@@ -668,38 +668,85 @@
                 </div>
             </div>
 
-            <!-- Matter Activity Timeline (F-15) -->
+            <!-- Matter Activity Timeline & Case Chronology (Feature 28) -->
             <div id="timeline-section" class="border border-[#e5e3dc] bg-white rounded-md shadow-xs overflow-hidden">
-                <div class="p-4 border-b border-[#f0eee8] flex items-center justify-between">
+                <div class="p-4 border-b border-[#f0eee8] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="flex items-center gap-2">
                         <span class="material-symbols-outlined text-[#23493a] text-xl">history</span>
-                        <h3 class="text-sm font-semibold text-[#1a1a1a]">Matter Timeline &amp; Activity Log</h3>
+                        <div>
+                            <h3 class="text-sm font-semibold text-[#1a1a1a]">Case Chronology &amp; Procedural Timeline</h3>
+                            <p class="text-xs text-[#646864] mt-0.5">Chronological record of evidentiary filings, tasks, court hearings, and client interactions</p>
+                        </div>
                     </div>
-                    <span class="text-xs text-[#8a8a8a] font-mono">{{ $matter->activities->count() }} Events</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-[#8a8a8a] font-mono">{{ $matter->activities->count() }} Recorded</span>
+                        <a href="{{ route('matters.chronology', $matter) }}" class="btn-primary h-7 px-2.5 text-xs inline-flex items-center gap-1 shadow-xs">
+                            <span class="material-symbols-outlined text-[15px]">timeline</span>
+                            <span>Full Chronology</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Illustrative Progression Tracker -->
+                <div class="px-4 py-2.5 bg-[#faf9f5] border-b border-[#f0eee8] flex items-center gap-1.5 overflow-x-auto text-[11px] text-[#646864]">
+                    <span class="font-mono text-[#8a8a8a] text-[10px] uppercase whitespace-nowrap">Progress:</span>
+                    <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-medium whitespace-nowrap">Client Records Uploaded</span>
+                    <span class="text-[#8a8a8a]">&rarr;</span>
+                    <span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-medium whitespace-nowrap">Attorney Review</span>
+                    <span class="text-[#8a8a8a]">&rarr;</span>
+                    <span class="px-2 py-0.5 rounded bg-violet-100 text-violet-800 font-medium whitespace-nowrap">Complaint Drafted</span>
+                    <span class="text-[#8a8a8a]">&rarr;</span>
+                    <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-medium whitespace-nowrap">Complaint Filed</span>
+                    <span class="text-[#8a8a8a]">&rarr;</span>
+                    <span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-medium whitespace-nowrap">Hearing Scheduled</span>
                 </div>
 
                 <div class="p-4">
-                    <div class="relative pl-6 space-y-5 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#f0eee8]">
-                        @forelse($matter->activities->sortByDesc('created_at')->take(20) as $activity)
+                    <div class="relative pl-6 space-y-4 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#f0eee8]">
+                        @forelse($matter->activities->sortByDesc(fn($a) => $a->occurred_at ?? $a->created_at)->take(12) as $activity)
+                        @php
+                            $actIcon = $activity->icon;
+                            $isClientSafe = (bool) $activity->is_client_safe;
+                        @endphp
                         <div class="relative flex items-start gap-3">
                             <div class="absolute -left-6 top-1 w-4 h-4 rounded-full bg-white border-2 border-[#23493a] flex items-center justify-center">
                                 <div class="w-1.5 h-1.5 rounded-full bg-[#23493a]"></div>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 flex-wrap text-xs">
-                                    <span class="font-semibold text-[#1a1a1a]">{{ $activity->user?->name ?? 'System' }}</span>
-                                    <span class="px-1.5 py-0.2 rounded text-[10px] font-mono uppercase bg-stone-100 text-stone-600">
-                                        {{ str_replace('_', ' ', $activity->activity_type) }}
-                                    </span>
-                                    <span class="text-[#8a8a8a] font-mono text-[11px]">{{ $activity->created_at->format('M d, Y h:i A') }}</span>
+                            <div class="flex-1 min-w-0 bg-[#faf9f5] border border-[#e5e3dc] rounded-md p-3">
+                                <div class="flex items-center justify-between gap-2 flex-wrap text-xs">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="material-symbols-outlined text-[14px] text-[#23493a]">{{ $actIcon }}</span>
+                                        <span class="font-semibold text-[#1a1a1a]">{{ $activity->user?->name ?? ($activity->client?->name ?? 'Chambers') }}</span>
+                                        <span class="px-1.5 py-0.5 rounded text-[9.5px] font-mono uppercase bg-stone-100 text-stone-700 border border-stone-200">
+                                            {{ $activity->type_label }}
+                                        </span>
+                                        @if($isClientSafe)
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200" title="Visible on Client Portal">Client Safe</span>
+                                        @else
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-amber-50 text-amber-800 border border-amber-200" title="Internal Work Product Only">Internal</span>
+                                        @endif
+                                    </div>
+                                    <span class="text-[#8a8a8a] font-mono text-[11px]">{{ ($activity->occurred_at ?? $activity->created_at)->format('M d, Y h:i A') }}</span>
                                 </div>
-                                <p class="text-xs text-[#646864] mt-0.5 leading-relaxed">{{ $activity->description }}</p>
+                                <p class="text-xs text-[#1a1a1a] mt-1.5 leading-relaxed">{{ $activity->description }}</p>
                             </div>
                         </div>
                         @empty
-                        <div class="text-center py-4 text-xs text-[#8a8a8a]">No chronological activities logged for this matter yet.</div>
+                        <div class="text-center py-6 text-xs text-[#8a8a8a] bg-[#faf9f5] rounded border border-[#e5e3dc]">
+                            <p class="font-medium text-[#1a1a1a]">No chronological activities logged for this matter yet.</p>
+                            <a href="{{ route('matters.chronology', $matter) }}" class="text-[#23493a] underline text-xs mt-1 inline-block">Record the first procedural milestone &rarr;</a>
+                        </div>
                         @endforelse
                     </div>
+
+                    @if($matter->activities->count() > 12)
+                        <div class="mt-4 pt-3 border-t border-[#f0eee8] text-center">
+                            <a href="{{ route('matters.chronology', $matter) }}" class="text-xs font-semibold text-[#23493a] hover:underline inline-flex items-center gap-1">
+                                <span>View all {{ $matter->activities->count() }} activities in full Case Chronology</span>
+                                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
 

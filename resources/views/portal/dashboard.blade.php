@@ -38,7 +38,16 @@
 
     <!-- Top Connected Metric Ribbon (Standard Grid) -->
     @php
-        $pendingReqCount = $pendingDocumentRequests->count();
+        $activeMatters = $activeMatters ?? ($matters ?? collect())->where('status', '!=', 'closed');
+        $clientTasks = $clientTasks ?? collect();
+        $recentDocs = $recentDocuments ?? collect();
+        $pendingDocs = $pendingDocumentRequests ?? ($documentRequests ?? collect())->where('status', 'pending');
+        $upcomingEvents = $upcomingEvents ?? ($events ?? collect());
+        $recentMessages = $recentMessages ?? collect();
+        $notifications = $notifications ?? collect();
+        $documentsCount = $documentsCount ?? $recentDocs->count();
+
+        $pendingReqCount = $pendingDocs->count();
         $pendingTaskCount = $clientTasks->where('status', '!=', 'completed')->count();
         $activeMattersCount = $activeMatters->count();
     @endphp
@@ -53,8 +62,8 @@
         <!-- 2. Recent Documents -->
         <a href="#recent-documents-section" class="p-4 sm:p-5 block hover:bg-[#faf9f5] transition-colors">
             <div class="text-[12px] text-[#646864]">Vault Documents</div>
-            <div class="text-[26px] font-semibold text-[#1a1a1a] tracking-tight mt-1">{{ str_pad($recentDocuments->count(), 2, '0', STR_PAD_LEFT) }}</div>
-            <div class="text-[11.5px] text-[#8a8a8a] mt-0.5 truncate">{{ $documentsCount }} in vault total</div>
+            <div class="text-[26px] font-semibold text-[#1a1a1a] tracking-tight mt-1">{{ str_pad($recentDocs->count(), 2, '0', STR_PAD_LEFT) }}</div>
+            <div class="text-[11.5px] text-[#8a8a8a] mt-0.5 truncate">{{ $documentsCount ?? $recentDocs->count() }} in vault total</div>
         </a>
 
         <!-- 3. Pending document requests -->
@@ -218,9 +227,9 @@
                         <div>
                             <div class="flex items-center gap-2">
                                 <h2 class="text-[15px] font-semibold text-[#1a1a1a]">Pending Document Requests</h2>
-                                @if($pendingDocumentRequests->count() > 0)
+                                @if($pendingDocs->count() > 0)
                                     <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#fef2f2] text-[#991b1b] border border-[#fecaca]">
-                                        {{ $pendingDocumentRequests->count() }} Action {{ \Illuminate\Support\Str::plural('Item', $pendingDocumentRequests->count()) }}
+                                        {{ $pendingDocs->count() }} Action {{ \Illuminate\Support\Str::plural('Item', $pendingDocs->count()) }}
                                     </span>
                                 @endif
                             </div>
@@ -233,9 +242,9 @@
                     </a>
                 </div>
 
-                @if($pendingDocumentRequests->count() > 0)
+                @if($pendingDocs->count() > 0)
                 <div class="flex flex-col gap-3">
-                    @foreach($pendingDocumentRequests as $req)
+                    @foreach($pendingDocs as $req)
                     <div class="border border-[#e5e3dc] bg-[#faf9f5] rounded-md p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div class="flex flex-col gap-1 min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
@@ -397,9 +406,9 @@
                     </a>
                 </div>
 
-                @if($recentDocuments->count() > 0)
+                @if($recentDocs->count() > 0)
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    @foreach($recentDocuments as $doc)
+                    @foreach($recentDocs as $doc)
                     <div class="border border-[#e5e3dc] bg-[#faf9f5] rounded-md p-4 flex flex-col justify-between hover:border-[#23493a]/40 transition-colors">
                         <div>
                             <div class="flex items-center justify-between gap-1 mb-2">

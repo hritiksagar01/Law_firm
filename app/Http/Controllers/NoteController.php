@@ -84,7 +84,8 @@ class NoteController extends Controller
                     description: "Advocate {$user->name} recorded case note: '{$note->title}'",
                     subject: $note,
                     userId: $user->id,
-                    clientId: $matter->client_id
+                    clientId: $matter->client_id,
+                    isClientSafe: ($note->type === 'client_visible')
                 );
             }
         }

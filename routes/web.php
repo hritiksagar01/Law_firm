@@ -969,6 +969,13 @@ Route::middleware('auth')->group(function () {
             return back()->with('success', $flashMessage);
         })->name('matters.status.update');
 
+        // Matter Chronology & Milestone Timeline (Feature 28)
+        Route::get('/matters/{matter}/chronology', [ActivityController::class, 'matterChronology'])->name('matters.chronology');
+        Route::post('/matters/{matter}/chronology', [ActivityController::class, 'storeMatterChronology'])->name('matters.chronology.store');
+
+        // Chambers Activity Audit Trail
+        Route::get('/activity', [ActivityController::class, 'index'])->name('activity.index');
+
         // Clients Directory, Dossier & Indian Practice Intake
         Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
         Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
@@ -1109,6 +1116,16 @@ Route::middleware('auth')->group(function () {
                 'previous_version_id' => null,
             ]);
 
+            MatterActivity::log(
+                matter: $matter,
+                activityType: 'document_uploaded',
+                description: "Uploaded document '{$doc->title}' ({$file->getClientOriginalName()}) [Category: {$doc->category}]",
+                subject: $doc,
+                userId: $user->id,
+                clientId: $matter->client_id,
+                isClientSafe: (bool) $isClientVisible
+            );
+
             return back()->with('success', 'Filing securely uploaded and SHA-256 authenticated.');
         })->name('documents.upload');
 
@@ -1166,6 +1183,18 @@ Route::middleware('auth')->group(function () {
                 'sha256' => $sha256,
                 'document_status' => in_array(strtolower($versionStatus), ['final', 'executed']) ? 'final' : 'draft',
             ]);
+
+            if ($document->matter) {
+                MatterActivity::log(
+                    matter: $document->matter,
+                    activityType: 'document_uploaded',
+                    description: "Uploaded revision v{$newVersionNumber} ({$versionStatus}) for document '{$document->title}'",
+                    subject: $document,
+                    userId: $user->id,
+                    clientId: $document->client_id,
+                    isClientSafe: (bool) $document->is_client_visible
+                );
+            }
 
             return back()->with('success', 'New document version v'.$newVersionNumber.' ('.$versionStatus.') uploaded successfully.');
         })->name('documents.versions.store');
@@ -1226,6 +1255,18 @@ Route::middleware('auth')->group(function () {
                 'document_status' => in_array(strtolower($versionStatus), ['final', 'executed']) ? 'final' : 'draft',
             ]);
 
+            if ($document->matter) {
+                MatterActivity::log(
+                    matter: $document->matter,
+                    activityType: 'document_uploaded',
+                    description: "Uploaded revision v{$newVersionNumber} ({$versionStatus}) for document '{$document->title}'",
+                    subject: $document,
+                    userId: $user->id,
+                    clientId: $document->client_id,
+                    isClientSafe: (bool) $document->is_client_visible
+                );
+            }
+
             return back()->with('success', 'New document version v'.$newVersionNumber.' ('.$versionStatus.') uploaded successfully.');
         })->name('documents.versions.upload');
 
@@ -1247,6 +1288,18 @@ Route::middleware('auth')->group(function () {
                 if (! $assigned) {
                     abort(403, 'Unauthorized: You are not assigned to this case dossier.');
                 }
+            }
+
+            if ($document->matter) {
+                MatterActivity::log(
+                    matter: $document->matter,
+                    activityType: 'document_downloaded',
+                    description: "Advocate {$user->name} downloaded revision v{$version->version_number} of '{$document->title}'",
+                    subject: $version,
+                    userId: $user->id,
+                    clientId: $document->client_id,
+                    isClientSafe: (bool) $document->is_client_visible
+                );
             }
 
             $defaultDisk = config('filesystems.default', 'local');
@@ -1303,6 +1356,18 @@ Route::middleware('auth')->group(function () {
                 }
             }
 
+            if ($document->matter) {
+                MatterActivity::log(
+                    matter: $document->matter,
+                    activityType: 'document_downloaded',
+                    description: "Advocate {$user->name} downloaded document '{$document->title}' ({$document->filename})",
+                    subject: $document,
+                    userId: $user->id,
+                    clientId: $document->client_id,
+                    isClientSafe: (bool) $document->is_client_visible
+                );
+            }
+
             $defaultDisk = config('filesystems.default', 'local');
             if ($document->file_path) {
                 try {
@@ -1343,6 +1408,87 @@ Route::middleware('auth')->group(function () {
             ]);
         })->name('documents.download');
 
+        // Document View / Inline Preview
+        Route::get('/documents/{document}/view', function (Document $document) {
+            $user = Auth::user();
+            if ($document->firm_id !== ($user->firm_id ?? 1)) {
+                abort(403, 'Unauthorized document access across firms.');
+            }
+
+            if (! in_array($user->role, ['superadmin', 'partner'])) {
+                $isCreatorOrRequester = ($document->user_id === $user->id) ||
+                    DocumentRequest::where('document_id', $document->id)->where('requested_by', $user->id)->exists();
+
+                $assigned = $isCreatorOrRequester || ($document->matter && (
+                    $document->matter->lead_attorney_id === $user->id ||
+                    $document->matter->users()->where('users.id', $user->id)->exists()
+                ));
+                if (! $assigned) {
+                    abort(403, 'Unauthorized: You are not assigned to this case dossier.');
+                }
+            }
+
+            if ($document->matter) {
+                MatterActivity::log(
+                    matter: $document->matter,
+                    activityType: 'document_viewed',
+                    description: "Advocate {$user->name} viewed document '{$document->title}'",
+                    subject: $document,
+                    userId: $user->id,
+                    clientId: $document->client_id,
+                    isClientSafe: (bool) $document->is_client_visible
+                );
+            }
+
+            $defaultDisk = config('filesystems.default', 'local');
+            if ($document->file_path) {
+                try {
+                    if (Storage::disk($defaultDisk)->exists($document->file_path)) {
+                        return Storage::disk($defaultDisk)->response($document->file_path, $document->filename, [
+                            'Content-Type' => $document->mime_type ?: 'application/pdf',
+                            'Content-Disposition' => "inline; filename=\"{$document->filename}\"",
+                        ]);
+                    }
+                } catch (Throwable $e) {
+                }
+            }
+
+            $pdfContent = LegalPdfGenerator::forDocument($document);
+
+            return response($pdfContent, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => "inline; filename=\"{$document->filename}\"",
+                'Content-Length' => strlen($pdfContent),
+            ]);
+        })->name('documents.view');
+
+        // Document Share with Client Portal
+        Route::post('/documents/{document}/share', function (Request $request, Document $document) {
+            $user = Auth::user();
+            if ($document->firm_id !== ($user->firm_id ?? 1)) {
+                abort(403);
+            }
+
+            $document->update([
+                'is_client_visible' => true,
+                'visibility' => 'client_visible',
+            ]);
+
+            if ($document->matter) {
+                MatterActivity::log(
+                    matter: $document->matter,
+                    activityType: 'document_shared',
+                    description: "Advocate {$user->name} shared document '{$document->title}' with client portal",
+                    subject: $document,
+                    userId: $user->id,
+                    clientId: $document->client_id,
+                    isClientSafe: true
+                );
+            }
+
+            return back()->with('success', "Document '{$document->title}' shared with client.");
+        })->name('documents.share');
+
         // Chambers Calendar & Court Docket
         Route::get('/calendar', function () {
             $firmId = Auth::user()->firm_id;
@@ -1363,7 +1509,7 @@ Route::middleware('auth')->group(function () {
                 'is_statutory_deadline' => 'nullable',
             ]);
 
-            Event::create([
+            $event = Event::create([
                 'firm_id' => Auth::user()->firm_id ?? 1,
                 'matter_id' => $validated['matter_id'] ?? null,
                 'user_id' => Auth::id(),
@@ -1373,6 +1519,23 @@ Route::middleware('auth')->group(function () {
                 'location' => $validated['location'],
                 'is_statutory_deadline' => $request->has('is_statutory_deadline'),
             ]);
+
+            if ($event->matter_id) {
+                $matter = Matter::find($event->matter_id);
+                if ($matter) {
+                    $activityType = (strtolower($event->event_type) === 'hearing' || str_contains(strtolower($event->title), 'hearing')) ? 'hearing_scheduled' : 'calendar_event';
+                    MatterActivity::log(
+                        matter: $matter,
+                        activityType: $activityType,
+                        description: "Registered calendar docket event: {$event->title} (".ucwords(str_replace('_', ' ', $event->event_type)).') on '.date('M d, Y H:i', strtotime($event->start_time)),
+                        subject: $event,
+                        userId: Auth::id(),
+                        clientId: $matter->client_id,
+                        isClientSafe: true,
+                        occurredAt: Carbon::parse($event->start_time)
+                    );
+                }
+            }
 
             return back()->with('success', 'Docket event registered on chambers calendar.');
         })->name('calendar.store');

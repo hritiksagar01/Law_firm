@@ -294,10 +294,11 @@ class PortalController extends Controller
 
         // Client-safe activities only (exclude privileged internal actions)
         $activities = MatterActivity::where('matter_id', $matter->id)
+            ->where('is_client_safe', true)
             ->whereNotIn('activity_type', ['internal_note', 'billing_entry', 'conflict_check', 'time_entry'])
             ->with(['user'])
-            ->latest()
-            ->take(25)
+            ->chronological('desc')
+            ->take(50)
             ->get();
 
         // Client-visible notes only
@@ -379,6 +380,18 @@ class PortalController extends Controller
             'client_notes' => $httpRequest->client_notes,
         ]);
 
+        if ($request->matter) {
+            MatterActivity::log(
+                matter: $request->matter,
+                activityType: 'document_uploaded',
+                description: "Client {$client->name} fulfilled document request '{$request->title}': uploaded '{$doc->filename}'",
+                subject: $doc,
+                userId: $user->id,
+                clientId: $client->id,
+                isClientSafe: true
+            );
+        }
+
         return back()->with('success', "Document '{$doc->filename}' submitted to legal counsel.");
     }
 
@@ -442,7 +455,7 @@ class PortalController extends Controller
             }
         }
 
-        Document::create([
+        $doc = Document::create([
             'firm_id' => $matter->firm_id,
             'matter_id' => $matter->id,
             'user_id' => $user->id,
@@ -457,6 +470,16 @@ class PortalController extends Controller
             'is_client_visible' => true,
             'version' => 1,
         ]);
+
+        MatterActivity::log(
+            matter: $matter,
+            activityType: 'document_uploaded',
+            description: "Client {$client->name} uploaded document '{$doc->title}' ({$doc->filename})",
+            subject: $doc,
+            userId: $user->id,
+            clientId: $client->id,
+            isClientSafe: true
+        );
 
         return back()->with('success', 'Document uploaded to case file.');
     }
@@ -478,6 +501,16 @@ class PortalController extends Controller
         if ($document->is_client_visible === false) {
             abort(403, 'Unauthorized: This filing is restricted to internal chambers work product.');
         }
+
+        MatterActivity::log(
+            matter: $matter,
+            activityType: 'document_downloaded',
+            description: "Client {$client->name} downloaded document '{$document->title}' ({$document->filename})",
+            subject: $document,
+            userId: Auth::id(),
+            clientId: $client->id,
+            isClientSafe: true
+        );
 
         $defaultDisk = config('filesystems.default', 'local');
         if ($document->file_path) {
