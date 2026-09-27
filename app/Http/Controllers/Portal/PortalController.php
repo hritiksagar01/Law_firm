@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
+use App\Models\CaseNote;
 use App\Models\Client;
 use App\Models\Document;
 use App\Models\DocumentRequest;
@@ -10,6 +11,7 @@ use App\Models\Event;
 use App\Models\Firm;
 use App\Models\Invoice;
 use App\Models\Matter;
+use App\Models\MatterActivity;
 use App\Models\Message;
 use App\Models\Task;
 use App\Services\LegalPdfGenerator;
@@ -210,23 +212,6 @@ class PortalController extends Controller
             ]);
         }
 
-        // Invoice / Billing notices
-        $unpaidInvoices = $invoices->where('status', '!=', 'paid')->take(2);
-        foreach ($unpaidInvoices as $inv) {
-            $notifications->push([
-                'id' => 'inv-'.$inv->id,
-                'type' => 'billing',
-                'icon' => 'receipt_long',
-                'color' => 'amber',
-                'badge' => 'Fee Bill Pending',
-                'title' => 'Invoice '.($inv->invoice_number ?? '#INV-'.$inv->id).' Awaiting Settlement',
-                'description' => 'Outstanding amount: '.config('legal.currency.symbol', '₹').number_format($inv->total ?? $inv->balance_due ?? 0, 2).($inv->matter ? ' · '.$inv->matter->case_number : ''),
-                'time' => $inv->due_date ? 'Due by '.Carbon::parse($inv->due_date)->format('d M Y') : 'Due upon receipt',
-                'action_url' => route('portal.invoices.index'),
-                'action_label' => 'Settle Fee',
-            ]);
-        }
-
         // Baseline statutory privilege status if collection is sparse
         if ($notifications->count() < 2) {
             $notifications->push([
@@ -287,14 +272,39 @@ class PortalController extends Controller
         }
 
         $matter->load([
-            'documents' => fn ($q) => $q->where('is_client_visible', true),
+            'documents' => fn ($q) => $q->where('is_client_visible', true)->latest(),
             'leadAttorney',
+            'supervisingAttorney',
+            'assignedParalegal',
+            'teamMembers',
             'documentRequests.requestedBy',
-            'events',
+            'events' => fn ($q) => $q->orderBy('start_time'),
             'messages.sender',
+            'tasks' => fn ($q) => $q->where(function ($q2) use ($client, $matter) {
+                if ($client->user_id) {
+                    $q2->where('assigned_to', $client->user_id);
+                }
+                $q2->orWhere('matter_id', $matter->id);
+            })->orderByRaw("CASE WHEN status = 'completed' THEN 1 ELSE 0 END")
+                ->orderBy('due_date', 'asc'),
         ]);
 
-        return view('portal.matters.show', compact('client', 'matter'));
+        // Client-safe activities only (exclude privileged internal actions)
+        $activities = MatterActivity::where('matter_id', $matter->id)
+            ->whereNotIn('activity_type', ['internal_note', 'billing_entry', 'conflict_check', 'time_entry'])
+            ->with(['user'])
+            ->latest()
+            ->take(25)
+            ->get();
+
+        // Client-visible notes only
+        $notes = CaseNote::where('matter_id', $matter->id)
+            ->where('type', 'client_visible')
+            ->with('user')
+            ->latest()
+            ->get();
+
+        return view('portal.matters.show', compact('client', 'matter', 'activities', 'notes'));
     }
 
     /**

@@ -45,14 +45,14 @@
     <div class="grid grid-cols-2 lg:grid-cols-5 border border-[#e5e3dc] bg-white rounded-md divide-y lg:divide-y-0 sm:divide-x divide-[#e5e3dc] shadow-xs mb-8">
         <!-- 1. Active matters -->
         <a href="#active-matters-section" class="p-4 sm:p-5 block hover:bg-[#faf9f5] transition-colors">
-            <div class="text-[12px] text-[#646864]">Active matters</div>
+            <div class="text-[12px] text-[#646864]">Active Cases</div>
             <div class="text-[26px] font-semibold text-[#1a1a1a] tracking-tight mt-1">{{ str_pad($activeMattersCount, 2, '0', STR_PAD_LEFT) }}</div>
             <div class="text-[11.5px] text-[#8a8a8a] mt-0.5 truncate">High Court &amp; Tribunals</div>
         </a>
 
         <!-- 2. Recent Documents -->
         <a href="#recent-documents-section" class="p-4 sm:p-5 block hover:bg-[#faf9f5] transition-colors">
-            <div class="text-[12px] text-[#646864]">Recent documents</div>
+            <div class="text-[12px] text-[#646864]">Vault Documents</div>
             <div class="text-[26px] font-semibold text-[#1a1a1a] tracking-tight mt-1">{{ str_pad($recentDocuments->count(), 2, '0', STR_PAD_LEFT) }}</div>
             <div class="text-[11.5px] text-[#8a8a8a] mt-0.5 truncate">{{ $documentsCount }} in vault total</div>
         </a>
@@ -81,11 +81,11 @@
             <div class="text-[11.5px] text-[#8a8a8a] mt-0.5 truncate">Signatures &amp; reviews</div>
         </a>
 
-        <!-- 5. Retainer Trust Balance -->
-        <a href="{{ route('portal.invoices.index') }}" class="p-4 sm:p-5 col-span-2 sm:col-span-1 block hover:bg-[#faf9f5] transition-colors">
-            <div class="text-[12px] text-[#646864]">Advance retainer</div>
-            <div class="text-[26px] font-semibold text-[#1a1a1a] tracking-tight mt-1">{{ config('legal.currency.symbol', '₹') }}{{ number_format($client->trust_balance, 2) }}</div>
-            <div class="text-[11.5px] text-[#8a8a8a] mt-0.5 truncate">Ledger balance</div>
+        <!-- 5. Upcoming Hearings / Events -->
+        <a href="#upcoming-events-section" class="p-4 sm:p-5 col-span-2 sm:col-span-1 block hover:bg-[#faf9f5] transition-colors">
+            <div class="text-[12px] text-[#646864]">Upcoming events</div>
+            <div class="text-[26px] font-semibold text-[#1a1a1a] tracking-tight mt-1">{{ str_pad($upcomingEvents->count(), 2, '0', STR_PAD_LEFT) }}</div>
+            <div class="text-[11.5px] text-[#8a8a8a] mt-0.5 truncate">Hearings &amp; listings</div>
         </a>
     </div>
 
@@ -637,19 +637,19 @@
             </div>
             @endif
 
-            <!-- Enterprise Retainer Statement -->
+            <!-- Privileged Chambers Vault Card -->
             <div class="border border-[#e5e3dc] bg-white rounded-md p-4 sm:p-5 shadow-xs flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-md bg-[#23493a]/10 text-[#23493a] flex items-center justify-center shrink-0">
-                        <span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+                        <span class="material-symbols-outlined text-[20px]">verified_user</span>
                     </div>
                     <div class="flex flex-col">
-                        <span class="text-[13px] font-semibold text-[#1a1a1a]">Retainer Account Ledger</span>
-                        <span class="text-[11.5px] text-[#8a8a8a]">Trust Balance Verified</span>
+                        <span class="text-[13px] font-semibold text-[#1a1a1a]">Privileged Chambers Vault</span>
+                        <span class="text-[11.5px] text-[#8a8a8a]">Section 126 &amp; 129 Evidence Act</span>
                     </div>
                 </div>
-                <a href="{{ route('portal.invoices.index') }}" class="text-[12px] text-[#23493a] font-medium hover:underline flex items-center gap-0.5">
-                    <span>Statements &rarr;</span>
+                <a href="{{ route('portal.documents.index') }}" class="text-[12px] text-[#23493a] font-medium hover:underline flex items-center gap-0.5">
+                    <span>Open Vault &rarr;</span>
                 </a>
             </div>
 
