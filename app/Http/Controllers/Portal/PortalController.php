@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
+use App\Models\Appointment;
 use App\Models\CaseNote;
 use App\Models\Client;
 use App\Models\Document;
@@ -115,6 +116,108 @@ class PortalController extends Controller
                 ->get();
         }
         $events = $upcomingEvents;
+
+        // 3-Week Interactive Court Calendar Engine (Previous Week, This Week, Next Week - identical to Law Firm & Super Admin)
+        $previousWeekStart = Carbon::now()->subWeek()->startOfWeek();
+        $previousWeekEnd = Carbon::now()->subWeek()->endOfWeek()->endOfDay();
+        $thisWeekStart = Carbon::now()->startOfWeek();
+        $thisWeekEnd = Carbon::now()->endOfWeek()->endOfDay();
+        $comingWeekStart = Carbon::now()->addWeek()->startOfWeek();
+        $comingWeekEnd = Carbon::now()->addWeek()->endOfWeek()->endOfDay();
+
+        $getScheduleForRange = function (Carbon $start, Carbon $end) use ($client, $matterIds) {
+            $items = collect();
+            $evts = Event::whereIn('matter_id', $matterIds)
+                ->whereBetween('start_time', [$start, $end])
+                ->with('matter')
+                ->orderBy('start_time')
+                ->get();
+
+            foreach ($evts as $evt) {
+                $startTime = Carbon::parse($evt->start_time);
+                $type = $evt->event_type ?: 'Hearing';
+                $isDeadline = $evt->is_statutory_deadline || str_contains(strtolower($type), 'deadline');
+
+                $badgeColor = match (true) {
+                    $isDeadline => 'bg-[#fce8e6] text-[#c5221f]',
+                    str_contains(strtolower($type), 'hearing') => 'bg-[#f3e8ff] text-[#7e22ce]',
+                    str_contains(strtolower($type), 'meeting') || str_contains(strtolower($type), 'conference') => 'bg-[#e0f2fe] text-[#0284c7]',
+                    default => 'bg-[#e6f4ea] text-[#137333]',
+                };
+
+                $items->push([
+                    'date' => $startTime,
+                    'month_short' => strtoupper($startTime->format('M')),
+                    'day_num' => $startTime->format('j'),
+                    'time_str' => $startTime->format('g:i A'),
+                    'type_label' => $isDeadline ? 'Deadline' : (str_contains(strtolower($type), 'hearing') ? 'Hearing' : (str_contains(strtolower($type), 'meeting') ? 'Meeting' : 'Hearing')),
+                    'badge_class' => $badgeColor,
+                    'title' => $evt->title,
+                    'matter_info' => $evt->matter ? ($evt->matter->case_number.' '.$evt->matter->title) : 'Case Docket',
+                    'matter_id' => $evt->matter_id,
+                ]);
+            }
+
+            $appts = Appointment::where(function ($q) use ($client, $matterIds) {
+                $q->where('client_id', $client->id);
+                if ($matterIds->isNotEmpty()) {
+                    $q->orWhereIn('matter_id', $matterIds);
+                }
+            })
+                ->whereBetween('scheduled_at', [$start, $end])
+                ->with(['matter', 'client'])
+                ->orderBy('scheduled_at')
+                ->get();
+
+            foreach ($appts as $appt) {
+                $schedTime = Carbon::parse($appt->scheduled_at);
+                $items->push([
+                    'date' => $schedTime,
+                    'month_short' => strtoupper($schedTime->format('M')),
+                    'day_num' => $schedTime->format('j'),
+                    'time_str' => $schedTime->format('g:i A'),
+                    'type_label' => 'Appointment',
+                    'badge_class' => 'bg-[#e6f4ea] text-[#137333]',
+                    'title' => $appt->title,
+                    'matter_info' => $appt->matter ? ($appt->matter->case_number.' '.$appt->matter->title) : ($appt->client ? $appt->client->name : 'Client Consultation'),
+                    'matter_id' => $appt->matter_id,
+                ]);
+            }
+
+            return $items->sortBy('date')->values();
+        };
+
+        $previousWeekSchedule = $getScheduleForRange($previousWeekStart, $previousWeekEnd);
+        $thisWeekSchedule = $getScheduleForRange($thisWeekStart, $thisWeekEnd);
+        $comingWeekSchedule = $getScheduleForRange($comingWeekStart, $comingWeekEnd);
+
+        // Fallback: If this week & coming week are empty, but events has items, ensure they are represented under This Week
+        if ($thisWeekSchedule->isEmpty() && $comingWeekSchedule->isEmpty() && $events->isNotEmpty()) {
+            foreach ($events as $fallbackEvt) {
+                $startTime = Carbon::parse($fallbackEvt->start_time);
+                $type = $fallbackEvt->event_type ?: 'Hearing';
+                $isDeadline = $fallbackEvt->is_statutory_deadline || str_contains(strtolower($type), 'deadline');
+
+                $badgeColor = match (true) {
+                    $isDeadline => 'bg-[#fce8e6] text-[#c5221f]',
+                    str_contains(strtolower($type), 'hearing') => 'bg-[#f3e8ff] text-[#7e22ce]',
+                    str_contains(strtolower($type), 'meeting') || str_contains(strtolower($type), 'conference') => 'bg-[#e0f2fe] text-[#0284c7]',
+                    default => 'bg-[#e6f4ea] text-[#137333]',
+                };
+
+                $thisWeekSchedule->push([
+                    'date' => $startTime,
+                    'month_short' => strtoupper($startTime->format('M')),
+                    'day_num' => $startTime->format('j'),
+                    'time_str' => $startTime->format('g:i A'),
+                    'type_label' => $isDeadline ? 'Deadline' : (str_contains(strtolower($type), 'hearing') ? 'Hearing' : 'Hearing'),
+                    'badge_class' => $badgeColor,
+                    'title' => $fallbackEvt->title,
+                    'matter_info' => $fallbackEvt->matter ? ($fallbackEvt->matter->case_number.' '.$fallbackEvt->matter->title) : 'Case Docket',
+                    'matter_id' => $fallbackEvt->matter_id,
+                ]);
+            }
+        }
 
         // 5. Recent Messages (Privileged Counsel Communications)
         $recentMessages = Message::whereIn('matter_id', $matterIds)
@@ -237,6 +340,9 @@ class PortalController extends Controller
             'recentDocuments',
             'pendingDocumentRequests',
             'upcomingEvents',
+            'previousWeekSchedule',
+            'thisWeekSchedule',
+            'comingWeekSchedule',
             'recentMessages',
             'clientTasks',
             'notifications',

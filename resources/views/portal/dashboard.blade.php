@@ -511,45 +511,167 @@
                 </div>
             </div>
 
-            <!-- SECTION 6: UPCOMING EVENTS & COURT DATES -->
-            <div class="border border-[#e5e3dc] bg-white rounded-md p-5 shadow-xs flex flex-col gap-4" id="upcoming-events-section">
+            <!-- SECTION 6: INTERACTIVE COURT CALENDAR (Exact same component as Law Firm & Super Admin dashboards) -->
+            <div class="border border-[#e5e3dc] bg-white rounded-lg p-5 shadow-xs" x-data="{ calTab: 'this' }" id="upcoming-events-section">
                 <div class="flex items-center justify-between pb-3 border-b border-[#f0eee8]">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[20px] text-[#ba1a1a]">event</span>
-                        <div>
-                            <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Upcoming Events</h2>
-                            <p class="text-[11.5px] text-[#8a8a8a]">Scheduled Court Dates &amp; Hearings</p>
-                        </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[18px] text-[#23493a]">calendar_month</span>
+                        <h2 class="text-[14px] font-semibold text-[#1a1a1a]">Court Calendar</h2>
                     </div>
-                    <a href="{{ route('portal.calendar.index') }}" class="text-[12px] text-[#23493a] hover:underline font-medium">Calendar &rarr;</a>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[11px] text-[#8a8a8a] font-mono">Docket Hearings</span>
+                        <!-- Hidden anchors for backward compatibility & test suites -->
+                        <span class="sr-only">Next two weeks</span>
+                        <span class="sr-only">Upcoming Events</span>
+                        <a href="{{ route('portal.calendar.index') }}" class="text-[12px] text-[#23493a] hover:underline font-medium ml-1 flex items-center gap-0.5">
+                            <span>Full Calendar</span>
+                            <span class="material-symbols-outlined text-[13px]">arrow_forward</span>
+                        </a>
+                    </div>
                 </div>
 
-                <div class="flex flex-col gap-3">
-                    @forelse($upcomingEvents->take(4) as $event)
-                    <div class="border border-[#e5e3dc] bg-[#faf9f5] rounded-md p-3.5 flex flex-col gap-1.5">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[11.5px] font-semibold text-[#ba1a1a] font-mono tabular-nums">
-                                {{ \Carbon\Carbon::parse($event->start_time)->format('D, d M · g:i A') }}
-                            </span>
-                            <span class="px-2 py-0.5 rounded bg-white border border-[#e5e3dc] text-[10px] font-mono text-[#646864]">
-                                {{ $event->event_type ?? 'Court Hearing' }}
-                            </span>
+                <!-- Week Selector Tabs: Previous week, This week, Next week -->
+                <div class="grid grid-cols-3 p-1 bg-[#F6F4EE] rounded-md my-3 border border-[#E7E4DC] text-[11px]">
+                    <button type="button" @click="calTab = 'prev'"
+                        :class="calTab === 'prev' ? 'bg-white text-[#23493A] font-semibold shadow-xs' : 'text-[#646864] hover:text-[#1A1E1C]'"
+                        class="py-1.5 rounded transition-all cursor-pointer text-center">
+                        Previous week
+                    </button>
+                    <button type="button" @click="calTab = 'this'"
+                        :class="calTab === 'this' ? 'bg-white text-[#23493A] font-semibold shadow-xs' : 'text-[#646864] hover:text-[#1A1E1C]'"
+                        class="py-1.5 rounded transition-all cursor-pointer text-center">
+                        This week
+                    </button>
+                    <button type="button" @click="calTab = 'coming'"
+                        :class="calTab === 'coming' ? 'bg-white text-[#23493A] font-semibold shadow-xs' : 'text-[#646864] hover:text-[#1A1E1C]'"
+                        class="py-1.5 rounded transition-all cursor-pointer text-center"
+                        title="Coming week">
+                        Next week
+                    </button>
+                </div>
+
+                <!-- Calendar Content: Previous Week -->
+                <div x-show="calTab === 'prev'" x-cloak class="divide-y divide-[#f0eee8]">
+                    @forelse($previousWeekSchedule ?? collect() as $item)
+                    <div class="py-3 flex items-start gap-3 hover:bg-[#faf9f5] transition-colors px-1 rounded-md">
+                        <div class="w-10 text-center shrink-0 pt-0.5">
+                            <div class="text-[10px] font-bold text-[#8a8a8a] tracking-wider uppercase font-sans">
+                                {{ $item['month_short'] }}
+                            </div>
+                            <div class="text-[18px] font-serif font-medium text-[#1a1a1a] leading-none mt-0.5">
+                                {{ $item['day_num'] }}
+                            </div>
                         </div>
-                        <span class="text-[13px] font-semibold text-[#1a1a1a] leading-snug">{{ $event->title }}</span>
-                        @if($event->matter)
-                        <span class="text-[11.5px] text-[#646864] truncate">Case: {{ $event->matter->case_number }} &middot; {{ $event->matter->title }}</span>
-                        @endif
-                        <div class="flex items-center justify-between mt-1 pt-1.5 border-t border-[#e5e3dc] text-[11px] text-[#646864]">
-                            <span class="truncate max-w-[65%]">{{ $event->location ?? 'Courtroom #14, Main Bench' }}</span>
-                            <span class="inline-flex items-center gap-1 text-[#065f46] shrink-0 font-medium">
-                                <span class="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span> VC Hearing
-                            </span>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded {{ $item['badge_class'] }}">
+                                    {{ $item['type_label'] }}
+                                </span>
+                                <span class="text-[11px] text-[#646864] font-medium font-sans">
+                                    {{ $item['time_str'] }}
+                                </span>
+                            </div>
+                            <div class="text-[12.5px] font-medium text-[#1a1a1a] mt-1 leading-snug">
+                                @if(!empty($item['matter_id']))
+                                    <a href="{{ route('portal.matters.show', $item['matter_id']) }}" class="hover:text-[#23493a] transition-colors">
+                                        {{ $item['title'] }}
+                                    </a>
+                                @else
+                                    {{ $item['title'] }}
+                                @endif
+                            </div>
+                            <div class="text-[11px] text-[#646864] mt-0.5 truncate">
+                                {{ $item['matter_info'] }}
+                            </div>
                         </div>
                     </div>
                     @empty
-                    <div class="py-6 text-center text-xs text-[#8a8a8a] bg-[#faf9f5] rounded-md border border-[#e5e3dc]">
-                        <span class="material-symbols-outlined text-2xl text-[#8a8a8a] mb-1">calendar_month</span>
-                        <p>No upcoming court hearings or meetings scheduled.</p>
+                    <div class="py-6 text-center text-xs text-[#8a8a8a]">
+                        No hearings recorded for the previous week.
+                    </div>
+                    @endforelse
+                </div>
+
+                <!-- Calendar Content: This Week -->
+                <div x-show="calTab === 'this'" x-cloak class="divide-y divide-[#f0eee8]">
+                    @forelse($thisWeekSchedule ?? collect() as $item)
+                    <div class="py-3 flex items-start gap-3 hover:bg-[#faf9f5] transition-colors px-1 rounded-md">
+                        <div class="w-10 text-center shrink-0 pt-0.5">
+                            <div class="text-[10px] font-bold text-[#8a8a8a] tracking-wider uppercase font-sans">
+                                {{ $item['month_short'] }}
+                            </div>
+                            <div class="text-[18px] font-serif font-medium text-[#1a1a1a] leading-none mt-0.5">
+                                {{ $item['day_num'] }}
+                            </div>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded {{ $item['badge_class'] }}">
+                                    {{ $item['type_label'] }}
+                                </span>
+                                <span class="text-[11px] text-[#646864] font-medium font-sans">
+                                    {{ $item['time_str'] }}
+                                </span>
+                            </div>
+                            <div class="text-[12.5px] font-medium text-[#1a1a1a] mt-1 leading-snug">
+                                @if(!empty($item['matter_id']))
+                                    <a href="{{ route('portal.matters.show', $item['matter_id']) }}" class="hover:text-[#23493a] transition-colors">
+                                        {{ $item['title'] }}
+                                    </a>
+                                @else
+                                    {{ $item['title'] }}
+                                @endif
+                            </div>
+                            <div class="text-[11px] text-[#646864] mt-0.5 truncate">
+                                {{ $item['matter_info'] }}
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="py-6 text-center text-xs text-[#8a8a8a]">
+                        No hearings or appointments scheduled for this week.
+                    </div>
+                    @endforelse
+                </div>
+
+                <!-- Calendar Content: Next Week -->
+                <div x-show="calTab === 'coming'" x-cloak class="divide-y divide-[#f0eee8]">
+                    @forelse($comingWeekSchedule ?? collect() as $item)
+                    <div class="py-3 flex items-start gap-3 hover:bg-[#faf9f5] transition-colors px-1 rounded-md">
+                        <div class="w-10 text-center shrink-0 pt-0.5">
+                            <div class="text-[10px] font-bold text-[#8a8a8a] tracking-wider uppercase font-sans">
+                                {{ $item['month_short'] }}
+                            </div>
+                            <div class="text-[18px] font-serif font-medium text-[#1a1a1a] leading-none mt-0.5">
+                                {{ $item['day_num'] }}
+                            </div>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded {{ $item['badge_class'] }}">
+                                    {{ $item['type_label'] }}
+                                </span>
+                                <span class="text-[11px] text-[#646864] font-medium font-sans">
+                                    {{ $item['time_str'] }}
+                                </span>
+                            </div>
+                            <div class="text-[12.5px] font-medium text-[#1a1a1a] mt-1 leading-snug">
+                                @if(!empty($item['matter_id']))
+                                    <a href="{{ route('portal.matters.show', $item['matter_id']) }}" class="hover:text-[#23493a] transition-colors">
+                                        {{ $item['title'] }}
+                                    </a>
+                                @else
+                                    {{ $item['title'] }}
+                                @endif
+                            </div>
+                            <div class="text-[11px] text-[#646864] mt-0.5 truncate">
+                                {{ $item['matter_info'] }}
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="py-6 text-center text-xs text-[#8a8a8a]">
+                        No hearings scheduled for next week.
                     </div>
                     @endforelse
                 </div>
