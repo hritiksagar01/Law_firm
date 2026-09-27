@@ -30,8 +30,6 @@
         leadAttorneyId: '{{ old('lead_attorney_id', auth()->id() ?? '') }}',
         supervisingAttorneyId: '{{ old('supervising_attorney_id', '') }}',
         assignedParalegalId: '{{ old('assigned_paralegal_id', '') }}',
-        billingType: '{{ old('billing_type', 'flat_fee') }}',
-        budget: '{{ old('budget', '150000') }}',
         selectedTypes: {{ json_encode(old('matter_types', ['Civil Litigation', 'Commercial Litigation'])) }},
         customType: '{{ old('custom_matter_type', '') }}',
         judges: {{ json_encode(old('judges', [
@@ -221,10 +219,10 @@
                         <span class="text-[10.5px] text-[#8a8a8a]">Formal judicial caption as styled on court petitions, pleadings, or legal briefs</span>
                     </div>
 
-                    <!-- 2ND: Client / Retaining Entity -->
+                    <!-- 2ND: Client / Corporate Entity -->
                     <div class="flex flex-col gap-1.5 md:col-span-2">
                         <div class="flex items-center justify-between">
-                            <label class="text-xs font-semibold text-[#1a1a1a]">Client / Retaining Entity *</label>
+                            <label class="text-xs font-semibold text-[#1a1a1a]">Client / Corporate Entity *</label>
                             <span class="text-[11px] text-[#646864]">Select corporate client or individual principal</span>
                         </div>
                         <select name="client_id" x-model="clientId" required 
@@ -454,10 +452,10 @@
 
                     <!-- Open Date -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-xs font-semibold text-[#1a1a1a]">Open / Retainer Date *</label>
+                        <label class="text-xs font-semibold text-[#1a1a1a]">Matter Opening Date *</label>
                         <input type="date" name="opened_at" x-model="openedAt" required
                                class="w-full h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:outline-none focus:border-[#23493a]"/>
-                        <span class="text-[10.5px] text-[#8a8a8a]">Formal retention or commencement date</span>
+                        <span class="text-[10.5px] text-[#8a8a8a]">Official date case dossier is opened</span>
                     </div>
 
                     <!-- Target / Close Date (Optional) -->
@@ -796,27 +794,9 @@
                         <span class="text-[10.5px] text-[#8a8a8a]">Staff member handling filings, docketing, and briefs</span>
                     </div>
 
-                    <!-- Billing Type & Budget -->
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-xs font-semibold text-[#1a1a1a]">Commercial Billing Type *</label>
-                        <select name="billing_type" x-model="billingType" required
-                                class="w-full h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:outline-none focus:border-[#23493a]">
-                            <option value="flat_fee">Fixed / Stage-wise Flat Fee</option>
-                            <option value="hourly">Hourly Rate Billing</option>
-                            <option value="contingency">Contingency / Success Fee</option>
-                            <option value="retainer">Monthly General Retainer</option>
-                        </select>
-                    </div>
-
-                    <div class="flex flex-col gap-1.5 md:col-span-2">
-                        <label class="text-xs font-semibold text-[#1a1a1a]">Estimated Matter Budget / Retainer Value</label>
-                        <div class="relative">
-                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#8a8a8a]">payments</span>
-                            <input type="number" step="0.01" name="budget" x-model="budget"
-                                   placeholder="e.g. 150000"
-                                   class="w-full h-10 pl-9 pr-3 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono text-[#1a1a1a] focus:outline-none focus:border-[#23493a]"/>
-                        </div>
-                    </div>
+                    <!-- System Billing Defaults (Hidden) -->
+                    <input type="hidden" name="billing_type" value="standard"/>
+                    <input type="hidden" name="budget" value="0"/>
                 </div>
 
                 <!-- Additional Legal Team Members Selection -->
