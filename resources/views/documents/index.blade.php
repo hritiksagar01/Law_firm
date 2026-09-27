@@ -4,29 +4,37 @@
 @section('header_title', 'Document Vault')
 
 @section('content')
-<div x-data="{
-    openUploadModal: {{ ($errors->any() || session('error')) ? 'true' : 'false' }},
-    categoryFilter: 'all',
-    selectedFileName: '',
-    selectedFileSizeText: '',
-    fileSizeError: '',
-    selectedTags: [],
-    toggleTag(tag) {
-        const idx = this.selectedTags.indexOf(tag);
-        if (idx === -1) {
-            this.selectedTags.push(tag);
-        } else {
-            this.selectedTags.splice(idx, 1);
-        }
-    },
-    openVersionModal: false,
-    versionFilterStatus: 'all',
-    versionFilterDoc: 'all',
-    selectedVersionDocId: '{{ $documents->first()?->id ?? '' }}',
-    selectedVersionFileName: '',
-    selectedVersionFileSizeText: '',
-    versionFileSizeError: ''
-}}" class="flex flex-col w-full text-[#1a1a1a]">
+<script>
+    function documentVaultState(initialOpenUpload = false, initialVersionDocId = '') {
+        return {
+            openUploadModal: Boolean(initialOpenUpload),
+            categoryFilter: 'all',
+            selectedFileName: '',
+            selectedFileSizeText: '',
+            fileSizeError: '',
+            selectedTags: [],
+            toggleTag(tag) {
+                const idx = this.selectedTags.indexOf(tag);
+                if (idx === -1) {
+                    this.selectedTags.push(tag);
+                } else {
+                    this.selectedTags.splice(idx, 1);
+                }
+            },
+            openVersionModal: false,
+            versionFilterStatus: 'all',
+            versionFilterDoc: 'all',
+            selectedVersionDocId: String(initialVersionDocId || ''),
+            selectedVersionFileName: '',
+            selectedVersionFileSizeText: '',
+            versionFileSizeError: ''
+        };
+    }
+</script>
+
+<div x-data="documentVaultState({{ ($errors->any() || session('error')) ? 'true' : 'false' }}, '{{ $documents->first()?->id ?? '' }}')" 
+     @open-upload-modal.window="openUploadModal = true"
+     class="flex flex-col w-full text-[#1a1a1a]">
     <!-- Header & Action Ribbon -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
@@ -34,7 +42,7 @@
             <p class="text-[13px] text-[#646864] mt-1">SHA-256 authenticated filings, exhibits, depositions, and executed agreements</p>
         </div>
         <div class="flex items-center gap-2">
-            <button type="button" @click.stop="openUploadModal = true" class="btn-primary h-9 px-3.5 text-xs inline-flex items-center gap-2 cursor-pointer">
+            <button type="button" id="btn-upload-new-filing" @click.stop="openUploadModal = true" class="btn-primary h-9 px-3.5 text-xs inline-flex items-center gap-2 cursor-pointer">
                 <span class="material-symbols-outlined text-[18px]">upload</span>
                 <span>Upload New Filing</span>
             </button>
@@ -166,19 +174,27 @@
                         </td>
                         <td class="py-3.5 px-4">
                             @php
-                                $classification = $doc->classification ?? (strtolower($doc->privilege ?? '') === 'public filing' ? 'public' : 'confidential');
+                                $classification = strtolower($doc->classification ?? ($doc->privilege ?? 'confidential'));
                             @endphp
-                            @if(str_contains(strtolower($classification), 'public'))
+                            @if(str_contains($classification, 'public'))
                                 <span class="inline-flex items-center gap-1 font-mono text-[10.5px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
                                     <span>Public</span>
                                 </span>
-                            @elseif(str_contains(strtolower($classification), 'privileged') || str_contains(strtolower($classification), 'attorney'))
+                            @elseif(str_contains($classification, 'privileged') || str_contains($classification, 'attorney_client'))
                                 <span class="inline-flex items-center gap-1 font-mono text-[10.5px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 font-medium">
-                                    <span>Privileged</span>
+                                    <span>Atty-Client Priv.</span>
                                 </span>
-                            @elseif(str_contains(strtolower($classification), 'highly'))
+                            @elseif(str_contains($classification, 'work_product') || str_contains($classification, 'product'))
+                                <span class="inline-flex items-center gap-1 font-mono text-[10.5px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-medium">
+                                    <span>Work Product</span>
+                                </span>
+                            @elseif(str_contains($classification, 'highly'))
                                 <span class="inline-flex items-center gap-1 font-mono text-[10.5px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-medium">
                                     <span>Highly Conf.</span>
+                                </span>
+                            @elseif(str_contains($classification, 'internal'))
+                                <span class="inline-flex items-center gap-1 font-mono text-[10.5px] px-2 py-0.5 rounded-full bg-slate-50 text-slate-700 border border-slate-200 font-medium">
+                                    <span>Internal</span>
                                 </span>
                             @else
                                 <span class="inline-flex items-center gap-1 font-mono text-[10.5px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-medium">
@@ -187,15 +203,43 @@
                             @endif
                         </td>
                         <td class="py-3.5 px-4">
-                            @if($doc->is_client_visible || $doc->visibility === 'client_visible')
-                                <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-full bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0] font-medium">
+                            @php
+                                $vis = strtolower($doc->visibility ?? ($doc->is_client_visible ? 'client_visible' : 'internal_only'));
+                            @endphp
+                            @if($vis === 'client_visible')
+                                <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
                                     <span class="material-symbols-outlined text-xs">visibility</span>
                                     <span>Client Visible</span>
                                 </span>
+                            @elseif($vis === 'attorney_only')
+                                <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 font-medium">
+                                    <span class="material-symbols-outlined text-xs">gavel</span>
+                                    <span>Attorney Only</span>
+                                </span>
+                            @elseif($vis === 'legal_team')
+                                <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-medium">
+                                    <span class="material-symbols-outlined text-xs">groups</span>
+                                    <span>Legal Team</span>
+                                </span>
+                            @elseif($vis === 'specific_users')
+                                <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-medium">
+                                    <span class="material-symbols-outlined text-xs">badge</span>
+                                    <span>Specific Users</span>
+                                </span>
+                            @elseif($vis === 'specific_client')
+                                <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200 font-medium">
+                                    <span class="material-symbols-outlined text-xs">person</span>
+                                    <span>Specific Client</span>
+                                </span>
+                            @elseif($vis === 'restricted')
+                                <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-medium">
+                                    <span class="material-symbols-outlined text-xs">lock_clock</span>
+                                    <span>Restricted</span>
+                                </span>
                             @else
-                                <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-full bg-[#fbf3db] text-[#634812] border border-[#f0dfaa] font-medium">
+                                <span class="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-medium">
                                     <span class="material-symbols-outlined text-xs">lock</span>
-                                    <span>Chambers Only</span>
+                                    <span>Internal Only</span>
                                 </span>
                             @endif
                         </td>
@@ -544,37 +588,37 @@
                     <div class="flex flex-col gap-1">
                         <label class="font-semibold text-[#1a1a1a]">Legal Document Type *</label>
                         <select name="category" required class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
-                            <option value="" disabled selected>Select type…</option>
-                            <optgroup label="Court Filings & Pleadings">
+                            <option value="" disabled selected>Select document type…</option>
+                            <optgroup label="Court Pleadings, Motions & Orders">
                                 <option value="Pleading">Pleading</option>
                                 <option value="Motion">Motion</option>
                                 <option value="Brief">Brief</option>
                                 <option value="Order">Order</option>
                                 <option value="Judgment">Judgment</option>
-                                <option value="Court Filing">Court Filing</option>
-                                <option value="Notice">Notice</option>
                             </optgroup>
                             <optgroup label="Contracts & Agreements">
                                 <option value="Contract">Contract</option>
                                 <option value="Agreement">Agreement</option>
                                 <option value="Correspondence">Correspondence</option>
                             </optgroup>
-                            <optgroup label="Discovery & Evidence">
+                            <optgroup label="Discovery, Evidence & Exhibits">
                                 <option value="Discovery">Discovery</option>
                                 <option value="Deposition">Deposition</option>
                                 <option value="Evidence">Evidence</option>
                                 <option value="Exhibit">Exhibit</option>
                             </optgroup>
-                            <optgroup label="Sworn Statements">
+                            <optgroup label="Affidavits, Declarations & Filings">
                                 <option value="Affidavit">Affidavit</option>
                                 <option value="Declaration">Declaration</option>
+                                <option value="Court Filing">Court Filing</option>
+                                <option value="Notice">Notice</option>
                             </optgroup>
-                            <optgroup label="Research & Client Documents">
+                            <optgroup label="Legal Research & Work Product">
                                 <option value="Legal Research">Legal Research</option>
                                 <option value="Memorandum">Memorandum</option>
                                 <option value="Client Document">Client Document</option>
                             </optgroup>
-                            <optgroup label="Other Records">
+                            <optgroup label="Financial, Medical & Other Records">
                                 <option value="Financial Document">Financial Document</option>
                                 <option value="Medical Record">Medical Record</option>
                                 <option value="Photograph">Photograph</option>
@@ -596,7 +640,10 @@
                 {{-- Row 2: Visibility + Classification --}}
                 <div class="grid grid-cols-2 gap-3">
                     <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">Visibility</label>
+                        <div class="flex items-center justify-between">
+                            <label class="font-semibold text-[#1a1a1a]">Visibility</label>
+                            <span class="text-[10px] text-[#8a8a8a]">Access scope</span>
+                        </div>
                         <select name="visibility" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
                             <option value="internal_only" selected>Internal Only</option>
                             <option value="attorney_only">Attorney Only</option>
@@ -608,7 +655,10 @@
                         </select>
                     </div>
                     <div class="flex flex-col gap-1">
-                        <label class="font-semibold text-[#1a1a1a]">Classification</label>
+                        <div class="flex items-center justify-between">
+                            <label class="font-semibold text-[#1a1a1a]">Classification</label>
+                            <span class="text-[10px] text-[#8a8a8a]">Sensitivity level</span>
+                        </div>
                         <select name="classification" class="h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:border-[#23493a] focus:outline-none">
                             <option value="public">Public</option>
                             <option value="internal">Internal</option>
@@ -623,7 +673,10 @@
 
                 {{-- Document Tags Section --}}
                 <div class="flex flex-col gap-1.5">
-                    <label class="font-semibold text-[#1a1a1a]">Document Tags</label>
+                    <div class="flex items-center justify-between">
+                        <label class="font-semibold text-[#1a1a1a]">Document Tags</label>
+                        <span class="text-[10.5px] text-[#8a8a8a]">Click tags to tag filing</span>
+                    </div>
                     <div class="flex flex-wrap gap-1.5">
                         @php
                             $tagPresets = [
@@ -635,18 +688,18 @@
                         @foreach($tagPresets as $preset)
                         <button type="button"
                             @click="toggleTag('{{ $preset }}')"
-                            :class="selectedTags.includes('{{ $preset }}') ? 'bg-[#23493a] text-white border-[#23493a]' : 'bg-white text-[#334155] border-[#cbd5e1] hover:border-[#23493a] hover:text-[#23493a]'"
-                            class="px-2 py-1 rounded text-[10.5px] font-medium border transition-all duration-150 cursor-pointer inline-flex items-center gap-1">
-                            <span class="material-symbols-outlined text-[11px]" x-text="selectedTags.includes('{{ $preset }}') ? 'check_circle' : 'add_circle_outline'"></span>
-                            #{{ $preset }}
+                            :class="selectedTags.includes('{{ $preset }}') ? 'bg-[#23493a] text-white border-[#23493a] font-semibold' : 'bg-white text-[#334155] border-[#cbd5e1] hover:border-[#23493a] hover:text-[#23493a]'"
+                            class="px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all duration-150 cursor-pointer inline-flex items-center gap-1 shadow-2xs">
+                            <span class="material-symbols-outlined text-[12px]" x-text="selectedTags.includes('{{ $preset }}') ? 'check' : 'add'"></span>
+                            <span>#{{ $preset }}</span>
                         </button>
                         @endforeach
                     </div>
                     {{-- Selected tags summary --}}
                     <template x-if="selectedTags.length > 0">
-                        <div class="flex items-center gap-1.5 text-[10.5px] text-[#23493a] font-medium mt-0.5">
+                        <div class="flex items-center gap-1.5 text-[10.5px] text-[#23493a] font-medium mt-1">
                             <span class="material-symbols-outlined text-xs">label</span>
-                            <span x-text="selectedTags.length + ' tag' + (selectedTags.length > 1 ? 's' : '') + ' selected'"></span>
+                            <span x-text="selectedTags.length + ' tag' + (selectedTags.length > 1 ? 's' : '') + ' selected: #' + selectedTags.join(', #')"></span>
                         </div>
                     </template>
                 </div>
@@ -661,9 +714,9 @@
                 </div>
 
                 {{-- Classification disclaimer --}}
-                <div class="p-2 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10.5px] flex items-start gap-1.5">
-                    <span class="material-symbols-outlined text-sm mt-0.5 shrink-0">info</span>
-                    <span>Classification labels are administrative markers and should <strong>not</strong> be treated as a legal determination merely because a user selected a label.</span>
+                <div class="p-2.5 rounded-md bg-amber-50/90 text-amber-900 border border-amber-200 text-[11px] flex items-start gap-2 leading-relaxed">
+                    <span class="material-symbols-outlined text-base mt-0.5 text-amber-700 shrink-0">shield</span>
+                    <span>These are classification labels and should not be treated as a legal determination merely because a user selected a label.</span>
                 </div>
 
                 {{-- File Selection + Capture --}}
