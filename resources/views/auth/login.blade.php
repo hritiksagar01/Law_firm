@@ -283,39 +283,46 @@
                 </div>
             </div>
 
-            <!-- Law Firm & Advocate Registration Prompt -->
-            <div x-show="tab === 'firm'"
-                class="mt-4 pt-3.5 border-t border-[#E7E4DC] flex items-center justify-between gap-3 bg-[#23493A]/5 p-3.5 rounded-lg border border-[#23493A]/15">
-                <div class="flex items-center gap-2.5">
-                    <span class="material-symbols-outlined text-[#23493A] text-xl">domain_add</span>
-                    <div class="flex flex-col">
-                        <span class="text-xs font-semibold text-[#1A1E1C]">New Law Firm or Advocate?</span>
-                        <span class="text-[11px] text-[#646864]">Establish chambers &amp; practice</span>
-                    </div>
-                </div>
-                <a href="{{ route('register') }}"
-                    class="py-1.5 px-3 rounded-[6px] bg-[#23493A] hover:bg-[#1B3B2F] text-white text-xs font-semibold transition-all shrink-0 shadow-xs flex items-center gap-1 cursor-pointer">
-                    <span>Register Now</span>
-                    <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                </a>
-            </div>
+            <!-- Registration Prompts — Always visible for both roles -->
+            <div class="mt-4 pt-4 border-t border-[#E7E4DC] flex flex-col gap-2.5">
 
-            <!-- Client Portal Registration Prompt -->
-            <div x-show="tab === 'client'"
-                class="mt-4 pt-3.5 border-t border-[#E7E4DC] flex items-center justify-between gap-3 bg-[#23493A]/5 p-3.5 rounded-lg border border-[#23493A]/15">
-                <div class="flex items-center gap-2.5">
-                    <span class="material-symbols-outlined text-[#23493A] text-xl">person_add</span>
-                    <div class="flex flex-col">
-                        <span class="text-xs font-semibold text-[#1A1E1C]">New client?</span>
-                        <span class="text-[11px] text-[#646864]">Register for client portal access</span>
+                <!-- Client Portal Registration -->
+                <div class="flex items-center justify-between gap-3 bg-[#23493A]/5 p-3.5 rounded-lg border border-[#23493A]/15 hover:bg-[#23493A]/8 transition-colors">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-[#23493A]/10 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-[#23493A] text-lg">person_add</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold text-[#1A1E1C]">New Client Registration</span>
+                            <span class="text-[11px] text-[#646864]">Register for client portal access</span>
+                        </div>
                     </div>
+                    <a href="{{ route('register.client') }}"
+                        @click.prevent="$dispatch('open-client-register-modal')"
+                        class="py-1.5 px-3 rounded-[6px] bg-[#23493A] hover:bg-[#1B3B2F] text-white text-xs font-semibold transition-all shrink-0 shadow-xs flex items-center gap-1 cursor-pointer">
+                        <span>Register</span>
+                        <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                    </a>
                 </div>
-                <a href="{{ route('register.client') }}"
-                    @click.prevent="$dispatch('open-client-register-modal')"
-                    class="py-1.5 px-3 rounded-[6px] bg-[#23493A] hover:bg-[#1B3B2F] text-white text-xs font-semibold transition-all shrink-0 shadow-xs flex items-center gap-1 cursor-pointer">
-                    <span>Register Now</span>
-                    <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                </a>
+
+                <!-- Law Firm & Advocate Registration -->
+                <div class="flex items-center justify-between gap-3 bg-amber-50/80 p-3.5 rounded-lg border border-amber-200/80 hover:bg-amber-50 transition-colors">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-amber-800 text-lg">domain_add</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold text-[#1A1E1C]">New Law Firm / Advocate</span>
+                            <span class="text-[11px] text-[#646864]">Establish chambers &amp; practice</span>
+                        </div>
+                    </div>
+                    <a href="{{ route('register') }}"
+                        class="py-1.5 px-3 rounded-[6px] bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold transition-all shrink-0 shadow-xs flex items-center gap-1 cursor-pointer">
+                        <span>Register</span>
+                        <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                    </a>
+                </div>
+
             </div>
 
         </div>
@@ -346,18 +353,17 @@
                 class="text-[#8A8E89] hover:text-[#1A1E1C] underline">Skybridge IT Consulting</a>
         </p>
 
-        <!-- Super Admin Access: Positioned at bottom of page below credits -->
-        <div class="pt-2 flex items-center justify-center">
+        <!-- Super Admin Access: Styled as a visible green button -->
+        <div class="pt-3 flex items-center justify-center">
             <button type="button"
                 @click="setCredential('admin', 'admin@sharmalegal.in', 'password123'); window.scrollTo({top: 0, behavior: 'smooth'});"
-                class="text-[11.5px] text-[#8A8E89] hover:text-[#23493A] transition-colors cursor-pointer inline-flex items-center gap-1.5 py-1 px-3 rounded-full hover:bg-white/80 border border-transparent hover:border-[#E7E4DC]"
-                :class="tab === 'admin' ? 'text-[#23493A] font-semibold bg-white border-[#E7E4DC] shadow-xs' : ''">
-                <span class="w-3 h-3 rounded-full border flex items-center justify-center transition-all shrink-0"
-                    :class="tab === 'admin' ? 'border-[#23493A] bg-[#23493A]' : 'border-[#cfcbc0] bg-white'">
-                    <span class="w-1 h-1 rounded-full bg-white" x-show="tab === 'admin'"></span>
-                </span>
-                <span class="material-symbols-outlined text-[14px]">admin_panel_settings</span>
+                class="inline-flex items-center gap-2 py-2 px-5 rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-sm"
+                :class="tab === 'admin'
+                    ? 'bg-[#23493A] text-white shadow-md ring-2 ring-[#23493A]/30'
+                    : 'bg-[#23493A]/10 text-[#23493A] border border-[#23493A]/25 hover:bg-[#23493A] hover:text-white hover:shadow-md'">
+                <span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
                 <span>Super Admin Access</span>
+                <span class="material-symbols-outlined text-[14px]" x-show="tab === 'admin'">check_circle</span>
             </button>
         </div>
     </footer>

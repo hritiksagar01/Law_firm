@@ -11,10 +11,13 @@ use App\Models\Firm;
 use App\Models\Invoice;
 use App\Models\Matter;
 use App\Models\Message;
+use App\Models\Task;
 use App\Services\LegalPdfGenerator;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Throwable;
 
 class PortalController extends Controller
@@ -54,6 +57,7 @@ class PortalController extends Controller
      */
     public function dashboard()
     {
+        $user = Auth::user();
         $client = $this->getClient();
         $client->load('primaryAttorney');
 
@@ -62,9 +66,73 @@ class PortalController extends Controller
             ->latest()
             ->get();
 
+        $matterIds = $matters->pluck('id');
+
+        // 1. Active Matters (excluding closed/settled/dismissed/archived)
+        $activeMatters = $matters->reject(fn ($m) => in_array(strtolower($m->status ?? ''), ['closed', 'settled', 'dismissed', 'archived']));
+
+        // 2. Recent Documents (Client visible)
+        $recentDocuments = Document::whereIn('matter_id', $matterIds)
+            ->where('is_client_visible', true)
+            ->with(['matter', 'uploader'])
+            ->latest()
+            ->take(6)
+            ->get();
+
+        $documentsCount = Document::whereIn('matter_id', $matterIds)
+            ->where('is_client_visible', true)
+            ->count();
+
+        // 3. Pending Document Requests
+        $pendingDocumentRequests = DocumentRequest::where('client_id', $client->id)
+            ->whereIn('status', ['pending', 'rejected', 'in_review'])
+            ->with(['matter', 'requestedBy'])
+            ->latest()
+            ->get();
+
         $documentRequests = DocumentRequest::where('client_id', $client->id)
             ->with('matter')
             ->latest()
+            ->get();
+
+        // 4. Upcoming Events & Scheduled Court Hearings
+        $upcomingEvents = Event::whereIn('matter_id', $matterIds)
+            ->where('start_time', '>=', now()->subHours(6))
+            ->with('matter')
+            ->orderBy('start_time', 'asc')
+            ->take(6)
+            ->get();
+
+        if ($upcomingEvents->isEmpty()) {
+            $upcomingEvents = Event::whereIn('matter_id', $matterIds)
+                ->with('matter')
+                ->orderBy('start_time', 'desc')
+                ->take(6)
+                ->get();
+        }
+        $events = $upcomingEvents;
+
+        // 5. Recent Messages (Privileged Counsel Communications)
+        $recentMessages = Message::whereIn('matter_id', $matterIds)
+            ->with(['sender', 'matter'])
+            ->latest()
+            ->take(6)
+            ->get();
+
+        // 6. Tasks Requiring Client Action
+        $clientTasks = Task::where(function ($q) use ($client, $matterIds) {
+            if ($client->user_id) {
+                $q->where('assigned_to', $client->user_id);
+            }
+            if ($matterIds->isNotEmpty()) {
+                $q->orWhereIn('matter_id', $matterIds);
+            }
+        })
+            ->with(['matter', 'assignee'])
+            ->orderByRaw("CASE WHEN status = 'completed' THEN 1 ELSE 0 END")
+            ->orderByRaw("CASE WHEN priority = 'urgent' THEN 1 WHEN priority = 'high' THEN 2 WHEN priority = 'medium' THEN 3 ELSE 4 END")
+            ->orderBy('due_date', 'asc')
+            ->take(8)
             ->get();
 
         $invoices = Invoice::where('client_id', $client->id)
@@ -72,17 +140,124 @@ class PortalController extends Controller
             ->latest()
             ->get();
 
-        $matterIds = $matters->pluck('id');
-        $events = Event::whereIn('matter_id', $matterIds)
-            ->with('matter')
-            ->orderBy('start_time')
-            ->get();
+        // 7. Dynamic Notifications & Legal Alerts Hub
+        $notifications = collect();
 
-        $documentsCount = Document::whereIn('matter_id', $matterIds)
-            ->where('is_client_visible', true)
-            ->count();
+        // Pending document requests alerts
+        foreach ($pendingDocumentRequests as $req) {
+            $notifications->push([
+                'id' => 'req-'.$req->id,
+                'type' => $req->status === 'rejected' ? 'urgent' : 'document',
+                'icon' => 'upload_file',
+                'color' => $req->status === 'rejected' ? 'red' : 'amber',
+                'badge' => $req->status === 'rejected' ? 'Resubmission Required' : 'Filing Required',
+                'title' => 'Document Requested: '.$req->title,
+                'description' => ($req->description ? Str::limit($req->description, 85) : 'Counsel requested submission').($req->matter ? ' for '.$req->matter->case_number : ''),
+                'time' => $req->due_date ? 'Due '.Carbon::parse($req->due_date)->format('d M Y') : 'Immediate submission requested',
+                'action_url' => route('portal.requests.index'),
+                'action_label' => 'Upload File',
+            ]);
+        }
 
-        return view('portal.dashboard', compact('client', 'matters', 'documentRequests', 'invoices', 'events', 'documentsCount'));
+        // Upcoming hearings notifications
+        foreach ($upcomingEvents as $evt) {
+            $evtDate = Carbon::parse($evt->start_time);
+            $isImminent = $evtDate->isBetween(now()->subDay(), now()->addDays(7));
+            $notifications->push([
+                'id' => 'evt-'.$evt->id,
+                'type' => 'event',
+                'icon' => 'gavel',
+                'color' => $isImminent ? 'amber' : 'blue',
+                'badge' => $evt->event_type ?? 'Court Hearing',
+                'title' => $evt->title,
+                'description' => ($evt->matter ? $evt->matter->case_number.' · ' : '').($evt->location ?? 'Court Hearing'),
+                'time' => $evtDate->format('D, d M · h:i A'),
+                'action_url' => route('portal.calendar.index'),
+                'action_label' => 'Hearing Listing',
+            ]);
+        }
+
+        // Pending client tasks notifications
+        foreach ($clientTasks->where('status', '!=', 'completed')->take(3) as $tsk) {
+            $notifications->push([
+                'id' => 'task-'.$tsk->id,
+                'type' => 'task',
+                'icon' => 'task_alt',
+                'color' => $tsk->priority === 'urgent' ? 'red' : 'emerald',
+                'badge' => ucfirst($tsk->priority).' Task',
+                'title' => 'Action Item: '.$tsk->title,
+                'description' => ($tsk->matter ? $tsk->matter->case_number.' · ' : '').($tsk->description ? Str::limit($tsk->description, 80) : 'Procedural action required'),
+                'time' => $tsk->due_date ? 'Due '.Carbon::parse($tsk->due_date)->diffForHumans() : 'Action requested',
+                'action_url' => '#client-tasks-section',
+                'action_label' => 'Review Task',
+            ]);
+        }
+
+        // Recent messages from counsel
+        $unacknowledgedMsgs = $recentMessages->filter(fn ($m) => $user && $m->sender_id !== $user->id)->take(2);
+        foreach ($unacknowledgedMsgs as $msg) {
+            $notifications->push([
+                'id' => 'msg-'.$msg->id,
+                'type' => 'message',
+                'icon' => 'forum',
+                'color' => 'emerald',
+                'badge' => 'Privileged Communication',
+                'title' => 'Message from '.($msg->sender?->name ?? 'Chambers Counsel'),
+                'description' => Str::limit($msg->body, 90),
+                'time' => $msg->created_at->diffForHumans(),
+                'action_url' => '#counsel-thread',
+                'action_label' => 'Reply',
+            ]);
+        }
+
+        // Invoice / Billing notices
+        $unpaidInvoices = $invoices->where('status', '!=', 'paid')->take(2);
+        foreach ($unpaidInvoices as $inv) {
+            $notifications->push([
+                'id' => 'inv-'.$inv->id,
+                'type' => 'billing',
+                'icon' => 'receipt_long',
+                'color' => 'amber',
+                'badge' => 'Fee Bill Pending',
+                'title' => 'Invoice '.($inv->invoice_number ?? '#INV-'.$inv->id).' Awaiting Settlement',
+                'description' => 'Outstanding amount: '.config('legal.currency.symbol', '₹').number_format($inv->total ?? $inv->balance_due ?? 0, 2).($inv->matter ? ' · '.$inv->matter->case_number : ''),
+                'time' => $inv->due_date ? 'Due by '.Carbon::parse($inv->due_date)->format('d M Y') : 'Due upon receipt',
+                'action_url' => route('portal.invoices.index'),
+                'action_label' => 'Settle Fee',
+            ]);
+        }
+
+        // Baseline statutory privilege status if collection is sparse
+        if ($notifications->count() < 2) {
+            $notifications->push([
+                'id' => 'system-privilege',
+                'type' => 'info',
+                'icon' => 'verified_user',
+                'color' => 'emerald',
+                'badge' => 'Statutory Privilege Active',
+                'title' => 'Protected Legal Communication Infrastructure',
+                'description' => 'Chambers transmission channels and filing repositories encrypted under Section 126 & 129 Evidence Act.',
+                'time' => 'Operational',
+                'action_url' => route('portal.matters.index'),
+                'action_label' => 'View Dockets',
+            ]);
+        }
+
+        return view('portal.dashboard', compact(
+            'client',
+            'matters',
+            'activeMatters',
+            'recentDocuments',
+            'pendingDocumentRequests',
+            'upcomingEvents',
+            'recentMessages',
+            'clientTasks',
+            'notifications',
+            'documentRequests',
+            'invoices',
+            'events',
+            'documentsCount'
+        ));
     }
 
     /**
@@ -442,5 +617,23 @@ class PortalController extends Controller
         $client->update($validated);
 
         return back()->with('success', 'Account contact details updated successfully.');
+    }
+
+    /**
+     * Toggle Client Task Status (completed <-> todo).
+     */
+    public function toggleTask(Request $request, Task $task)
+    {
+        $client = $this->getClient();
+        $matterIds = Matter::where('client_id', $client->id)->pluck('id');
+
+        if ($task->assigned_to !== $client->user_id && ! $matterIds->contains($task->matter_id)) {
+            abort(403, 'Unauthorized task action.');
+        }
+
+        $newStatus = $task->status === 'completed' ? 'todo' : 'completed';
+        $task->update(['status' => $newStatus]);
+
+        return back()->with('success', $newStatus === 'completed' ? 'Task marked as completed.' : 'Task marked as pending.');
     }
 }

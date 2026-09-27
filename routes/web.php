@@ -1334,6 +1334,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/invoices', [PortalController::class, 'invoices'])->name('invoices.index');
         Route::post('/invoices/{invoice}/pay', [PortalController::class, 'payInvoice'])->name('invoices.pay');
 
+        // Client Action Tasks
+        Route::post('/tasks/{task}/toggle', [PortalController::class, 'toggleTask'])->name('tasks.toggle');
+
         // Client Account & Settings
         Route::get('/settings', [PortalController::class, 'settings'])->name('settings');
         Route::post('/settings', [PortalController::class, 'updateSettings'])->name('settings.update');
