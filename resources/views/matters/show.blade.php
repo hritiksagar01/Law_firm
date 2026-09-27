@@ -15,33 +15,80 @@
             @php
                 $isClosed = in_array(strtolower($matter->status ?? ''), ['closed', 'settled', 'dismissed', 'archived']);
             @endphp
-            <div class="flex items-center gap-2">
-                @if($isClosed)
-                    <span class="inline-flex items-center gap-1 font-mono text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium border border-slate-200">
-                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                        Closed
-                    </span>
-                @else
-                    <span class="inline-flex items-center gap-1 font-mono text-xs px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium border border-emerald-200">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        Open
+            <div class="flex flex-wrap items-center gap-2">
+                @php
+                    $statusStyles = [
+                        'Active' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                        'Open' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                        'Intake' => 'bg-blue-50 text-blue-700 border-blue-200',
+                        'Prospective' => 'bg-purple-50 text-purple-700 border-purple-200',
+                        'Conflict Check' => 'bg-amber-50 text-amber-700 border-amber-200',
+                        'Pending' => 'bg-amber-50 text-amber-700 border-amber-200',
+                        'On Hold' => 'bg-orange-50 text-orange-700 border-orange-200',
+                        'Settled' => 'bg-teal-50 text-teal-700 border-teal-200',
+                        'Resolved' => 'bg-teal-50 text-teal-700 border-teal-200',
+                        'Closed' => 'bg-slate-100 text-slate-700 border-slate-200',
+                        'Archived' => 'bg-stone-100 text-stone-600 border-stone-200',
+                    ];
+                    $currentStatusStyle = $statusStyles[ucfirst($matter->status ?? '')] ?? 'bg-[#f5f3ed] text-[#23493a] border-[#e5e3dc]';
+                @endphp
+                <span class="inline-flex items-center gap-1 font-mono text-xs px-2.5 py-0.5 rounded-full font-medium border {{ $currentStatusStyle }}">
+                    <span class="w-1.5 h-1.5 rounded-full {{ $isClosed ? 'bg-slate-400' : 'bg-emerald-500' }}"></span>
+                    {{ ucfirst($matter->status ?? 'Active') }}
+                </span>
+                @if(!empty($matter->priority) && $matter->priority !== 'medium')
+                    <span class="font-mono text-xs px-2 py-0.5 rounded-full uppercase font-semibold border 
+                        {{ $matter->priority === 'urgent' ? 'bg-rose-50 text-rose-700 border-rose-200' : ($matter->priority === 'high' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-stone-100 text-stone-600 border-stone-200') }}">
+                        {{ $matter->priority }}
                     </span>
                 @endif
                 <span class="font-mono text-xs px-2.5 py-0.5 rounded-full bg-[#f5f3ed] text-[#23493a] font-medium border border-[#e5e3dc]">
                     {{ $matter->stage }}
                 </span>
-                <span class="font-mono text-xs px-2.5 py-0.5 rounded bg-[#f5f3ed] text-[#23493a] font-semibold border border-[#e5e3dc]">
+                <span class="font-mono text-xs px-2.5 py-0.5 rounded bg-[#f5f3ed] text-[#23493a] font-semibold border border-[#e5e3dc]" title="Matter Case Number">
                     {{ $matter->case_number }}
                 </span>
+                @if($matter->matter_uuid)
+                    <span class="font-mono text-[11px] px-2 py-0.5 rounded bg-stone-50 text-[#8a8a8a] border border-[#e5e3dc] hidden sm:inline-flex items-center gap-1" title="System UUID: {{ $matter->matter_uuid }}">
+                        <span class="material-symbols-outlined text-[13px]">fingerprint</span>
+                        <span>{{ substr($matter->matter_uuid, 0, 8) }}...</span>
+                    </span>
+                @endif
             </div>
         </div>
 
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div class="flex flex-col">
-                <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">{{ $matter->title }}</h1>
-                <p class="text-[13px] text-[#646864] mt-1">
-                    {{ $matter->court_name }} <span class="mx-1">&middot;</span> Presiding: {{ $matter->judge_name }} <span class="mx-1">&middot;</span> Opened {{ $matter->opened_at?->format('M d, Y') }}
-                </p>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">{{ $matter->title }}</h1>
+                    @if($matter->short_title)
+                        <span class="text-xs font-mono font-normal px-2 py-0.5 rounded bg-[#faf8f5] text-[#646864] border border-[#e5e3dc]">
+                            Alias: {{ $matter->short_title }}
+                        </span>
+                    @endif
+                </div>
+                <div class="flex items-center gap-2 flex-wrap text-[13px] text-[#646864] mt-1.5">
+                    @if($matter->court_name)
+                        <span>{{ $matter->court_name }}</span>
+                        <span>&middot;</span>
+                    @endif
+                    @if($matter->docket_number)
+                        <span class="font-mono font-medium text-[#1a1a1a]">Docket: {{ $matter->docket_number }}</span>
+                        <span>&middot;</span>
+                    @endif
+                    <span>Presiding: {{ $matter->judge_name ?? 'Bench Pending' }}</span>
+                    <span>&middot;</span>
+                    <span>Opened {{ $matter->opened_at?->format('M d, Y') ?? 'N/A' }}</span>
+                </div>
+                @if(!empty($matter->matter_types) && is_array($matter->matter_types))
+                    <div class="flex flex-wrap items-center gap-1.5 mt-2">
+                        @foreach($matter->matter_types as $mType)
+                            <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-[#f5f3ed] text-[#23493a] border border-[#e5e3dc]">
+                                {{ $mType }}
+                            </span>
+                        @endforeach
+                    </div>
+                @endif
             </div>
             <div class="flex items-center gap-2 shrink-0">
                 @if($isClosed)
@@ -531,18 +578,128 @@
         <!-- Right 1-Column: Judicial Information & Team -->
         <div class="flex flex-col gap-6" x-data="{ openAddTeamModal: false }">
 
-            <!-- Forum & Judge Card -->
+            <!-- Forum, Bench & Judicial Assignment Card -->
             <div class="border border-[#e5e3dc] bg-white rounded-md p-5 shadow-xs">
-                <h3 class="text-xs font-mono uppercase tracking-wider text-[#8a8a8a] mb-3">Judicial Assignment</h3>
-                <div class="flex flex-col gap-3 text-xs">
+                <div class="flex items-center justify-between pb-2 mb-3 border-b border-[#f0eee8]">
+                    <h3 class="text-xs font-mono uppercase tracking-wider text-[#8a8a8a]">Judicial Forum &amp; Bench</h3>
+                    @if($matter->docket_number)
+                        <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">
+                            {{ $matter->docket_number }}
+                        </span>
+                    @endif
+                </div>
+
+                <div class="flex flex-col gap-3.5 text-xs">
+                    <!-- Court Forum & Type -->
                     <div>
-                        <span class="text-[#8a8a8a] block text-[11px]">Court Forum</span>
-                        <span class="font-medium text-[#1a1a1a]">{{ $matter->court_name ?? 'Forum Not Assigned' }}</span>
+                        <span class="text-[#8a8a8a] block text-[11px]">Court / Judicial Forum</span>
+                        <span class="font-medium text-[#1a1a1a] block">{{ $matter->court_name ?? 'Forum Not Assigned' }}</span>
+                        @if($matter->court_type)
+                            <span class="text-[11px] text-[#23493a] font-mono mt-0.5 inline-block">{{ $matter->court_type }}</span>
+                        @endif
                     </div>
-                    <div>
-                        <span class="text-[#8a8a8a] block text-[11px]">Presiding Judge</span>
-                        <span class="font-medium text-[#1a1a1a]">{{ $matter->judge_name ?? 'Magistrate Pending' }}</span>
+
+                    <!-- Jurisdiction, State & County -->
+                    @if($matter->jurisdiction || $matter->state || $matter->county)
+                        <div class="grid grid-cols-2 gap-2 pt-1 border-t border-[#f0eee8]">
+                            @if($matter->jurisdiction)
+                                <div>
+                                    <span class="text-[#8a8a8a] block text-[10px]">Jurisdiction</span>
+                                    <span class="text-[#1a1a1a] text-[11.5px] font-medium">{{ $matter->jurisdiction }}</span>
+                                </div>
+                            @endif
+                            @if($matter->state || $matter->county)
+                                <div>
+                                    <span class="text-[#8a8a8a] block text-[10px]">Territory / County</span>
+                                    <span class="text-[#1a1a1a] text-[11.5px]">{{ $matter->county ? $matter->county . ', ' : '' }}{{ $matter->state ?? '' }}</span>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+
+                    <!-- Bench & Judges (Current, Previous, New) -->
+                    <div class="pt-1 border-t border-[#f0eee8]">
+                        <span class="text-[#8a8a8a] block text-[11px] mb-1.5">Bench &amp; Judicial Officers</span>
+                        @if(!empty($matter->judges) && is_array($matter->judges))
+                            <div class="space-y-2">
+                                @foreach($matter->judges as $judgeItem)
+                                    <div class="p-2 rounded bg-[#faf8f5] border border-[#f0eee8]">
+                                        <div class="flex items-center justify-between gap-1 mb-1">
+                                            <span class="font-medium text-[#1a1a1a]">{{ $judgeItem['name'] ?? 'Judicial Officer' }}</span>
+                                            @php
+                                                $jType = $judgeItem['type'] ?? 'current';
+                                                $jBadge = match($jType) {
+                                                    'current' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                                    'previous' => 'bg-amber-50 text-amber-700 border-amber-200',
+                                                    'new' => 'bg-blue-50 text-blue-700 border-blue-200',
+                                                    'magistrate' => 'bg-purple-50 text-purple-700 border-purple-200',
+                                                    default => 'bg-stone-100 text-stone-600 border-stone-200',
+                                                };
+                                                $jText = match($jType) {
+                                                    'current' => 'Presiding',
+                                                    'previous' => 'Previous Judge',
+                                                    'new' => 'New Judge',
+                                                    'magistrate' => 'Magistrate',
+                                                    default => ucfirst(str_replace('_', ' ', $jType)),
+                                                };
+                                            @endphp
+                                            <span class="px-1.5 py-0.2 rounded text-[9.5px] font-mono uppercase border {{ $jBadge }}">
+                                                {{ $jText }}
+                                            </span>
+                                        </div>
+                                        @if(!empty($judgeItem['courtroom']))
+                                            <div class="text-[10.5px] text-[#646864] font-mono">{{ $judgeItem['courtroom'] }}</div>
+                                        @endif
+                                        @if(!empty($judgeItem['notes']))
+                                            <div class="text-[10.5px] text-[#8a8a8a] mt-0.5 italic">{{ $judgeItem['notes'] }}</div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="p-2 rounded bg-[#faf8f5] border border-[#f0eee8]">
+                                <span class="font-medium text-[#1a1a1a] block">{{ $matter->judge_name ?? 'Magistrate Pending' }}</span>
+                                <span class="text-[10.5px] text-[#8a8a8a]">Presiding Bench</span>
+                            </div>
+                        @endif
                     </div>
+
+                    <!-- Appearance & Schedule Dates -->
+                    @if($matter->filing_date || $matter->hearing_date || $matter->trial_date)
+                        <div class="pt-1 border-t border-[#f0eee8] space-y-1.5">
+                            <span class="text-[#8a8a8a] block text-[11px]">Procedural Schedule</span>
+                            <div class="grid grid-cols-3 gap-1.5 text-center">
+                                @if($matter->filing_date)
+                                    <div class="p-1.5 rounded bg-stone-50 border border-stone-200">
+                                        <span class="text-[9px] uppercase tracking-wider text-[#8a8a8a] block font-mono">Filing</span>
+                                        <span class="font-mono text-[11px] font-semibold text-[#1a1a1a]">{{ $matter->filing_date->format('d M y') }}</span>
+                                    </div>
+                                @endif
+                                @if($matter->hearing_date)
+                                    <div class="p-1.5 rounded bg-blue-50 border border-blue-200">
+                                        <span class="text-[9px] uppercase tracking-wider text-blue-700 block font-mono font-medium">Hearing</span>
+                                        <span class="font-mono text-[11px] font-semibold text-blue-900">{{ $matter->hearing_date->format('d M y') }}</span>
+                                    </div>
+                                @endif
+                                @if($matter->trial_date)
+                                    <div class="p-1.5 rounded bg-purple-50 border border-purple-200">
+                                        <span class="text-[9px] uppercase tracking-wider text-purple-700 block font-mono font-medium">Trial</span>
+                                        <span class="font-mono text-[11px] font-semibold text-purple-900">{{ $matter->trial_date->format('d M y') }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Statute & Rule References -->
+                    @if($matter->statute_references)
+                        <div class="pt-1 border-t border-[#f0eee8]">
+                            <span class="text-[#8a8a8a] block text-[11px] mb-1">Statute &amp; Rule References</span>
+                            <div class="p-2 rounded bg-[#faf8f5] border border-[#f0eee8] text-[11px] text-[#646864] leading-relaxed">
+                                {{ $matter->statute_references }}
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -611,6 +768,28 @@
                 </div>
                 
                 <div class="divide-y divide-[#f0eee8]">
+                    <!-- Supervising Partner / Senior Advocate (if assigned) -->
+                    @if($matter->supervisingAttorney)
+                    <div class="py-2.5 flex items-center justify-between">
+                        <div class="flex items-center gap-3 min-w-0">
+                            @if($matter->supervisingAttorney->avatar_url)
+                                <img alt="{{ $matter->supervisingAttorney->name }}" class="w-8 h-8 rounded-full object-cover ring-1 ring-[#e5e3dc] shrink-0" src="{{ $matter->supervisingAttorney->avatar_url }}"/>
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-[#1b3a2e] text-white flex items-center justify-center font-semibold text-xs shrink-0 shadow-xs">
+                                    {{ strtoupper(substr($matter->supervisingAttorney->name, 0, 1)) }}
+                                </div>
+                            @endif
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-xs font-semibold text-[#1a1a1a] truncate">{{ $matter->supervisingAttorney->name }}</span>
+                                <span class="text-[11px] text-[#646864]">Supervising Partner &middot; Oversight</span>
+                            </div>
+                        </div>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase bg-amber-50 text-amber-800 border border-amber-200 font-medium shrink-0">
+                            Supervising
+                        </span>
+                    </div>
+                    @endif
+
                     <!-- Lead Attorney -->
                     <div class="py-2.5 flex items-center justify-between">
                         <div class="flex items-center gap-3 min-w-0">
@@ -630,6 +809,28 @@
                             Lead
                         </span>
                     </div>
+
+                    <!-- Assigned Paralegal / Staff (if assigned) -->
+                    @if($matter->assignedParalegal)
+                    <div class="py-2.5 flex items-center justify-between">
+                        <div class="flex items-center gap-3 min-w-0">
+                            @if($matter->assignedParalegal->avatar_url)
+                                <img alt="{{ $matter->assignedParalegal->name }}" class="w-8 h-8 rounded-full object-cover ring-1 ring-[#e5e3dc] shrink-0" src="{{ $matter->assignedParalegal->avatar_url }}"/>
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-[#3b5998] text-white flex items-center justify-center font-semibold text-xs shrink-0 shadow-xs">
+                                    {{ strtoupper(substr($matter->assignedParalegal->name, 0, 1)) }}
+                                </div>
+                            @endif
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-xs font-semibold text-[#1a1a1a] truncate">{{ $matter->assignedParalegal->name }}</span>
+                                <span class="text-[11px] text-[#646864]">Assigned Paralegal / Staff &middot; Filings</span>
+                            </div>
+                        </div>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase bg-blue-50 text-blue-700 border border-blue-200 font-medium shrink-0">
+                            Paralegal
+                        </span>
+                    </div>
+                    @endif
 
                     <!-- Assigned Team Members -->
                     @forelse($matter->users->where('id', '!=', $matter->lead_attorney_id) as $member)

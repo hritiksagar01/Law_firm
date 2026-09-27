@@ -18,6 +18,11 @@ class Matter extends Model
         'budget' => 'decimal:2',
         'opened_at' => 'date',
         'closed_at' => 'date',
+        'filing_date' => 'date',
+        'hearing_date' => 'date',
+        'trial_date' => 'date',
+        'matter_types' => 'array',
+        'judges' => 'array',
     ];
 
     public function firm(): BelongsTo
@@ -33,6 +38,16 @@ class Matter extends Model
     public function leadAttorney(): BelongsTo
     {
         return $this->belongsTo(User::class, 'lead_attorney_id');
+    }
+
+    public function supervisingAttorney(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'supervising_attorney_id');
+    }
+
+    public function assignedParalegal(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_paralegal_id');
     }
 
     public const TEAM_ROLES = [

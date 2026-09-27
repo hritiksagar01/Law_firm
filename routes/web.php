@@ -55,6 +55,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 
 /*
@@ -611,52 +612,200 @@ Route::middleware('auth')->group(function () {
         })->name('matters.index');
 
         // Create Matter
-        Route::get('/matters/create', function () {
+        Route::get('/matters/create', function (Request $request) {
             $firmId = Auth::user()->firm_id ?? 1;
-            $clients = Client::where('firm_id', $firmId)->get();
-            $attorneys = User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate'])->get();
+            $clients = Client::where('firm_id', $firmId)->orderBy('name')->get();
+            $attorneys = User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate', 'superadmin'])->orderBy('name')->get();
+            $supervisingAttorneys = User::where('firm_id', $firmId)->whereIn('role', ['partner', 'superadmin'])->orderBy('name')->get();
+            $paralegals = User::where('firm_id', $firmId)->whereIn('role', ['paralegal', 'staff', 'associate'])->orderBy('name')->get();
+            $allStaff = User::where('firm_id', $firmId)->where('role', '!=', 'client')->orderBy('name')->get();
 
-            return view('matters.create', compact('clients', 'attorneys'));
+            $year = date('Y');
+            $nextCount = Matter::where('firm_id', $firmId)->count() + 1;
+            $suggestedCaseNumber = "HO-{$year}-".str_pad((string) $nextCount, 4, '0', STR_PAD_LEFT);
+            $suggestedUuid = (string) Str::uuid();
+            $selectedClientId = $request->query('client_id');
+
+            return view('matters.create', compact(
+                'clients',
+                'attorneys',
+                'supervisingAttorneys',
+                'paralegals',
+                'allStaff',
+                'suggestedCaseNumber',
+                'suggestedUuid',
+                'selectedClientId'
+            ));
         })->name('matters.create');
 
         Route::post('/matters', function (Request $request) {
+            $firmId = Auth::user()->firm_id ?? 1;
+
             $validated = $request->validate([
                 'client_id' => 'required|exists:clients,id',
+                'case_number' => 'nullable|string|max:100',
+                'matter_uuid' => 'nullable|string|max:100',
                 'title' => 'required|string|max:255',
-                'practice_area' => 'required|string',
-                'court_name' => 'nullable|string',
-                'judge_name' => 'nullable|string',
-                'stage' => 'required|string',
+                'short_title' => 'nullable|string|max:255',
+                'practice_area' => 'required|string|max:255',
+                'matter_types' => 'nullable|array',
+                'matter_types.*' => 'string',
+                'custom_matter_type' => 'nullable|string|max:150',
+                'status' => 'required|string|max:50',
+                'priority' => 'required|string|in:low,medium,high,urgent',
+                'opened_at' => 'nullable|date',
+                'closed_at' => 'nullable|date',
+                'description' => 'nullable|string',
+                'court_name' => 'nullable|string|max:255',
+                'court_type' => 'nullable|string|max:100',
+                'jurisdiction' => 'nullable|string|max:100',
+                'county' => 'nullable|string|max:100',
+                'state' => 'nullable|string|max:100',
+                'docket_number' => 'nullable|string|max:100',
+                'judge_name' => 'nullable|string|max:255',
+                'judges' => 'nullable|array',
+                'filing_date' => 'nullable|date',
+                'hearing_date' => 'nullable|date',
+                'trial_date' => 'nullable|date',
+                'statute_references' => 'nullable|string',
+                'stage' => 'required|string|max:100',
                 'lead_attorney_id' => 'required|exists:users,id',
+                'supervising_attorney_id' => 'nullable|exists:users,id',
+                'assigned_paralegal_id' => 'nullable|exists:users,id',
                 'billing_type' => 'required|string',
                 'budget' => 'nullable|numeric',
+                'team_members' => 'nullable|array',
+                'team_members.*' => 'exists:users,id',
             ]);
 
-            $year = date('Y');
-            $randomSeq = str_pad((string) (Matter::where('firm_id', Auth::user()->firm_id ?? 1)->count() + 1), 4, '0', STR_PAD_LEFT);
-            $caseNumber = "HO-{$year}-{$randomSeq}";
+            $caseNumber = $validated['case_number'] ?? null;
+            if (empty($caseNumber)) {
+                $year = date('Y');
+                $randomSeq = str_pad((string) (Matter::where('firm_id', $firmId)->count() + 1), 4, '0', STR_PAD_LEFT);
+                $caseNumber = "HO-{$year}-{$randomSeq}";
+            }
+
+            $matterUuid = $validated['matter_uuid'] ?? (string) Str::uuid();
+
+            // Consolidate matter types
+            $types = $validated['matter_types'] ?? [];
+            if (! empty($validated['custom_matter_type'])) {
+                $customTrimmed = trim($validated['custom_matter_type']);
+                if (! in_array($customTrimmed, $types)) {
+                    $types[] = $customTrimmed;
+                }
+            }
+
+            // Consolidate judges array
+            $judges = [];
+            if (! empty($validated['judges']) && is_array($validated['judges'])) {
+                foreach ($validated['judges'] as $j) {
+                    if (! empty($j['name'])) {
+                        $judges[] = [
+                            'name' => trim($j['name']),
+                            'type' => $j['type'] ?? 'current', // current, previous, new, magistrate, associate
+                            'courtroom' => $j['courtroom'] ?? '',
+                            'notes' => $j['notes'] ?? '',
+                        ];
+                    }
+                }
+            }
+
+            // Primary judge name for backwards compatibility
+            $primaryJudge = $validated['judge_name'] ?? null;
+            if (empty($primaryJudge) && ! empty($judges)) {
+                $presiding = collect($judges)->firstWhere('type', 'current') ?? $judges[0];
+                $primaryJudge = $presiding['name'];
+            }
 
             $matter = Matter::create([
-                'firm_id' => Auth::user()->firm_id ?? 1,
+                'firm_id' => $firmId,
                 'client_id' => $validated['client_id'],
+                'matter_uuid' => $matterUuid,
                 'case_number' => $caseNumber,
+                'docket_number' => $validated['docket_number'] ?? null,
                 'title' => $validated['title'],
+                'short_title' => $validated['short_title'] ?? null,
                 'practice_area' => $validated['practice_area'],
-                'court_name' => $validated['court_name'],
-                'judge_name' => $validated['judge_name'],
+                'matter_types' => $types,
+                'court_name' => $validated['court_name'] ?? null,
+                'court_type' => $validated['court_type'] ?? null,
+                'jurisdiction' => $validated['jurisdiction'] ?? null,
+                'county' => $validated['county'] ?? null,
+                'state' => $validated['state'] ?? null,
+                'judge_name' => $primaryJudge,
+                'judges' => $judges,
+                'filing_date' => $validated['filing_date'] ?? null,
+                'hearing_date' => $validated['hearing_date'] ?? null,
+                'trial_date' => $validated['trial_date'] ?? null,
+                'statute_references' => $validated['statute_references'] ?? null,
                 'stage' => $validated['stage'],
-                'status' => 'active',
+                'status' => $validated['status'] ?? 'Active',
+                'priority' => $validated['priority'] ?? 'medium',
+                'description' => $validated['description'] ?? null,
                 'lead_attorney_id' => $validated['lead_attorney_id'],
+                'supervising_attorney_id' => $validated['supervising_attorney_id'] ?? null,
+                'assigned_paralegal_id' => $validated['assigned_paralegal_id'] ?? null,
                 'billing_type' => $validated['billing_type'],
                 'budget' => $validated['budget'] ?? 100000,
-                'opened_at' => now()->toDateString(),
+                'opened_at' => $validated['opened_at'] ?? now()->toDateString(),
+                'closed_at' => $validated['closed_at'] ?? null,
             ]);
 
-            // Auto-assign lead attorney to matter team
-            $matter->users()->syncWithoutDetaching([$validated['lead_attorney_id']]);
+            // Assign team members
+            $teamMembers = [];
+            if (! empty($validated['lead_attorney_id'])) {
+                $teamMembers[$validated['lead_attorney_id']] = [
+                    'role' => 'lead_attorney',
+                    'access_level' => 'admin',
+                    'assignment_date' => now(),
+                    'is_active' => true,
+                ];
+            }
+            if (! empty($validated['supervising_attorney_id'])) {
+                $teamMembers[$validated['supervising_attorney_id']] = [
+                    'role' => 'supervising_attorney',
+                    'access_level' => 'admin',
+                    'assignment_date' => now(),
+                    'is_active' => true,
+                ];
+            }
+            if (! empty($validated['assigned_paralegal_id'])) {
+                $teamMembers[$validated['assigned_paralegal_id']] = [
+                    'role' => 'paralegal',
+                    'access_level' => 'write',
+                    'assignment_date' => now(),
+                    'is_active' => true,
+                ];
+            }
+            if (! empty($validated['team_members']) && is_array($validated['team_members'])) {
+                foreach ($validated['team_members'] as $staffId) {
+                    if (! isset($teamMembers[$staffId])) {
+                        $teamMembers[$staffId] = [
+                            'role' => 'associate',
+                            'access_level' => 'write',
+                            'assignment_date' => now(),
+                            'is_active' => true,
+                        ];
+                    }
+                }
+            }
+
+            if (! empty($teamMembers)) {
+                $matter->users()->syncWithoutDetaching($teamMembers);
+            }
+
+            // Log activity
+            MatterActivity::log(
+                matter: $matter,
+                activityType: 'matter_created',
+                description: "Initiated new case dossier {$caseNumber} ({$matter->title}) with status ".ucfirst($matter->status),
+                subject: $matter,
+                userId: Auth::id()
+            );
 
             return redirect()->route('matters.show', $matter->id)
-                ->with('success', "Matter {$caseNumber} ({$matter->title}) has been successfully opened.");
+                ->with('success', "Case dossier {$caseNumber} ({$matter->title}) has been successfully initiated.");
         })->name('matters.store');
 
         // Matter Detail Dossier
@@ -677,6 +826,8 @@ Route::middleware('auth')->group(function () {
             $matter->load([
                 'client',
                 'leadAttorney',
+                'supervisingAttorney',
+                'assignedParalegal',
                 'users' => fn ($q) => $q->wherePivot('is_active', true),
                 'activities.user',
                 'documents.uploader',
