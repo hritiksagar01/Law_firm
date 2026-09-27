@@ -168,6 +168,10 @@ class ClientDashboardTest extends TestCase
 
         // Check 7: Notifications
         $response->assertSee('Notifications');
+
+        // Verify Invoices & Billing is removed from client dashboard
+        $response->assertDontSee('Invoices &amp; Billing', false);
+        $response->assertDontSee('Invoices & Billing');
     }
 
     /**
