@@ -34,6 +34,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserGroupController;
 use App\Models\Appointment;
 use App\Models\AuditLog;
+use App\Models\CaseNote;
 use App\Models\Client;
 use App\Models\Document;
 use App\Models\DocumentRequest;
@@ -373,16 +374,77 @@ Route::middleware('auth')->group(function () {
 
             $recentActivities = $activities->sortByDesc('created_at')->values()->take(12);
 
-            // 4. Calendar: Previous Week, This Week, Next Week
-            $prevWeekStart = now()->subWeek()->startOfWeek();
-            $prevWeekEnd = now()->subWeek()->endOfWeek()->endOfDay();
-            $thisWeekStart = now()->startOfWeek();
-            $thisWeekEnd = now()->endOfWeek()->endOfDay();
-            $nextWeekStart = now()->addWeek()->startOfWeek();
-            $nextWeekEnd = now()->addWeek()->endOfWeek()->endOfDay();
+            // 4. Calendar: Previous Week, This Week, Coming Week (Exact mirror of Super Admin calendar engine)
+            $getScheduleForRange = function (Carbon $start, Carbon $end) use ($firmId) {
+                $items = collect();
+                $events = Event::where('firm_id', $firmId)
+                    ->whereBetween('start_time', [$start, $end])
+                    ->with('matter')
+                    ->orderBy('start_time')
+                    ->get();
+
+                foreach ($events as $evt) {
+                    $startTime = Carbon::parse($evt->start_time);
+                    $type = $evt->event_type ?: 'Hearing';
+                    $isDeadline = $evt->is_statutory_deadline || str_contains(strtolower($type), 'deadline');
+
+                    $badgeColor = match (true) {
+                        $isDeadline => 'bg-[#fce8e6] text-[#c5221f]',
+                        str_contains(strtolower($type), 'hearing') => 'bg-[#f3e8ff] text-[#7e22ce]',
+                        str_contains(strtolower($type), 'meeting') || str_contains(strtolower($type), 'conference') => 'bg-[#e0f2fe] text-[#0284c7]',
+                        default => 'bg-[#e6f4ea] text-[#137333]',
+                    };
+
+                    $items->push([
+                        'date' => $startTime,
+                        'month_short' => strtoupper($startTime->format('M')),
+                        'day_num' => $startTime->format('j'),
+                        'time_str' => $startTime->format('g:i A'),
+                        'type_label' => $isDeadline ? 'Deadline' : (str_contains(strtolower($type), 'hearing') ? 'Hearing' : (str_contains(strtolower($type), 'meeting') ? 'Meeting' : 'Hearing')),
+                        'badge_class' => $badgeColor,
+                        'title' => $evt->title,
+                        'matter_info' => $evt->matter ? ($evt->matter->case_number.' '.$evt->matter->title) : 'Chambers Docket',
+                        'matter_id' => $evt->matter_id,
+                    ]);
+                }
+
+                $appointments = Appointment::where('firm_id', $firmId)
+                    ->whereBetween('scheduled_at', [$start, $end])
+                    ->with(['matter', 'client'])
+                    ->orderBy('scheduled_at')
+                    ->get();
+
+                foreach ($appointments as $appt) {
+                    $schedTime = Carbon::parse($appt->scheduled_at);
+                    $items->push([
+                        'date' => $schedTime,
+                        'month_short' => strtoupper($schedTime->format('M')),
+                        'day_num' => $schedTime->format('j'),
+                        'time_str' => $schedTime->format('g:i A'),
+                        'type_label' => 'Appointment',
+                        'badge_class' => 'bg-[#e6f4ea] text-[#137333]',
+                        'title' => $appt->title,
+                        'matter_info' => $appt->matter ? ($appt->matter->case_number.' '.$appt->matter->title) : ($appt->client ? $appt->client->name : 'Client Consultation'),
+                        'matter_id' => $appt->matter_id,
+                    ]);
+                }
+
+                return $items->sortBy('date')->values();
+            };
+
+            $previousWeekStart = Carbon::now()->subWeek()->startOfWeek();
+            $previousWeekEnd = Carbon::now()->subWeek()->endOfWeek()->endOfDay();
+            $thisWeekStart = Carbon::now()->startOfWeek();
+            $thisWeekEnd = Carbon::now()->endOfWeek()->endOfDay();
+            $comingWeekStart = Carbon::now()->addWeek()->startOfWeek();
+            $comingWeekEnd = Carbon::now()->addWeek()->endOfWeek()->endOfDay();
+
+            $previousWeekSchedule = $getScheduleForRange($previousWeekStart, $previousWeekEnd);
+            $thisWeekSchedule = $getScheduleForRange($thisWeekStart, $thisWeekEnd);
+            $comingWeekSchedule = $getScheduleForRange($comingWeekStart, $comingWeekEnd);
 
             $prevWeekEvents = Event::where('firm_id', $firmId)
-                ->whereBetween('start_time', [$prevWeekStart, $prevWeekEnd])
+                ->whereBetween('start_time', [$previousWeekStart, $previousWeekEnd])
                 ->with('matter')
                 ->orderBy('start_time')
                 ->get();
@@ -394,7 +456,7 @@ Route::middleware('auth')->group(function () {
                 ->get();
 
             $nextWeekEvents = Event::where('firm_id', $firmId)
-                ->whereBetween('start_time', [$nextWeekStart, $nextWeekEnd])
+                ->whereBetween('start_time', [$comingWeekStart, $comingWeekEnd])
                 ->with('matter')
                 ->orderBy('start_time')
                 ->get();
@@ -414,7 +476,22 @@ Route::middleware('auth')->group(function () {
                     ->get();
             }
 
-            // 5. Last Sign-in for current user
+            // 5. Important Case Notes (Pinned & Privileged Memos)
+            $importantNotes = CaseNote::where('firm_id', $firmId)
+                ->with(['matter', 'user'])
+                ->orderByDesc('is_pinned')
+                ->latest()
+                ->take(5)
+                ->get();
+
+            $importantNotesCount = CaseNote::where('firm_id', $firmId)
+                ->where('is_pinned', true)
+                ->count();
+            if ($importantNotesCount === 0) {
+                $importantNotesCount = CaseNote::where('firm_id', $firmId)->count();
+            }
+
+            // 6. Last Sign-in for current user
             $lastSignIn = SignInHistory::where('user_id', $user->id)
                 ->where('result', 'signed_in')
                 ->latest()
@@ -446,10 +523,15 @@ Route::middleware('auth')->group(function () {
                 'clientUploads',
                 'recentClientDocs',
                 'recentActivities',
+                'previousWeekSchedule',
+                'thisWeekSchedule',
+                'comingWeekSchedule',
                 'prevWeekEvents',
                 'thisWeekEvents',
                 'nextWeekEvents',
                 'upcomingEvents',
+                'importantNotes',
+                'importantNotesCount',
                 'lastSignIn'
             ));
         })->name('dashboard');
