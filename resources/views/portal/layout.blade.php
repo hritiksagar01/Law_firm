@@ -73,6 +73,13 @@
 
             <!-- Navigation Links -->
             <nav class="px-3 py-4 flex flex-col gap-1">
+                <!-- Search Case Files -->
+                <a href="{{ route('search') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('search') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('search') ? 'text-white' : 'text-[#9ca3af]' }}">search</span>
+                    <span>Search Case Files</span>
+                </a>
+
                 <!-- Overview -->
                 <a href="{{ route('portal.dashboard') }}" 
                    class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('portal.dashboard') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
@@ -183,8 +190,16 @@
                 </div>
             </div>
 
-            <!-- Right: System Status, Notifications, Settings, Profile Dropdown -->
+            <!-- Right: System Status, Quick Search, Notifications, Settings, Profile Dropdown -->
             <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Quick Search Input -->
+                <form action="{{ route('search') }}" method="GET" class="relative hidden sm:block w-44 md:w-56">
+                    <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#8e8e8e]">
+                        <span class="material-symbols-outlined text-[17px]">search</span>
+                    </span>
+                    <input type="text" name="q" value="{{ request('q') }}" placeholder="Search my cases..." class="w-full pl-8 pr-3 py-1 bg-[#f4f2ed] border border-[#e5e3dc] rounded-md text-xs text-[#1a1a1a] placeholder-[#8e8e8e] focus:outline-none focus:bg-white focus:border-[#23493a] transition-all">
+                </form>
+
                 <!-- Status Pill -->
                 <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0]">
                     <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse"></span>

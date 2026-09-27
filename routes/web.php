@@ -28,6 +28,7 @@ use App\Http\Controllers\Portal\PortalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicContentController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TodoController;
@@ -112,6 +113,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.password');
     Route::post('/profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.change-password');
     Route::post('/profile/change-avatar', [ProfileController::class, 'changeAvatar'])->name('profile.change-avatar');
+
+    // Global Search Engine (Authorization-Aware across all 8 entities for Staff & Portal Users)
+    Route::get('/search', [SearchController::class, 'index'])->name('search');
 
     // Firm Workspace Routes (Strictly for Advocates & Staff)
     Route::middleware(['firm.staff'])->group(function () {
@@ -1428,42 +1432,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
         Route::post('/tasks/{task}/comments', [TaskController::class, 'addComment'])->name('tasks.comments.store');
 
-        // Global Search Engine
-        Route::get('/search', function (Request $request) {
-            $firmId = Auth::user()->firm_id ?? 1;
-            $q = trim($request->input('q', ''));
-            if (empty($q)) {
-                return redirect()->route('matters.index');
-            }
-
-            $matters = Matter::where('firm_id', $firmId)
-                ->where(function ($sub) use ($q) {
-                    $sub->where('title', 'like', "%{$q}%")
-                        ->orWhere('case_number', 'like', "%{$q}%")
-                        ->orWhere('court_name', 'like', "%{$q}%");
-                })
-                ->with('client')->get();
-
-            $clients = Client::where('firm_id', $firmId)
-                ->where(function ($sub) use ($q) {
-                    $sub->where('name', 'like', "%{$q}%")
-                        ->orWhere('email', 'like', "%{$q}%");
-                })->get();
-
-            $documents = Document::where('firm_id', $firmId)
-                ->where(function ($sub) use ($q) {
-                    $sub->where('title', 'like', "%{$q}%")
-                        ->orWhere('filename', 'like', "%{$q}%");
-                })
-                ->with('matter')->get();
-
-            $tasks = Task::where('firm_id', $firmId)
-                ->where('title', 'like', "%{$q}%")
-                ->with(['assignee', 'matter'])->get();
-
-            return view('search', compact('q', 'matters', 'clients', 'documents', 'tasks'));
-        })->name('search');
-
         // Dynamic Practice Settings Configuration Hub
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::put('/settings/firm', [SettingsController::class, 'updateFirm'])->name('settings.firm.update');
@@ -1527,6 +1495,9 @@ Route::middleware('auth')->group(function () {
         // Client Account & Settings
         Route::get('/settings', [PortalController::class, 'settings'])->name('settings');
         Route::post('/settings', [PortalController::class, 'updateSettings'])->name('settings.update');
+
+        // Portal Global Search
+        Route::get('/search', [SearchController::class, 'index'])->name('search');
     });
 });
 

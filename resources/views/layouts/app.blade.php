@@ -165,6 +165,13 @@
 
             <!-- Navigation Links -->
             <nav class="px-3 py-4 flex flex-col gap-0.5 overflow-y-auto max-h-[calc(100vh-140px)]">
+                <!-- Global Search -->
+                <a href="{{ route('search') }}" 
+                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('search') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
+                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('search') ? 'text-white' : 'text-[#9ca3af]' }}">search</span>
+                    <span>Global Search</span>
+                </a>
+
                 <!-- Dashboard -->
                 <a href="{{ route('dashboard') }}" 
                    class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('dashboard') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
@@ -382,7 +389,14 @@
             </div>
 
             <!-- Right: System Status, Search, Notifications, Settings, Profile Dropdown -->
-            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Header Quick Search Bar -->
+                <form action="{{ route('search') }}" method="GET" class="relative hidden sm:block w-44 md:w-56 lg:w-64">
+                    <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#8e8e8e]">
+                        <span class="material-symbols-outlined text-[17px]">search</span>
+                    </span>
+                    <input type="text" name="q" value="{{ request('q') }}" placeholder="Search chambers (/)..." class="w-full pl-8 pr-3 py-1 bg-[#f4f2ed] border border-[#e5e3dc] rounded-md text-xs text-[#1a1a1a] placeholder-[#8e8e8e] focus:outline-none focus:bg-white focus:border-[#23493a] transition-all">
+                </form>
+
                 <!-- Status Pill -->
                 <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0]">
                     <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse"></span>
