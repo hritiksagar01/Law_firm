@@ -29,6 +29,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicContentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TodoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserGroupController;
@@ -1390,24 +1391,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/bank-activity', [ReportController::class, 'bankActivity'])->name('bank-activity');
         });
 
-        // Toggle Task status
-        Route::post('/tasks/{task}/toggle', function (Task $task) {
-            $task->status = ($task->status === 'completed') ? 'todo' : 'completed';
-            $task->save();
-
-            if ($task->matter) {
-                MatterActivity::log(
-                    matter: $task->matter,
-                    activityType: $task->status === 'completed' ? 'task_completed' : 'task_created',
-                    description: ($task->status === 'completed' ? 'Completed task: ' : 'Re-opened task: ').$task->title,
-                    subject: $task,
-                    userId: Auth::id()
-                );
-            }
-
-            return back()->with('success', 'Task status updated.');
-        })->name('tasks.toggle');
-
         // Case Dispatches & Privileged Messages
         Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
         Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
@@ -1436,51 +1419,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/conflict-checks/{conflictCheck}', [ConflictCheckController::class, 'show'])->name('conflict-checks.show');
         Route::put('/conflict-checks/{conflictCheck}', [ConflictCheckController::class, 'update'])->name('conflict-checks.update');
 
-        // Tasks & Productivity Hub
-        Route::get('/tasks', function () {
-            $firmId = Auth::user()->firm_id ?? 1;
-            $tasks = Task::where('firm_id', $firmId)->with(['assignee', 'matter', 'comments.user'])->latest()->get();
-            $attorneys = User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate', 'paralegal'])->get();
-            $matters = Matter::where('firm_id', $firmId)->get();
-
-            return view('tasks.index', compact('tasks', 'attorneys', 'matters'));
-        })->name('tasks.index');
-
-        Route::post('/tasks', function (Request $request) {
-            $validated = $request->validate([
-                'title' => 'required|string|max:255',
-                'priority' => 'required|in:urgent,high,normal,low',
-                'due_date' => 'required|date',
-                'matter_id' => 'nullable|exists:matters,id',
-                'assigned_to' => 'nullable|exists:users,id',
-            ]);
-
-            Task::create([
-                'firm_id' => Auth::user()->firm_id ?? 1,
-                'matter_id' => $validated['matter_id'] ?? null,
-                'assigned_to' => $validated['assigned_to'] ?? Auth::id(),
-                'created_by' => Auth::id() ?? 1,
-                'title' => $validated['title'],
-                'priority' => $validated['priority'],
-                'due_date' => $validated['due_date'],
-                'status' => 'todo',
-            ]);
-
-            return back()->with('success', 'Litigation task successfully logged.');
-        })->name('tasks.store');
-
-        Route::post('/tasks/{task}/comments', function (Request $request, Task $task) {
-            $validated = $request->validate([
-                'comment' => 'required|string|max:2000',
-            ]);
-
-            $task->comments()->create([
-                'user_id' => Auth::id(),
-                'comment' => $validated['comment'],
-            ]);
-
-            return back()->with('success', 'Comment added.');
-        })->name('tasks.comments.store');
+        // Litigation Tasks & Practice Productivity Hub (Feature 18)
+        Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+        Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+        Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+        Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.status.update');
+        Route::post('/tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
+        Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+        Route::post('/tasks/{task}/comments', [TaskController::class, 'addComment'])->name('tasks.comments.store');
 
         // Global Search Engine
         Route::get('/search', function (Request $request) {

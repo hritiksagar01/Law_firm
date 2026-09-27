@@ -135,6 +135,10 @@
                 <span class="material-symbols-outlined text-base">forum</span>
                 <span>Privileged Messages ({{ $matter->messages->count() }})</span>
             </a>
+            <a href="#tasks-section" class="px-3.5 py-2 text-xs font-medium text-[#646864] hover:text-[#1a1a1a] flex items-center gap-1.5 transition-colors">
+                <span class="material-symbols-outlined text-base">checklist</span>
+                <span>Tasks ({{ $matter->tasks->count() }})</span>
+            </a>
             <a href="#notes-section" class="px-3.5 py-2 text-xs font-medium text-[#646864] hover:text-[#1a1a1a] flex items-center gap-1.5 transition-colors">
                 <span class="material-symbols-outlined text-base">sticky_note_2</span>
                 <span>Case Notes ({{ $matter->caseNotes->count() }})</span>
@@ -460,6 +464,60 @@
                         <a href="{{ route('messages.index', ['matter_id' => $matter->id]) }}" class="hover:underline text-[#23493a] font-medium">Start new thread &rarr;</a>
                     </div>
                 </form>
+            </div>
+
+            <!-- Matter Tasks & Deadlines (F-18) -->
+            <div id="tasks-section" class="border border-[#e5e3dc] bg-white rounded-md shadow-xs overflow-hidden">
+                <div class="p-4 border-b border-[#f0eee8] bg-[#faf8f5] flex items-center justify-between flex-wrap gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[#23493a] text-xl">checklist</span>
+                        <div>
+                            <h3 class="text-sm font-semibold text-[#1a1a1a]">Case Tasks &amp; Procedural Steps</h3>
+                            <span class="text-[10px] font-mono text-[#646864]">{{ $matter->tasks->where('status', 'completed')->count() }} of {{ $matter->tasks->count() }} completed</span>
+                        </div>
+                    </div>
+                    <a href="{{ route('tasks.index', ['matter_id' => $matter->id]) }}" class="btn-secondary h-7 px-2.5 text-[11px] inline-flex items-center gap-1">
+                        <span>Task Hub</span>
+                        <span class="material-symbols-outlined text-[13px]">open_in_new</span>
+                    </a>
+                </div>
+
+                <div class="divide-y divide-[#f0eee8]">
+                    @forelse($matter->tasks as $mtask)
+                        <div class="p-3.5 flex items-center justify-between gap-3 hover:bg-[#faf9f5] transition-colors">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <form action="{{ route('tasks.toggle', $mtask->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="w-4.5 h-4.5 rounded border flex items-center justify-center transition-colors cursor-pointer {{ $mtask->status === 'completed' ? 'bg-[#23493a] border-[#23493a] text-white' : 'border-[#c1c8c3] hover:border-[#23493a] bg-white' }}">
+                                        @if($mtask->status === 'completed')
+                                            <span class="material-symbols-outlined text-[12px]">check</span>
+                                        @endif
+                                    </button>
+                                </form>
+                                <div class="flex flex-col min-w-0">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="font-mono text-[10px] text-[#23493a] font-semibold">{{ $mtask->formatted_id }}</span>
+                                        <span class="px-1.5 py-0.2 rounded text-[9.5px] font-mono border {{ $mtask->priority_badge_classes }}">{{ $mtask->priority_label }}</span>
+                                        <span class="px-1.5 py-0.2 rounded text-[9.5px] font-mono border {{ $mtask->status_badge_classes }}">{{ $mtask->status_label }}</span>
+                                    </div>
+                                    <span class="text-xs font-semibold text-[#1a1a1a] truncate mt-0.5 {{ $mtask->status === 'completed' ? 'line-through text-[#8a8a8a]' : '' }}">
+                                        {{ $mtask->title }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 shrink-0 text-[11px] font-mono text-[#8a8a8a]">
+                                <span>Due: {{ $mtask->due_date ? $mtask->due_date->format('d M') : 'None' }}</span>
+                                <span class="text-[#1a1a1a]">&middot; {{ $mtask->assignee->name ?? 'Unassigned' }}</span>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-6 text-center text-xs text-[#8a8a8a]">
+                            No litigation tasks scheduled for this matter dossier yet.
+                            <a href="{{ route('tasks.index', ['matter_id' => $matter->id]) }}" class="text-[#23493a] underline ml-1">Schedule task</a>.
+                        </div>
+                    @endforelse
+                </div>
             </div>
 
             <!-- Case Notes & Strategy Memoranda (F-12) -->
