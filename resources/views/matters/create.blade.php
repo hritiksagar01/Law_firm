@@ -10,9 +10,6 @@
         totalSteps: 3,
         clientId: '{{ old('client_id', $selectedClientId ?? '') }}',
         title: '{{ old('title', '') }}',
-        shortTitle: '{{ old('short_title', '') }}',
-        caseNumber: '{{ old('case_number', $suggestedCaseNumber) }}',
-        matterUuid: '{{ old('matter_uuid', $suggestedUuid) }}',
         practiceArea: '{{ old('practice_area', 'Commercial Litigation & Arbitration') }}',
         status: '{{ old('status', 'Active') }}',
         priority: '{{ old('priority', 'medium') }}',
@@ -65,24 +62,14 @@
                 this.judges.splice(index, 1);
             }
         },
-        generateUuid() {
-            this.matterUuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            }).toUpperCase();
-        },
-        copyUuid() {
-            navigator.clipboard.writeText(this.matterUuid);
-            alert('Matter UUID copied to clipboard: ' + this.matterUuid);
-        },
         validateStep(step) {
             if (step === 1) {
-                if (!this.clientId) {
-                    alert('Please select a Client for this matter dossier.');
+                if (!this.title.trim()) {
+                    alert('Please provide the Case Title / Matter Caption (1st field).');
                     return false;
                 }
-                if (!this.title.trim()) {
-                    alert('Please provide a Case Caption / Matter Name.');
+                if (!this.clientId) {
+                    alert('Please select a Client for this matter dossier (2nd field).');
                     return false;
                 }
                 if (!this.practiceArea) {
@@ -116,9 +103,9 @@
 
         <!-- Quick Meta Badges -->
         <div class="flex items-center gap-2">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#f5f3ed] border border-[#e5e3dc] text-xs font-mono font-semibold text-[#23493a]" title="Matter Case Number">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#f5f3ed] border border-[#e5e3dc] text-xs font-mono font-medium text-[#23493a]">
                 <span class="material-symbols-outlined text-sm">tag</span>
-                <span x-text="caseNumber || 'HO-{{ date('Y') }}-XXXX'"></span>
+                <span>Matter ID: Auto-created on submission</span>
             </span>
             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-stone-100 border border-[#e5e3dc] text-[11px] font-mono text-[#646864]">
                 <span>Stage: </span>
@@ -214,18 +201,27 @@
         <!-- ========================================================================================= -->
         <div x-show="currentStep === 1" x-cloak class="flex flex-col gap-6">
             
-            <!-- Section 1.1: Identifiers & Client Profile -->
+            <!-- Section 1.1: Case Title, Client & Practice Discipline -->
             <div class="border border-[#e5e3dc] bg-white rounded-lg p-6 shadow-xs">
                 <div class="flex items-center justify-between pb-3 mb-5 border-b border-[#f0eee8]">
                     <div class="flex items-center gap-2">
                         <span class="material-symbols-outlined text-[#23493a] text-xl">folder_managed</span>
-                        <h2 class="text-sm font-semibold uppercase tracking-wider text-[#1a1a1a]">1.1 Matter Identification &amp; Identifiers</h2>
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-[#1a1a1a]">1.1 Case Title &amp; Client Relationship</h2>
                     </div>
                     <span class="text-[11px] font-mono text-[#8a8a8a]">Fields marked * are mandatory</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <!-- Client Selector -->
+                    <!-- 1ST: Case Title (Case Caption / Full Matter Name) -->
+                    <div class="flex flex-col gap-1.5 md:col-span-2">
+                        <label class="text-xs font-semibold text-[#1a1a1a]">Case Title / Matter Caption *</label>
+                        <input type="text" name="title" x-model="title" required
+                               placeholder="e.g. Malhotra Enterprises Pvt. Ltd. v. Apex Commercial Bank &amp; Ors."
+                               class="w-full h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs font-medium text-[#1a1a1a] focus:outline-none focus:border-[#23493a]"/>
+                        <span class="text-[10.5px] text-[#8a8a8a]">Formal judicial caption as styled on court petitions, pleadings, or legal briefs</span>
+                    </div>
+
+                    <!-- 2ND: Client / Retaining Entity -->
                     <div class="flex flex-col gap-1.5 md:col-span-2">
                         <div class="flex items-center justify-between">
                             <label class="text-xs font-semibold text-[#1a1a1a]">Client / Retaining Entity *</label>
@@ -259,56 +255,8 @@
                         </template>
                     </div>
 
-                    <!-- Matter Number (Internal ID) -->
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-xs font-semibold text-[#1a1a1a]">Matter ID / Number *</label>
-                        <div class="relative">
-                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#8a8a8a]">tag</span>
-                            <input type="text" name="case_number" x-model="caseNumber" required
-                                   class="w-full h-10 pl-9 pr-3 rounded-md bg-white border border-[#e5e3dc] text-xs font-mono font-medium text-[#1a1a1a] focus:outline-none focus:border-[#23493a]"
-                                   placeholder="e.g. HO-2026-0042"/>
-                        </div>
-                        <span class="text-[10.5px] text-[#8a8a8a]">Standardized Chambers file number</span>
-                    </div>
-
-                    <!-- Matter UUID (System Universally Unique Identifier) -->
-                    <div class="flex flex-col gap-1.5">
-                        <div class="flex items-center justify-between">
-                            <label class="text-xs font-semibold text-[#1a1a1a]">System UUID</label>
-                            <div class="flex items-center gap-2">
-                                <button type="button" @click="generateUuid()" class="text-[11px] text-[#23493a] hover:underline font-mono">Regenerate</button>
-                                <button type="button" @click="copyUuid()" class="text-[11px] text-[#23493a] hover:underline font-mono">Copy</button>
-                            </div>
-                        </div>
-                        <div class="relative">
-                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#8a8a8a]">fingerprint</span>
-                            <input type="text" name="matter_uuid" x-model="matterUuid"
-                                   class="w-full h-10 pl-9 pr-3 rounded-md bg-[#faf8f5] border border-[#e5e3dc] text-xs font-mono text-[#646864] focus:outline-none focus:border-[#23493a]"
-                                   placeholder="UUID identifier"/>
-                        </div>
-                        <span class="text-[10.5px] text-[#8a8a8a]">Cryptographic UUID for audit trails &amp; court e-filing</span>
-                    </div>
-
-                    <!-- Full Matter Name (Case Caption) -->
+                    <!-- 3RD: Primary Practice Area Discipline -->
                     <div class="flex flex-col gap-1.5 md:col-span-2">
-                        <label class="text-xs font-semibold text-[#1a1a1a]">Matter Name &amp; Legal Caption *</label>
-                        <input type="text" name="title" x-model="title" required
-                               placeholder="e.g. Malhotra Enterprises Pvt. Ltd. v. Apex Commercial Bank &amp; Ors."
-                               class="w-full h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:outline-none focus:border-[#23493a]"/>
-                        <span class="text-[10.5px] text-[#8a8a8a]">Formal judicial title as filed in court petitions and pleadings</span>
-                    </div>
-
-                    <!-- Short Matter Name (Colloquial / File Tag) -->
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-xs font-semibold text-[#1a1a1a]">Short Matter Name</label>
-                        <input type="text" name="short_title" x-model="shortTitle"
-                               placeholder="e.g. Malhotra v. Apex Bank"
-                               class="w-full h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:outline-none focus:border-[#23493a]"/>
-                        <span class="text-[10.5px] text-[#8a8a8a]">Abbreviated docket name used in calendars and time entries</span>
-                    </div>
-
-                    <!-- Primary Practice Area Discipline -->
-                    <div class="flex flex-col gap-1.5">
                         <label class="text-xs font-semibold text-[#1a1a1a]">Primary Practice Area *</label>
                         <select name="practice_area" x-model="practiceArea" required
                                 class="w-full h-10 px-3 rounded-md bg-white border border-[#e5e3dc] text-xs text-[#1a1a1a] focus:outline-none focus:border-[#23493a]">
@@ -326,6 +274,20 @@
                             <option value="Regulatory & Environmental Compliance">Regulatory &amp; Environmental Compliance</option>
                         </select>
                         <span class="text-[10.5px] text-[#8a8a8a]">Primary chambers discipline responsible for this engagement</span>
+                    </div>
+
+                    <!-- Matter ID Notice (Auto-created on submit) -->
+                    <div class="md:col-span-2 p-3 rounded-md bg-[#faf8f5] border border-[#f0eee8] flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-2.5">
+                            <span class="material-symbols-outlined text-[#23493a] text-lg">tag</span>
+                            <div>
+                                <span class="font-semibold text-[#1a1a1a]">Matter ID / Number: </span>
+                                <span class="text-[#646864]">Will be automatically generated upon creating this case dossier</span>
+                            </div>
+                        </div>
+                        <span class="text-[11px] font-mono text-[#23493a] bg-white px-2.5 py-0.5 rounded border border-[#e5e3dc]">
+                            Auto-assigned (e.g. {{ $suggestedCaseNumber }})
+                        </span>
                     </div>
                 </div>
             </div>
@@ -884,17 +846,21 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                    <!-- Column 1 -->
+                    <!-- Column 1: Case & Client Profile -->
                     <div class="bg-white p-4 rounded-md border border-[#e5e3dc] flex flex-col gap-2.5">
                         <span class="text-[11px] font-mono uppercase tracking-wider text-[#8a8a8a]">Matter Summary</span>
                         <div>
                             <span class="text-[#8a8a8a] block text-[11px]">Case Caption</span>
-                            <span class="font-semibold text-[#1a1a1a]" x-text="title || 'Not specified'"></span>
+                            <span class="font-semibold text-[#1a1a1a] text-sm" x-text="title || 'Not specified'"></span>
+                        </div>
+                        <div>
+                            <span class="text-[#8a8a8a] block text-[11px]">Client</span>
+                            <span class="text-[#1a1a1a] font-medium" x-text="selectedClientObj ? selectedClientObj.name : 'No client selected'"></span>
                         </div>
                         <div class="flex items-center gap-4">
                             <div>
-                                <span class="text-[#8a8a8a] block text-[11px]">File Number</span>
-                                <span class="font-mono text-[#23493a] font-medium" x-text="caseNumber"></span>
+                                <span class="text-[#8a8a8a] block text-[11px]">Matter Number</span>
+                                <span class="font-mono text-[#23493a] font-medium">Auto-generated</span>
                             </div>
                             <div>
                                 <span class="text-[#8a8a8a] block text-[11px]">Status</span>
@@ -906,10 +872,6 @@
                                       :class="priority === 'urgent' ? 'text-rose-700' : 'text-[#23493a]'"
                                       x-text="priority"></span>
                             </div>
-                        </div>
-                        <div>
-                            <span class="text-[#8a8a8a] block text-[11px]">Client</span>
-                            <span class="text-[#1a1a1a] font-medium" x-text="selectedClientObj ? selectedClientObj.name : 'No client selected'"></span>
                         </div>
                         <div>
                             <span class="text-[#8a8a8a] block text-[11px]">Practice Discipline</span>
@@ -925,7 +887,7 @@
                         </div>
                     </div>
 
-                    <!-- Column 2 -->
+                    <!-- Column 2: Judicial Forum & Schedule -->
                     <div class="bg-white p-4 rounded-md border border-[#e5e3dc] flex flex-col gap-2.5">
                         <span class="text-[11px] font-mono uppercase tracking-wider text-[#8a8a8a]">Judicial Forum &amp; Bench</span>
                         <div>

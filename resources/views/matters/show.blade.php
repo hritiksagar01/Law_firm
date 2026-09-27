@@ -48,25 +48,12 @@
                 <span class="font-mono text-xs px-2.5 py-0.5 rounded bg-[#f5f3ed] text-[#23493a] font-semibold border border-[#e5e3dc]" title="Matter Case Number">
                     {{ $matter->case_number }}
                 </span>
-                @if($matter->matter_uuid)
-                    <span class="font-mono text-[11px] px-2 py-0.5 rounded bg-stone-50 text-[#8a8a8a] border border-[#e5e3dc] hidden sm:inline-flex items-center gap-1" title="System UUID: {{ $matter->matter_uuid }}">
-                        <span class="material-symbols-outlined text-[13px]">fingerprint</span>
-                        <span>{{ substr($matter->matter_uuid, 0, 8) }}...</span>
-                    </span>
-                @endif
             </div>
         </div>
 
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div class="flex flex-col">
-                <div class="flex items-center gap-2 flex-wrap">
-                    <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">{{ $matter->title }}</h1>
-                    @if($matter->short_title)
-                        <span class="text-xs font-mono font-normal px-2 py-0.5 rounded bg-[#faf8f5] text-[#646864] border border-[#e5e3dc]">
-                            Alias: {{ $matter->short_title }}
-                        </span>
-                    @endif
-                </div>
+                <h1 class="text-[28px] sm:text-[32px] font-semibold text-[#1a1a1a] tracking-tight leading-tight">{{ $matter->title }}</h1>
                 <div class="flex items-center gap-2 flex-wrap text-[13px] text-[#646864] mt-1.5">
                     @if($matter->court_name)
                         <span>{{ $matter->court_name }}</span>
