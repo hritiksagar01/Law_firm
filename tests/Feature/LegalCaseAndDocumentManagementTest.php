@@ -66,7 +66,8 @@ class LegalCaseAndDocumentManagementTest extends TestCase
         $response->assertSee('Activity');
         $response->assertSee('Profile');
         $response->assertSee('Settings');
-        $response->assertSee('Conflict Checks');
+        $response->assertDontSee('Conflict Checks');
+        $response->assertDontSee('Conflict-Check Gateway');
     }
 
     /**

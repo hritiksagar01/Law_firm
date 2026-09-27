@@ -231,14 +231,6 @@
                 </a>
                 @endif
 
-                <!-- Conflict Checks -->
-                @if(Route::has('conflict-checks.index'))
-                <a href="{{ route('conflict-checks.index') }}" 
-                   class="flex items-center gap-3 px-3 py-2 rounded-md text-[13.5px] transition-colors {{ request()->routeIs('conflict-checks.*') ? 'bg-white/[.10] text-white font-medium shadow-xs' : 'text-[#9ca3af] hover:text-white hover:bg-white/[.05]' }}">
-                    <span class="material-symbols-outlined text-[19px] {{ request()->routeIs('conflict-checks.*') ? 'text-white' : 'text-[#9ca3af]' }}">policy</span>
-                    <span>Conflict Checks</span>
-                </a>
-                @endif
 
                 <!-- Tasks -->
                 <a href="{{ route('tasks.index') }}" 

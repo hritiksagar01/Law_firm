@@ -61,10 +61,6 @@
                 <span class="material-symbols-outlined text-[15px]">add</span>
                 <span>New Matter</span>
             </a>
-            <a href="{{ route('conflict-checks.index') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-white border border-[#e5e3dc] text-[#1a1a1a] hover:bg-[#faf9f5] text-xs font-medium transition-colors shadow-xs">
-                <span class="material-symbols-outlined text-[15px] text-[#646864]">policy</span>
-                <span>Conflict Scan</span>
-            </a>
         </div>
     </div>
 
@@ -624,23 +620,6 @@
                 </div>
             </div>
 
-            <!-- Quick Conflict Check Card -->
-            <div class="border border-[#e5e3dc] bg-white rounded-md p-5 shadow-xs">
-                <div class="flex items-center justify-between pb-2 mb-3 border-b border-[#f0eee8]">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#23493a] text-[18px]">verified_user</span>
-                        <h3 class="text-[13px] font-semibold text-[#1a1a1a]">Conflict-Check Gateway</h3>
-                    </div>
-                    <a href="{{ route('conflict-checks.index') }}" class="text-xs text-[#23493a] hover:underline font-medium">Log &rarr;</a>
-                </div>
-                <p class="text-xs text-[#646864] mb-3">
-                    Instantly screen opposing parties, witnesses, companies, and related entities before onboarding new matters.
-                </p>
-                <a href="{{ route('conflict-checks.index') }}" class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded bg-[#f5f3ed] hover:bg-[#eae8e2] border border-[#e5e3dc] text-xs font-medium text-[#1a1a1a] transition-colors">
-                    <span class="material-symbols-outlined text-[15px]">search</span>
-                    <span>Launch Live Conflict Scan</span>
-                </a>
-            </div>
 
             <!-- Last sign-in Footnote -->
             <div class="text-[11.5px] text-[#8a8a8a] px-1 leading-normal">
