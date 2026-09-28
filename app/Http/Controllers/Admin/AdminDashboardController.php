@@ -385,6 +385,54 @@ class AdminDashboardController extends Controller
             ]);
         }
 
+        if ($actionableTasks->count() < 4) {
+            $defaultPlatformTasks = [
+                [
+                    'id' => 'sec-audit',
+                    'title' => 'Law Society & Bar Council Compliance Audit Verification',
+                    'priority' => 'High',
+                    'priority_class' => 'bg-[#fce8e6] text-[#c5221f]',
+                    'subtitle' => 'Security compliance · Annual audit of encrypted vault storage & multi-tenant access',
+                    'action_label' => 'Audit',
+                    'action_url' => route('admin.firms.index'),
+                ],
+                [
+                    'id' => 'trust-reconcile',
+                    'title' => 'Reconcile Multi-Tenant Trust Account & Retainer Ledgers',
+                    'priority' => 'Medium',
+                    'priority_class' => 'bg-[#fef3c7] text-[#92400e]',
+                    'subtitle' => 'Financial oversight · Monthly statutory escrow balance verification across active chambers',
+                    'action_label' => 'Verify',
+                    'action_url' => route('admin.matters.index'),
+                ],
+                [
+                    'id' => 'retention-review',
+                    'title' => 'Review Statutory Data Retention & Archival Schedules',
+                    'priority' => 'Normal',
+                    'priority_class' => 'bg-[#e0f2fe] text-[#0369a1]',
+                    'subtitle' => 'Data governance · Review closed matters exceeding 7-year limitation period',
+                    'action_label' => 'Inspect',
+                    'action_url' => route('admin.matters.index'),
+                ],
+                [
+                    'id' => 'onboard-verify',
+                    'title' => 'Verify New Chambers Onboarding & Domain SSL Certificates',
+                    'priority' => 'Normal',
+                    'priority_class' => 'bg-[#e0f2fe] text-[#0369a1]',
+                    'subtitle' => 'Infrastructure · Tenant custom subdomains & SMTP delivery relay verification',
+                    'action_label' => 'Check',
+                    'action_url' => route('admin.firms.index'),
+                ],
+            ];
+
+            foreach ($defaultPlatformTasks as $dpt) {
+                if ($actionableTasks->count() >= 4) {
+                    break;
+                }
+                $actionableTasks->push($dpt);
+            }
+        }
+
         // 12. Calendar: Previous Week, This Week, Coming Week
         $getScheduleForRange = function (Carbon $start, Carbon $end) {
             $items = collect();

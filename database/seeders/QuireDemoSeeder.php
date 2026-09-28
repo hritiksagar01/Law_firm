@@ -14,6 +14,7 @@ use App\Models\Permission;
 use App\Models\PlatformSetting;
 use App\Models\Role;
 use App\Models\SignInHistory;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -348,6 +349,10 @@ class QuireDemoSeeder extends Seeder
                 ]);
             }
         }
+
+        // 6.5. Seed Active Sample Tasks (Litigation milestones & docket deadlines)
+        Task::ensureSampleTasksForFirm($firm->id, $margaret->id);
+        Task::ensureSampleTasksForFirm($meridianFirm->id, $margaret->id);
 
         // 7. Notification Delivery Logs
         if (DeliveryLog::count() === 0) {

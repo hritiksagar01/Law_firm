@@ -216,4 +216,164 @@ class Task extends Model
     {
         return $query->where('priority', $priority);
     }
+
+    /**
+     * Ensure a firm has active sample litigation tasks with overdue, due today, and upcoming milestones.
+     */
+    public static function ensureSampleTasksForFirm(int $firmId, ?int $userId = null): void
+    {
+        $incompleteCount = static::where('firm_id', $firmId)
+            ->where('status', '!=', self::STATUS_COMPLETED)
+            ->count();
+
+        $firm = Firm::find($firmId);
+        $currency = $firm?->currency ?? 'USD';
+
+        if ($incompleteCount < 4) {
+            $matter = Matter::where('firm_id', $firmId)->first();
+            if (! $matter) {
+                $client = Client::where('firm_id', $firmId)->first();
+                if (! $client) {
+                    $client = Client::create([
+                        'firm_id' => $firmId,
+                        'name' => $currency === 'INR' ? 'Premier Industrial Enterprises' : 'Beacon Global Enterprises Inc.',
+                        'type' => 'corporate',
+                        'contact_person' => 'Corporate Legal Representative',
+                        'email' => 'contact@'.($firm?->slug ?? 'client').'.example',
+                        'phone' => '+1 (555) 019-2831',
+                        'status' => 'active',
+                    ]);
+                }
+
+                $matter = Matter::create([
+                    'firm_id' => $firmId,
+                    'client_id' => $client->id,
+                    'case_number' => $currency === 'INR' ? 'DEL/2026/0142' : '2026-0142',
+                    'title' => $currency === 'INR' ? 'Commercial Arbitration & Recovery Proceedings' : 'Commercial Contract & Supply Chain Litigation',
+                    'status' => 'open',
+                    'stage' => 'Litigation',
+                    'priority' => 'urgent',
+                    'lead_attorney_id' => $userId,
+                    'billing_type' => 'hourly',
+                    'budget' => 150000,
+                    'opened_at' => Carbon::now()->subMonth(),
+                ]);
+            }
+
+            $matters = Matter::where('firm_id', $firmId)->get();
+
+            $samples = $currency === 'INR' ? [
+                [
+                    'title' => 'File Sworn Statement of Truth & Vakalatnama at High Court Registry',
+                    'description' => 'Ensure affidavit is duly notarized and signed with client verification stamp for electronic filing before cutoff.',
+                    'priority' => self::PRIORITY_URGENT,
+                    'status' => self::STATUS_NOT_STARTED,
+                    'due_date' => Carbon::now()->subDays(1)->startOfDay(),
+                ],
+                [
+                    'title' => 'Draft Rejoinder & Comparative Statement of Claims',
+                    'description' => 'Address preliminary objections raised in Bank written statement; cite Hon. SC ruling in Union of India v. D.N. Revri.',
+                    'priority' => self::PRIORITY_URGENT,
+                    'status' => self::STATUS_IN_PROGRESS,
+                    'due_date' => Carbon::now()->startOfDay(),
+                ],
+                [
+                    'title' => 'Prepare Cross-Examination Brief & Exhibit Dossier for Hearing',
+                    'description' => 'Collate petitioner lease deeds, municipal notices, and revenue survey maps into indexed judge bundle.',
+                    'priority' => self::PRIORITY_HIGH,
+                    'status' => self::STATUS_NOT_STARTED,
+                    'due_date' => Carbon::now()->addDay()->startOfDay(),
+                ],
+                [
+                    'title' => 'Client Briefing & Interlocutory Affidavit Verification',
+                    'description' => 'Conduct pre-hearing briefing with authorized signatory to verify affidavit deposition and evidence exhibits.',
+                    'priority' => self::PRIORITY_HIGH,
+                    'status' => self::STATUS_NOT_STARTED,
+                    'due_date' => Carbon::now()->addDays(2)->startOfDay(),
+                ],
+                [
+                    'title' => 'Review Resolution Plan & Committee of Creditors Protocol',
+                    'description' => 'Scrutinize prospective resolution applicant submissions against Section 29A disqualification criteria.',
+                    'priority' => self::PRIORITY_URGENT,
+                    'status' => self::STATUS_IN_PROGRESS,
+                    'due_date' => Carbon::now()->addDays(3)->startOfDay(),
+                ],
+                [
+                    'title' => 'Scrutinize Opposing Counsel\'s Additional Documents & Rebuttal Memo',
+                    'description' => 'Review railway demurrage vouchers and draft itemized objection schedule for the arbitrator.',
+                    'priority' => self::PRIORITY_NORMAL,
+                    'status' => self::STATUS_NOT_STARTED,
+                    'due_date' => Carbon::now()->addDays(4)->startOfDay(),
+                ],
+            ] : [
+                [
+                    'title' => 'File Notice of Appearance & Corporate Disclosure Statement at District Court',
+                    'description' => 'Complete Rule 7.1 corporate disclosure statement and electronically file notice of lead counsel appearance.',
+                    'priority' => self::PRIORITY_URGENT,
+                    'status' => self::STATUS_NOT_STARTED,
+                    'due_date' => Carbon::now()->subDays(1)->startOfDay(),
+                ],
+                [
+                    'title' => 'Draft Summary Judgment Motion & Responsive Statement of Undisputed Facts',
+                    'description' => 'Finalize Rule 56 motion with citations to deposition transcripts and counter-affidavits.',
+                    'priority' => self::PRIORITY_URGENT,
+                    'status' => self::STATUS_IN_PROGRESS,
+                    'due_date' => Carbon::now()->startOfDay(),
+                ],
+                [
+                    'title' => 'Prepare Cross-Examination & Deposition Exhibit Binder for Hearing',
+                    'description' => 'Assemble marked trial exhibits, witness outline, and prior contradictory statements for hearing.',
+                    'priority' => self::PRIORITY_HIGH,
+                    'status' => self::STATUS_NOT_STARTED,
+                    'due_date' => Carbon::now()->addDay()->startOfDay(),
+                ],
+                [
+                    'title' => 'Client Case Conference & Interlocutory Affidavit Verification',
+                    'description' => 'Meet with corporate representative to finalize verified interrogatory answers and production disclosures.',
+                    'priority' => self::PRIORITY_HIGH,
+                    'status' => self::STATUS_NOT_STARTED,
+                    'due_date' => Carbon::now()->addDays(2)->startOfDay(),
+                ],
+                [
+                    'title' => 'Review Transaction Covenants & Closing Disclosure Protocol',
+                    'description' => 'Audit acquisition escrow conditions and regulatory filings prior to transaction cutoff.',
+                    'priority' => self::PRIORITY_URGENT,
+                    'status' => self::STATUS_IN_PROGRESS,
+                    'due_date' => Carbon::now()->addDays(3)->startOfDay(),
+                ],
+                [
+                    'title' => 'Scrutinize Opposing Counsel\'s Expert Rebuttal Disclosures',
+                    'description' => 'Evaluate economic expert report methodology and prepare Daubert challenge motions.',
+                    'priority' => self::PRIORITY_NORMAL,
+                    'status' => self::STATUS_NOT_STARTED,
+                    'due_date' => Carbon::now()->addDays(4)->startOfDay(),
+                ],
+            ];
+
+            foreach ($samples as $idx => $sample) {
+                $targetMatter = $matters[$idx % $matters->count()] ?? $matter;
+                static::create(array_merge($sample, [
+                    'firm_id' => $firmId,
+                    'matter_id' => $targetMatter->id,
+                    'assigned_to' => $userId,
+                    'created_by' => $userId,
+                ]));
+            }
+        }
+
+        // If user is provided and has 0 active tasks assigned to them, assign top active firm tasks to this user
+        if ($userId) {
+            $userTasksCount = static::where('firm_id', $firmId)
+                ->where('assigned_to', $userId)
+                ->where('status', '!=', self::STATUS_COMPLETED)
+                ->count();
+
+            if ($userTasksCount === 0) {
+                static::where('firm_id', $firmId)
+                    ->where('status', '!=', self::STATUS_COMPLETED)
+                    ->take(3)
+                    ->update(['assigned_to' => $userId]);
+            }
+        }
+    }
 }

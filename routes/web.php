@@ -180,6 +180,9 @@ Route::middleware('auth')->group(function () {
                 ->count();
             $openMattersCount = $activeMattersCount;
 
+            // Ensure firm has baseline sample tasks so "Your tasks" is never empty
+            Task::ensureSampleTasksForFirm($firmId, $user->id);
+
             // Tasks metrics
             $tasksDueThisWeekCount = Task::where('firm_id', $firmId)
                 ->where('status', '!=', 'completed')
@@ -287,6 +290,7 @@ Route::middleware('auth')->group(function () {
                 })
                 ->where('status', '!=', 'completed')
                 ->with(['matter', 'assignee'])
+                ->orderByRaw('CASE WHEN assigned_to = ? THEN 0 ELSE 1 END', [$user->id])
                 ->orderByRaw('CASE WHEN due_date < ? THEN 0 ELSE 1 END', [now()->toDateString()])
                 ->orderBy('due_date', 'asc')
                 ->take(6)
@@ -298,6 +302,7 @@ Route::middleware('auth')->group(function () {
                     ->where('status', '!=', 'completed')
                     ->whereNotIn('id', $existingTaskIds)
                     ->with(['matter', 'assignee'])
+                    ->orderByRaw('CASE WHEN assigned_to = ? THEN 0 ELSE 1 END', [$user->id])
                     ->orderByRaw('CASE WHEN due_date < ? THEN 0 ELSE 1 END', [now()->toDateString()])
                     ->orderBy('due_date', 'asc')
                     ->take(6 - $userTasks->count())

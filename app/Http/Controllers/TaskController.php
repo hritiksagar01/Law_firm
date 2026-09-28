@@ -25,6 +25,8 @@ class TaskController extends Controller
         $user = Auth::user();
         $firmId = $user->firm_id ?? 1;
 
+        Task::ensureSampleTasksForFirm($firmId, $user?->id);
+
         $statusFilter = $request->get('status', 'all');
         $priorityFilter = $request->get('priority', 'all');
         $matterId = $request->get('matter_id');
