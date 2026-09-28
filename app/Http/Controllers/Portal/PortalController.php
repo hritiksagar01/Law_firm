@@ -66,6 +66,9 @@ class PortalController extends Controller
         $client = $this->getClient();
         $client->load('primaryAttorney');
 
+        // Ensure client has baseline sample document requests
+        DocumentRequest::ensureSampleRequestsForClient($client);
+
         $matters = Matter::where('client_id', $client->id)
             ->with(['documents', 'leadAttorney', 'documentRequests', 'events'])
             ->latest()
@@ -423,6 +426,9 @@ class PortalController extends Controller
     public function requests(Request $request)
     {
         $client = $this->getClient();
+
+        // Ensure client has baseline sample document requests
+        DocumentRequest::ensureSampleRequestsForClient($client);
 
         $requests = DocumentRequest::where('client_id', $client->id)
             ->with(['matter', 'requestedBy'])

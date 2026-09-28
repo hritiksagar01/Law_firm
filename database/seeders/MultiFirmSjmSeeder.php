@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Appointment;
 use App\Models\BankAccount;
 use App\Models\Client;
+use App\Models\DocumentRequest;
 use App\Models\Event;
 use App\Models\Expense;
 use App\Models\Firm;
@@ -505,6 +506,9 @@ class MultiFirmSjmSeeder extends Seeder
                 'status' => 'todo',
             ]
         );
+
+        // Seed Sample Document Requests for Deepak Gupta (Client Portal)
+        DocumentRequest::ensureSampleRequestsForClient($clientApex);
 
         // Firm 2 Time Entries
         TimeEntry::firstOrCreate(

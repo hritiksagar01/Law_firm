@@ -812,6 +812,8 @@ class DatabaseSeeder extends Seeder
             'review_notes' => 'Verified and matched with delivery challans. Added to compilation of documents.',
         ]);
 
+        DocumentRequest::ensureSampleRequestsForClient($clientMalhotra);
+
         // Second Invoice for Malhotra (Paid retainer invoice)
         Invoice::create([
             'firm_id' => $firm->id,

@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\DefaultDocumentCategory;
 use App\Models\DeliveryLog;
 use App\Models\Document;
+use App\Models\DocumentRequest;
 use App\Models\Firm;
 use App\Models\Matter;
 use App\Models\Message;
@@ -353,6 +354,11 @@ class QuireDemoSeeder extends Seeder
         // 6.5. Seed Active Sample Tasks (Litigation milestones & docket deadlines)
         Task::ensureSampleTasksForFirm($firm->id, $margaret->id);
         Task::ensureSampleTasksForFirm($meridianFirm->id, $margaret->id);
+
+        // 6.6. Seed Sample Document Requests for Client Portal
+        DocumentRequest::ensureSampleRequestsForClient($clientElena);
+        DocumentRequest::ensureSampleRequestsForClient($clientSam);
+        DocumentRequest::ensureSampleRequestsForClient($clientKiran);
 
         // 7. Notification Delivery Logs
         if (DeliveryLog::count() === 0) {
