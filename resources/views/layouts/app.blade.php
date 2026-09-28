@@ -408,6 +408,7 @@
             </div>
 
             <!-- Right: System Status, Search, Notifications, Settings, Profile Dropdown -->
+            <div class="flex items-center gap-2 sm:gap-3">
                 <!-- Header Quick Search Bar -->
                 <form action="{{ route('search') }}" method="GET" class="relative hidden sm:block w-44 md:w-56 lg:w-64">
                     <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#8e8e8e]">
