@@ -650,6 +650,67 @@ class PortalController extends Controller
     }
 
     /**
+     * Inline View Privileged Document with Strict Access Isolation.
+     */
+    public function viewDocument(Document $document)
+    {
+        $client = $this->getClient();
+
+        // STRICT DATA ISOLATION: The document must belong to a matter owned by this client
+        $matter = Matter::where('id', $document->matter_id)->where('client_id', $client->id)->first();
+        if (! $matter) {
+            abort(403, 'Unauthorized document access: This filing does not belong to your case dossiers.');
+        }
+
+        // Document must be designated client-visible
+        if ($document->is_client_visible === false) {
+            abort(403, 'Unauthorized: This filing is restricted to internal chambers work product.');
+        }
+
+        MatterActivity::log(
+            matter: $matter,
+            activityType: 'document_viewed',
+            description: "Client {$client->name} viewed document '{$document->title}' ({$document->filename})",
+            subject: $document,
+            userId: Auth::id(),
+            clientId: $client->id,
+            isClientSafe: true
+        );
+
+        $defaultDisk = config('filesystems.default', 'local');
+        if ($document->file_path) {
+            try {
+                if (Storage::disk($defaultDisk)->exists($document->file_path)) {
+                    return Storage::disk($defaultDisk)->response($document->file_path, $document->filename, [
+                        'Content-Type' => $document->mime_type ?: 'application/pdf',
+                        'Content-Disposition' => "inline; filename=\"{$document->filename}\"",
+                    ]);
+                }
+            } catch (Throwable $e) {
+            }
+
+            try {
+                if ($defaultDisk !== 'local' && Storage::disk('local')->exists($document->file_path)) {
+                    return Storage::disk('local')->response($document->file_path, $document->filename, [
+                        'Content-Type' => $document->mime_type ?: 'application/pdf',
+                        'Content-Disposition' => "inline; filename=\"{$document->filename}\"",
+                    ]);
+                }
+            } catch (Throwable $e) {
+            }
+        }
+
+        // Compliant legal PDF fallback stream
+        $pdfContent = LegalPdfGenerator::forDocument($document);
+
+        return response($pdfContent, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => "inline; filename=\"{$document->filename}\"",
+            'Content-Length' => strlen($pdfContent),
+        ]);
+    }
+
+    /**
      * Privileged Counsel Messages Channel (F-09).
      */
     public function messages(Request $request)
@@ -1093,7 +1154,22 @@ class PortalController extends Controller
         }
 
         $newStatus = $task->status === 'completed' ? 'todo' : 'completed';
-        $task->update(['status' => $newStatus]);
+        $task->update([
+            'status' => $newStatus,
+            'completed_date' => $newStatus === 'completed' ? now()->toDateString() : null,
+        ]);
+
+        if ($task->matter) {
+            MatterActivity::log(
+                matter: $task->matter,
+                activityType: $newStatus === 'completed' ? 'task_completed' : 'client_activity',
+                description: ($newStatus === 'completed' ? "Client {$client->name} completed task: " : "Client {$client->name} reopened task: ").$task->title,
+                subject: $task,
+                userId: Auth::id(),
+                clientId: $client->id,
+                isClientSafe: true
+            );
+        }
 
         return back()->with('success', $newStatus === 'completed' ? 'Task marked as completed.' : 'Task marked as pending.');
     }

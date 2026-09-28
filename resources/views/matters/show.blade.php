@@ -705,18 +705,36 @@
                     </div>
                 </div>
 
+                @php
+                    $actCollection = $matter->activities ?? collect();
+                    $stg1Done = $actCollection->contains(fn($a) => in_array($a->activity_type, ['client_activity']) || str_contains(strtolower($a->description ?? ''), 'medical') || str_contains(strtolower($a->description ?? ''), 'record') || str_contains(strtolower($a->description ?? ''), 'client uploaded'));
+                    $stg2Done = $actCollection->contains(fn($a) => in_array($a->activity_type, ['medical_records_reviewed', 'document_viewed']) || str_contains(strtolower($a->description ?? ''), 'review'));
+                    $stg3Done = $actCollection->contains(fn($a) => $a->activity_type === 'complaint_drafted' || str_contains(strtolower($a->description ?? ''), 'complaint drafted') || str_contains(strtolower($a->description ?? ''), 'draft'));
+                    $stg4Done = $actCollection->contains(fn($a) => $a->activity_type === 'complaint_filed' || str_contains(strtolower($a->description ?? ''), 'complaint filed') || str_contains(strtolower($a->description ?? ''), 'filed with court')) || !empty($matter->filing_date);
+                    $stg5Done = $actCollection->contains(fn($a) => in_array($a->activity_type, ['hearing_scheduled', 'calendar_event']) || str_contains(strtolower($a->description ?? ''), 'hearing')) || ($matter->events && $matter->events->isNotEmpty());
+                @endphp
                 <!-- Illustrative Progression Tracker -->
                 <div class="px-4 py-2.5 bg-[#faf9f5] border-b border-[#f0eee8] flex items-center gap-1.5 overflow-x-auto text-[11px] text-[#646864]">
                     <span class="font-mono text-[#8a8a8a] text-[10px] uppercase whitespace-nowrap">Progress:</span>
-                    <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-medium whitespace-nowrap">Client Records Uploaded</span>
+                    <span class="px-2 py-0.5 rounded font-medium whitespace-nowrap {{ $stg1Done ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-500 opacity-75' }}">
+                        {{ $stg1Done ? '✓ ' : '' }}Client Records Uploaded
+                    </span>
                     <span class="text-[#8a8a8a]">&rarr;</span>
-                    <span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-medium whitespace-nowrap">Attorney Review</span>
+                    <span class="px-2 py-0.5 rounded font-medium whitespace-nowrap {{ $stg2Done ? 'bg-sky-100 text-sky-800' : 'bg-gray-100 text-gray-500 opacity-75' }}">
+                        {{ $stg2Done ? '✓ ' : '' }}Attorney Review
+                    </span>
                     <span class="text-[#8a8a8a]">&rarr;</span>
-                    <span class="px-2 py-0.5 rounded bg-violet-100 text-violet-800 font-medium whitespace-nowrap">Complaint Drafted</span>
+                    <span class="px-2 py-0.5 rounded font-medium whitespace-nowrap {{ $stg3Done ? 'bg-violet-100 text-violet-800' : 'bg-gray-100 text-gray-500 opacity-75' }}">
+                        {{ $stg3Done ? '✓ ' : '' }}Complaint Drafted
+                    </span>
                     <span class="text-[#8a8a8a]">&rarr;</span>
-                    <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-medium whitespace-nowrap">Complaint Filed</span>
+                    <span class="px-2 py-0.5 rounded font-medium whitespace-nowrap {{ $stg4Done ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-500 opacity-75' }}">
+                        {{ $stg4Done ? '✓ ' : '' }}Complaint Filed
+                    </span>
                     <span class="text-[#8a8a8a]">&rarr;</span>
-                    <span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-medium whitespace-nowrap">Hearing Scheduled</span>
+                    <span class="px-2 py-0.5 rounded font-medium whitespace-nowrap {{ $stg5Done ? 'bg-rose-100 text-rose-800' : 'bg-gray-100 text-gray-500 opacity-75' }}">
+                        {{ $stg5Done ? '✓ ' : '' }}Hearing Scheduled
+                    </span>
                 </div>
 
                 <div class="p-4">

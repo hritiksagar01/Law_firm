@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\Appointment;
 use App\Models\Client;
 use App\Models\Document;
 use App\Models\Firm;
 use App\Models\Matter;
 use App\Models\MatterActivity;
+use App\Models\Task;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\MultiFirmSjmSeeder;
@@ -496,5 +498,181 @@ class MatterActivityChronologyTest extends TestCase
 
         $response = $this->actingAs($unassignedAttorney)->get(route('matters.chronology', $matter));
         $response->assertStatus(403);
+    }
+
+    /**
+     * Test chronology CSV export streams entries.
+     */
+    public function test_chronology_csv_export_streams_entries(): void
+    {
+        $firm = Firm::first() ?: Firm::factory()->create();
+        $attorney = User::where('firm_id', $firm->id)->whereIn('role', ['admin', 'partner', 'lawyer'])->first()
+            ?: User::factory()->create(['firm_id' => $firm->id, 'role' => 'partner']);
+        $matter = Matter::where('firm_id', $firm->id)->first() ?: Matter::factory()->create([
+            'firm_id' => $firm->id,
+            'lead_attorney_id' => $attorney->id,
+        ]);
+
+        MatterActivity::log(
+            matter: $matter,
+            activityType: 'complaint_drafted',
+            description: 'Drafted constitutional writ prayer',
+            userId: $attorney->id
+        );
+
+        $response = $this->actingAs($attorney)->get(route('matters.chronology', [
+            'matter' => $matter,
+            'export' => 'csv',
+        ]));
+
+        $response->assertStatus(200);
+        $this->assertStringContainsString('text/csv', (string) $response->headers->get('Content-Type'));
+        $this->assertStringContainsString('attachment; filename=', (string) $response->headers->get('Content-Disposition'));
+    }
+
+    /**
+     * Test client toggling task logs client activity.
+     */
+    public function test_client_task_toggle_logs_activity(): void
+    {
+        $firm = Firm::first() ?: Firm::factory()->create();
+        $client = Client::where('firm_id', $firm->id)->first() ?: Client::factory()->create(['firm_id' => $firm->id]);
+        $clientUser = User::factory()->create(['firm_id' => $firm->id, 'role' => 'client']);
+        $client->update(['user_id' => $clientUser->id]);
+
+        $matter = Matter::create([
+            'firm_id' => $firm->id,
+            'client_id' => $client->id,
+            'lead_attorney_id' => User::where('firm_id', $firm->id)->first()->id,
+            'case_number' => 'MAT-TASK-001',
+            'title' => 'Client Task Test Case',
+            'status' => 'active',
+            'priority' => 'medium',
+        ]);
+
+        $task = Task::create([
+            'firm_id' => $firm->id,
+            'matter_id' => $matter->id,
+            'assigned_to' => $clientUser->id,
+            'created_by' => $clientUser->id,
+            'title' => 'Sign Affidavit Form 4',
+            'status' => 'todo',
+            'priority' => 'high',
+        ]);
+
+        $response = $this->actingAs($clientUser)->post(route('portal.tasks.toggle', $task));
+        $response->assertRedirect();
+
+        $this->assertTrue(MatterActivity::where('matter_id', $matter->id)
+            ->where('activity_type', 'task_completed')
+            ->where('subject_id', $task->id)
+            ->exists());
+    }
+
+    /**
+     * Test client viewing document logs document_viewed activity.
+     */
+    public function test_client_view_document_logs_activity(): void
+    {
+        $firm = Firm::first() ?: Firm::factory()->create();
+        $client = Client::where('firm_id', $firm->id)->first() ?: Client::factory()->create(['firm_id' => $firm->id]);
+        $clientUser = User::factory()->create(['firm_id' => $firm->id, 'role' => 'client']);
+        $client->update(['user_id' => $clientUser->id]);
+
+        $matter = Matter::create([
+            'firm_id' => $firm->id,
+            'client_id' => $client->id,
+            'lead_attorney_id' => User::where('firm_id', $firm->id)->first()->id,
+            'case_number' => 'MAT-DOC-VIEW-001',
+            'title' => 'Document View Test Case',
+            'status' => 'active',
+            'priority' => 'medium',
+        ]);
+
+        $doc = Document::create([
+            'firm_id' => $firm->id,
+            'matter_id' => $matter->id,
+            'client_id' => $client->id,
+            'user_id' => $clientUser->id,
+            'title' => 'Affidavit Copy',
+            'filename' => 'affidavit.pdf',
+            'file_size' => 1024,
+            'category' => 'Pleadings',
+            'is_client_visible' => true,
+        ]);
+
+        $response = $this->actingAs($clientUser)->get(route('portal.documents.view', $doc));
+        $response->assertStatus(200);
+
+        $this->assertTrue(MatterActivity::where('matter_id', $matter->id)
+            ->where('activity_type', 'document_viewed')
+            ->where('subject_id', $doc->id)
+            ->where('is_client_safe', true)
+            ->exists());
+    }
+
+    /**
+     * Test appointment status update logs activity.
+     */
+    public function test_appointment_status_update_logs_activity(): void
+    {
+        $firm = Firm::first() ?: Firm::factory()->create();
+        $attorney = User::where('firm_id', $firm->id)->whereIn('role', ['admin', 'partner', 'lawyer'])->first()
+            ?: User::factory()->create(['firm_id' => $firm->id, 'role' => 'partner']);
+        $matter = Matter::where('firm_id', $firm->id)->first() ?: Matter::factory()->create([
+            'firm_id' => $firm->id,
+            'lead_attorney_id' => $attorney->id,
+        ]);
+
+        $appointment = Appointment::create([
+            'firm_id' => $firm->id,
+            'matter_id' => $matter->id,
+            'client_id' => $matter->client_id,
+            'user_id' => $attorney->id,
+            'title' => 'Motion for Directions',
+            'type' => 'court_appearance',
+            'scheduled_at' => now()->addDays(2),
+            'duration_minutes' => 45,
+            'status' => 'scheduled',
+        ]);
+
+        $response = $this->actingAs($attorney)->post(route('appointments.update-status', $appointment), [
+            'status' => 'adjourned',
+        ]);
+        $response->assertRedirect();
+
+        $this->assertTrue(MatterActivity::where('matter_id', $matter->id)
+            ->where('activity_type', 'hearing_scheduled')
+            ->where('description', 'like', '%adjourned%')
+            ->exists());
+    }
+
+    /**
+     * Test internal messages are logged as internal activities.
+     */
+    public function test_internal_messages_are_logged_as_internal_activities(): void
+    {
+        $firm = Firm::first() ?: Firm::factory()->create();
+        $attorney = User::where('firm_id', $firm->id)->whereIn('role', ['admin', 'partner', 'lawyer'])->first()
+            ?: User::factory()->create(['firm_id' => $firm->id, 'role' => 'partner']);
+        $matter = Matter::where('firm_id', $firm->id)->first() ?: Matter::factory()->create([
+            'firm_id' => $firm->id,
+            'lead_attorney_id' => $attorney->id,
+        ]);
+
+        $response = $this->actingAs($attorney)->post(route('messages.threads.store'), [
+            'matter_id' => $matter->id,
+            'subject' => 'Confidential Strategy Review',
+            'thread_type' => 'internal_team',
+            'body' => 'Need to verify jurisdiction grounds with lead counsel.',
+        ]);
+        $response->assertRedirect();
+
+        $activity = MatterActivity::where('matter_id', $matter->id)
+            ->where('description', 'like', '%Confidential Strategy Review%')
+            ->first();
+
+        $this->assertNotNull($activity);
+        $this->assertFalse($activity->is_client_safe);
     }
 }

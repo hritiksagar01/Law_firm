@@ -37,7 +37,17 @@
             </p>
         </div>
 
-        <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+        <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap print:hidden">
+            <a href="{{ route('matters.chronology', array_merge(request()->query(), ['matter' => $matter, 'export' => 'csv'])) }}" class="btn-secondary h-9 px-3 text-xs inline-flex items-center gap-1.5 shadow-xs" title="Download chronology as CSV table">
+                <span class="material-symbols-outlined text-base">download</span>
+                <span>Export CSV</span>
+            </a>
+
+            <button type="button" onclick="window.print()" class="btn-secondary h-9 px-3 text-xs inline-flex items-center gap-1.5 shadow-xs" title="Print court-ready case chronology">
+                <span class="material-symbols-outlined text-base">print</span>
+                <span>Print</span>
+            </button>
+
             <a href="{{ route('matters.show', $matter) }}" class="btn-secondary h-9 px-3.5 text-xs inline-flex items-center gap-1.5 shadow-xs">
                 <span class="material-symbols-outlined text-base">folder_open</span>
                 <span>Dossier Overview</span>
@@ -69,95 +79,62 @@
 
         <!-- Pipeline Step Chain -->
         <div class="grid grid-cols-1 md:grid-cols-5 gap-3 pt-2">
-            <!-- Step 1: Intake & Records Upload -->
-            <div class="p-3 rounded-md border border-[#e5e3dc] bg-[#faf9f5] flex flex-col justify-between relative">
-                <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">STAGE 01</span>
-                        <span class="material-symbols-outlined text-[18px] text-emerald-700">upload_file</span>
-                    </div>
-                    <h3 class="text-xs font-semibold text-[#1a1a1a]">Client Uploads Records</h3>
-                    <p class="text-[11px] text-[#646864] mt-1 leading-snug">
-                        Medical records, dispute contracts, and evidentiary exhibits provided.
-                    </p>
-                </div>
-                <div class="mt-3 pt-2 border-t border-[#f0eee8] flex items-center justify-between text-[10px] font-mono text-[#8a8a8a]">
-                    <span>Status</span>
-                    <span class="text-emerald-700 font-medium">Logged</span>
-                </div>
-            </div>
+            @php
+                $stagesConfig = [
+                    'stage1' => ['num' => '01', 'icon' => 'upload_file', 'badge_class' => 'bg-emerald-100 text-emerald-800', 'icon_class' => 'text-emerald-700'],
+                    'stage2' => ['num' => '02', 'icon' => 'visibility', 'badge_class' => 'bg-sky-100 text-sky-800', 'icon_class' => 'text-sky-700'],
+                    'stage3' => ['num' => '03', 'icon' => 'description', 'badge_class' => 'bg-violet-100 text-violet-800', 'icon_class' => 'text-violet-700'],
+                    'stage4' => ['num' => '04', 'icon' => 'gavel', 'badge_class' => 'bg-amber-100 text-amber-800', 'icon_class' => 'text-amber-700'],
+                    'stage5' => ['num' => '05', 'icon' => 'calendar_month', 'badge_class' => 'bg-rose-100 text-rose-800', 'icon_class' => 'text-rose-700'],
+                ];
+            @endphp
 
-            <!-- Step 2: Attorney Review -->
-            <div class="p-3 rounded-md border border-[#e5e3dc] bg-[#faf9f5] flex flex-col justify-between relative">
+            @foreach(['stage1', 'stage2', 'stage3', 'stage4', 'stage5'] as $sKey)
+            @php
+                $stage = $pipelineStages[$sKey] ?? [
+                    'title' => ucfirst($sKey),
+                    'desc' => '',
+                    'completed' => false,
+                    'occurred_at' => null,
+                    'template_title' => '',
+                    'type' => 'milestone',
+                    'is_safe' => true,
+                ];
+                $cfg = $stagesConfig[$sKey];
+            @endphp
+            <div class="p-3 rounded-md border {{ $stage['completed'] ? 'border-emerald-300 bg-emerald-50/30' : 'border-[#e5e3dc] bg-[#faf9f5]' }} flex flex-col justify-between relative transition-all">
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
-                        <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-sky-100 text-sky-800">STAGE 02</span>
-                        <span class="material-symbols-outlined text-[18px] text-sky-700">visibility</span>
+                        <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded {{ $cfg['badge_class'] }}">STAGE {{ $cfg['num'] }}</span>
+                        <span class="material-symbols-outlined text-[18px] {{ $cfg['icon_class'] }}">{{ $cfg['icon'] }}</span>
                     </div>
-                    <h3 class="text-xs font-semibold text-[#1a1a1a]">Counsel Review</h3>
+                    <h3 class="text-xs font-semibold text-[#1a1a1a] flex items-center gap-1">
+                        <span>{{ $stage['title'] }}</span>
+                        @if($stage['completed'])
+                            <span class="material-symbols-outlined text-[14px] text-emerald-600">check_circle</span>
+                        @endif
+                    </h3>
                     <p class="text-[11px] text-[#646864] mt-1 leading-snug">
-                        Advising counsel reviews documents, legal precedents, and damages.
+                        {{ $stage['desc'] }}
                     </p>
                 </div>
-                <div class="mt-3 pt-2 border-t border-[#f0eee8] flex items-center justify-between text-[10px] font-mono text-[#8a8a8a]">
-                    <span>Status</span>
-                    <span class="text-sky-700 font-medium">In Progress</span>
+                <div class="mt-3 pt-2 border-t border-[#f0eee8] flex items-center justify-between text-[10px] font-mono">
+                    <span class="text-[#8a8a8a]">Status</span>
+                    @if($stage['completed'])
+                        <span class="text-emerald-700 font-semibold flex items-center gap-0.5">
+                            <span>Completed</span>
+                            @if($stage['occurred_at'])
+                                <span class="text-[9px] text-[#646864]">({{ \Carbon\Carbon::parse($stage['occurred_at'])->format('M d') }})</span>
+                            @endif
+                        </span>
+                    @else
+                        <button type="button" @click="applyTemplate('{{ $stage['template_title'] }}', '{{ $stage['type'] }}', {{ $stage['is_safe'] ? 'true' : 'false' }}); openRecordModal = true" class="text-[#23493a] hover:underline font-semibold flex items-center gap-0.5 cursor-pointer">
+                            <span>+ Record</span>
+                        </button>
+                    @endif
                 </div>
             </div>
-
-            <!-- Step 3: Complaint Drafted -->
-            <div class="p-3 rounded-md border border-[#e5e3dc] bg-[#faf9f5] flex flex-col justify-between relative">
-                <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-violet-100 text-violet-800">STAGE 03</span>
-                        <span class="material-symbols-outlined text-[18px] text-violet-700">description</span>
-                    </div>
-                    <h3 class="text-xs font-semibold text-[#1a1a1a]">Complaint Drafted</h3>
-                    <p class="text-[11px] text-[#646864] mt-1 leading-snug">
-                        Primary pleading, affidavit, and prayer for relief formulated.
-                    </p>
-                </div>
-                <div class="mt-3 pt-2 border-t border-[#f0eee8] flex items-center justify-between text-[10px] font-mono text-[#8a8a8a]">
-                    <span>Status</span>
-                    <span class="text-violet-700 font-medium">Drafted</span>
-                </div>
-            </div>
-
-            <!-- Step 4: Complaint Filed -->
-            <div class="p-3 rounded-md border border-[#e5e3dc] bg-[#faf9f5] flex flex-col justify-between relative">
-                <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">STAGE 04</span>
-                        <span class="material-symbols-outlined text-[18px] text-amber-700">gavel</span>
-                    </div>
-                    <h3 class="text-xs font-semibold text-[#1a1a1a]">Complaint Filed</h3>
-                    <p class="text-[11px] text-[#646864] mt-1 leading-snug">
-                        Substantive filing lodged with registry; case number issued.
-                    </p>
-                </div>
-                <div class="mt-3 pt-2 border-t border-[#f0eee8] flex items-center justify-between text-[10px] font-mono text-[#8a8a8a]">
-                    <span>Status</span>
-                    <span class="text-amber-700 font-medium">Filed</span>
-                </div>
-            </div>
-
-            <!-- Step 5: Hearing Scheduled -->
-            <div class="p-3 rounded-md border border-[#e5e3dc] bg-[#faf9f5] flex flex-col justify-between relative">
-                <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-rose-100 text-rose-800">STAGE 05</span>
-                        <span class="material-symbols-outlined text-[18px] text-rose-700">calendar_month</span>
-                    </div>
-                    <h3 class="text-xs font-semibold text-[#1a1a1a]">Hearing Scheduled</h3>
-                    <p class="text-[11px] text-[#646864] mt-1 leading-snug">
-                        Court summons, preliminary hearing, or motion on docket.
-                    </p>
-                </div>
-                <div class="mt-3 pt-2 border-t border-[#f0eee8] flex items-center justify-between text-[10px] font-mono text-[#8a8a8a]">
-                    <span>Status</span>
-                    <span class="text-rose-700 font-medium">Docketed</span>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 
@@ -484,7 +461,23 @@
                 </div>
             </form>
         </div>
-    </div>
-
+    <style>
+        @media print {
+            header, nav, aside, .print\:hidden, form, button {
+                display: none !important;
+            }
+            body, main {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+            }
+            .border, .border-t, .border-b {
+                border-color: #d1d5db !important;
+            }
+            .shadow-xs, .shadow-xl {
+                box-shadow: none !important;
+            }
+        }
+    </style>
 </div>
 @endsection

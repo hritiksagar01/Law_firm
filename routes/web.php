@@ -1668,6 +1668,7 @@ Route::middleware('auth')->group(function () {
         // Case Documents Repository
         Route::get('/documents', [PortalController::class, 'documents'])->name('documents.index');
         Route::post('/documents/upload', [PortalController::class, 'uploadDocument'])->name('documents.upload');
+        Route::get('/documents/{document}/view', [PortalController::class, 'viewDocument'])->name('documents.view');
         Route::get('/documents/{document}/download', [PortalController::class, 'downloadDocument'])->name('documents.download');
 
         // Counsel Communications / Messages

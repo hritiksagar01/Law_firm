@@ -138,6 +138,21 @@ class NoteController extends Controller
 
         $note->update($validated);
 
+        if (! empty($note->matter_id)) {
+            $matter = Matter::find($note->matter_id);
+            if ($matter) {
+                MatterActivity::log(
+                    matter: $matter,
+                    activityType: 'note_added',
+                    description: "Advocate {$request->user()->name} updated case note: '{$note->title}'",
+                    subject: $note,
+                    userId: $request->user()->id,
+                    clientId: $matter->client_id,
+                    isClientSafe: ($note->type === 'client_visible' && ! $note->is_privileged)
+                );
+            }
+        }
+
         return back()->with('success', 'Note updated successfully.');
     }
 

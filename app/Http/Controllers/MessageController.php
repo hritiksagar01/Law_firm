@@ -215,17 +215,18 @@ class MessageController extends Controller
 
         $thread->update(['last_message_at' => now()]);
 
-        // Log procedural activity only if safe (not internal)
-        if (! $isInternal) {
-            MatterActivity::log(
-                matter: $matter,
-                activityType: 'message_sent',
-                description: "Counsel {$user->name} sent a message in thread '{$thread->subject}'",
-                subject: $msg,
-                userId: $user->id,
-                clientId: $matter->client_id
-            );
-        }
+        // Log procedural activity (client safe if not internal, internal privileged otherwise)
+        MatterActivity::log(
+            matter: $matter,
+            activityType: 'message_sent',
+            description: $isInternal
+                ? "Counsel {$user->name} recorded internal message in thread '{$thread->subject}'"
+                : "Counsel {$user->name} sent a message in thread '{$thread->subject}'",
+            subject: $msg,
+            userId: $user->id,
+            clientId: $matter->client_id,
+            isClientSafe: ! $isInternal
+        );
 
         return redirect()->route('messages.index', [
             'matter_id' => $matter->id,
@@ -319,16 +320,17 @@ class MessageController extends Controller
             }
         }
 
-        if (! $isInternal) {
-            MatterActivity::log(
-                matter: $matter,
-                activityType: 'message_sent',
-                description: "New thread initiated: '{$thread->subject}'",
-                subject: $thread,
-                userId: $user->id,
-                clientId: $matter->client_id
-            );
-        }
+        MatterActivity::log(
+            matter: $matter,
+            activityType: 'message_sent',
+            description: $isInternal
+                ? "Counsel {$user->name} initiated internal discussion: '{$thread->subject}'"
+                : "New thread initiated: '{$thread->subject}'",
+            subject: $thread,
+            userId: $user->id,
+            clientId: $matter->client_id,
+            isClientSafe: ! $isInternal
+        );
 
         return redirect()->route('messages.index', [
             'matter_id' => $matter->id,

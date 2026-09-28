@@ -99,10 +99,16 @@
                         </td>
 
                         <td class="py-3.5 px-4 text-right">
-                            <a href="{{ route('portal.documents.download', $doc->id) }}" class="inline-flex items-center gap-1 text-xs text-[#23493a] hover:underline font-medium">
-                                <span class="material-symbols-outlined text-[14px]">download</span>
-                                <span>Download</span>
-                            </a>
+                            <div class="inline-flex items-center gap-3">
+                                <a href="{{ route('portal.documents.view', $doc->id) }}" target="_blank" class="inline-flex items-center gap-1 text-xs text-[#23493a] hover:underline font-medium">
+                                    <span class="material-symbols-outlined text-[14px]">visibility</span>
+                                    <span>View</span>
+                                </a>
+                                <a href="{{ route('portal.documents.download', $doc->id) }}" class="inline-flex items-center gap-1 text-xs text-[#23493a] hover:underline font-medium">
+                                    <span class="material-symbols-outlined text-[14px]">download</span>
+                                    <span>Download</span>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     @empty

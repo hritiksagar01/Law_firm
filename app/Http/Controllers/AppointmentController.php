@@ -187,6 +187,23 @@ class AppointmentController extends Controller
 
         $appointment->update(['status' => $validated['status']]);
 
+        if ($appointment->matter_id) {
+            $matter = Matter::find($appointment->matter_id);
+            if ($matter) {
+                $statusLabel = ucfirst($validated['status']);
+                $actType = ($appointment->type === 'court_appearance') ? 'hearing_scheduled' : 'calendar_event';
+                MatterActivity::log(
+                    matter: $matter,
+                    activityType: $actType,
+                    description: "Docket event '{$appointment->title}' status updated to {$statusLabel}",
+                    subject: $appointment,
+                    userId: Auth::id(),
+                    clientId: $appointment->client_id,
+                    isClientSafe: true
+                );
+            }
+        }
+
         // Dispatch cancellation notice if appointment is cancelled
         if ($validated['status'] === 'cancelled' && $appointment->client_id) {
             $client = Client::find($appointment->client_id);
