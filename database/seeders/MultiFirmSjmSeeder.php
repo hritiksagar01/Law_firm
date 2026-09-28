@@ -420,20 +420,44 @@ class MultiFirmSjmSeeder extends Seeder
             ]
         );
 
-        // Firm 2 Calendar Docket Events
+        // Firm 2 Calendar Docket Events (Hearings and statutory deadlines within alert horizon)
         Event::firstOrCreate(
             ['firm_id' => $firm2->id, 'title' => 'DIAC Preliminary Hearing - Evidence Framing'],
             [
                 'matter_id' => $matterArb->id,
                 'user_id' => $sanjeev->id,
                 'event_type' => 'Court Hearing',
-                'start_time' => Carbon::now()->addDays(9)->setTime(14, 0),
+                'start_time' => Carbon::now()->addHours(18)->setTime(14, 0),
                 'location' => 'DIAC Chamber 3, Delhi High Court',
                 'is_statutory_deadline' => false,
             ]
         );
 
-        // Firm 2 Tasks
+        Event::firstOrCreate(
+            ['firm_id' => $firm2->id, 'title' => 'NCLT Admission & Section 9 Interim Relief Hearing'],
+            [
+                'matter_id' => $matterNclt->id,
+                'user_id' => $neha->id,
+                'event_type' => 'Court Hearing',
+                'start_time' => Carbon::now()->addHours(30)->setTime(11, 30),
+                'location' => 'NCLT Principal Bench, Block 3, CGO Complex',
+                'is_statutory_deadline' => false,
+            ]
+        );
+
+        Event::firstOrCreate(
+            ['firm_id' => $firm2->id, 'title' => 'High Court Writ Motion Hearing (Court 38)'],
+            [
+                'matter_id' => $matterWrit->id,
+                'user_id' => $sanjeev->id,
+                'event_type' => 'Court Hearing',
+                'start_time' => Carbon::now()->addHours(42)->setTime(10, 30),
+                'location' => 'Courtroom 38, Delhi High Court',
+                'is_statutory_deadline' => false,
+            ]
+        );
+
+        // Firm 2 Tasks (Prioritized action items)
         Task::firstOrCreate(
             ['firm_id' => $firm2->id, 'title' => 'File DIAC Statement of Claim & Expert Documents'],
             [
@@ -441,7 +465,43 @@ class MultiFirmSjmSeeder extends Seeder
                 'assigned_to' => $neha->id,
                 'created_by' => $sanjeev->id,
                 'priority' => 'urgent',
-                'due_date' => Carbon::now()->addDays(5)->toDateString(),
+                'due_date' => Carbon::now()->subDays(1)->startOfDay(),
+                'status' => 'todo',
+            ]
+        );
+
+        Task::firstOrCreate(
+            ['firm_id' => $firm2->id, 'title' => 'Serve Advance Copy of Rejoinder on RBI Standing Counsel'],
+            [
+                'matter_id' => $matterWrit->id,
+                'assigned_to' => $sanjeev->id,
+                'created_by' => $sanjeev->id,
+                'priority' => 'urgent',
+                'due_date' => Carbon::now()->startOfDay(),
+                'status' => 'in_progress',
+            ]
+        );
+
+        Task::firstOrCreate(
+            ['firm_id' => $firm2->id, 'title' => 'Finalize NCLT Evidence Affidavit & Financial Debt Records'],
+            [
+                'matter_id' => $matterNclt->id,
+                'assigned_to' => $neha->id,
+                'created_by' => $sanjeev->id,
+                'priority' => 'high',
+                'due_date' => Carbon::now()->addDay()->startOfDay(),
+                'status' => 'todo',
+            ]
+        );
+
+        Task::firstOrCreate(
+            ['firm_id' => $firm2->id, 'title' => 'Client Conference on Corporate Restructuring Plan'],
+            [
+                'matter_id' => $matterNclt->id,
+                'assigned_to' => $sanjeev->id,
+                'created_by' => $sanjeev->id,
+                'priority' => 'medium',
+                'due_date' => Carbon::now()->addDays(3)->startOfDay(),
                 'status' => 'todo',
             ]
         );

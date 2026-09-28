@@ -170,10 +170,11 @@
                                     <span>Lead: {{ $attMatter->leadAttorney->name ?? 'Unassigned' }}</span>
                                     @if($attMatter->events->isNotEmpty())
                                         <span class="text-[#c1c8c3]">&middot;</span>
-                                        <span class="text-rose-700 font-medium">Hearing/Event in &le;48h: {{ \Carbon\Carbon::parse($attMatter->events->first()->start_time)->format('M j, g:i A') }}</span>
-                                    @elseif($attMatter->tasks->isNotEmpty())
+                                        <span class="text-rose-700 font-medium">Hearing/Event: {{ \Carbon\Carbon::parse($attMatter->events->first()->start_time)->format('M j, g:i A') }}</span>
+                                    @endif
+                                    @if($attMatter->tasks->isNotEmpty())
                                         <span class="text-[#c1c8c3]">&middot;</span>
-                                        <span class="text-amber-800 font-medium">{{ $attMatter->tasks->count() }} action items</span>
+                                        <span class="text-amber-800 font-medium">{{ $attMatter->tasks->count() }} action item{{ $attMatter->tasks->count() === 1 ? '' : 's' }}</span>
                                     @endif
                                 </div>
                             </div>

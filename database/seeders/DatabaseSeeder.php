@@ -207,6 +207,7 @@ class DatabaseSeeder extends Seeder
             'court_name' => 'High Court of Delhi, New Delhi',
             'judge_name' => 'Hon. Justice C. Hari Shankar',
             'stage' => 'Notice & Pleadings',
+            'priority' => 'urgent',
             'status' => 'active',
             'lead_attorney_id' => $rajesh->id,
             'billing_type' => 'hourly',
@@ -223,6 +224,7 @@ class DatabaseSeeder extends Seeder
             'court_name' => 'High Court of Delhi, New Delhi',
             'judge_name' => 'Hon. Justice Subramonium Prasad',
             'stage' => 'Pleadings',
+            'priority' => 'urgent',
             'status' => 'active',
             'lead_attorney_id' => $rajesh->id,
             'billing_type' => 'hourly',
@@ -239,6 +241,7 @@ class DatabaseSeeder extends Seeder
             'court_name' => 'National Company Law Tribunal (NCLT), Principal Bench',
             'judge_name' => 'Hon. Chief Justice (Retd.) Ramalingam Sudhakar',
             'stage' => 'Evidence & Arguments',
+            'priority' => 'urgent',
             'status' => 'active',
             'lead_attorney_id' => $priya->id,
             'billing_type' => 'hourly',
@@ -255,6 +258,7 @@ class DatabaseSeeder extends Seeder
             'court_name' => 'Arbitration Tribunal, New Delhi',
             'judge_name' => 'Hon. Justice (Retd.) A.K. Sikri, Sole Arbitrator',
             'stage' => 'Final Hearing & Order',
+            'priority' => 'urgent',
             'status' => 'active',
             'lead_attorney_id' => $priya->id,
             'billing_type' => 'hourly',
@@ -558,18 +562,18 @@ class DatabaseSeeder extends Seeder
             'entry_date' => now()->subDay()->toDateString(),
         ]);
 
-        // 7. Events & Indian Court Docket
+        // 7. Events & Indian Court Docket (Hearings and statutory deadlines)
         Event::create([
             'firm_id' => $firm->id,
             'matter_id' => $matterMalhotra->id,
             'user_id' => $rajesh->id,
             'title' => 'Interim Injunction Hearing (Item No. 18, Court No. 24)',
             'event_type' => 'Court Hearing',
-            'start_time' => now()->addDays(2)->setTime(10, 30),
-            'end_time' => now()->addDays(2)->setTime(12, 30),
+            'start_time' => now()->addHours(16)->setTime(10, 30),
+            'end_time' => now()->addHours(18)->setTime(12, 30),
             'location' => 'Courtroom 24, Main Block, Delhi High Court',
             'is_statutory_deadline' => false,
-            'notes' => 'Senior Advocate Adv. Rajesh Sharma leading arguments. Adv. Priya Nair to keep authorities ready.',
+            'notes' => 'Senior Advocate Adv. Rajesh Sharma leading arguments on Order 39 Rules 1 & 2 CPC.',
         ]);
 
         Event::create([
@@ -578,7 +582,7 @@ class DatabaseSeeder extends Seeder
             'user_id' => $priya->id,
             'title' => 'Rejoinder Filing Deadline (Registry Closes 4:30 PM)',
             'event_type' => 'Filing Deadline',
-            'start_time' => now()->addDay()->setTime(16, 30),
+            'start_time' => now()->addHours(22)->setTime(16, 30),
             'location' => 'Delhi High Court e-Filing Portal',
             'is_statutory_deadline' => true,
             'notes' => 'Statutory deadline pursuant to High Court Original Side Rules. Advance copy served on opposing counsel.',
@@ -586,14 +590,40 @@ class DatabaseSeeder extends Seeder
 
         Event::create([
             'firm_id' => $firm->id,
+            'matter_id' => $matterKavita->id,
+            'user_id' => $rajesh->id,
+            'title' => 'Notice of Motion & DDA Status Report Hearing',
+            'event_type' => 'Court Hearing',
+            'start_time' => now()->addHours(28)->setTime(11, 00),
+            'end_time' => now()->addHours(30)->setTime(13, 00),
+            'location' => 'Courtroom 12, Delhi High Court',
+            'is_statutory_deadline' => false,
+            'notes' => 'Hon. Justice Subramonium Prasad presiding. Verify DDA counter-affidavit compliance.',
+        ]);
+
+        Event::create([
+            'firm_id' => $firm->id,
             'matter_id' => $matterDelta->id,
             'user_id' => $priya->id,
-            'title' => 'NCLT Section 7 Hearing (Item 04, Courtroom 1)',
+            'title' => 'NCLT Section 7 Admission Hearing (Principal Bench, Item 04)',
             'event_type' => 'Court Hearing',
-            'start_time' => now()->addDays(4)->setTime(11, 0),
-            'end_time' => now()->addDays(4)->setTime(13, 0),
+            'start_time' => now()->addHours(38)->setTime(14, 00),
+            'end_time' => now()->addHours(40)->setTime(16, 00),
             'location' => 'Block 3, CGO Complex, Lodhi Road, New Delhi',
             'is_statutory_deadline' => false,
+            'notes' => 'Financial Creditor Section 7 application listed for final admission arguments.',
+        ]);
+
+        Event::create([
+            'firm_id' => $firm->id,
+            'matter_id' => $matterApex->id,
+            'user_id' => $priya->id,
+            'title' => 'Section 11(6) Arbitration Filing & Service Verification Deadline',
+            'event_type' => 'Filing Deadline',
+            'start_time' => now()->addHours(44)->setTime(17, 00),
+            'location' => 'Arbitration Registry, New Delhi',
+            'is_statutory_deadline' => true,
+            'notes' => 'Final deadline for submission of arbitration notice proof of delivery.',
         ]);
 
         // 8. Invoices & GST Bills
@@ -627,17 +657,65 @@ class DatabaseSeeder extends Seeder
             'status' => 'paid',
         ]);
 
-        // 9. Tasks & Registry Protocols
+        // 9. Tasks & Registry Protocols (Prioritized action items across lawyers)
         Task::create([
             'firm_id' => $firm->id,
             'matter_id' => $matterMalhotra->id,
-            'assigned_to' => $priya->id,
+            'assigned_to' => $rajesh->id,
+            'created_by' => $rajesh->id,
+            'title' => 'File Sworn Statement of Truth & Vakalatnama at High Court Registry',
+            'description' => 'Ensure affidavit is duly notarized and signed with client verification stamp for electronic filing before cutoff.',
+            'priority' => 'urgent',
+            'status' => 'not_started',
+            'due_date' => now()->subDays(1)->startOfDay(),
+        ]);
+
+        Task::create([
+            'firm_id' => $firm->id,
+            'matter_id' => $matterMalhotra->id,
+            'assigned_to' => $rajesh->id,
             'created_by' => $rajesh->id,
             'title' => 'Draft Rejoinder & Comparative Statement of Claims',
             'description' => 'Address preliminary objections raised in Bank written statement; cite Hon. SC ruling in Union of India v. D.N. Revri.',
             'priority' => 'urgent',
             'status' => 'in_progress',
-            'due_date' => now()->addDays(1)->toDateString(),
+            'due_date' => now()->startOfDay(),
+        ]);
+
+        Task::create([
+            'firm_id' => $firm->id,
+            'matter_id' => $matterKavita->id,
+            'assigned_to' => $rajesh->id,
+            'created_by' => $rajesh->id,
+            'title' => 'Prepare Cross-Examination Brief & Exhibit Dossier for Hearing',
+            'description' => 'Collate petitioner lease deeds, municipal notices, and revenue survey maps into indexed judge bundle.',
+            'priority' => 'high',
+            'status' => 'not_started',
+            'due_date' => now()->addDay()->startOfDay(),
+        ]);
+
+        Task::create([
+            'firm_id' => $firm->id,
+            'matter_id' => $matterDelta->id,
+            'assigned_to' => $priya->id,
+            'created_by' => $rajesh->id,
+            'title' => 'Review Resolution Plan & Committee of Creditors Protocol',
+            'description' => 'Scrutinize prospective resolution applicant submissions against Section 29A disqualification criteria.',
+            'priority' => 'urgent',
+            'status' => 'in_progress',
+            'due_date' => now()->addDays(2)->startOfDay(),
+        ]);
+
+        Task::create([
+            'firm_id' => $firm->id,
+            'matter_id' => $matterApex->id,
+            'assigned_to' => $rajesh->id,
+            'created_by' => $rajesh->id,
+            'title' => 'Scrutinize Opposing Counsel\'s Additional Documents & Rebuttal Memo',
+            'description' => 'Review railway demurrage vouchers and draft itemized objection schedule for the arbitrator.',
+            'priority' => 'urgent',
+            'status' => 'not_started',
+            'due_date' => now()->addDays(3)->startOfDay(),
         ]);
 
         Task::create([
@@ -647,9 +725,9 @@ class DatabaseSeeder extends Seeder
             'created_by' => $rajesh->id,
             'title' => 'Inspect Court File at High Court Registry & Obtain Certified Copies',
             'description' => 'Check if notice report from Process Server has been uploaded in Registry cause file.',
-            'priority' => 'high',
-            'status' => 'todo',
-            'due_date' => now()->addDays(2)->toDateString(),
+            'priority' => 'medium',
+            'status' => 'not_started',
+            'due_date' => now()->addDays(4)->startOfDay(),
         ]);
 
         // 10. Privileged Counsel & Client Messages

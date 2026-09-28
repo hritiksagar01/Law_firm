@@ -223,13 +223,13 @@ Route::middleware('auth')->group(function () {
                 ->where('sender_id', '!=', $user->id)
                 ->count();
 
-            // Matters requiring attention (Hearings/Deadlines within 48h, overdue tasks, or urgent tasks)
+            // Matters requiring attention (Hearings/Deadlines within 48-72h, overdue tasks, or urgent priority)
             $mattersRequiringAttention = Matter::where('firm_id', $firmId)
                 ->whereIn('status', ['active', 'open', 'pending'])
                 ->where(function ($q) use ($firmId) {
                     $q->whereHas('events', function ($eq) use ($firmId) {
                         $eq->where('firm_id', $firmId)
-                            ->whereBetween('start_time', [now()->subHours(2), now()->addHours(48)]);
+                            ->whereBetween('start_time', [now()->subHours(6), now()->addHours(72)]);
                     })
                         ->orWhereHas('tasks', function ($tq) use ($firmId) {
                             $tq->where('firm_id', $firmId)
@@ -238,15 +238,32 @@ Route::middleware('auth')->group(function () {
                                     $sub->where('due_date', '<', now()->toDateString())
                                         ->orWhere('priority', 'urgent');
                                 });
-                        });
+                        })
+                        ->orWhere('priority', 'urgent');
                 })
                 ->with(['client', 'leadAttorney', 'tasks' => function ($t) use ($firmId) {
                     $t->where('firm_id', $firmId)->where('status', '!=', 'completed')->orderBy('due_date');
                 }, 'events' => function ($e) use ($firmId) {
-                    $e->where('firm_id', $firmId)->whereBetween('start_time', [now()->subHours(2), now()->addHours(48)])->orderBy('start_time');
+                    $e->where('firm_id', $firmId)->whereBetween('start_time', [now()->subHours(6), now()->addHours(72)])->orderBy('start_time');
                 }])
                 ->take(6)
                 ->get();
+
+            if ($mattersRequiringAttention->count() < 4) {
+                $existingAttMatterIds = $mattersRequiringAttention->pluck('id')->toArray();
+                $additionalAttMatters = Matter::where('firm_id', $firmId)
+                    ->whereIn('status', ['active', 'open', 'pending'])
+                    ->whereNotIn('id', $existingAttMatterIds)
+                    ->with(['client', 'leadAttorney', 'tasks' => function ($t) use ($firmId) {
+                        $t->where('firm_id', $firmId)->where('status', '!=', 'completed')->orderBy('due_date');
+                    }, 'events' => function ($e) use ($firmId) {
+                        $e->where('firm_id', $firmId)->orderBy('start_time');
+                    }])
+                    ->orderByRaw("CASE WHEN priority = 'urgent' THEN 1 WHEN priority = 'high' THEN 2 ELSE 3 END")
+                    ->take(4 - $mattersRequiringAttention->count())
+                    ->get();
+                $mattersRequiringAttention = $mattersRequiringAttention->concat($additionalAttMatters);
+            }
 
             $currencyMap = [
                 'USD' => '$',
@@ -264,7 +281,8 @@ Route::middleware('auth')->group(function () {
                             ->orWhereNull('assigned_to')
                             ->orWhereIn('priority', ['urgent', 'high', 'medium']);
                     } else {
-                        $q->where('assigned_to', $user->id);
+                        $q->where('assigned_to', $user->id)
+                            ->orWhereNull('assigned_to');
                     }
                 })
                 ->where('status', '!=', 'completed')
@@ -274,13 +292,17 @@ Route::middleware('auth')->group(function () {
                 ->take(6)
                 ->get();
 
-            if ($userTasks->isEmpty()) {
-                $userTasks = Task::where('firm_id', $firmId)
+            if ($userTasks->count() < 5) {
+                $existingTaskIds = $userTasks->pluck('id')->toArray();
+                $additionalTasks = Task::where('firm_id', $firmId)
+                    ->where('status', '!=', 'completed')
+                    ->whereNotIn('id', $existingTaskIds)
                     ->with(['matter', 'assignee'])
                     ->orderByRaw('CASE WHEN due_date < ? THEN 0 ELSE 1 END', [now()->toDateString()])
                     ->orderBy('due_date', 'asc')
-                    ->take(4)
+                    ->take(6 - $userTasks->count())
                     ->get();
+                $userTasks = $userTasks->concat($additionalTasks);
             }
 
             // 2. Waiting On You: (A) Clients awaiting a reply
