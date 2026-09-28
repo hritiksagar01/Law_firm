@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Http\Controllers\Portal\PortalController;
 use App\Models\AuditLog;
+use App\Models\CaseNote;
 use App\Models\Client;
 use App\Models\DefaultDocumentCategory;
 use App\Models\DeliveryLog;
@@ -351,14 +353,20 @@ class QuireDemoSeeder extends Seeder
             }
         }
 
-        // 6.5. Seed Active Sample Tasks (Litigation milestones & docket deadlines)
+        // 6.5. Seed Active Sample Tasks, Inquiries, Uploads & Notes for Advocate Dashboard
         Task::ensureSampleTasksForFirm($firm->id, $margaret->id);
         Task::ensureSampleTasksForFirm($meridianFirm->id, $margaret->id);
+        Message::ensureSampleClientInquiriesForFirm($firm->id);
+        Message::ensureSampleClientInquiriesForFirm($meridianFirm->id);
+        DocumentRequest::ensureSampleClientUploadsForFirm($firm->id);
+        DocumentRequest::ensureSampleClientUploadsForFirm($meridianFirm->id);
+        CaseNote::ensureSampleNotesForFirm($firm->id, $margaret->id);
+        CaseNote::ensureSampleNotesForFirm($meridianFirm->id, $margaret->id);
 
-        // 6.6. Seed Sample Document Requests for Client Portal
-        DocumentRequest::ensureSampleRequestsForClient($clientElena);
-        DocumentRequest::ensureSampleRequestsForClient($clientSam);
-        DocumentRequest::ensureSampleRequestsForClient($clientKiran);
+        // 6.6. Seed Comprehensive Client Dashboard Samples for Demo Clients
+        PortalController::ensureClientDashboardSamples($clientElena);
+        PortalController::ensureClientDashboardSamples($clientSam);
+        PortalController::ensureClientDashboardSamples($clientKiran);
 
         // 7. Notification Delivery Logs
         if (DeliveryLog::count() === 0) {

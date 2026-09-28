@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Http\Controllers\Portal\PortalController;
 use App\Models\Appointment;
 use App\Models\BankAccount;
+use App\Models\CaseNote;
 use App\Models\Client;
 use App\Models\DocumentRequest;
 use App\Models\Event;
@@ -11,6 +13,7 @@ use App\Models\Expense;
 use App\Models\Firm;
 use App\Models\Invoice;
 use App\Models\Matter;
+use App\Models\Message;
 use App\Models\Opinion;
 use App\Models\Plan;
 use App\Models\Subscription;
@@ -507,8 +510,14 @@ class MultiFirmSjmSeeder extends Seeder
             ]
         );
 
-        // Seed Sample Document Requests for Deepak Gupta (Client Portal)
-        DocumentRequest::ensureSampleRequestsForClient($clientApex);
+        // Seed Advocate Dashboard samples (Waiting on you, tasks, notes)
+        Task::ensureSampleTasksForFirm($firm2->id, $sanjeev->id);
+        Message::ensureSampleClientInquiriesForFirm($firm2->id);
+        DocumentRequest::ensureSampleClientUploadsForFirm($firm2->id);
+        CaseNote::ensureSampleNotesForFirm($firm2->id, $sanjeev->id);
+
+        // Seed Client Portal samples for Deepak Gupta (Client Portal)
+        PortalController::ensureClientDashboardSamples($clientApex);
 
         // Firm 2 Time Entries
         TimeEntry::firstOrCreate(

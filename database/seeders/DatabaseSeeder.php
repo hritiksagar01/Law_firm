@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Http\Controllers\Portal\PortalController;
+use App\Models\CaseNote;
 use App\Models\Client;
 use App\Models\Document;
 use App\Models\DocumentRequest;
@@ -812,7 +814,14 @@ class DatabaseSeeder extends Seeder
             'review_notes' => 'Verified and matched with delivery challans. Added to compilation of documents.',
         ]);
 
-        DocumentRequest::ensureSampleRequestsForClient($clientMalhotra);
+        // Ensure firm-level advocate dashboard samples (Waiting on you, tasks, notes)
+        Task::ensureSampleTasksForFirm($firm->id, $priya->id);
+        Message::ensureSampleClientInquiriesForFirm($firm->id);
+        DocumentRequest::ensureSampleClientUploadsForFirm($firm->id);
+        CaseNote::ensureSampleNotesForFirm($firm->id, $priya->id);
+
+        // Ensure client portal dashboard & matter view samples
+        PortalController::ensureClientDashboardSamples($clientMalhotra);
 
         // Second Invoice for Malhotra (Paid retainer invoice)
         Invoice::create([

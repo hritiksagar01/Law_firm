@@ -230,4 +230,119 @@ class DocumentRequest extends Model
             }
         }
     }
+
+    /**
+     * Ensure the firm has sample client uploads awaiting advocate review in "Waiting on you".
+     */
+    public static function ensureSampleClientUploadsForFirm(int $firmId): void
+    {
+        $submittedCount = static::where('firm_id', $firmId)
+            ->whereIn('status', ['submitted', 'under_review'])
+            ->count();
+
+        if ($submittedCount >= 2) {
+            return;
+        }
+
+        $firm = Firm::find($firmId);
+        $currency = $firm?->currency ?? 'USD';
+
+        $client = Client::where('firm_id', $firmId)->first();
+        if (! $client) {
+            $client = Client::create([
+                'firm_id' => $firmId,
+                'name' => $currency === 'INR' ? 'Premier Corporate Ventures Pvt Ltd' : 'Beacon Global Enterprises Inc.',
+                'contact_person' => 'Managing Director',
+                'email' => 'contact@'.($firm?->slug ?? 'client').'.example',
+                'phone' => '+1 (555) 019-2831',
+                'category' => 'corporate',
+                'type' => 'corporate',
+                'status' => 'active',
+            ]);
+        }
+
+        $matter = Matter::where('firm_id', $firmId)->first();
+        if (! $matter) {
+            $prefix = $currency === 'INR' ? 'CS(COMM)' : 'MAT';
+            $caseNumber = sprintf('%s/%s/%04d-%03d', $prefix, date('Y'), $client->id, rand(100, 999));
+            while (Matter::where('case_number', $caseNumber)->exists()) {
+                $caseNumber = sprintf('%s/%s/%04d-%04d', $prefix, date('Y'), $client->id, rand(1000, 9999));
+            }
+
+            $matter = Matter::create([
+                'firm_id' => $firmId,
+                'client_id' => $client->id,
+                'case_number' => $caseNumber,
+                'title' => $currency === 'INR' ? 'Commercial Arbitration & Debt Recovery Proceedings' : 'Commercial Contract & Supply Chain Litigation',
+                'status' => 'open',
+                'stage' => 'Discovery',
+                'priority' => 'urgent',
+                'billing_type' => 'hourly',
+                'opened_at' => now()->subMonth(),
+            ]);
+        }
+
+        $requestedBy = $matter->lead_attorney_id
+            ?: User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate'])->first()?->id
+            ?: User::where('firm_id', $firmId)->first()?->id;
+
+        $uploads = $currency === 'INR' ? [
+            [
+                'title' => 'Client Submission: Disputed Contract Delivery Vouchers & GST Returns',
+                'description' => 'Running invoices and delivery receipts uploaded by client finance team for advocate verification.',
+                'category' => 'Financial Statements',
+                'priority' => 'high',
+                'status' => 'submitted',
+                'submitted_at' => Carbon::now()->subHours(5),
+                'client_notes' => 'Uploaded by finance controller. Statutory audit certificate affixed on page 14.',
+                'due_date' => Carbon::now()->addDays(3)->toDateString(),
+            ],
+            [
+                'title' => 'Client Submission: Certified Extract of Board Minutes & Notary Stamp',
+                'description' => 'Extract of Board resolution passed under Section 179 authorizing arbitration counsel.',
+                'category' => 'Corporate Governance',
+                'priority' => 'urgent',
+                'status' => 'under_review',
+                'submitted_at' => Carbon::now()->subHours(12),
+                'client_notes' => 'Certified true copy signed by Managing Director with company common seal.',
+                'due_date' => Carbon::now()->addDays(2)->toDateString(),
+            ],
+        ] : [
+            [
+                'title' => 'Client Submission: Counter-Signed Escrow Vouchers & Wire Confirmations',
+                'description' => 'Certified accounting ledger showing supply chain disbursements and escrow payment vouchers.',
+                'category' => 'Financial Statements',
+                'priority' => 'high',
+                'status' => 'submitted',
+                'submitted_at' => Carbon::now()->subHours(4),
+                'client_notes' => 'Uploaded signed ledger reconciliation and escrow release confirmations.',
+                'due_date' => Carbon::now()->addDays(3)->toDateString(),
+            ],
+            [
+                'title' => 'Client Submission: Certified Articles of Amendment & State Registry Seal',
+                'description' => 'Secretary of State good standing certificate and corporate authorization resolution.',
+                'category' => 'Corporate Governance',
+                'priority' => 'urgent',
+                'status' => 'under_review',
+                'submitted_at' => Carbon::now()->subHours(15),
+                'client_notes' => 'Uploaded certified digital state seal PDF certificate.',
+                'due_date' => Carbon::now()->addDays(2)->toDateString(),
+            ],
+        ];
+
+        foreach ($uploads as $up) {
+            $exists = static::where('firm_id', $firmId)
+                ->where('title', $up['title'])
+                ->exists();
+
+            if (! $exists) {
+                static::create(array_merge($up, [
+                    'firm_id' => $firmId,
+                    'matter_id' => $matter->id,
+                    'client_id' => $client->id,
+                    'requested_by' => $requestedBy,
+                ]));
+            }
+        }
+    }
 }

@@ -17,6 +17,7 @@ use App\Models\Message;
 use App\Models\MessageAttachment;
 use App\Models\MessageThread;
 use App\Models\Task;
+use App\Models\User;
 use App\Services\LegalPdfGenerator;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -66,8 +67,8 @@ class PortalController extends Controller
         $client = $this->getClient();
         $client->load('primaryAttorney');
 
-        // Ensure client has baseline sample document requests
-        DocumentRequest::ensureSampleRequestsForClient($client);
+        // Ensure client has baseline samples across all dashboard widgets & matters
+        self::ensureClientDashboardSamples($client);
 
         $matters = Matter::where('client_id', $client->id)
             ->with(['documents', 'leadAttorney', 'documentRequests', 'events'])
@@ -381,6 +382,8 @@ class PortalController extends Controller
         if ($matter->client_id !== $client->id) {
             abort(403, 'Unauthorized case dossier.');
         }
+
+        self::ensureClientDashboardSamples($client);
 
         $matter->load([
             'documents' => fn ($q) => $q->where('is_client_visible', true)->latest(),
@@ -1178,5 +1181,439 @@ class PortalController extends Controller
         }
 
         return back()->with('success', $newStatus === 'completed' ? 'Task marked as completed.' : 'Task marked as pending.');
+    }
+
+    /**
+     * Ensure the client has comprehensive sample data across all dashboard widgets & matter views.
+     */
+    public static function ensureClientDashboardSamples(Client $client): void
+    {
+        $firm = $client->firm ?: Firm::find($client->firm_id);
+        $currency = $firm?->currency ?? 'USD';
+
+        // 1. Ensure Client has at least 1 Active Matter
+        $matters = Matter::where('client_id', $client->id)->get();
+        if ($matters->isEmpty()) {
+            $leadAttorneyId = $client->primary_attorney_id
+                ?: User::where('firm_id', $client->firm_id)->whereIn('role', ['partner', 'associate'])->first()?->id
+                ?: User::where('firm_id', $client->firm_id)->first()?->id;
+
+            $prefix = $currency === 'INR' ? 'CS(COMM)' : 'MAT';
+            $caseNumber = sprintf('%s/%s/%04d-%03d', $prefix, date('Y'), $client->id, rand(100, 999));
+            while (Matter::where('case_number', $caseNumber)->exists()) {
+                $caseNumber = sprintf('%s/%s/%04d-%04d', $prefix, date('Y'), $client->id, rand(1000, 9999));
+            }
+
+            $primaryMatter = Matter::create([
+                'firm_id' => $client->firm_id,
+                'client_id' => $client->id,
+                'case_number' => $caseNumber,
+                'title' => $currency === 'INR' ? 'Commercial Arbitration & Debt Recovery Proceedings' : 'Commercial Contract & Supply Chain Litigation',
+                'court_name' => $currency === 'INR' ? 'High Court of Delhi' : 'U.S. District Court, Southern District of New York',
+                'judge_name' => $currency === 'INR' ? "Hon'ble Presiding Division Bench" : 'Hon. Marcus Vance, U.S. District Judge',
+                'status' => 'open',
+                'stage' => 'Discovery & Evidence',
+                'priority' => 'urgent',
+                'lead_attorney_id' => $leadAttorneyId,
+                'billing_type' => 'hourly',
+                'budget' => 150000,
+                'practice_area' => 'Commercial Litigation',
+                'description' => "Representation of {$client->name} in comprehensive proceedings regarding contractual enforcement, recovery of disputed balances, interim relief injunctions, and arbitral hearings.",
+                'opened_at' => Carbon::now()->subMonths(2),
+            ]);
+            $matters = collect([$primaryMatter]);
+        }
+
+        $primaryMatter = $matters->first();
+        $matterIds = $matters->pluck('id');
+
+        $leadAttorney = $primaryMatter->leadAttorney
+            ?: ($client->primaryAttorney ?: User::where('firm_id', $client->firm_id)->whereIn('role', ['partner', 'associate'])->first() ?: User::first());
+
+        // Ensure Lead Attorney on primary matter if missing
+        if (! $primaryMatter->lead_attorney_id && $leadAttorney) {
+            $primaryMatter->update(['lead_attorney_id' => $leadAttorney->id]);
+        }
+
+        // Ensure Team Members on primary matter
+        if ($primaryMatter->teamMembers()->count() === 0) {
+            $associates = User::where('firm_id', $client->firm_id)
+                ->where('id', '!=', $leadAttorney?->id)
+                ->take(2)
+                ->get();
+            foreach ($associates as $assoc) {
+                $primaryMatter->teamMembers()->attach($assoc->id, ['role' => 'associate']);
+            }
+        }
+
+        // 2. Ensure Sample Pending Document Requests
+        DocumentRequest::ensureSampleRequestsForClient($client);
+
+        // 3. Ensure Client-Visible Recent Documents (vault)
+        $docCount = Document::whereIn('matter_id', $matterIds)->where('is_client_visible', true)->count();
+        if ($docCount < 3) {
+            $sampleDocs = $currency === 'INR' ? [
+                [
+                    'title' => 'Certified Statement of Claim & Verified Pleadings Compendium',
+                    'filename' => 'statement_of_claim_pleadings_docket.pdf',
+                    'category' => 'Pleadings',
+                    'privilege' => 'Confidential',
+                    'file_size' => 2450000,
+                    'document_type' => 'Pleading',
+                ],
+                [
+                    'title' => 'Vakalatnama & Lead Counsel Appearance Memo (High Court Registry)',
+                    'filename' => 'vakalatnama_appearance_certified.pdf',
+                    'category' => 'Court Filing',
+                    'privilege' => 'Public',
+                    'file_size' => 840000,
+                    'document_type' => 'Court Filing',
+                ],
+                [
+                    'title' => 'Interim Injunction Order & Status Quo Direction (Courtroom 14)',
+                    'filename' => 'high_court_interim_injunction_order.pdf',
+                    'category' => 'Court Orders',
+                    'privilege' => 'Confidential',
+                    'file_size' => 1250000,
+                    'document_type' => 'Order',
+                ],
+                [
+                    'title' => 'Comparative Schedule of Disputed Invoices & Reconciled Ledger Vouchers',
+                    'filename' => 'reconciled_invoice_voucher_schedule.pdf',
+                    'category' => 'Evidence',
+                    'privilege' => 'Confidential',
+                    'file_size' => 3100000,
+                    'document_type' => 'Exhibit',
+                ],
+            ] : [
+                [
+                    'title' => 'Verified Complaint & Initial Disclosures Dossier',
+                    'filename' => 'verified_complaint_initial_disclosures.pdf',
+                    'category' => 'Pleadings',
+                    'privilege' => 'Confidential',
+                    'file_size' => 2850000,
+                    'document_type' => 'Pleading',
+                ],
+                [
+                    'title' => 'Notice of Appearance & Rule 7.1 Corporate Disclosure Statement',
+                    'filename' => 'notice_of_appearance_rule7_disclosure.pdf',
+                    'category' => 'Court Filing',
+                    'privilege' => 'Public',
+                    'file_size' => 620000,
+                    'document_type' => 'Court Filing',
+                ],
+                [
+                    'title' => 'District Court Preliminary Injunction & Status Conference Order',
+                    'filename' => 'district_court_injunction_order.pdf',
+                    'category' => 'Court Orders',
+                    'privilege' => 'Confidential',
+                    'file_size' => 1400000,
+                    'document_type' => 'Order',
+                ],
+                [
+                    'title' => 'Executed Master Services Agreement & Escrow Confirmation Schedule',
+                    'filename' => 'executed_msa_escrow_confirmation.pdf',
+                    'category' => 'Contracts',
+                    'privilege' => 'Confidential',
+                    'file_size' => 3400000,
+                    'document_type' => 'Contract',
+                ],
+            ];
+
+            foreach ($sampleDocs as $sdoc) {
+                $exists = Document::whereIn('matter_id', $matterIds)->where('title', $sdoc['title'])->exists();
+                if (! $exists) {
+                    Document::create([
+                        'firm_id' => $client->firm_id,
+                        'matter_id' => $primaryMatter->id,
+                        'user_id' => $leadAttorney?->id ?? User::first()->id,
+                        'title' => $sdoc['title'],
+                        'filename' => $sdoc['filename'],
+                        'file_path' => 'documents/samples/'.$sdoc['filename'],
+                        'file_size' => $sdoc['file_size'],
+                        'mime_type' => 'application/pdf',
+                        'category' => $sdoc['category'],
+                        'privilege' => $sdoc['privilege'],
+                        'document_type' => $sdoc['document_type'],
+                        'is_client_visible' => true,
+                        'created_at' => Carbon::now()->subDays(rand(2, 14)),
+                    ]);
+                }
+            }
+        }
+
+        // 4. Ensure Upcoming Events & Hearings
+        $eventCount = Event::whereIn('matter_id', $matterIds)
+            ->where('start_time', '>=', Carbon::now()->subHours(6))
+            ->count();
+        if ($eventCount < 2) {
+            $sampleEvents = $currency === 'INR' ? [
+                [
+                    'title' => 'Admission Hearing & Interim Injunction Arguments',
+                    'event_type' => 'Court Hearing',
+                    'start_time' => Carbon::now()->addDays(2)->setHour(10)->setMinute(30)->setSecond(0),
+                    'end_time' => Carbon::now()->addDays(2)->setHour(12)->setMinute(0)->setSecond(0),
+                    'location' => 'Courtroom 14, High Court of Delhi, New Delhi',
+                    'notes' => 'Senior Counsel and Lead Advocate appearing before Division Bench 3.',
+                ],
+                [
+                    'title' => 'Framing of Issues & Case Management Conference',
+                    'event_type' => 'Conference',
+                    'start_time' => Carbon::now()->addDays(7)->setHour(14)->setMinute(15)->setSecond(0),
+                    'end_time' => Carbon::now()->addDays(7)->setHour(15)->setMinute(30)->setSecond(0),
+                    'location' => 'Chamber 402, High Court Complex, New Delhi',
+                    'notes' => 'Settlement of issues and procedural timetable for cross-examination.',
+                ],
+            ] : [
+                [
+                    'title' => 'Preliminary Injunction & Motion Hearing',
+                    'event_type' => 'Court Hearing',
+                    'start_time' => Carbon::now()->addDays(2)->setHour(10)->setMinute(0)->setSecond(0),
+                    'end_time' => Carbon::now()->addDays(2)->setHour(11)->setMinute(30)->setSecond(0),
+                    'location' => 'Courtroom 15A, U.S. District Court, Foley Square, New York',
+                    'notes' => 'Lead arguing counsel appearing before Hon. Marcus Vance.',
+                ],
+                [
+                    'title' => 'Rule 16 Case Management & Pretrial Conference',
+                    'event_type' => 'Conference',
+                    'start_time' => Carbon::now()->addDays(7)->setHour(14)->setMinute(0)->setSecond(0),
+                    'end_time' => Carbon::now()->addDays(7)->setHour(15)->setMinute(0)->setSecond(0),
+                    'location' => 'Chambers Conference Room, 21st Floor, Federal Building',
+                    'notes' => 'Pretrial scheduling order and expert discovery milestones.',
+                ],
+            ];
+
+            foreach ($sampleEvents as $se) {
+                $exists = Event::whereIn('matter_id', $matterIds)->where('title', $se['title'])->exists();
+                if (! $exists) {
+                    Event::create([
+                        'firm_id' => $client->firm_id,
+                        'matter_id' => $primaryMatter->id,
+                        'user_id' => $leadAttorney?->id ?? User::first()->id,
+                        'title' => $se['title'],
+                        'event_type' => $se['event_type'],
+                        'start_time' => $se['start_time'],
+                        'end_time' => $se['end_time'],
+                        'location' => $se['location'],
+                        'notes' => $se['notes'],
+                    ]);
+                }
+            }
+        }
+
+        // 5. Ensure Recent Counsel Channel Messages
+        $msgCount = Message::whereIn('matter_id', $matterIds)->where('is_internal', false)->count();
+        if ($msgCount < 2) {
+            $clientUser = $client->user
+                ?: ($client->user_id ? User::find($client->user_id) : null);
+
+            if (! $clientUser) {
+                $clientUser = User::where('firm_id', $client->firm_id)->where('role', 'client')->first();
+                if (! $clientUser) {
+                    $clientUser = User::create([
+                        'firm_id' => $client->firm_id,
+                        'name' => $client->contact_person ?? $client->name,
+                        'email' => 'client.'.$client->id.'@clientportal.example',
+                        'password' => bcrypt('password123'),
+                        'role' => 'client',
+                        'status' => 'active',
+                    ]);
+                }
+                $client->update(['user_id' => $clientUser->id]);
+            }
+
+            $dialogues = $currency === 'INR' ? [
+                [
+                    'sender' => $clientUser->id,
+                    'recipient' => $leadAttorney?->id ?? User::first()->id,
+                    'body' => 'Good morning Counsel. Could you please confirm if the registry scrutiny objections have been cleared on our amended petition?',
+                    'hours_ago' => 8,
+                ],
+                [
+                    'sender' => $leadAttorney?->id ?? User::first()->id,
+                    'recipient' => $clientUser->id,
+                    'body' => 'Good morning. Registry scrutiny has been cleared and our filing diary number is confirmed. The matter has been assigned to Division Bench 3 for admission hearing on Wednesday.',
+                    'hours_ago' => 5,
+                ],
+                [
+                    'sender' => $clientUser->id,
+                    'recipient' => $leadAttorney?->id ?? User::first()->id,
+                    'body' => 'Thank you for the prompt update. All audited financial ledgers have been uploaded to the document vault for advocate verification.',
+                    'hours_ago' => 1,
+                ],
+            ] : [
+                [
+                    'sender' => $clientUser->id,
+                    'recipient' => $leadAttorney?->id ?? User::first()->id,
+                    'body' => 'Hello Counsel. Following up on the Rule 26 initial disclosure responses: Have all defense exhibits been received?',
+                    'hours_ago' => 8,
+                ],
+                [
+                    'sender' => $leadAttorney?->id ?? User::first()->id,
+                    'recipient' => $clientUser->id,
+                    'body' => 'Yes, initial disclosures have been exchanged and reviewed. We are preparing the deposition schedule for the upcoming hearing before Judge Vance.',
+                    'hours_ago' => 5,
+                ],
+                [
+                    'sender' => $clientUser->id,
+                    'recipient' => $leadAttorney?->id ?? User::first()->id,
+                    'body' => 'Excellent. The countersigned corporate authorization resolution has been uploaded to the document requests section.',
+                    'hours_ago' => 1,
+                ],
+            ];
+
+            foreach ($dialogues as $d) {
+                $exists = Message::whereIn('matter_id', $matterIds)->where('body', $d['body'])->exists();
+                if (! $exists) {
+                    Message::create([
+                        'firm_id' => $client->firm_id,
+                        'matter_id' => $primaryMatter->id,
+                        'sender_id' => $d['sender'],
+                        'recipient_id' => $d['recipient'],
+                        'subject' => 'Counsel Consultation',
+                        'body' => $d['body'],
+                        'is_internal' => false,
+                        'is_read' => true,
+                        'status' => 'read',
+                        'sent_at' => Carbon::now()->subHours($d['hours_ago']),
+                        'created_at' => Carbon::now()->subHours($d['hours_ago']),
+                    ]);
+                }
+            }
+        }
+
+        // 6. Ensure Tasks Requiring Client Action
+        $taskCount = Task::where(fn ($q) => $q->where('assigned_to', $client->user_id)->orWhereIn('matter_id', $matterIds))
+            ->where('status', '!=', 'completed')
+            ->count();
+
+        if ($taskCount < 2) {
+            $clientUserId = $client->user_id ?: ($client->user?->id ?? User::where('firm_id', $client->firm_id)->first()->id);
+            $authorId = $leadAttorney?->id ?? User::where('firm_id', $client->firm_id)->first()->id;
+
+            $sampleTasks = $currency === 'INR' ? [
+                [
+                    'title' => 'Review & Execute Sworn Statement of Truth Affidavit for Registry Filing',
+                    'description' => 'Commercial Courts Act verification affidavit must be executed before an Oath Commissioner and returned via the document upload portal.',
+                    'priority' => 'urgent',
+                    'due_date' => Carbon::now()->addDays(1)->startOfDay(),
+                ],
+                [
+                    'title' => 'Verify Reconciled Invoices & Disputed Delivery Vouchers Schedule',
+                    'description' => 'Examine opposing party disputed invoice schedule and certify working capital ledger balance for arbitral submission.',
+                    'priority' => 'high',
+                    'due_date' => Carbon::now()->addDays(3)->startOfDay(),
+                ],
+                [
+                    'title' => 'Execute Board Resolution Designating Authorized Signatory',
+                    'description' => 'Extract of board resolution authorizing advocate representation in arbitral proceedings.',
+                    'priority' => 'normal',
+                    'due_date' => Carbon::now()->addDays(5)->startOfDay(),
+                ],
+            ] : [
+                [
+                    'title' => 'Review & Sign Sworn Verification of Interrogatory Responses',
+                    'description' => 'Rule 33 verification affirming factual accuracy of responses to first set of discovery interrogatories.',
+                    'priority' => 'urgent',
+                    'due_date' => Carbon::now()->addDays(1)->startOfDay(),
+                ],
+                [
+                    'title' => 'Confirm Executive Deposition Availability for Pretrial Calendar',
+                    'description' => 'Coordinate with counsel regarding deposition dates and witness preparation schedule.',
+                    'priority' => 'high',
+                    'due_date' => Carbon::now()->addDays(3)->startOfDay(),
+                ],
+                [
+                    'title' => 'Execute Corporate Officer Disclosure Authorization Certificate',
+                    'description' => 'Sign corporate certificate designating corporate representative for upcoming hearing.',
+                    'priority' => 'normal',
+                    'due_date' => Carbon::now()->addDays(5)->startOfDay(),
+                ],
+            ];
+
+            foreach ($sampleTasks as $st) {
+                $exists = Task::whereIn('matter_id', $matterIds)->where('title', $st['title'])->exists();
+                if (! $exists) {
+                    Task::create([
+                        'firm_id' => $client->firm_id,
+                        'matter_id' => $primaryMatter->id,
+                        'assigned_to' => $clientUserId,
+                        'created_by' => $authorId,
+                        'title' => $st['title'],
+                        'description' => $st['description'],
+                        'priority' => $st['priority'],
+                        'status' => 'not_started',
+                        'due_date' => $st['due_date'],
+                    ]);
+                }
+            }
+        }
+
+        // 7. Ensure Permitted Briefing Notes (Client visible)
+        $clientNoteCount = CaseNote::whereIn('matter_id', $matterIds)->where('type', 'client_visible')->count();
+        if ($clientNoteCount === 0) {
+            $authorId = $leadAttorney?->id ?? User::where('firm_id', $client->firm_id)->first()->id;
+            CaseNote::create([
+                'firm_id' => $client->firm_id,
+                'matter_id' => $primaryMatter->id,
+                'user_id' => $authorId,
+                'title' => 'Procedural Status Briefing: Scrutiny Cleared & Hearing Listed',
+                'body' => "Official Counsel Update for Client:\n- All procedural objections from the Registry have been cured and the matter is cleared for hearing.\n- The interim relief application is scheduled before the Division Bench on the upcoming court docket.\n- Please ensure the notarized Statement of Truth is uploaded prior to the call of the list.",
+                'type' => 'client_visible',
+                'is_pinned' => true,
+                'is_privileged' => false,
+            ]);
+            CaseNote::create([
+                'firm_id' => $client->firm_id,
+                'matter_id' => $primaryMatter->id,
+                'user_id' => $authorId,
+                'title' => 'Procedural Instructions for Client Verification Affidavit Execution',
+                'body' => "Guidelines for Authorized Representative:\n1. Please sign all verification pages in the presence of an Oath Commissioner / Notary Public.\n2. Ensure the official company seal is affixed adjacent to the signature.\n3. Return high-resolution color PDF scans via the Document Requests tab.",
+                'type' => 'client_visible',
+                'is_pinned' => false,
+                'is_privileged' => false,
+            ]);
+        }
+
+        // 8. Ensure Limited Client-Safe Activity
+        $activityCount = MatterActivity::whereIn('matter_id', $matterIds)->where('is_client_safe', true)->count();
+        if ($activityCount === 0) {
+            $authorId = $leadAttorney?->id ?? User::where('firm_id', $client->firm_id)->first()->id;
+            $sampleActs = [
+                [
+                    'activity_type' => 'matter_created',
+                    'description' => 'Litigation matter initiated and assigned to Chambers Counsel.',
+                    'occurred_at' => Carbon::now()->subMonths(1),
+                ],
+                [
+                    'activity_type' => 'document_uploaded',
+                    'description' => 'Statement of Claim and verified pleadings uploaded to secure document vault.',
+                    'occurred_at' => Carbon::now()->subWeeks(2),
+                ],
+                [
+                    'activity_type' => 'procedural_milestone',
+                    'description' => 'Registry issued formal docket reference; scrutiny examination cleared.',
+                    'occurred_at' => Carbon::now()->subDays(5),
+                ],
+                [
+                    'activity_type' => 'calendar_event',
+                    'description' => 'Interim injunction hearing listed on official daily cause list.',
+                    'occurred_at' => Carbon::now()->subDays(1),
+                ],
+            ];
+
+            foreach ($sampleActs as $sa) {
+                MatterActivity::create([
+                    'firm_id' => $client->firm_id,
+                    'matter_id' => $primaryMatter->id,
+                    'client_id' => $client->id,
+                    'user_id' => $authorId,
+                    'activity_type' => $sa['activity_type'],
+                    'description' => $sa['description'],
+                    'is_client_safe' => true,
+                    'occurred_at' => $sa['occurred_at'],
+                ]);
+            }
+        }
     }
 }

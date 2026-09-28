@@ -180,8 +180,11 @@ Route::middleware('auth')->group(function () {
                 ->count();
             $openMattersCount = $activeMattersCount;
 
-            // Ensure firm has baseline sample tasks so "Your tasks" is never empty
+            // Ensure firm has baseline sample tasks, client inquiries, client uploads, and case notes
             Task::ensureSampleTasksForFirm($firmId, $user->id);
+            Message::ensureSampleClientInquiriesForFirm($firmId);
+            DocumentRequest::ensureSampleClientUploadsForFirm($firmId);
+            CaseNote::ensureSampleNotesForFirm($firmId, $user->id);
 
             // Tasks metrics
             $tasksDueThisWeekCount = Task::where('firm_id', $firmId)
@@ -330,7 +333,8 @@ Route::middleware('auth')->group(function () {
             $clientUploads = DocumentRequest::where('firm_id', $firmId)
                 ->whereIn('status', ['submitted', 'under_review', 'pending'])
                 ->with(['matter', 'client'])
-                ->latest()
+                ->orderByRaw("CASE WHEN status IN ('submitted', 'under_review') THEN 0 ELSE 1 END")
+                ->latest('updated_at')
                 ->take(4)
                 ->get();
 

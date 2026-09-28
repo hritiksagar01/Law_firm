@@ -350,13 +350,18 @@ class Task extends Model
                 ],
             ];
 
+            $assigneeId = $userId
+                ?: User::where('firm_id', $firmId)->whereIn('role', ['partner', 'associate', 'superadmin'])->first()?->id
+                ?: User::where('firm_id', $firmId)->first()?->id
+                ?: User::first()?->id;
+
             foreach ($samples as $idx => $sample) {
                 $targetMatter = $matters[$idx % $matters->count()] ?? $matter;
                 static::create(array_merge($sample, [
                     'firm_id' => $firmId,
                     'matter_id' => $targetMatter->id,
-                    'assigned_to' => $userId,
-                    'created_by' => $userId,
+                    'assigned_to' => $assigneeId,
+                    'created_by' => $assigneeId,
                 ]));
             }
         }

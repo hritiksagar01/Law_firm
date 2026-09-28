@@ -36,6 +36,10 @@ class LawFirmDashboardTest extends TestCase
         $response->assertSee('Waiting on you');
         $response->assertSee('Clients awaiting a reply');
         $response->assertSee('Client uploads to review');
+        $response->assertDontSee('No unanswered client messages.');
+        $response->assertDontSee('No pending client uploads to review.');
+        $response->assertSee('Important Notes');
+        $response->assertDontSee('No pinned strategy notes.');
         $response->assertSee('Recent activity on your matters');
         $response->assertSee('Next two weeks');
         $response->assertSee('open matter');
